@@ -1,0 +1,13 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# LES SUJETS QUE VOUS AVEZ RETIRÉS
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Un titre par ligne. La moisson ne les reproposera jamais, et la publication
+# les ignore. C'est le filet de sécurité : un sujet dont vous vous apercevez
+# après coup qu'il ne va pas sort d'ici et n'y revient plus.
+#
+# L'action « 5 · Publier → retirer » ajoute automatiquement une ligne ici.
+# Vous pouvez aussi en écrire à la main, avant même la première collecte.
+#
+# Le titre attendu est celui de l'article Wikipédia (français ou anglais).
+# ═══════════════════════════════════════════════════════════════════════════

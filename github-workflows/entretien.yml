@@ -1,0 +1,107 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  CURIO — ENTRETIEN
+#
+#    purger      sort du catalogue maitre tout ce que vous avez mis dans
+#                consignes/exclusions.txt. C est le geste qui suit « Copier
+#                pour exclusions.txt » dans la curation.
+#    recompter   recalcule anecdotes/index.json, donc les chiffres du site
+#    verifier    controle que les articles existent toujours sur Wikipedia
+#    nettoyer    retire les doublons herites des versions anterieures
+#    reclasser   recalcule les potentiels de l ancien catalog.json
+#
+#  Les deux derniers ne servent qu aux depots anterieurs a la version 8 :
+#  le catalogue maitre ne peut plus contenir de doublon.
+# ═══════════════════════════════════════════════════════════════════════════
+name: Entretien
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Quelle operation ?"
+        required: true
+        default: purger
+        type: choice
+        options:
+          - purger
+          - recompter
+          - verifier
+          - nettoyer
+          - reclasser
+
+permissions:
+  contents: write
+
+jobs:
+  curio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CURIO_CONTACT: "https://github.com/${{ github.repository }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: tools/.cache
+          key: curio-cache-${{ github.run_id }}
+          restore-keys: |
+            curio-cache-
+      - name: Verifier les scripts
+        run: |
+          for f in tools/build-catalog.mjs tools/write-anecdotes.mjs tools/controler.mjs tools/publier.mjs; do
+            [ -f "$f" ] || { echo "::error::$f est absent du depot. Importez le dossier tools/ en entier."; exit 1; }
+            node --check "$f"
+          done
+
+      - name: Executer
+        run: |
+          set -o pipefail
+          case "${{ github.event.inputs.operation }}" in
+            purger)    node tools/build-catalog.mjs --purger    2>&1 | tee curio.log ;;
+            recompter) node tools/write-anecdotes.mjs --index   2>&1 | tee curio.log ;;
+            verifier)  node tools/build-catalog.mjs --verifier  2>&1 | tee curio.log ;;
+            nettoyer)  node tools/build-catalog.mjs --nettoyer  2>&1 | tee curio.log ;;
+            reclasser) node tools/build-catalog.mjs --reclasser 2>&1 | tee curio.log ;;
+          esac
+
+      - name: Compte rendu
+        if: always()
+        run: |
+          {
+            echo "## Curio — entretien"
+            echo ""
+            echo '```'
+            tail -70 curio.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Enregistrer
+        if: always()
+        run: |
+          git config user.name  "curio-bot"
+          git config user.email "curio-bot@users.noreply.github.com"
+          rm -f curio.log
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json anecdotes controle.csv consignes/exclusions.txt; do
+            if [ -e "$p" ]; then
+              git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
+            fi
+          done
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau a enregistrer."
+            echo "> Rien de nouveau a enregistrer." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git commit -m "curio: entretien"
+          git pull --rebase --autostash || true
+          if git push; then
+            echo "Enregistre et publie."
+          else
+            echo "::error::Le push a echoue. Settings -> Actions -> General -> Workflow permissions -> Read and write."
+            exit 1
+          fi

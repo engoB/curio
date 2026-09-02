@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Curio — le catalogue</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  LE TABLEAU DE BORD
+
+  Une seule page, à ouvrir quand on veut savoir où on en est. Elle ne fait
+  rien : elle montre. Pas de case à cocher, pas de bouton qui engage, pas de
+  formulaire. On l'ouvre, on regarde, on ferme.
+
+  Elle lit deux fichiers du dépôt, produits par les actions :
+      catalogue-maitre.json    la liste de référence
+      anecdotes/index.json     ce qui est réellement en ligne
+
+  Tout se passe dans le navigateur, sans serveur et sans appel extérieur.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<style>
+:root{
+  --ink:#050E24; --ink-2:#0B1B3D; --ink-3:#12274F;
+  --line:rgba(150,190,255,.15); --line-fort:rgba(150,190,255,.30);
+  --texte:#EAF1FF; --texte-2:#9FB4DA; --texte-3:#6C82AD;
+  --accent:#3FA9FF; --accent-encre:#04122B; --accent-doux:rgba(63,169,255,.13);
+  --or:#F0C46A; --or-doux:rgba(240,196,106,.13);
+  --vert:#4ECBB9; --rouge:#FF7A85;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --ink:#EEF4FE; --ink-2:#FFFFFF; --ink-3:#E1EBFB;
+    --line:rgba(12,35,80,.14); --line-fort:rgba(12,35,80,.28);
+    --texte:#0A1B3D; --texte-2:#4A5F84; --texte-3:#7C8DAB;
+    --accent:#0B63C4; --accent-encre:#FFFFFF; --accent-doux:rgba(11,99,196,.10);
+    --or:#8A6512; --or-doux:rgba(138,101,18,.12);
+    --vert:#0E7C71; --rouge:#B32233;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--ink); color:var(--texte);
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.enveloppe{max-width:1180px;margin:0 auto;padding:26px 18px 60px}
+
+h1{font-size:23px;margin:0 0 4px;letter-spacing:-.01em}
+.sous{color:var(--texte-2);margin:0 0 22px;font-size:13.5px}
+.sous b{color:var(--texte);font-weight:600}
+.sous a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-doux)}
+
+/* ---------- les compteurs : ce qu'on vient chercher en premier ---------- */
+.chiffres{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:22px}
+.bloc{background:var(--ink-2);border:1px solid var(--line);border-radius:13px;padding:13px 15px}
+.bloc b{display:block;font-size:25px;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.bloc span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--texte-3);margin-top:5px}
+.bloc.k b{color:var(--accent)}
+.bloc.o b{color:var(--or)}
+
+/* ---------- les commandes ---------- */
+.commandes{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px;align-items:center}
+input[type=search],select{
+  font:inherit;font-size:13.5px;color:var(--texte);background:var(--ink-2);
+  border:1px solid var(--line-fort);border-radius:10px;padding:9px 12px;min-width:0;
+}
+input[type=search]{flex:1 1 240px}
+input[type=search]:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.compte{color:var(--texte-2);font-size:13px;margin-left:auto;font-variant-numeric:tabular-nums}
+
+/* ---------- la liste ---------- */
+.liste{display:flex;flex-direction:column;gap:8px}
+.item{
+  background:var(--ink-2);border:1px solid var(--line);border-radius:13px;
+  padding:12px 15px;
+}
+.meta{
+  display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px;
+  font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--texte-3);
+}
+.meta .pastille{width:7px;height:7px;border-radius:2px;flex:none}
+.meta b{padding:2px 7px;border-radius:6px;font-weight:700;font-size:10px;letter-spacing:.07em}
+.uni{color:var(--texte-2)}
+.lg{padding:2px 6px;border-radius:5px;background:var(--ink-3);color:var(--texte-2);font-size:9.5px;letter-spacing:.1em}
+.src-phare{background:var(--or);color:#17120A}
+.src-insolite{background:var(--accent);color:var(--accent-encre)}
+.src-saviez{background:var(--vert);color:var(--accent-encre)}
+.src-categorie{border:1px dashed var(--line-fort);color:var(--texte-3)}
+.src-reddit{background:#FF5A1F;color:#2A0A00}
+.src-manuel{background:var(--ink-3);color:var(--texte-2);border:1px solid var(--line-fort)}
+.croise{background:var(--accent-doux);color:var(--accent);border:1px solid var(--accent)}
+.note{border:1px solid var(--line-fort);color:var(--texte-2);font-variant-numeric:tabular-nums}
+.et-publie{background:var(--accent);color:var(--accent-encre)}
+.et-reserve{border:1px solid var(--accent);color:var(--accent);background:var(--accent-doux)}
+.et-ecrit{background:var(--or-doux);color:var(--or);border:1px solid var(--or-doux)}
+.et-quarantaine{background:var(--rouge);color:#2A0509}
+.et-retire{border:1px solid var(--line);color:var(--texte-3);text-decoration:line-through}
+.et-aecrire{border:1px solid var(--line);color:var(--texte-3)}
+
+.item h2{font-size:15.5px;margin:0 0 2px;font-weight:650;letter-spacing:-.005em}
+.item h2 a{color:inherit;text-decoration:none}
+.item h2 a:hover{color:var(--accent)}
+.autre{font-size:12px;color:var(--texte-3);margin:0 0 5px}
+.phrase{margin:0;font-size:13.5px;line-height:1.5;color:var(--texte-2)}
+.phrase.contrib{color:var(--texte);border-left:2px solid var(--accent);padding-left:9px}
+
+.copier{
+  font:inherit;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--texte-3);background:none;border:1px solid var(--line);border-radius:6px;
+  padding:2px 8px;cursor:pointer;margin-left:auto;
+}
+.copier:hover{color:var(--accent);border-color:var(--accent)}
+.copier.fait{color:var(--accent);border-color:var(--accent);background:var(--accent-doux)}
+
+/* ---------- que faire si quelque chose ne va pas ---------- */
+.aide{background:var(--ink-2);border:1px solid var(--line);border-radius:13px;
+  padding:4px 18px;margin-bottom:22px}
+.aide summary{cursor:pointer;padding:12px 0;font-weight:600;font-size:14px;list-style:none}
+.aide summary::-webkit-details-marker{display:none}
+.aide summary::before{content:"▸ ";color:var(--accent)}
+.aide[open] summary::before{content:"▾ "}
+.aide table{width:100%;border-collapse:collapse;margin:4px 0 16px;font-size:13.5px}
+.aide td{padding:9px 0;border-top:1px solid var(--line);vertical-align:top;color:var(--texte-2)}
+.aide td:first-child{width:38%;padding-right:16px;color:var(--texte);font-weight:600}
+.aide b{color:var(--accent);font-weight:600}
+.aide code{background:var(--ink-3);padding:1px 5px;border-radius:4px}
+
+.vide{padding:44px 16px;text-align:center;color:var(--texte-3);font-size:14px}
+.plus{margin:18px auto 0;display:block;font:inherit;font-size:13.5px;color:var(--accent);
+  background:var(--accent-doux);border:1px solid var(--accent);border-radius:10px;padding:10px 22px;cursor:pointer}
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);color:var(--texte-3);font-size:12px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--texte-2)}
+</style>
+</head>
+<body>
+<div class="enveloppe">
+
+  <h1>Le catalogue</h1>
+  <p class="sous" id="entete">Chargement…</p>
+
+  <div class="chiffres" id="chiffres"></div>
+
+  <details class="aide">
+    <summary>Un doublon, une erreur, une fiche qui n’a pas sa place — que faire ?</summary>
+    <p style="color:var(--texte-2);font-size:13.5px;margin:0 0 12px">
+      Tout se règle depuis l’onglet <b>Actions</b> de votre dépôt, avec le titre
+      exact du sujet. Le bouton <b>copier</b> de chaque ligne le met dans votre
+      presse-papiers : collez-le dans le champ <code>titre</code> de l’action.
+    </p>
+    <table>
+      <tr>
+        <td>Le sujet n’a rien à faire là</td>
+        <td><b>5 · Publier → retirer</b><br>
+            Il sort des deux langues, disparaît du site, et son titre s’inscrit
+            dans <code>consignes/exclusions.txt</code> : la moisson ne le
+            reproposera jamais. Réversible avec <b>rendre</b>.</td>
+      </tr>
+      <tr>
+        <td>Le sujet est bon, mais le texte est raté</td>
+        <td><b>5 · Publier → refaire</b><br>
+            Les deux fiches sont effacées et le sujet repasse « à écrire ».
+            La prochaine tranche de <b>2 · Écrire</b> le reprendra en priorité,
+            avec la consigne telle qu’elle sera ce jour-là.</td>
+      </tr>
+      <tr>
+        <td>Il n’est pas encore écrit et je n’en veux pas</td>
+        <td>Ajoutez son titre à <code>consignes/exclusions.txt</code> — vous
+            pouvez en coller cent d’un coup — puis lancez
+            <b>Entretien → purger</b>. Ils sortent du catalogue.</td>
+      </tr>
+      <tr>
+        <td>Deux lignes pour le même sujet</td>
+        <td>Cela ne devrait pas arriver : l’identité d’un sujet est son
+            identifiant Wikidata, pas son titre. Si vous en voyez une,
+            <b>retirez</b> l’une des deux et signalez-le-moi : c’est un défaut,
+            pas un réglage.</td>
+      </tr>
+      <tr>
+        <td>La consigne d’écriture ne me plaît pas</td>
+        <td>Modifiez <code>consignes/fr.md</code> et <code>en.md</code>
+            directement sur GitHub. Les tranches suivantes l’appliquent. Pour
+            réécrire ce qui l’a été avec l’ancienne, utilisez <b>refaire</b>.</td>
+      </tr>
+    </table>
+  </details>
+
+  <div class="commandes">
+    <input type="search" id="q" placeholder="Chercher : méduse, nyos, galaxie…" aria-label="Chercher">
+    <select id="uni" aria-label="Univers"><option value="">Tous les univers</option></select>
+    <select id="src" aria-label="Provenance">
+      <option value="">Toutes provenances</option>
+      <option value="phare">★ Sujets phares</option>
+      <option value="insolite">Articles insolites</option>
+      <option value="saviez">Le saviez-vous ?</option>
+      <option value="reddit">Reddit</option>
+      <option value="manuel">Ajouts manuels</option>
+      <option value="croise">Trouvé dans 2 sources ou plus</option>
+    </select>
+    <select id="etat" aria-label="État">
+      <option value="">Tous les états</option>
+      <option value="aecrire">À écrire</option>
+      <option value="ecrit">Écrit</option>
+      <option value="publie">En ligne</option>
+      <option value="retire">Retiré</option>
+    </select>
+    <select id="tri" aria-label="Tri">
+      <option value="potentiel">Trier par potentiel</option>
+      <option value="sources">Trier par nombre de sources</option>
+      <option value="titre">Trier par titre</option>
+      <option value="recent">Les derniers arrivés</option>
+    </select>
+    <span class="compte" id="compte"></span>
+  </div>
+
+  <div class="liste" id="liste"></div>
+  <button class="plus" id="plus" hidden>Afficher la suite</button>
+
+  <footer id="pied"></footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var NOMS = {
+  cosmos:['Cosmos',196], vivant:['Le Vivant',148], histoire:['Histoire oubliée',28],
+  esprit:['Corps & Esprit',320], sciences:['Sciences & Inventions',262],
+  mysteres:['Mystères',8], terre:['Terre & Océans',178], arts:['Arts & Civilisations',44]
+};
+var LOT = 120;
+var sujets = [], vue = [], montres = 0;
+
+function $(s){ return document.querySelector(s); }
+function el(t,c,h){ var n=document.createElement(t); if(c)n.className=c; if(h!=null)n.innerHTML=h; return n; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function nb(n){ return Number(n||0).toLocaleString('fr-FR'); }
+
+/* accents repliés : « meduse » doit trouver « méduse » */
+function plier(t){
+  return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[’']/g,"'").toLowerCase();
+}
+
+function etatDe(s){
+  if(s.statut === 'retire') return 'retire';
+  if(s.publie) return 'publie';
+  if(s.statut === 'ecrit' || s.ecrit) return 'ecrit';
+  return 'aecrire';
+}
+var ETIQ = { aecrire:'à écrire', ecrit:'écrit', publie:'en ligne', retire:'retiré' };
+
+function charger(){
+  return fetch('catalogue-maitre.json', {cache:'no-cache'}).then(function(r){
+    if(!r.ok) throw new Error('absent');
+    return r.json();
+  });
+}
+
+function compter(){
+  var c = { total:sujets.length, phare:0, insolite:0, saviez:0, croise:0,
+            aecrire:0, ecrit:0, publie:0, retire:0, bilingue:0 };
+  sujets.forEach(function(s){
+    var src = s.sources || [];
+    if(src.indexOf('phare') >= 0) c.phare++;
+    if(src.indexOf('insolite') >= 0) c.insolite++;
+    if(src.indexOf('saviez') >= 0) c.saviez++;
+    if(src.length >= 2) c.croise++;
+    if(s.fr && s.en) c.bilingue++;
+    c[etatDe(s)]++;
+  });
+  return c;
+}
+
+function peindreChiffres(){
+  var c = compter();
+  var blocs = [
+    ['k', c.total, 'sujets vérifiés'],
+    ['',  c.croise, 'dans 2 sources ou +'],
+    ['o', c.phare, 'sujets phares'],
+    ['',  c.insolite, 'articles insolites'],
+    ['',  c.saviez, 'le saviez-vous ?'],
+    ['k', c.publie, 'en ligne'],
+    ['',  c.ecrit, 'écrits, en réserve'],
+    ['',  c.aecrire, 'restent à écrire']
+  ];
+  var box = $('#chiffres'); box.innerHTML = '';
+  blocs.forEach(function(b){
+    box.appendChild(el('div','bloc '+b[0], '<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>'));
+  });
+}
+
+function filtrer(){
+  var q = plier($('#q').value.trim());
+  var u = $('#uni').value, sf = $('#src').value, ef = $('#etat').value, tri = $('#tri').value;
+
+  vue = sujets.filter(function(s){
+    if(u && s.uni !== u) return false;
+    var src = s.sources || [];
+    if(sf === 'croise'){ if(src.length < 2) return false; }
+    else if(sf && src.indexOf(sf) < 0) return false;
+    if(ef && etatDe(s) !== ef) return false;
+    if(q){
+      if(!s._foin) s._foin = plier([s.fr, s.en, s.phrase, s.apercu,
+        (NOMS[s.uni]||[''])[0]].filter(Boolean).join(' '));
+      if(s._foin.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+
+  if(tri === 'titre') vue.sort(function(a,b){
+    return String(a.fr||a.en).localeCompare(String(b.fr||b.en),'fr'); });
+  else if(tri === 'sources') vue.sort(function(a,b){
+    return (b.sources||[]).length - (a.sources||[]).length || b.potentiel - a.potentiel; });
+  else if(tri === 'recent') vue.sort(function(a,b){
+    return String(b.ajoute||'').localeCompare(String(a.ajoute||'')) || b.potentiel - a.potentiel; });
+  else vue.sort(function(a,b){
+    return b.potentiel - a.potentiel || (b.sources||[]).length - (a.sources||[]).length; });
+
+  montres = 0;
+  $('#liste').innerHTML = '';
+  $('#compte').textContent = nb(vue.length) + (vue.length > 1 ? ' sujets affichés' : ' sujet affiché');
+  if(!vue.length){
+    $('#liste').appendChild(el('div','vide','Rien ne correspond. Effacez la recherche ou élargissez les filtres.'));
+    $('#plus').hidden = true;
+    return;
+  }
+  suite();
+}
+
+function ligne(s){
+  var uni = NOMS[s.uni] || [s.uni, 200];
+  var src = (s.sources || []);
+  var et  = etatDe(s);
+  var lien = s.fr ? 'https://fr.wikipedia.org/wiki/' + encodeURIComponent(s.fr.replace(/ /g,'_'))
+                  : 'https://en.wikipedia.org/wiki/' + encodeURIComponent(String(s.en).replace(/ /g,'_'));
+
+  var meta = '<i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i>'
+           + '<span class="uni">'+esc(uni[0])+'</span>'
+           + (s.fr ? '<span class="lg">FR</span>' : '')
+           + (s.en ? '<span class="lg">EN</span>' : '')
+           + '<b class="note">'+(s.potentiel||1)+'/10</b>';
+  src.forEach(function(x){ meta += '<b class="src-'+x+'">'+esc(x === 'saviez' ? 'le saviez-vous' : x)+'</b>'; });
+  if(src.length >= 2) meta += '<b class="croise">'+src.length+' sources</b>';
+  meta += '<b class="et-'+et+'">'+ETIQ[et]+'</b>';
+
+  var n = el('article','item');
+  var mrow = el('div','meta', meta);
+  /* Le titre EXACT, celui que les actions attendent. Le retaper à la main est
+     la meilleure façon de se tromper d'accent ; un clic suffit. */
+  var cp = el('button','copier','copier');
+  cp.type = 'button';
+  cp.title = 'Copier le titre exact, pour le coller dans une action';
+  cp.addEventListener('click', function(){
+    var t = s.fr || s.en;
+    var fini = function(){ cp.textContent = 'copié'; cp.className = 'copier fait';
+      setTimeout(function(){ cp.textContent = 'copier'; cp.className = 'copier'; }, 1400); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(fini, function(){ window.prompt('Titre :', t); });
+    } else { window.prompt('Titre :', t); }
+  });
+  mrow.appendChild(cp);
+  n.appendChild(mrow);
+  n.appendChild(el('h2', null, '<a href="'+lien+'" target="_blank" rel="noopener">'+esc(s.fr || s.en)+'</a>'));
+  if(s.fr && s.en && s.fr !== s.en) n.appendChild(el('p','autre', esc(s.en)));
+  var duContrib = !!s.phrase;
+  var txt = s.phrase || s.apercu || '';
+  if(txt) n.appendChild(el('p','phrase' + (duContrib ? ' contrib' : ''), esc(txt)));
+  return n;
+}
+
+function suite(){
+  var box = $('#liste');
+  var fin = Math.min(montres + LOT, vue.length);
+  var frag = document.createDocumentFragment();
+  for(var i = montres; i < fin; i++) frag.appendChild(ligne(vue[i]));
+  box.appendChild(frag);
+  montres = fin;
+  $('#plus').hidden = montres >= vue.length;
+  $('#plus').textContent = 'Afficher la suite (' + nb(vue.length - montres) + ' restants)';
+}
+
+function demarrer(doc){
+  sujets = (doc.sujets || []).filter(function(s){ return s && (s.fr || s.en); });
+
+  var jour = String(doc.genere || '').slice(0,10);
+  $('#entete').innerHTML = '<b>' + nb(sujets.length) + ' sujets</b>, tous vérifiés, aucun doublon — '
+    + 'liste établie le ' + esc(jour || '—') + '. '
+    + 'Elle se met à jour toute seule chaque nuit.';
+
+  var us = {};
+  sujets.forEach(function(s){ us[s.uni] = (us[s.uni]||0)+1; });
+  var sel = $('#uni');
+  Object.keys(us).sort(function(a,b){ return us[b]-us[a]; }).forEach(function(k){
+    var o = document.createElement('option');
+    o.value = k; o.textContent = ((NOMS[k]||[k])[0]) + ' (' + nb(us[k]) + ')';
+    sel.appendChild(o);
+  });
+
+  peindreChiffres();
+  filtrer();
+
+  ['q','uni','src','etat','tri'].forEach(function(id){
+    var n = document.getElementById(id);
+    n.addEventListener(id === 'q' ? 'input' : 'change', filtrer);
+  });
+  $('#plus').addEventListener('click', suite);
+
+  $('#pied').innerHTML = 'Cette page ne fait rien : elle montre. Elle lit '
+    + '<code>catalogue-maitre.json</code>, produit par l’action <b>1 · Moissonner</b>, '
+    + 'qui tourne toute seule chaque nuit à minuit. Pour corriger quoi que ce soit, '
+    + 'dépliez « Un doublon, une erreur… » en haut de page.';
+}
+
+charger().then(demarrer).catch(function(){
+  $('#entete').textContent = 'Le catalogue n’a pas encore été construit.';
+  $('#chiffres').innerHTML = '';
+  $('#liste').appendChild(el('div','vide',
+    'Lancez l’action <b>1 · Moissonner</b> dans l’onglet Actions de votre dépôt.<br>'
+    + 'Elle est gratuite et dure une demi-heure. Revenez ensuite sur cette page.'));
+  $('#pied').textContent = '';
+});
+})();
+</script>
+</body>
+</html>

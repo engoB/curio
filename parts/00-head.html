@@ -1,0 +1,1175 @@
+<title>Curio</title>
+<meta name="description" content="Des anecdotes vraies, écrites pour être lues : deux minutes par récit, une par écran. Cosmos, histoire, vivant, mystères." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&family=Archivo:wght@400;500;600;700&display=swap" />
+
+<!-- Curio s'installe sur l'écran d'accueil comme une application : plein
+     écran, sans barre d'adresse, et lisible hors ligne. -->
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icones/curio-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icones/curio-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Curio" />
+<style>
+/* ============================================================
+   CURIO — design tokens
+   Palette : encre bleu-nuit / patine de cuivre (verdigris) / laiton
+   Type    : Fraunces (display, opsz variable) + Archivo (UI)
+   ============================================================ */
+:root{
+  /* Taille de lecture : réglable par le lecteur (petit / normal / grand).
+     Tout le corps de texte en dérive, jamais une valeur en dur. */
+  --lecture:1;
+  /* hauteur réelle de la barre haute, mesurée au chargement */
+  --barre:64px;
+  --ink:#050E24; --ink-2:#0B1B3D; --ink-3:#12274F; --ink-4:#1B3364;
+  --topbar:rgba(5,14,36,.84);
+  --line:rgba(150,190,255,.15); --line-strong:rgba(150,190,255,.28);
+  --text:#EAF1FF; --text-2:#9DB4D8; --text-3:#6A82A8;
+  --accent:#3FA9FF; --accent-2:#1668C7; --accent-ink:#04162E;
+  --accent-soft:rgba(63,169,255,.16);
+  --brass:#F0C46A; --brass-soft:rgba(240,196,106,.15); --brass-ink:#20170A;
+  --scrim:linear-gradient(to top,var(--ink) 0%,rgba(5,14,36,.975) 40%,rgba(5,14,36,.86) 58%,rgba(5,14,36,.30) 80%,rgba(5,14,36,.50) 100%);
+  --panel:rgba(5,14,36,.76);
+  --panel-line:rgba(150,190,255,.18);
+  --panel-hi:rgba(160,200,255,.12);
+  --scrim-center:radial-gradient(120% 90% at 50% 50%,rgba(5,14,36,.55) 0%,rgba(5,14,36,.72) 55%,rgba(5,14,36,.88) 100%);
+  --sheet:rgba(5,14,36,.95);
+  --shadow:0 24px 60px -18px rgba(2,8,22,.8);
+  --img-filter:saturate(1.06) contrast(1.04);
+  --grain:.055;
+  --r:14px;
+}
+:root[data-theme="light"]{
+  --ink:#EEF4FE; --ink-2:#FFFFFF; --ink-3:#E1EBFB; --ink-4:#CEDDF5;
+  --topbar:rgba(238,244,254,.88);
+  --line:rgba(12,35,80,.14); --line-strong:rgba(12,35,80,.28);
+  --text:#0A1B3D; --text-2:#4A5F84; --text-3:#7C8DAB;
+  --accent:#0B63C4; --accent-2:#08498F; --accent-ink:#FFFFFF;
+  --accent-soft:rgba(11,99,196,.11);
+  --brass:#8A6512; --brass-soft:rgba(138,101,18,.13); --brass-ink:#FFFFFF;
+  --scrim:linear-gradient(to top,var(--ink) 0%,rgba(238,244,254,.99) 42%,rgba(238,244,254,.92) 60%,rgba(238,244,254,.22) 81%,rgba(238,244,254,.45) 100%);
+  --panel:rgba(250,252,255,.90);
+  --panel-line:rgba(12,35,80,.15);
+  --panel-hi:rgba(255,255,255,.85);
+  --scrim-center:radial-gradient(120% 90% at 50% 50%,rgba(238,244,254,.5) 0%,rgba(238,244,254,.68) 55%,rgba(238,244,254,.86) 100%);
+  --sheet:rgba(238,244,254,.96);
+  --shadow:0 24px 60px -22px rgba(8,28,70,.24);
+  --img-filter:saturate(.96) contrast(1.02);
+  --grain:.03;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --ink:#EEF4FE; --ink-2:#FFFFFF; --ink-3:#E1EBFB; --ink-4:#CEDDF5;
+    --topbar:rgba(238,244,254,.88);
+    --line:rgba(12,35,80,.14); --line-strong:rgba(12,35,80,.28);
+    --text:#0A1B3D; --text-2:#4A5F84; --text-3:#7C8DAB;
+    --accent:#0B63C4; --accent-2:#08498F; --accent-ink:#FFFFFF;
+    --accent-soft:rgba(11,99,196,.11);
+    --brass:#8A6512; --brass-soft:rgba(138,101,18,.13); --brass-ink:#FFFFFF;
+    --scrim:linear-gradient(to top,var(--ink) 0%,rgba(238,244,254,.99) 42%,rgba(238,244,254,.92) 60%,rgba(238,244,254,.22) 81%,rgba(238,244,254,.45) 100%);
+    --panel:rgba(250,252,255,.90);
+  --panel-line:rgba(12,35,80,.15);
+  --panel-hi:rgba(255,255,255,.85);
+    --sheet:rgba(238,244,254,.96);
+    --shadow:0 24px 60px -22px rgba(8,28,70,.24);
+    --img-filter:saturate(.96) contrast(1.02);
+    --grain:.03;
+  }
+}
+
+/* ═══════════════ la palette d'origine, celle d'avant le bleu ═══════════════
+   Le bleu profond n'a pas plu à tout le monde, et il n'y a aucune raison
+   d'imposer un goût. Un second jeu de teintes — l'encre presque noire et le
+   vert-de-gris des premières versions — reste disponible : le menu « … »
+   bascule `data-palette="origine"` sur la racine, et rien d'autre ne change.
+   Aucun composant ne connaît une couleur en dur ; tout passe par ces jetons. */
+:root[data-palette="origine"]{
+  --ink:#080B11; --ink-2:#10151F; --ink-3:#19212E; --ink-4:#232D3D;
+  --topbar:rgba(8,11,17,.82);
+  --line:rgba(255,255,255,.10); --line-strong:rgba(255,255,255,.18);
+  --text:#EDF1F5; --text-2:#9DAAB9; --text-3:#68737F;
+  --accent:#4ECBB9; --accent-2:#1D8377; --accent-ink:#05201D;
+  --accent-soft:rgba(78,203,185,.14);
+  --brass:#E3B95F; --brass-soft:rgba(227,185,95,.13); --brass-ink:#241A05;
+  --scrim:linear-gradient(to top,var(--ink) 0%,rgba(8,11,17,.975) 40%,rgba(8,11,17,.86) 58%,rgba(8,11,17,.30) 80%,rgba(8,11,17,.50) 100%);
+  --panel:rgba(8,11,17,.74);
+  --panel-line:rgba(255,255,255,.13);
+  --panel-hi:rgba(255,255,255,.10);
+  --scrim-center:radial-gradient(120% 90% at 50% 50%,rgba(8,11,17,.55) 0%,rgba(8,11,17,.72) 55%,rgba(8,11,17,.88) 100%);
+  --sheet:rgba(8,11,17,.95);
+}
+:root[data-palette="origine"][data-theme="light"]{
+  --ink:#F4F3F0; --ink-2:#FFFFFF; --ink-3:#EAE8E3; --ink-4:#DCD9D2;
+  --topbar:rgba(244,243,240,.86);
+  --line:rgba(18,24,33,.13); --line-strong:rgba(18,24,33,.26);
+  --text:#131820; --text-2:#57616F; --text-3:#8A929C;
+  --accent:#0E7C71; --accent-2:#0A5C54; --accent-ink:#FFFFFF;
+  --accent-soft:rgba(14,124,113,.11);
+  --brass:#8C6A17; --brass-soft:rgba(140,106,23,.12); --brass-ink:#FFFFFF;
+  --scrim:linear-gradient(to top,var(--ink) 0%,rgba(244,243,240,.99) 42%,rgba(244,243,240,.92) 60%,rgba(244,243,240,.22) 81%,rgba(244,243,240,.45) 100%);
+  --panel:rgba(252,251,249,.88);
+  --panel-line:rgba(18,24,33,.14);
+  --panel-hi:rgba(255,255,255,.85);
+  --scrim-center:radial-gradient(120% 90% at 50% 50%,rgba(244,243,240,.5) 0%,rgba(244,243,240,.68) 55%,rgba(244,243,240,.86) 100%);
+  --sheet:rgba(244,243,240,.96);
+  --shadow:0 24px 60px -22px rgba(20,26,36,.28);
+}
+@media (prefers-color-scheme: light){
+  :root[data-palette="origine"]:not([data-theme="dark"]){
+    --ink:#F4F3F0; --ink-2:#FFFFFF; --ink-3:#EAE8E3; --ink-4:#DCD9D2;
+    --topbar:rgba(244,243,240,.86);
+    --line:rgba(18,24,33,.13); --line-strong:rgba(18,24,33,.26);
+    --text:#131820; --text-2:#57616F; --text-3:#8A929C;
+    --accent:#0E7C71; --accent-2:#0A5C54; --accent-ink:#FFFFFF;
+    --accent-soft:rgba(14,124,113,.11);
+    --brass:#8C6A17; --brass-soft:rgba(140,106,23,.12); --brass-ink:#FFFFFF;
+    --scrim:linear-gradient(to top,var(--ink) 0%,rgba(244,243,240,.99) 42%,rgba(244,243,240,.92) 60%,rgba(244,243,240,.22) 81%,rgba(244,243,240,.45) 100%);
+    --panel:rgba(252,251,249,.88);
+    --panel-line:rgba(18,24,33,.14);
+    --panel-hi:rgba(255,255,255,.85);
+    --sheet:rgba(244,243,240,.96);
+    --shadow:0 24px 60px -22px rgba(20,26,36,.28);
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--ink); color:var(--text);
+  font-family:Archivo,"Helvetica Neue",Arial,system-ui,sans-serif;
+  font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;
+}
+button,input,select{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+a{color:var(--accent);text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+::selection{background:var(--accent);color:var(--accent-ink)}
+
+/* grain plate — donne au feed un rendu de planche imprimée */
+#grain{
+  position:fixed;inset:0;z-index:60;pointer-events:none;opacity:var(--grain);
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- barre haute ---------- */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:40;
+  display:flex;align-items:center;gap:7px;flex-wrap:nowrap;
+  padding:calc(env(safe-area-inset-top,0px) + 10px) clamp(10px,3vw,24px) 11px;
+  pointer-events:none;
+}
+/* Le fond flouté est porté par un calque séparé : sans quoi son dégradé de
+   masquage rognerait aussi le tiroir « … » qui se déplie sous la barre. */
+.topbar::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(to bottom,var(--topbar) 0%,var(--topbar) 66%,transparent 100%);
+  -webkit-backdrop-filter:blur(18px) saturate(1.25);
+          backdrop-filter:blur(18px) saturate(1.25);
+  -webkit-mask-image:linear-gradient(to bottom,#000 74%,transparent);
+          mask-image:linear-gradient(to bottom,#000 74%,transparent);
+}
+.topbar > *{pointer-events:auto;flex:0 0 auto}
+.tbgap{flex:1 1 auto !important;min-width:0}
+
+/* le tiroir « … » : ce qui ne tient pas sur un telephone */
+.tbmore{
+  position:absolute;top:100%;right:clamp(10px,3vw,24px);
+  display:none;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;
+  max-width:min(320px,86vw);
+  padding:10px 11px;border-radius:14px;
+  border:1px solid var(--line-strong);background:var(--ink-2);
+  box-shadow:0 22px 60px -26px rgba(0,0,0,.75);
+}
+.tbmore.open{display:flex}
+.iconbtn--more{position:relative}
+@media (min-width:900px){
+  /* sur grand ecran tout tient : le tiroir se deplie dans la barre */
+  .iconbtn--more{display:none}
+  .tbmore{
+    position:static;display:flex;background:none;border:0;box-shadow:none;
+    padding:0;max-width:none;
+  }
+}
+
+.brand{display:flex;align-items:baseline;gap:9px;letter-spacing:-.02em;min-width:0}
+.brand b{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:21px;font-variation-settings:"SOFT" 40,"WONK" 1;flex:none}
+/* Le statut du compte, à côté du nom : on doit savoir en un coup d'œil si
+   on est en gratuit ou en illimité. Trois mots au maximum, jamais tronqués. */
+.planbadge{
+  align-self:center;flex:none;display:inline-block;
+  font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:4px 8px;border-radius:7px;white-space:nowrap;line-height:1.5;
+  color:var(--text-3);border:1px solid var(--line);
+}
+.planbadge i{
+  font-style:normal;margin-left:6px;padding-left:6px;border-left:1px solid var(--line);
+  font-size:10px;font-variant-numeric:tabular-nums;color:var(--text-2);
+}
+.planbadge.bas i{color:var(--brass)}
+.planbadge.paye{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.planbadge.vie{color:var(--brass);border-color:var(--brass);background:var(--brass-soft)}
+@media (max-width:420px){ .planbadge{font-size:8.5px;padding:3px 7px;letter-spacing:.09em} }
+
+.iconbtn{
+  width:36px;height:36px;display:grid;place-items:center;border-radius:11px;position:relative;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--text-2);
+  transition:color .18s,border-color .18s,background .18s,transform .18s;
+}
+.iconbtn:hover{color:var(--text);border-color:var(--line-strong);transform:translateY(-1px)}
+.iconbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn .dot{
+  position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 2px var(--ink-2);
+}
+.langbtn{
+  height:36px;padding:0 12px;border-radius:11px;border:1px solid var(--line-strong);
+  background:var(--ink-2);color:var(--text-2);font-size:11px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+}
+.langbtn:hover{color:var(--text)}
+.streak{
+  height:38px;display:flex;align-items:center;gap:7px;padding:0 13px;border-radius:11px;
+  border:1px solid var(--brass-soft);background:var(--brass-soft);color:var(--brass);
+  font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;
+}
+.streak svg{width:14px;height:14px;fill:currentColor}
+
+/* ---------- feed ---------- */
+.feed{
+  height:100dvh;overflow-y:scroll;scroll-snap-type:y mandatory;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.feed::-webkit-scrollbar{display:none}
+
+.card{
+  position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;
+  overflow:hidden;display:flex;align-items:flex-end;isolation:isolate;
+}
+.card__media{position:absolute;inset:0;z-index:0;background:var(--ink-2)}
+.card__media img,.card__media canvas{
+  width:100%;height:100%;object-fit:cover;display:block;filter:var(--img-filter);
+  transform:scale(1.06);
+}
+.card__media img{opacity:0;transition:opacity .7s ease}
+.card__media img.ready{opacity:1}
+@media (prefers-reduced-motion:no-preference){
+  .card.is-active .card__media img,.card.is-active .card__media canvas{
+    animation:kb 26s ease-out forwards;
+  }
+}
+@keyframes kb{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.19) translate3d(0,-1.5%,0)}}
+.card__scrim{position:absolute;inset:0;z-index:1;background:var(--scrim)}
+
+.card__body{
+  position:relative;z-index:2;width:100%;
+  padding:calc(env(safe-area-inset-top,0px) + var(--barre) + 26px) clamp(24px,6vw,64px)
+          calc(env(safe-area-inset-bottom,0px) + 30px) clamp(18px,5vw,42px);
+  max-width:min(820px,100%);
+  height:100%;display:flex;flex-direction:column;justify-content:flex-start;
+  min-height:0;overflow:hidden;
+}
+/* Le contenu est calé en bas — mais par une marge automatique, pas par
+   justify-content : sinon, dès que le texte agrandi dépasse la hauteur, il
+   déborde VERS LE HAUT et passe sous la barre. Avec margin-top:auto il reste
+   toujours sous elle, et c'est le bas qui défile. */
+.card__body > :first-child{margin-top:auto}
+.card.is-active .card__body > *{animation:rise .62s cubic-bezier(.16,1,.3,1) both}
+.card.is-active .card__body > *:nth-child(2){animation-delay:.06s}
+.card.is-active .card__body > *:nth-child(3){animation-delay:.12s}
+.card.is-active .card__body > *:nth-child(4){animation-delay:.18s}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.card.is-active .card__body > *{animation:none}}
+
+.eyebrow{
+  display:flex;align-items:center;gap:9px;flex-wrap:nowrap;margin:0 0 14px;
+  font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--text-2);
+  /* la hauteur de ligne est explicite : sans elle, les majuscules accentuées
+     dépassent la boîte et se font rogner */
+  line-height:1.6;min-height:1.6em;white-space:nowrap;
+}
+.eyebrow .subj{overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto;line-height:inherit}
+.eyebrow .mins{flex:none}
+.eyebrow .sep{opacity:.55}
+.eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.eyebrow .sep{color:var(--text-3);letter-spacing:0}
+.card h2{
+  font-family:Fraunces,Georgia,serif;font-weight:450;font-variation-settings:"SOFT" 26,"WONK" 1;
+  font-size:calc(clamp(26px,4.6vw,44px) * var(--lecture));
+  line-height:1.08;letter-spacing:-.025em;
+  margin:0 0 20px;text-wrap:balance;
+}
+.card .lede{
+  margin:0 0 18px;max-width:60ch;
+  flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin;
+  scrollbar-color:var(--line-strong) transparent;
+}
+.card .lede::-webkit-scrollbar{width:3px}
+.card .lede::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px}
+.card .lede{scroll-behavior:smooth}
+.card .lede.more{
+  -webkit-mask-image:linear-gradient(to bottom,#000 82%,rgba(0,0,0,.25) 100%);
+          mask-image:linear-gradient(to bottom,#000 82%,rgba(0,0,0,.25) 100%);
+}
+.card .lede p{
+  margin:0 0 1.5em;
+  font-size:calc(clamp(17px,2vw,19px) * var(--lecture));
+  line-height:1.78;color:var(--text);
+  letter-spacing:.002em;
+  text-wrap:pretty;
+}
+/* La première phrase porte le texte : on lui donne un peu plus de présence. */
+.card .lede p:first-child{
+  font-size:calc(clamp(18px,2.2vw,21px) * var(--lecture));
+  line-height:1.62;color:var(--text);
+}
+.card .lede p:last-child{margin-bottom:.4em}
+.card .lede strong{font-weight:600;color:var(--text);box-shadow:inset 0 -.42em 0 var(--accent-soft)}
+.card .lede em{font-style:italic;color:var(--text-2)}
+.card .lede p:last-child{margin-bottom:0}
+.card .lede .sec{
+  margin:1.5em 0 .5em;font-size:10.5px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent);
+}
+.card .lede .sec:first-child{margin-top:0}
+.curraw{
+  width:100%;min-height:132px;margin:0 0 14px;padding:11px 13px;border-radius:12px;resize:vertical;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--text-2);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.55;
+}
+
+/* ---------- curation : etat du stock, onglets, sources ---------- */
+.curstats{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.cs{
+  display:inline-flex;align-items:baseline;gap:6px;padding:6px 12px;border-radius:999px;
+  border:1px solid var(--line);background:var(--ink-2);
+  font-size:11.5px;color:var(--text-2);white-space:nowrap;
+}
+.cs b{font-size:15px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.cs--ok{border-color:var(--accent);background:var(--accent-soft)}
+.cs--ok b{color:var(--accent)}
+.cs--soft{opacity:.72}
+.curtabs{display:flex;gap:6px;margin:0 0 14px;border-bottom:1px solid var(--line)}
+.curtab{
+  padding:9px 14px;border-radius:10px 10px 0 0;margin-bottom:-1px;
+  border:1px solid transparent;border-bottom:0;
+  font-size:13px;font-weight:600;color:var(--text-3);
+}
+.curtab.on{color:var(--text);border-color:var(--line);background:var(--ink-2)}
+.curhelp{margin:0 0 12px;font-size:13.5px;line-height:1.55;color:var(--text-2);max-width:64ch}
+.curaddrow{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.curaddrow input{
+  flex:1 1 220px;min-width:0;height:40px;padding:0 13px;border-radius:11px;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--text);font-size:14px;
+}
+.curaddrow select{
+  height:40px;padding:0 11px;border-radius:11px;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--text);font-size:13.5px;
+}
+.cursrclist{display:flex;flex-direction:column;gap:8px}
+.cursrc{
+  display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:12px;
+  border:1px solid var(--line);background:var(--ink-2);
+}
+.cursrc .sw{width:9px;height:9px;border-radius:3px;flex:none}
+.cursrc .tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
+.cursrc .tx b{font-size:14px;font-weight:600}
+.cursrc .tx i{font-style:normal;font-size:11.5px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cursrc__x{flex:none;width:28px;height:28px;border-radius:8px;color:var(--text-3);font-size:18px;line-height:1}
+.cursrc__x:hover{color:var(--text);background:var(--ink-3)}
+.curmeta .pot{
+  font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;
+  color:var(--text-3);border:1px solid var(--line);
+}
+.curmeta .done{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:6px;color:var(--accent);background:var(--accent-soft);
+}
+.curmeta .ext{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:6px;color:var(--brass);background:var(--brass-soft);
+}
+/* venu d'une liste d'articles insolites : c'est le meilleur signal du lot */
+.curmeta .cure{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:6px;color:var(--accent-ink);background:var(--accent);
+}
+/* un sujet que VOUS avez imposé dans consignes/sujets-phares.txt : il passe
+   avant tout le reste, et se voit. */
+.curmeta .phare{
+  font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:6px;color:#17120A;background:var(--brass);
+}
+/* L'état d'avancement, d'un coup d'oeil. C'est la colonne qui dit ce qui est
+   fait et ce qui ne l'est pas : en ligne (vert d'accent, plein), en réserve
+   (contour), à contrôler, quarantaine (rouge), retirée (barré), à écrire. */
+.curmeta .et{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:6px;border:1px solid transparent;
+}
+.curmeta .et--publie{color:var(--accent-ink);background:var(--accent)}
+.curmeta .et--reserve{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.curmeta .et--ecrit{color:var(--brass);border-color:var(--brass-soft);background:var(--brass-soft)}
+.curmeta .et--quarantaine{color:#FFD9D9;background:#8B2027}
+.curmeta .et--retire{color:var(--text-3);border-color:var(--line);text-decoration:line-through}
+.curmeta .et--aecrire{color:var(--text-3);border-color:var(--line)}
+
+/* la provenance : « le saviez-vous » et « catégorie » se distinguent d'un
+   coup d'oeil de « liste insolite ». Savoir d'où vient un sujet, c'est
+   pouvoir garantir ce qu'on livre. */
+.curmeta .cure.said{color:var(--ink);background:var(--accent-2);filter:brightness(1.35)}
+.curmeta .categ{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:6px;color:var(--text-3);border:1px dashed var(--line-strong);
+}
+/* la langue de la fiche : indispensable depuis que les deux cohabitent */
+.curmeta .lg{
+  font-size:9.5px;font-weight:800;letter-spacing:.1em;
+  padding:2px 6px;border-radius:5px;color:var(--text-2);background:var(--ink-3);
+}
+
+.tocnote{
+  margin:0 0 16px;padding:11px 13px;border-radius:11px;
+  border:1px solid var(--line);background:var(--ink-2);
+  font-size:13px;line-height:1.5;color:var(--text-2);
+}
+.toclist--rich .toc{
+  display:block;width:100%;text-align:left;white-space:normal;
+  font-size:14.5px;line-height:1.45;padding:11px 13px;
+}
+/* Deux lignes, jamais plus : c'est ce qui donne à toutes les lignes la même
+   hauteur, et c'est ce qui rend la liste virtualisée possible. */
+.curprev{
+  margin:4px 0 0;font-size:12.5px;line-height:1.5;color:var(--text-2);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;height:calc(2 * 1.5 * 12.5px);
+}
+/* La phrase écrite à la main par le contributeur de la liste — celle qui dit
+   pourquoi le sujet étonne — n'est pas l'introduction d'un article. On la
+   distingue à l'œil : c'est sur elle qu'on tranche. */
+.curprev--w{color:var(--text);border-left:2px solid var(--accent);padding-left:9px}
+.curload{font-style:normal;color:var(--text-3);opacity:.7;font-size:12.5px}
+
+/* la version qui tourne, discrète mais lisible : c'est ce qu'on demande en
+   premier quand quelque chose ne se comporte pas comme prévu */
+.tbver{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10.5px;letter-spacing:.02em;color:var(--text-3);
+  padding:0 4px;white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+
+/* ---------- proposition d'installation sur l'ecran d'accueil ---------- */
+.install{
+  position:fixed;z-index:60;
+  left:clamp(12px,4vw,26px);right:clamp(12px,4vw,26px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 18px);
+  max-width:520px;margin-inline:auto;
+  display:flex;align-items:center;gap:12px;
+  padding:13px 13px 13px 16px;border-radius:16px;
+  border:1px solid var(--line-strong);background:var(--ink-2);
+  box-shadow:0 22px 60px -26px rgba(0,0,0,.8);
+  animation:instUp .5s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes instUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.install{animation:none}}
+.install__tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
+.install__tx b{font-size:13.5px;font-weight:600;letter-spacing:-.005em}
+.install__tx span{font-size:12px;color:var(--text-2);line-height:1.45}
+.install__go{
+  flex:none;height:36px;padding:0 15px;border-radius:11px;
+  background:var(--accent);color:var(--accent-ink);
+  font-size:12.5px;font-weight:700;letter-spacing:.02em;
+  transition:filter .15s,transform .15s;
+}
+.install__go:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.install__x{
+  flex:none;width:30px;height:30px;display:grid;place-items:center;border-radius:9px;
+  color:var(--text-3);transition:color .15s,background .15s;
+}
+.install__x:hover{color:var(--text);background:var(--ink-3)}
+.install__x svg{width:15px;height:15px}
+@media (max-width:640px){ .install{bottom:calc(env(safe-area-inset-bottom,0px) + 14px)} }
+.fineprint--src{opacity:.62;max-width:44ch;margin-top:6px}
+
+/* ---------- réglage de la taille de lecture ---------- */
+.sizepop{
+  position:absolute;top:100%;right:clamp(10px,3vw,24px);z-index:2;
+  display:none;flex-direction:column;gap:8px;
+  padding:12px 13px;border-radius:14px;
+  border:1px solid var(--line-strong);background:var(--ink-2);
+  box-shadow:0 22px 60px -26px rgba(0,0,0,.75);
+}
+.sizepop.open{display:flex}
+.sizepop__lb{
+  font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);
+}
+.sizer{display:inline-flex;align-items:stretch;gap:3px}
+.sizer button{
+  width:44px;height:40px;border-radius:10px;color:var(--text-2);
+  border:1px solid var(--line);background:transparent;
+  font-family:Fraunces,Georgia,serif;font-weight:600;line-height:1;
+  display:grid;place-items:center;
+  transition:color .15s,background .15s,border-color .15s;
+}
+.sizer button:nth-child(1){font-size:13px}
+.sizer button:nth-child(2){font-size:16px}
+.sizer button:nth-child(3){font-size:20px}
+.sizer button:nth-child(4){font-size:25px}
+.sizer button.on{color:var(--accent);background:var(--accent-soft);border-color:var(--accent)}
+.sizer button:hover{color:var(--text)}
+
+/* ---------- fiche en aperçu : on lit le début, puis ça s'estompe ----------
+   Un mur opaque fait fermer l'application. Voir les premières lignes, et
+   les regarder se dissoudre, montre exactement ce qu'on rate — c'est plus
+   honnête, et c'est ce qui donne envie de payer.                        */
+.card.apercu .lede{
+  position:relative;
+  max-height:min(42vh,380px);
+  overflow:hidden;
+}
+.card.apercu .lede::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  /* le flou ne s'applique que dans la moitié basse, par le masque */
+  -webkit-backdrop-filter:blur(3.5px); backdrop-filter:blur(3.5px);
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,transparent 32%,#000 68%,#000 100%);
+          mask-image:linear-gradient(180deg,transparent 0%,transparent 32%,#000 68%,#000 100%);
+  background:linear-gradient(180deg,transparent 0%,transparent 46%,var(--ink) 100%);
+}
+/* Sans backdrop-filter (anciens Firefox), le dégradé seul suffit. */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .card.apercu .lede::after{
+    -webkit-mask-image:none;mask-image:none;
+    background:linear-gradient(180deg,transparent 0%,transparent 34%,var(--ink) 96%);
+  }
+}
+.card.apercu .readmore{display:none}
+
+/* Le cadenas et l'appel à l'abonnement, posés sous l'aperçu. */
+.gate{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  margin:16px 0 0;padding:14px 16px;border-radius:14px;
+  border:1px solid var(--brass);background:var(--brass-soft);
+}
+.gate__ico{flex:none;width:26px;height:26px;display:grid;place-items:center;color:var(--brass)}
+.gate__ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.gate__tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 190px}
+.gate__tx b{font-size:14px;font-weight:600}
+.gate__tx span{font-size:12.5px;color:var(--text-2);line-height:1.45}
+.gate .btn{flex:none}
+@media (max-width:400px){ .gate .btn{flex:1 1 100%} }
+
+/* ---------- la version courte, celle qu'on dit à voix haute ---------- */
+.dire{
+  position:relative;margin:18px 0 0;padding:15px 17px 15px 18px;
+  border-radius:0 14px 14px 0;border-left:2px solid var(--accent);
+  background:var(--accent-soft);
+}
+.dire__lb{
+  display:block;margin-bottom:7px;
+  font-size:9.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);
+}
+.dire__tx{
+  margin:0;padding-right:64px;
+  font-family:Fraunces,Georgia,serif;font-weight:400;font-variation-settings:"SOFT" 26;
+  font-size:calc(clamp(16px,1.9vw,18.5px) * var(--lecture));
+  line-height:1.45;letter-spacing:-.008em;color:var(--text);
+}
+.dire__cp{
+  position:absolute;top:12px;right:12px;
+  height:28px;padding:0 11px;border-radius:9px;
+  border:1px solid var(--accent);color:var(--accent);
+  font-size:11px;font-weight:700;letter-spacing:.04em;
+  transition:background .15s,color .15s;
+}
+.dire__cp:hover{background:var(--accent);color:var(--accent-ink)}
+@media (max-width:420px){ .dire__tx{padding-right:0} .dire__cp{position:static;margin-top:10px} }
+
+/* ---------- fin d'article : garder, partager, et la suite ---------- */
+.endrow{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  margin:16px 0 0;padding-top:15px;border-top:1px solid var(--line);
+}
+.ebtn{
+  display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 15px;
+  border-radius:999px;border:1px solid var(--line);background:var(--ink-2);
+  color:var(--text-2);font-size:12.5px;font-weight:600;letter-spacing:.01em;
+  transition:color .16s,border-color .16s,transform .16s,background .16s;
+}
+.ebtn:hover{color:var(--text);border-color:var(--line-strong);transform:translateY(-1px)}
+.ebtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ebtn.on{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.ebtn.on svg{fill:currentColor}
+.ehint{
+  margin-left:auto;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--text-3);white-space:nowrap;
+}
+@media (max-width:640px){ .ehint{display:none} }
+
+/* ---------- invite de lecture : le texte long ne doit jamais sembler coupe ---------- */
+.readmore{
+  display:inline-flex;align-items:center;gap:7px;margin:2px 0 0;padding:7px 13px 7px 14px;
+  border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);
+  color:var(--accent);font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  transition:transform .18s cubic-bezier(.16,1,.3,1),filter .18s;
+}
+.readmore:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.readmore svg{width:13px;height:13px;animation:nudge 1.9s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(2.5px)}}
+@media (prefers-reduced-motion:reduce){.readmore svg{animation:none}}
+
+.srcrow{
+  margin:18px 0 0;font-size:11px;line-height:1.5;color:var(--text-3);
+  letter-spacing:.01em;
+}
+.srcrow a{color:var(--text-3);text-decoration:none;border-bottom:1px solid var(--line)}
+.srcrow a:hover{color:var(--text-2)}
+
+/* ---------- actions latérales ---------- */
+.actions{
+  position:fixed;right:clamp(10px,2.4vw,22px);bottom:clamp(74px,11vh,104px);z-index:35;
+  display:flex;flex-direction:column;gap:10px;transition:opacity .25s;
+}
+.act{
+  width:46px;height:46px;display:grid;place-items:center;border-radius:14px;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--text-2);
+  transition:transform .2s cubic-bezier(.16,1,.3,1),color .18s,border-color .18s;
+}
+.act:hover{transform:translateY(-2px) scale(1.04);color:var(--text);border-color:var(--line-strong)}
+.act svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.act.on{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.act.on svg{fill:currentColor;stroke:currentColor}
+.act[data-count]::after{
+  content:attr(data-count);position:absolute;margin:34px 0 0 30px;
+  font-size:10px;font-weight:700;color:var(--accent);
+}
+
+/* ---------- pastilles de la barre haute ---------- */
+.chip{
+  display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 12px;border-radius:999px;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--text-2);
+  font-size:11px;font-weight:600;letter-spacing:.04em;white-space:nowrap;
+  transition:color .18s,border-color .18s;
+}
+.chip:hover{color:var(--text);border-color:var(--line-strong)}
+.chip svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+.chip .sw{width:9px;height:9px;border-radius:3px;background:var(--accent)}
+/* Verrouillé : un vrai cadenas, dessiné, posé sur l'angle du bouton. Une
+   pastille ne dit rien ; un cadenas dit exactement de quoi il s'agit — et on
+   doit avoir envie de cliquer dessus, c'est la porte de l'abonnement, pas un
+   bouton grisé. Le tracé est en SVG encodé : net à toutes les densités, et
+   il suit la couleur du laiton dans les deux thèmes. */
+.counter.verrou,.iconbtn.verrou{position:relative;overflow:visible}
+.counter.verrou::after,.iconbtn.verrou::after{
+  content:"";position:absolute;top:-5px;right:-5px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--brass);border:2px solid var(--ink);
+  -webkit-mask:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,\
+%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' \
+stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E\
+%3Crect x='5' y='10.5' width='14' height='9.5' rx='2.5'/%3E\
+%3Cpath d='M8.2 10.5V7.6a3.8 3.8 0 017.6 0v2.9'/%3E%3C/svg%3E");
+  background-size:11px 11px;background-repeat:no-repeat;background-position:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.35);
+}
+/* le trait du cadenas doit rester lisible sur le laiton clair du thème clair */
+:root[data-theme="light"] .counter.verrou::after,
+:root[data-theme="light"] .iconbtn.verrou::after{box-shadow:0 1px 3px rgba(20,26,36,.25)}
+.counter{
+  display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 12px 0 13px;
+  border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);
+  color:var(--text);white-space:nowrap;
+  transition:transform .18s cubic-bezier(.16,1,.3,1),filter .18s;
+}
+.counter:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.counter b{
+  font-family:Fraunces,Georgia,serif;font-weight:600;font-size:18px;letter-spacing:-.02em;
+  color:var(--accent);font-variant-numeric:tabular-nums;
+  /* centré optiquement : les chiffres serif ont un jambage plus bas que les
+     capitales du libellé, une hauteur de ligne explicite les réaligne */
+  line-height:36px;display:block;
+}
+.counter .lab,.counter .fresh{align-self:center}
+.counter .lab{
+  font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--text-2);
+}
+.counter .fresh{
+  font-style:normal;font-size:10px;font-weight:800;letter-spacing:.04em;
+  padding:3px 8px;border-radius:999px;background:var(--accent);color:var(--accent-ink);
+  align-self:center;
+}
+.toctotal .fresh{
+  font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);
+  border:1px solid var(--accent);
+}
+.quota{display:flex;align-items:center;gap:8px;white-space:nowrap;font-variant-numeric:tabular-nums;
+  height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--ink-2);
+  font-size:11.5px;color:var(--text-2)}
+.quota em{font-style:normal}
+.gauge{width:44px;height:4px;border-radius:2px;background:var(--ink-4);overflow:hidden}
+.gauge > i{display:block;height:100%;background:var(--accent);transition:width .4s cubic-bezier(.16,1,.3,1)}
+.quota.low .gauge > i{background:var(--brass)}
+.quota b{font-weight:700;color:var(--text)}
+
+/* ---------- carte verrouillée ---------- */
+.card.locked .card__media img,.card.locked .card__media canvas{filter:blur(22px) saturate(.85) brightness(.8);transform:scale(1.2);animation:none}
+.lockwrap{
+  position:relative;z-index:2;width:100%;display:flex;justify-content:center;
+  padding:0 clamp(18px,5vw,42px) clamp(74px,11vh,104px);
+}
+.lockcard{
+  width:min(540px,100%);border:1px solid var(--line);border-radius:20px;
+  background:var(--ink-2);box-shadow:var(--shadow);padding:clamp(24px,4vw,36px);text-align:center;
+}
+.lockcard .seal{
+  width:52px;height:52px;margin:0 auto 18px;border-radius:16px;display:grid;place-items:center;
+  background:var(--brass-soft);border:1px solid var(--brass);color:var(--brass);
+}
+.lockcard .seal svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6}
+.lockcard h3{
+  font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(23px,3.4vw,31px);
+  line-height:1.12;margin:0 0 10px;letter-spacing:-.02em;text-wrap:balance;
+}
+.lockcard p{margin:0 0 22px;color:var(--text-2);font-size:14.5px;max-width:44ch;margin-inline:auto}
+
+/* ---------- boutons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  height:48px;padding:0 24px;border-radius:13px;font-size:14.5px;font-weight:600;
+  letter-spacing:.01em;transition:transform .18s cubic-bezier(.16,1,.3,1),filter .18s,background .18s;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn--primary{background:var(--accent);color:var(--accent-ink)}
+.btn--primary:hover{filter:brightness(1.08)}
+.btn--brass{background:var(--brass);color:var(--brass-ink)}
+.btn--brass:hover{filter:brightness(1.06)}
+.btn--ghost{border:1px solid var(--line-strong);color:var(--text)}
+.btn--ghost:hover{background:var(--ink-3)}
+.btn--block{width:100%}
+.btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- panneaux ---------- */
+.sheet{
+  position:fixed;inset:0;z-index:50;display:none;
+  background:var(--sheet);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  overflow-y:auto;overscroll-behavior:contain;
+}
+.sheet.open{display:block;animation:fade .25s ease both}
+#onboard{background:var(--ink);backdrop-filter:none;-webkit-backdrop-filter:none}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet__inner{
+  max-width:940px;margin:0 auto;padding:clamp(20px,4vw,44px) clamp(18px,4vw,32px) 72px;
+  animation:rise .45s cubic-bezier(.16,1,.3,1) both;
+}
+@media (prefers-reduced-motion:reduce){.sheet.open,.sheet__inner{animation:none}}
+.sheet__head{display:flex;align-items:flex-start;gap:16px;margin-bottom:clamp(20px,4vw,34px)}
+.sheet__head h2{
+  font-family:Fraunces,Georgia,serif;font-weight:500;font-variation-settings:"SOFT" 30,"WONK" 1;
+  font-size:clamp(26px,4.4vw,40px);line-height:1.06;letter-spacing:-.025em;margin:0 0 8px;
+}
+.sheet__head p{margin:0;color:var(--text-2);font-size:14.5px;max-width:52ch}
+.sheet__close{margin-left:auto;flex:none}
+
+/* grille des univers */
+.universes{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:12px}
+.uni{
+  position:relative;overflow:hidden;border-radius:var(--r);border:1px solid var(--line);
+  background:var(--ink-2);padding:18px 16px 16px;text-align:left;min-height:132px;
+  display:flex;flex-direction:column;gap:6px;
+  transition:border-color .2s,transform .2s cubic-bezier(.16,1,.3,1);
+}
+.uni:hover{transform:translateY(-3px);border-color:var(--line-strong)}
+.uni canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.4}
+.uni > *{position:relative;z-index:1}
+/* La réserve de 84 px à droite est là pour la pastille « payant ». Quand il
+   n'y en a pas — c'est le cas des huit univers ouverts — elle ne sert qu'à
+   casser les titres en deux lignes. On ne la prend que si la pastille existe. */
+.uni h3{font-size:16px;font-weight:700;margin:0;letter-spacing:-.01em;padding-right:4px}
+.uni:has(.pill) h3{padding-right:84px}
+.uni p{margin:0;font-size:12.5px;color:var(--text-2);line-height:1.45}
+.uni .n{
+  margin-top:auto;font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text-3);font-variant-numeric:tabular-nums;
+}
+.uni .pill{
+  position:absolute;top:12px;right:12px;z-index:2;font-size:9.5px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;border-radius:999px;
+  background:var(--brass-soft);color:var(--brass);border:1px solid var(--brass);
+}
+.uni.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.uni.sel::after{
+  content:"";position:absolute;top:12px;left:12px;z-index:2;width:8px;height:8px;
+  border-radius:50%;background:var(--accent);
+}
+
+/* tarifs */
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:26px 0 18px}
+.plan{
+  border:1px solid var(--line);border-radius:18px;background:var(--ink-2);padding:22px 20px;
+  display:flex;flex-direction:column;gap:10px;position:relative;
+}
+.plan.feature{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass),var(--shadow)}
+.plan .tag{
+  position:absolute;top:-10px;left:20px;font-size:9.5px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--brass);color:var(--brass-ink);
+}
+.plan h4{margin:0;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-2);font-weight:700}
+.price{display:flex;align-items:baseline;gap:5px}
+.price b{
+  font-family:Fraunces,Georgia,serif;font-weight:500;font-size:38px;letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;
+}
+.price span{font-size:12.5px;color:var(--text-2)}
+.plan ul{margin:4px 0 14px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.plan li{display:flex;gap:9px;font-size:13.5px;color:var(--text-2);line-height:1.4}
+.plan li svg{width:15px;height:15px;flex:none;margin-top:2px;fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.plan .btn{margin-top:auto}
+.fineprint{font-size:12px;color:var(--text-3);line-height:1.6;max-width:60ch}
+.keyrow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.keyrow input{
+  flex:1;min-width:180px;height:44px;padding:0 14px;border-radius:12px;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--text);font-size:14px;
+}
+.keyrow input::placeholder{color:var(--text-3)}
+
+/* recherche & bibliothèque */
+.searchbar{display:flex;gap:8px;margin-bottom:20px}
+.searchbar input{
+  flex:1;height:50px;padding:0 16px;border-radius:13px;border:1px solid var(--line);
+  background:var(--ink-2);color:var(--text);font-size:15px;
+}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{
+  display:flex;gap:14px;align-items:center;text-align:left;width:100%;
+  padding:12px;border-radius:var(--r);border:1px solid var(--line);background:var(--ink-2);
+  transition:border-color .18s,transform .18s;
+}
+.item:hover{border-color:var(--line-strong);transform:translateX(2px)}
+.item .thumb{
+  width:60px;height:60px;border-radius:11px;object-fit:cover;flex:none;
+  background:var(--ink-3);display:block;
+}
+.item .tx{min-width:0}
+.item h4{margin:0 0 3px;font-size:14.5px;font-weight:600;letter-spacing:-.01em}
+.item p{margin:0;font-size:12.5px;color:var(--text-2);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-clamp:2}
+.empty{padding:44px 0;text-align:center;color:var(--text-3);font-size:14px}
+
+/* curation */
+.sheet__inner--wide{max-width:1080px}
+.curbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.curbar input,.curbar select{
+  height:42px;padding:0 12px;border-radius:11px;border:1px solid var(--line);
+  background:var(--ink-2);color:var(--text);font-size:14px;
+}
+.curbar input{flex:1;min-width:180px}
+.curactions{
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;
+  padding-bottom:14px;border-bottom:1px solid var(--line);
+}
+#curCount{font-size:13px;font-weight:700;color:var(--accent);margin-right:auto;font-variant-numeric:tabular-nums}
+.btn--sm{height:38px;padding:0 15px;font-size:13px;border-radius:10px}
+/* La curation est un outil, pas un article : la feuille occupe l'écran, les
+   commandes restent en haut, et c'est la liste qui défile. Sur un téléphone,
+   sans cela, les filtres et les boutons mangeaient tout l'écran et il ne
+   restait pas une ligne de visible. */
+#curSheet{overflow:hidden}
+#curSheet .sheet__inner{
+  display:flex;flex-direction:column;
+  height:100dvh;max-height:100dvh;
+  padding-bottom:clamp(14px,3vw,24px);
+}
+#curSheet .sheet__head{margin-bottom:14px}
+#curSheet #curPanCat,#curSheet #curPanSrc,#curSheet .curstats,#curSheet .curtabs{flex:none}
+#curSheet .curactions{margin-bottom:12px}
+@media (max-width:720px){
+  #curSheet .sheet__head h2{font-size:clamp(24px,6.5vw,30px)}
+  #curSheet .sheet__head p{
+    font-size:12.5px;line-height:1.4;
+    display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  /* sur un téléphone, le mot « potentiel » vole la place du nom d'univers :
+     le chiffre suffit, l'infobulle garde l'explication */
+  #curSheet .curmeta .pot .w{display:none}
+  #curSheet .curmeta .curuni{min-width:4.5em}
+  /* « liste insolite » compte, mais pas au prix de l'état de la fiche :
+     sur petit écran on garde le signal, réduit à son étoile. */
+  #curSheet .curmeta .cure{font-size:0;padding:2px 5px}
+  #curSheet .curmeta .cure::before{content:"\2605";font-size:11px;line-height:1}
+  #curSheet .curmeta .phare{font-size:0;padding:2px 5px}
+  #curSheet .curmeta .phare::before{content:"\2605\2605";font-size:10px;line-height:1}
+  /* les quatre actions en grille : deux lignes nettes au lieu d'un retour
+     à la ligne qui dépend de la longueur des libellés traduits */
+  #curSheet .curactions{display:grid;grid-template-columns:1fr 1fr}
+  #curSheet .curactions .btn{width:100%}
+  #curCount{grid-column:1 / -1}
+  #curSheet .sheet__inner{padding-top:16px}
+  /* les compteurs sur une seule ligne, qui glisse latéralement */
+  #curSheet .curstats{
+    flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;
+    margin-bottom:10px;padding-bottom:2px;
+  }
+  #curSheet .curstats .cs{flex:none}
+  #curSheet .curtabs{margin-bottom:10px}
+  #curSheet .curbar{gap:6px;margin-bottom:10px}
+  #curSheet .curbar input,#curSheet .curbar select{height:38px;font-size:13px}
+  #curSheet .curbar select{flex:1 1 46%;min-width:0}
+  #curSheet .curactions{gap:6px;margin-bottom:10px;padding-bottom:10px}
+  #curSheet .curactions .btn{height:34px;padding:0 11px;font-size:12px}
+  #curCount{flex:1 1 100%;margin-right:0;margin-bottom:2px}
+}
+
+/* Liste virtualisée : une fenêtre défilante, un rail à la hauteur totale, et
+   des lignes posées à leur position calculée. Le DOM ne contient jamais plus
+   d'une trentaine de lignes, quel que soit le nombre de sujets. */
+.curlist{
+  --curh:118px;                      /* hauteur d'une ligne, lue par le script */
+  --curgap:8px;                      /* écart entre deux lignes */
+  position:relative;overflow-y:auto;overscroll-behavior:contain;
+  flex:1 1 auto;min-height:220px;
+  margin:0 -4px;padding:0 4px;
+  -webkit-overflow-scrolling:touch;
+}
+@media (max-width:720px){ .curlist{--curh:122px} }
+.curlist__rail{position:relative;width:100%}
+.curlist .empty{position:static}
+.cur{
+  position:absolute;left:0;right:0;
+  height:var(--curh);overflow:hidden;
+  display:flex;gap:12px;align-items:flex-start;cursor:pointer;
+  padding:11px 14px;border-radius:13px;border:1px solid var(--line);background:var(--ink-2);
+  transition:border-color .16s,background .16s;
+}
+.cur:hover{border-color:var(--line-strong)}
+.cur.on{border-color:var(--accent);background:var(--accent-soft)}
+.curcheck{flex:none;display:grid;place-items:center;padding-top:2px}
+.curcheck input{width:19px;height:19px;accent-color:var(--accent);cursor:pointer}
+/* centré dans la hauteur fixe de la ligne : sans cela, une fiche sans aperçu
+   laisse un trou en bas de sa rangée */
+.curtx{min-width:0;flex:1;align-self:center}
+/* Une ligne d'étiquettes, jamais deux : chacune reste d'un bloc, et la ligne
+   glisse latéralement plutôt que de casser la hauteur des rangées — dont
+   dépend la liste virtualisée. */
+/* Une ligne d'étiquettes, jamais deux : la hauteur des rangées est fixe et la
+   liste virtualisée en dépend. C'est le nom de l'univers qui se tronque —
+   l'état et la note, eux, sont ce qui sert à décider. */
+.curmeta{
+  display:flex;align-items:center;gap:6px;margin-bottom:4px;
+  flex-wrap:nowrap;overflow:hidden;
+  font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);
+}
+.curmeta > *{flex:none;white-space:nowrap}
+/* « curuni » et non « uni » : .uni est déjà la carte d'univers de l'accueil,
+   et la collision transformait chaque ligne en carte de 132 px de haut. */
+.curmeta .curuni{
+  display:inline;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;
+}
+.curmeta .sw{width:7px;height:7px;border-radius:2px;display:inline-block}
+.curmeta .note{
+  font-size:9.5px;letter-spacing:.04em;padding:2px 7px;border-radius:999px;
+  background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);
+}
+.curmeta .todo{
+  font-size:9.5px;letter-spacing:.08em;padding:2px 7px;border-radius:999px;
+  background:var(--brass-soft);color:var(--brass);border:1px solid var(--brass);
+}
+.cur h4{
+  margin:0 0 2px;font-size:14.5px;font-weight:600;letter-spacing:-.01em;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.cur .curart{
+  margin:0 0 3px;font-size:11.5px;color:var(--text-3);font-style:italic;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.cur p{margin:0;font-size:13px;line-height:1.5;color:var(--text-2)}
+
+/* sommaire */
+.tocgroup{margin-bottom:26px}
+.tochead{
+  display:flex;align-items:baseline;gap:10px;margin:0 0 10px;padding-bottom:8px;
+  border-bottom:1px solid var(--line);
+}
+.tochead b{font-size:13px;font-weight:700;letter-spacing:.02em}
+.tochead .sw{width:8px;height:8px;border-radius:3px;flex:none}
+.tochead .n{
+  margin-left:auto;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-3);font-variant-numeric:tabular-nums;
+}
+.tochead .pill{
+  font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  padding:3px 7px;border-radius:999px;background:var(--brass-soft);color:var(--brass);
+  border:1px solid var(--brass);
+}
+.toclist{display:flex;flex-wrap:wrap;gap:6px}
+.toc{
+  padding:7px 12px;border-radius:9px;border:1px solid var(--line);background:var(--ink-2);
+  font-size:13px;color:var(--text-2);text-align:left;
+  transition:color .16s,border-color .16s,background .16s;
+}
+.toc:hover{color:var(--text);border-color:var(--accent);background:var(--accent-soft)}
+.tocgroup.locked .toc{opacity:.5}
+.tocmore{
+  margin-top:10px;font-size:12px;color:var(--accent);font-weight:600;
+  border-bottom:1px solid currentColor;padding-bottom:1px;
+}
+.toctotal{
+  display:flex;align-items:baseline;gap:8px;margin:-10px 0 22px;
+  font-size:13px;color:var(--text-2);
+}
+.toctotal b{
+  font-family:Fraunces,Georgia,serif;font-weight:500;font-size:28px;letter-spacing:-.02em;
+  color:var(--text);font-variant-numeric:tabular-nums;
+}
+
+/* onboarding */
+.hero{min-height:100dvh;display:grid;place-items:center;padding:56px 22px;text-align:center}
+.hero__in{max-width:640px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.hero .kicker{font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.hero h1{
+  font-family:Fraunces,Georgia,serif;font-weight:300;font-variation-settings:"SOFT" 40,"WONK" 1;
+  font-size:clamp(40px,8.5vw,78px);line-height:.98;letter-spacing:-.04em;margin:0;text-wrap:balance;
+}
+.hero h1 em{font-style:italic;font-weight:500;color:var(--accent)}
+.hero p{margin:0;color:var(--text-2);font-size:clamp(15px,2.2vw,17.5px);max-width:46ch;line-height:1.6}
+.hero .picks{width:100%;margin-top:6px}
+/* Sur grand écran, le texte garde sa colonne lisible mais la grille des huit
+   univers respire : trois colonnes plutôt que deux, et pas de bande vide. */
+@media (min-width:900px){
+  /* width:100% est indispensable : .hero est une grille en place-items:center,
+     donc sans elle le bloc se dimensionne sur son contenu et la grille reste
+     à deux colonnes quelle que soit la max-width. */
+  .hero__in{max-width:1060px;width:100%}
+  .hero .picks{margin-top:14px}
+}
+
+/* toast */
+#toast{
+  position:fixed;left:50%;bottom:112px;transform:translate(-50%,14px);z-index:70;
+  padding:11px 18px;border-radius:12px;background:var(--ink-3);border:1px solid var(--line-strong);
+  color:var(--text);font-size:13.5px;font-weight:500;box-shadow:var(--shadow);
+  opacity:0;pointer-events:none;transition:opacity .24s,transform .24s cubic-bezier(.16,1,.3,1);
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+.offline{
+  display:none;font-style:normal;font-size:9px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text-3);white-space:nowrap;
+  border:1px solid var(--line);border-radius:999px;padding:3px 8px;opacity:.7;
+}
+.offline.show{display:inline-block}
+
+/* ---------- bureau : image plein cadre, texte au centre ---------- */
+@media (min-width:1024px){
+  .card{align-items:center;justify-content:center}
+  .card__body::before{
+    content:"";position:absolute;left:clamp(30px,3vw,46px);right:clamp(30px,3vw,46px);top:0;
+    height:2px;border-radius:2px;background:linear-gradient(to right,var(--accent),transparent);
+    opacity:.5;
+  }
+  .card__scrim{background:var(--scrim-center)}
+  .card__body{
+    max-width:min(760px,86vw);margin-inline:auto;
+    background:var(--panel);border:1px solid var(--panel-line);border-radius:24px;
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    box-shadow:var(--shadow);
+    padding:clamp(30px,3vw,44px) clamp(30px,3vw,46px) clamp(26px,2.6vw,38px);
+  }
+  .card h2{font-size:clamp(32px,3vw,46px)}
+  .card .lede{max-height:min(58vh,620px);max-width:none}
+  .card .lede p{font-size:16.5px}
+  .lockwrap{align-self:center;padding-bottom:0}
+  .actions{right:clamp(16px,1.6vw,28px)}
+}
+
+/* ---------- finitions : matière du panneau et fond vivant ---------- */
+.card__body{position:relative}
+.card__body::after{
+  /* liseré intérieur : donne au panneau une épaisseur de verre */
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:inset 0 1px 0 var(--panel-hi), inset 0 -1px 0 rgba(0,0,0,.18);
+}
+@media (max-width:1023px){ .card__body::after{display:none} }
+
+/* le fond respire lentement : la carte n'est jamais tout à fait figée */
+@media (prefers-reduced-motion:no-preference){
+  .card.is-active .card__media canvas{animation:drift 48s ease-in-out infinite alternate}
+}
+@keyframes drift{
+  from{transform:scale(1.10) translate3d(-1.2%,-0.8%,0)}
+  to  {transform:scale(1.18) translate3d(1.4%,1.1%,0)}
+}
+
+/* Téléphone : la barre garde tout, mais sans un mot de trop. */
+@media (max-width:820px){
+  .counter .lab{display:none}
+  .counter{padding:0 13px}
+  .quota #quotaTxt em{display:none}
+}
+@media (max-width:560px){
+  .chip--uni .lb{display:none}
+  .chip--uni{padding:0 10px;gap:5px}
+  .topbar{gap:6px}
+  .quota{padding:0 10px;gap:6px}
+  .quota .gauge{width:30px}
+}
+@media (max-width:440px){
+  /* petits écrans : on garde le chiffre, on retire la décoration */
+  .counter .fresh{display:none}
+  .counter{padding:0 11px}
+  .topbar{gap:5px;padding-left:8px;padding-right:8px}
+  .iconbtn{width:34px;height:34px}
+  .quota .gauge{width:24px}
+  .quota{padding:0 9px}
+}
+@media (max-width:640px){
+  .streak{display:none}
+  /* lecture d'abord : le texte occupe tout l'espace laisse par la barre haute */
+  .card__body{
+    padding:calc(env(safe-area-inset-top,0px) + var(--barre) + 22px) clamp(18px,5vw,26px)
+            calc(env(safe-area-inset-bottom,0px) + 20px) clamp(18px,5vw,26px);
+  }
+  .lockwrap{padding-bottom:40px}
+  .card h2{font-size:clamp(25px,7vw,32px);margin-bottom:12px}
+  .eyebrow{margin-bottom:12px}
+  .card .lede{max-width:none}
+  .actions{bottom:calc(env(safe-area-inset-bottom,0px) + 18px);gap:8px}
+  .act{width:42px;height:42px;border-radius:13px}
+  .counter .lab{font-size:9px;letter-spacing:.1em}
+  .quota em{display:none}
+}
+@media (max-width:430px){
+  .offline{display:none!important}
+  .brand b{font-size:20px}
+}
+
+/* Sur téléphone la jauge ferait doublon avec la pastille de statut, qui
+   porte déjà le nombre restant. Une seule information, un seul endroit. */
+@media (max-width:820px){ .topbar .quota{display:none} }
+/* Sur grand écran la jauge affiche le reste : le badge se contente du nom. */
+@media (min-width:821px){ .planbadge i{display:none} }
+
+/* Très petit écran (iPhone SE et compagnie) : le nom de marque et l'univers
+   se réduisent, mais rien ne disparaît — tout reste atteignable au pouce. */
+@media (max-width:360px){
+  .topbar{gap:3px;padding-left:5px;padding-right:5px}
+  .chip--uni svg{display:none}
+  .brand b{font-size:18px}
+  .brand{gap:6px}
+  .planbadge{font-size:8px;padding:3px 5px;letter-spacing:.06em}
+  .planbadge i{margin-left:4px;padding-left:4px;font-size:9.5px}
+  .counter b{font-size:16px}
+  .counter{padding:0 9px}
+  .chip--uni{padding:0 8px}
+  .iconbtn{width:32px;height:32px}
+  .iconbtn svg{width:16px;height:16px}
+}
+</style>

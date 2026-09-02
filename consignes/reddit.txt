@@ -1,0 +1,89 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# REDDIT — une source, pas une corvée
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Les histoires vraies de Reddit ne s'ajoutent pas à la main. C'est une
+# SOURCE, au même titre que « Le saviez-vous ? » : elle tourne dans la même
+# moisson, chaque nuit, et alimente le même catalogue maître.
+#
+# CE FICHIER EST VIDE PAR DÉFAUT — décommentez des subreddits pour l'activer.
+# Tant qu'aucun n'est listé, la moisson ne touche pas à Reddit du tout.
+#
+# ─────────────────────────────────────────────────────────────────────────
+# LES SUBREDDITS  — une ligne chacun. « r/ » facultatif.
+#   Un deuxième champ, après une barre verticale, force l'univers de ce
+#   subreddit ; sinon celui réglé plus bas s'applique.
+# ─────────────────────────────────────────────────────────────────────────
+
+# tifu                     | histoire
+# TalesFromRetail          | histoire
+# UnresolvedMysteries      | mysteres
+# AskHistorians            | histoire
+# todayilearned            | sciences
+# HumansBeingBros          | histoire
+# MaliciousCompliance      | histoire
+# ProRevenge               | histoire
+# LetsNotMeet              | mysteres
+# ThatHappened             | mysteres
+
+# ─────────────────────────────────────────────────────────────────────────
+# LES SEUILS
+# ─────────────────────────────────────────────────────────────────────────
+
+# Nombre de votes minimum. C'est votre garde-fou de qualité : un billet très
+# voté a été jugé remarquable par des milliers de gens avant vous.
+votes: 2000
+
+# Longueur du billet, en caractères. En dessous, il n'y a pas de quoi écrire
+# une anecdote ; au-dessus, c'est un roman qu'on ne saura pas résumer.
+longueurMini: 1200
+longueurMaxi: 9000
+
+# Sur quelle période prendre le classement :
+#   all · year · month · week · day
+periode: year
+
+# Combien de billets lire par subreddit à chaque passage. Maximum 100.
+parSub: 100
+
+# L'univers par défaut, quand une ligne n'en précise pas.
+univers: histoire
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CE QUI EST ÉCARTÉ AUTOMATIQUEMENT
+#
+#   · les liens et les images : il faut du TEXTE, c'est lui que le rédacteur
+#     lira. Un billet sans corps n'a rien à offrir ;
+#   · les billets supprimés, ceux marqués NSFW ou spoiler, les épinglés ;
+#   · ceux sous le seuil de votes ou de longueur ;
+#   · ceux déjà présents — l'identifiant Reddit sert de clé, relancer
+#     n'ajoute jamais deux fois le même billet.
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# ALLER PLUS VITE ET PLUS LOIN : UN IDENTIFIANT D'APPLICATION
+#
+# Sans rien, la moisson utilise l'accès public de Reddit. Ça marche pour
+# quelques centaines de billets par nuit, mais Reddit finit par ralentir.
+#
+# Pour un quota confortable :
+#   1. reddit.com/prefs/apps → Create another app… → type « script »
+#   2. notez le client id (sous le nom de l'app) et le secret
+#   3. dépôt GitHub → Settings → Secrets and variables → Actions
+#      → New repository secret, deux fois :
+#           REDDIT_ID       le client id
+#           REDDIT_SECRET   le secret
+#
+# La moisson les détecte toute seule et bascule sur le jeton. Le journal
+# le dit : « jeton d'application obtenu ».
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# UN UNIVERS DÉDIÉ
+#
+# Si vous voulez que ces histoires vivent à part, une ligne dans
+# consignes/univers.txt :
+#
+#   reddit | 16 | Histoires vraies | Ce que les gens racontent quand ils croient que personne ne les lit.
+#
+# puis « univers: reddit » ci-dessus. L'application découvre le nouvel
+# univers toute seule.
+# ═══════════════════════════════════════════════════════════════════════════

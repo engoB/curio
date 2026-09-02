@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Curio — console</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  LA CONSOLE
+
+  Une page, à mettre en favori. Deux vues :
+
+    CATALOGUE   tout ce que la moisson a trouvé. Vous retenez ou vous
+                écartez, à la main. Vos décisions sont enregistrées DANS LE
+                DÉPÔT, et l'écriture se lance d'ici.
+
+    RELECTURE   les fiches écrites, en entier. Vous validez, une par une ou
+                d'un bloc, et la publication définitive part d'ici.
+
+  Elle parle à GitHub directement, avec un jeton que VOUS créez et qui ne
+  quitte jamais votre navigateur : il est rangé dans le stockage local de
+  cette page, sur cette machine. Aucun serveur intermédiaire, aucune donnée
+  qui transite ailleurs.
+
+  Ce qu'elle écrit dans le dépôt :
+      consignes/decisions.json     ce que vous retenez et ce que vous écartez
+      consignes/validations.json   ce que vous validez pour publication
+  Deux fichiers, lus par les outils. Rien d'autre n'est touché.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<style>
+:root{
+  --ink:#050E24; --ink-2:#0B1B3D; --ink-3:#12274F; --ink-4:#1B3364;
+  --line:rgba(150,190,255,.15); --line-fort:rgba(150,190,255,.30);
+  --texte:#EAF1FF; --texte-2:#9FB4DA; --texte-3:#6C82AD;
+  --accent:#3FA9FF; --accent-encre:#04122B; --accent-doux:rgba(63,169,255,.13);
+  --or:#F0C46A; --or-doux:rgba(240,196,106,.13);
+  --vert:#4ECBB9; --vert-doux:rgba(78,203,185,.14);
+  --rouge:#FF7A85; --rouge-doux:rgba(255,122,133,.14);
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --ink:#EEF4FE; --ink-2:#FFFFFF; --ink-3:#E1EBFB; --ink-4:#CEDDF5;
+    --line:rgba(12,35,80,.14); --line-fort:rgba(12,35,80,.28);
+    --texte:#0A1B3D; --texte-2:#4A5F84; --texte-3:#7C8DAB;
+    --accent:#0B63C4; --accent-encre:#FFFFFF; --accent-doux:rgba(11,99,196,.10);
+    --or:#8A6512; --or-doux:rgba(138,101,18,.12);
+    --vert:#0E7C71; --vert-doux:rgba(14,124,113,.12);
+    --rouge:#B32233; --rouge-doux:rgba(179,34,51,.10);
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ink);color:var(--texte);
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;padding-bottom:110px}
+.env{max-width:1180px;margin:0 auto;padding:20px 18px 0}
+
+/* ---------- barre haute ---------- */
+.haut{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+h1{font-size:20px;margin:0;letter-spacing:-.01em;flex:none}
+.onglets{display:flex;gap:4px;background:var(--ink-2);border:1px solid var(--line);border-radius:11px;padding:3px}
+.onglets button{font:inherit;font-size:13.5px;font-weight:600;color:var(--texte-2);background:none;
+  border:0;border-radius:8px;padding:7px 15px;cursor:pointer}
+.onglets button.on{background:var(--accent);color:var(--accent-encre)}
+.etatCx{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:12px;color:var(--texte-3)}
+.point{width:8px;height:8px;border-radius:50%;background:var(--texte-3)}
+.point.ok{background:var(--vert)} .point.ko{background:var(--rouge)}
+.lienreg{font:inherit;font-size:12px;color:var(--accent);background:none;border:0;cursor:pointer;text-decoration:underline}
+
+/* ---------- réglages ---------- */
+.reglages{background:var(--ink-2);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin-bottom:16px}
+.reglages h3{margin:0 0 4px;font-size:14px}
+.reglages p{margin:0 0 12px;font-size:12.5px;color:var(--texte-2);line-height:1.55}
+.reglages p a{color:var(--accent)}
+.champs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--texte-3);margin-bottom:4px}
+input,select,textarea{font:inherit;font-size:13.5px;color:var(--texte);background:var(--ink-3);
+  border:1px solid var(--line-fort);border-radius:9px;padding:8px 11px;width:100%}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+/* ---------- compteurs ---------- */
+.chiffres{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:9px;margin-bottom:16px}
+.bloc{background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:11px 13px}
+.bloc b{display:block;font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.bloc span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--texte-3);margin-top:4px}
+.bloc.k b{color:var(--accent)} .bloc.v b{color:var(--vert)} .bloc.o b{color:var(--or)} .bloc.r b{color:var(--rouge)}
+
+/* ---------- commandes ---------- */
+.cmd{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.cmd input[type=search]{flex:1 1 220px;width:auto}
+.cmd select{width:auto}
+.cmd .compte{margin-left:auto;font-size:13px;color:var(--texte-2);font-variant-numeric:tabular-nums}
+.btn{font:inherit;font-size:13px;font-weight:600;border-radius:9px;padding:8px 14px;cursor:pointer;
+  border:1px solid var(--line-fort);background:var(--ink-2);color:var(--texte-2)}
+.btn:hover{color:var(--texte);border-color:var(--accent)}
+.btn.p{background:var(--accent);color:var(--accent-encre);border-color:var(--accent)}
+.btn.v{background:var(--vert);color:var(--accent-encre);border-color:var(--vert)}
+.btn.o{background:var(--or);color:#17120A;border-color:var(--or)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- lignes ---------- */
+.liste{display:flex;flex-direction:column;gap:8px}
+.item{background:var(--ink-2);border:1px solid var(--line);border-radius:13px;padding:12px 15px;transition:border-color .12s}
+.item.retenu{border-color:var(--vert);background:var(--vert-doux)}
+.item.ecarte{border-color:var(--rouge);opacity:.55}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px;
+  font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--texte-3)}
+.meta .pastille{width:7px;height:7px;border-radius:2px;flex:none}
+.meta b{padding:2px 7px;border-radius:6px;font-size:10px;letter-spacing:.07em}
+.lg{padding:2px 6px;border-radius:5px;background:var(--ink-3);color:var(--texte-2);font-size:9.5px;letter-spacing:.1em}
+.s-phare{background:var(--or);color:#17120A}
+.s-insolite{background:var(--accent);color:var(--accent-encre)}
+.s-saviez{background:var(--vert);color:var(--accent-encre)}
+.s-manuel{background:var(--ink-4);color:var(--texte)}
+.s-reddit{background:#FF5A1F;color:#2A0A00}
+.croise{background:var(--accent-doux);color:var(--accent);border:1px solid var(--accent)}
+.note{border:1px solid var(--line-fort);color:var(--texte-2);font-variant-numeric:tabular-nums}
+.e-publie{background:var(--accent);color:var(--accent-encre)}
+.e-ecrit{background:var(--or-doux);color:var(--or)}
+.e-aecrire{border:1px solid var(--line);color:var(--texte-3)}
+.e-retire{border:1px solid var(--line);color:var(--texte-3);text-decoration:line-through}
+.item h2{font-size:15.5px;margin:0 0 2px;font-weight:650}
+.item h2 a{color:inherit;text-decoration:none} .item h2 a:hover{color:var(--accent)}
+.autre{font-size:12px;color:var(--texte-3);margin:0 0 5px}
+.phrase{margin:0;font-size:13.5px;line-height:1.5;color:var(--texte-2)}
+.phrase.c{color:var(--texte);border-left:2px solid var(--accent);padding-left:9px}
+.gestes{display:flex;gap:6px;margin-left:auto;flex:none}
+.g{font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  border:1px solid var(--line-fort);background:none;color:var(--texte-3);border-radius:7px;padding:3px 10px;cursor:pointer}
+.g:hover{color:var(--texte)}
+.g.on-v{background:var(--vert);color:var(--accent-encre);border-color:var(--vert)}
+.g.on-r{background:var(--rouge);color:#2A0509;border-color:var(--rouge)}
+
+/* ---------- relecture : la fiche entière ---------- */
+.fiche{background:var(--ink-2);border:1px solid var(--line);border-radius:15px;padding:18px 22px;margin-bottom:10px}
+.fiche.valide{border-color:var(--vert)}
+.fiche h2{font-size:21px;margin:0 0 3px;letter-spacing:-.01em;line-height:1.25}
+.fiche .art{font-size:12.5px;color:var(--texte-3);margin:0 0 12px}
+.fiche .art a{color:var(--texte-3)}
+.corps{font-size:15px;line-height:1.68;color:var(--texte)}
+.corps p{margin:0 0 13px}
+.corps strong{color:var(--accent);font-weight:600}
+.raconter{margin:14px 0 0;padding:12px 15px;background:var(--ink-3);border-radius:11px;
+  font-size:14px;font-style:italic;color:var(--texte);border-left:3px solid var(--or)}
+.raconter span{display:block;font-style:normal;font-size:10px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--texte-3);margin-bottom:5px}
+.replier{font:inherit;font-size:12px;color:var(--accent);background:none;border:0;cursor:pointer;padding:0;margin-top:10px}
+
+/* ---------- barre d'action, en bas, toujours visible ---------- */
+.pied{position:fixed;left:0;right:0;bottom:0;background:var(--ink-2);border-top:1px solid var(--line-fort);
+  padding:12px 18px;z-index:40;backdrop-filter:blur(12px)}
+.pied .in{max-width:1180px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pied .resume{font-size:13px;color:var(--texte-2)}
+.pied .resume b{color:var(--texte)}
+.pied .droite{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+
+.msg{padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:12px;display:none}
+.msg.ok{display:block;background:var(--vert-doux);color:var(--vert);border:1px solid var(--vert)}
+.msg.ko{display:block;background:var(--rouge-doux);color:var(--rouge);border:1px solid var(--rouge)}
+.msg.info{display:block;background:var(--accent-doux);color:var(--accent);border:1px solid var(--accent)}
+.vide{padding:44px 16px;text-align:center;color:var(--texte-3);font-size:14px;line-height:1.7}
+.plus{margin:16px auto 0;display:block}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:var(--ink-3);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="env">
+
+  <div class="haut">
+    <h1>Curio · console</h1>
+    <div class="onglets">
+      <button id="ongCat" class="on">Catalogue</button>
+      <button id="ongRel">Relecture</button>
+    </div>
+    <div class="etatCx">
+      <span class="point" id="pt"></span><span id="cx">non connectée</span>
+      <button class="btn" id="moissonner" style="padding:5px 11px;font-size:12px">Moissonner maintenant</button>
+      <button class="lienreg" id="ouvrirReg">réglages</button>
+    </div>
+  </div>
+
+  <div class="reglages" id="reglages" hidden>
+    <h3>Se connecter à votre dépôt</h3>
+    <p>
+      Il faut un jeton GitHub pour que cette page puisse enregistrer vos décisions
+      et lancer les actions. <b>Il ne quitte jamais votre navigateur</b> : il est rangé
+      dans le stockage local de cette page, sur cette machine.<br>
+      Créez-le sur <a id="lienJeton" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com → jeton à portée fine</a>,
+      limité à ce seul dépôt, avec les permissions <code>Contents: Read and write</code>
+      et <code>Actions: Read and write</code>. Donnez-lui une expiration courte : vous le
+      recréerez en trente secondes.
+    </p>
+    <div class="champs">
+      <div><label for="rOwner">Compte GitHub</label><input id="rOwner" placeholder="votre-compte"></div>
+      <div><label for="rRepo">Dépôt</label><input id="rRepo" placeholder="curio"></div>
+      <div><label for="rBranch">Branche</label><input id="rBranch" placeholder="main"></div>
+      <div><label for="rToken">Jeton</label><input id="rToken" type="password" placeholder="github_pat_…"></div>
+    </div>
+    <div class="cmd" style="margin:12px 0 0">
+      <button class="btn p" id="regOk">Enregistrer et vérifier</button>
+      <button class="btn" id="regOubli">Oublier le jeton</button>
+    </div>
+  </div>
+
+  <div class="msg" id="msg"></div>
+
+  <!-- ═══════════════ CATALOGUE ═══════════════ -->
+  <section id="vueCat">
+    <div class="chiffres" id="chCat"></div>
+    <div class="cmd">
+      <input type="search" id="q" placeholder="Chercher : méduse, nyos, galaxie…">
+      <select id="fUni"><option value="">Tous les univers</option></select>
+      <select id="fSrc">
+        <option value="">Toutes provenances</option>
+        <option value="phare">★ Sujets phares</option>
+        <option value="insolite">Articles insolites</option>
+        <option value="saviez">Le saviez-vous ?</option>
+        <option value="reddit">Reddit</option>
+      <option value="manuel">Ajouts manuels</option>
+        <option value="croise">Croisé : 2 sources ou +</option>
+      </select>
+      <select id="fDec">
+        <option value="">Toutes décisions</option>
+        <option value="neutre">Pas encore décidé</option>
+        <option value="retenu">Retenus</option>
+        <option value="ecarte">Écartés</option>
+      </select>
+      <select id="fEtat">
+        <option value="">Tous les états</option>
+        <option value="aecrire">À écrire</option>
+        <option value="ecrit">Écrit</option>
+        <option value="publie">En ligne</option>
+      </select>
+      <select id="fTri">
+        <option value="potentiel">Par potentiel</option>
+        <option value="sources">Par nombre de sources</option>
+        <option value="recent">Les derniers arrivés</option>
+        <option value="titre">Par titre</option>
+      </select>
+      <span class="compte" id="cCat"></span>
+    </div>
+    <div class="cmd">
+      <button class="btn v" id="toutRetenir">Retenir tout ce qui est affiché</button>
+      <button class="btn" id="toutEcarter">Écarter tout ce qui est affiché</button>
+      <button class="btn" id="toutNeutre">Remettre à zéro l’affichage</button>
+    </div>
+    <div class="liste" id="lCat"></div>
+    <button class="btn plus" id="plusCat" hidden>Afficher la suite</button>
+  </section>
+
+  <!-- ═══════════════ RELECTURE ═══════════════ -->
+  <section id="vueRel" hidden>
+    <div class="chiffres" id="chRel"></div>
+    <div class="cmd">
+      <input type="search" id="qR" placeholder="Chercher dans les fiches écrites…">
+      <select id="fLang"><option value="fr">Fiches françaises</option><option value="en">Fiches anglaises</option></select>
+      <select id="fUniR"><option value="">Tous les univers</option></select>
+      <select id="fVal">
+        <option value="">Toutes</option>
+        <option value="neutre">Pas encore relues</option>
+        <option value="valide">Validées</option>
+        <option value="refaire">À refaire</option>
+        <option value="retire">À retirer</option>
+        <option value="enligne">Déjà en ligne</option>
+      </select>
+      <span class="compte" id="cRel"></span>
+    </div>
+    <div class="cmd">
+      <button class="btn v" id="toutValider">Valider tout ce qui est affiché</button>
+      <button class="btn" id="toutReplier">Replier tous les textes</button>
+    </div>
+    <div class="liste" id="lRel"></div>
+    <button class="btn plus" id="plusRel" hidden>Afficher la suite</button>
+  </section>
+</div>
+
+<div class="pied">
+  <div class="in">
+    <span class="resume" id="resume">—</span>
+    <span class="droite" id="actions"></span>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ══════════════════════════ état ══════════════════════════ */
+var NOMS = {
+  cosmos:['Cosmos',196], vivant:['Le Vivant',148], histoire:['Histoire oubliée',28],
+  esprit:['Corps & Esprit',320], sciences:['Sciences & Inventions',262],
+  mysteres:['Mystères',8], terre:['Terre & Océans',178], arts:['Arts & Civilisations',44]
+};
+var LOT = 60;
+var S = {
+  onglet:'cat',
+  sujets:[], decisions:{}, decSha:null,
+  fiches:[], validations:{}, valSha:null,
+  vueCat:[], nCat:0, vueRel:[], nRel:0,
+  cfg:{ owner:'', repo:'', branch:'main', token:'' },
+  connecte:false, sale:false
+};
+
+function $(s){ return document.querySelector(s); }
+function el(t,c,h){ var n=document.createElement(t); if(c)n.className=c; if(h!=null)n.innerHTML=h; return n; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function nb(n){ return Number(n||0).toLocaleString('fr-FR'); }
+function plier(t){ return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’']/g,"'").toLowerCase(); }
+function dit(txt, genre){ var m=$('#msg'); m.className='msg '+(genre||'info'); m.innerHTML=txt;
+  if(genre==='ok') setTimeout(function(){ if(m.className.indexOf('ok')>=0) m.className='msg'; }, 6000); }
+
+/* ══════════════════════════ réglages ══════════════════════════ */
+function lireCfg(){
+  try{ var v = JSON.parse(localStorage.getItem('curio.console')||'{}');
+       S.cfg.owner=v.owner||''; S.cfg.repo=v.repo||''; S.cfg.branch=v.branch||'main'; S.cfg.token=v.token||''; }
+  catch(e){}
+  if(!S.cfg.owner || !S.cfg.repo){
+    var h = location.hostname.match(/^([^.]+)\.github\.io$/);
+    if(h){ S.cfg.owner = S.cfg.owner || h[1];
+      var seg = location.pathname.split('/').filter(Boolean);
+      S.cfg.repo = S.cfg.repo || (seg.length ? seg[0] : (h[1]+'.github.io')); }
+  }
+}
+function ecrireCfg(){
+  try{ localStorage.setItem('curio.console', JSON.stringify(S.cfg)); }catch(e){}
+}
+/* Un filet : vos décisions sont gardées dans ce navigateur au fur et à mesure.
+   Un rechargement malencontreux ne vous fait pas recommencer une heure de
+   travail. Le dépôt reste la référence — c'est lui qu'on relit au démarrage
+   quand le jeton est là — mais tant que vous n'avez pas enregistré, c'est ici
+   que ça vit. */
+function memoriser(){
+  try{
+    localStorage.setItem('curio.brouillon', JSON.stringify({
+      decisions: S.decisions, validations: S.validations, sale: S.sale, quand: Date.now()
+    }));
+  }catch(e){}
+}
+function relireBrouillon(){
+  try{
+    var v = JSON.parse(localStorage.getItem('curio.brouillon')||'{}');
+    if(v.decisions && Object.keys(v.decisions).length) S.decisions = v.decisions;
+    if(v.validations && Object.keys(v.validations).length) S.validations = v.validations;
+    S.sale = !!v.sale;
+  }catch(e){}
+}
+function peindreCfg(){
+  $('#rOwner').value=S.cfg.owner; $('#rRepo').value=S.cfg.repo;
+  $('#rBranch').value=S.cfg.branch; $('#rToken').value=S.cfg.token;
+  if(S.cfg.owner && S.cfg.repo)
+    $('#lienJeton').href='https://github.com/settings/personal-access-tokens/new';
+}
+function marquerCx(ok, txt){
+  S.connecte = !!ok;
+  $('#pt').className = 'point ' + (ok?'ok':(txt?'ko':''));
+  $('#cx').textContent = txt || (ok ? (S.cfg.owner+'/'+S.cfg.repo) : 'non connectée');
+  peindrePied();
+}
+
+/* ══════════════════════════ GitHub ══════════════════════════ */
+function api(chemin, opts){
+  opts = opts || {};
+  var h = { 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28' };
+  if(S.cfg.token) h.Authorization = 'Bearer ' + S.cfg.token;
+  if(opts.body) h['Content-Type']='application/json';
+  return fetch('https://api.github.com/repos/'+S.cfg.owner+'/'+S.cfg.repo+chemin, {
+    method: opts.method||'GET', headers:h, body: opts.body?JSON.stringify(opts.body):undefined
+  }).then(function(r){
+    if(r.status===204) return {};
+    return r.json().then(function(j){
+      if(!r.ok){ var e=new Error((j&&j.message)||('HTTP '+r.status)); e.statut=r.status; throw e; }
+      return j;
+    });
+  });
+}
+/* base64 qui survit aux accents */
+function versB64(txt){
+  var o = new TextEncoder().encode(txt), s='';
+  for(var i=0;i<o.length;i++) s += String.fromCharCode(o[i]);
+  return btoa(s);
+}
+function depuisB64(b){
+  var s = atob(String(b).replace(/\s/g,'')), o = new Uint8Array(s.length);
+  for(var i=0;i<s.length;i++) o[i]=s.charCodeAt(i);
+  return new TextDecoder().decode(o);
+}
+function lireFichier(chemin){
+  return api('/contents/'+chemin+'?ref='+encodeURIComponent(S.cfg.branch))
+    .then(function(j){ return { texte: depuisB64(j.content), sha: j.sha }; })
+    .catch(function(e){ if(e.statut===404) return { texte:null, sha:null }; throw e; });
+}
+function ecrireFichier(chemin, texte, sha, message){
+  var corps = { message: message, content: versB64(texte), branch: S.cfg.branch };
+  if(sha) corps.sha = sha;
+  return api('/contents/'+chemin, { method:'PUT', body:corps })
+    .then(function(j){ return j.content ? j.content.sha : null; });
+}
+function lancerAction(fichier, entrees){
+  return api('/actions/workflows/'+fichier+'/dispatches',
+    { method:'POST', body:{ ref:S.cfg.branch, inputs: entrees||{} } });
+}
+
+/* ══════════════════════════ chargement ══════════════════════════ */
+function localJson(chemin){
+  return fetch(chemin+'?t='+Date.now(), {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+}
+
+function chargerTout(){
+  return localJson('catalogue-maitre.json').then(function(m){
+    S.sujets = (m && m.sujets ? m.sujets : []).filter(function(s){ return s && (s.fr||s.en); });
+    S.jour = m && m.genere ? String(m.genere).slice(0,10) : '';
+    if(!S.sujets.length){
+      $('#lCat').appendChild(el('div','vide',
+        'Le catalogue n’a pas encore été construit.<br>Lancez <b>1 · Moissonner</b> — ou attendez cette nuit, elle tourne à minuit.'));
+    }
+    remplirUnivers();
+    return chargerFiches();
+  }).then(function(){
+    return S.cfg.token ? chargerDecisions() : null;
+  }).then(function(){
+    peindreCat(); peindreRel(); peindrePied();
+  });
+}
+
+function chargerFiches(){
+  var unis = {};
+  S.sujets.forEach(function(s){ unis[s.uni]=1; });
+  var cles = Object.keys(unis); if(!cles.length) cles = Object.keys(NOMS);
+  var jobs = [];
+  cles.forEach(function(u){
+    ['fr','en'].forEach(function(l){
+      jobs.push(localJson('anecdotes/'+l+'-'+u+'.json').then(function(j){
+        if(!j || !j.items) return;
+        Object.keys(j.items).forEach(function(titre){
+          var r = j.items[titre];
+          S.fiches.push({ lang:l, uni:u, titre:titre, rec:r });
+        });
+      }));
+    });
+  });
+  return Promise.all(jobs);
+}
+
+function chargerDecisions(){
+  return Promise.all([lireFichier('consignes/decisions.json'), lireFichier('consignes/validations.json')])
+    .then(function(r){
+      /* Le dépôt fait foi — SAUF si ce navigateur porte un brouillon non
+         enregistré : on ne jette jamais un travail en cours sans le dire. */
+      var brouillon = S.sale;
+      if(!brouillon){
+        if(r[0].texte){ try{ S.decisions = JSON.parse(r[0].texte)||{}; }catch(e){} }
+        if(r[1].texte){ try{ S.validations = JSON.parse(r[1].texte)||{}; }catch(e){} }
+      }
+      S.decSha = r[0].sha; S.valSha = r[1].sha;
+      marquerCx(true);
+      if(brouillon) dit('Ce navigateur porte des décisions non enregistrées : elles ont été gardées. '
+        + 'Enregistrez-les, ou rechargez la page après les avoir effacées.', 'info');
+    })
+    .catch(function(e){ marquerCx(false, 'jeton refusé — ' + e.message); });
+}
+
+function remplirUnivers(){
+  var us = {};
+  S.sujets.forEach(function(s){ us[s.uni]=(us[s.uni]||0)+1; });
+  [['#fUni',true],['#fUniR',false]].forEach(function(p){
+    var sel = $(p[0]); if(!sel) return;
+    while(sel.options.length>1) sel.remove(1);
+    Object.keys(us).sort(function(a,b){ return us[b]-us[a]; }).forEach(function(k){
+      var o=document.createElement('option'); o.value=k;
+      o.textContent=((NOMS[k]||[k])[0]) + (p[1] ? ' ('+nb(us[k])+')' : '');
+      sel.appendChild(o);
+    });
+  });
+}
+
+/* ══════════════════════════ CATALOGUE ══════════════════════════ */
+function etatDe(s){
+  if(s.statut==='retire') return 'retire';
+  if(s.publie) return 'publie';
+  if(s.statut==='ecrit'||s.ecrit) return 'ecrit';
+  return 'aecrire';
+}
+var ETIQ={aecrire:'à écrire',ecrit:'écrit',publie:'en ligne',retire:'retiré'};
+
+function decDe(s){ return S.decisions[s.qid] || 'neutre'; }
+
+function filtrerCat(){
+  var q=plier($('#q').value.trim()), u=$('#fUni').value, sf=$('#fSrc').value,
+      df=$('#fDec').value, ef=$('#fEtat').value, tri=$('#fTri').value;
+  S.vueCat = S.sujets.filter(function(s){
+    if(u && s.uni!==u) return false;
+    var src=s.sources||[];
+    if(sf==='croise'){ if(src.length<2) return false; }
+    else if(sf && src.indexOf(sf)<0) return false;
+    if(df && decDe(s)!==df) return false;
+    if(ef && etatDe(s)!==ef) return false;
+    if(q){
+      if(!s._f) s._f = plier([s.fr,s.en,s.phrase,s.apercu,(NOMS[s.uni]||[''])[0]].filter(Boolean).join(' '));
+      if(s._f.indexOf(q)<0) return false;
+    }
+    return true;
+  });
+  if(tri==='titre') S.vueCat.sort(function(a,b){ return String(a.fr||a.en).localeCompare(String(b.fr||b.en),'fr'); });
+  else if(tri==='sources') S.vueCat.sort(function(a,b){ return (b.sources||[]).length-(a.sources||[]).length || b.potentiel-a.potentiel; });
+  else if(tri==='recent') S.vueCat.sort(function(a,b){ return String(b.ajoute||'').localeCompare(String(a.ajoute||'')) || b.potentiel-a.potentiel; });
+  else S.vueCat.sort(function(a,b){ return b.potentiel-a.potentiel || (b.sources||[]).length-(a.sources||[]).length; });
+}
+
+function ligneCat(s){
+  var uni=NOMS[s.uni]||[s.uni,200], src=s.sources||[], et=etatDe(s), d=decDe(s);
+  var lien = s.fr ? 'https://fr.wikipedia.org/wiki/'+encodeURIComponent(s.fr.replace(/ /g,'_'))
+                  : 'https://en.wikipedia.org/wiki/'+encodeURIComponent(String(s.en).replace(/ /g,'_'));
+  var n = el('article','item'+(d==='retenu'?' retenu':d==='ecarte'?' ecarte':''));
+
+  var meta = el('div','meta');
+  var h = '<i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i><span>'+esc(uni[0])+'</span>'
+        + (s.fr?'<span class="lg">FR</span>':'') + (s.en?'<span class="lg">EN</span>':'')
+        + '<b class="note">'+(s.potentiel||1)+'/10</b>';
+  src.forEach(function(x){ h += '<b class="s-'+x+'">'+esc(x==='saviez'?'le saviez-vous':x)+'</b>'; });
+  if(src.length>=2) h += '<b class="croise">'+src.length+' sources</b>';
+  h += '<b class="e-'+et+'">'+ETIQ[et]+'</b>';
+  meta.innerHTML = h;
+
+  var g = el('span','gestes');
+  [['retenu','à écrire','on-v'],['ecarte','écarter','on-r']].forEach(function(x){
+    var b=el('button','g'+(d===x[0]?' '+x[2]:''),x[1]); b.type='button';
+    b.addEventListener('click', function(){
+      S.decisions[s.qid] = (S.decisions[s.qid]===x[0]) ? 'neutre' : x[0];
+      if(S.decisions[s.qid]==='neutre') delete S.decisions[s.qid];
+      S.sale=true; memoriser(); peindreCat();
+    });
+    g.appendChild(b);
+  });
+  meta.appendChild(g);
+  n.appendChild(meta);
+
+  n.appendChild(el('h2',null,'<a href="'+lien+'" target="_blank" rel="noopener">'+esc(s.fr||s.en)+'</a>'));
+  if(s.fr&&s.en&&s.fr!==s.en) n.appendChild(el('p','autre',esc(s.en)));
+  var txt = s.phrase || s.apercu || '';
+  if(txt) n.appendChild(el('p','phrase'+(s.phrase?' c':''),esc(txt)));
+  return n;
+}
+
+function peindreCat(){
+  filtrerCat();
+  var c={total:S.sujets.length,retenu:0,ecarte:0,neutre:0,aecrire:0,ecrit:0,publie:0};
+  S.sujets.forEach(function(s){ c[decDe(s)]++; c[etatDe(s)] = (c[etatDe(s)]||0)+1; });
+  var box=$('#chCat'); box.innerHTML='';
+  [['k',c.total,'au catalogue'],['v',c.retenu,'retenus'],['r',c.ecarte,'écartés'],
+   ['',c.neutre,'pas décidés'],['o',c.ecrit,'écrits'],['k',c.publie,'en ligne']]
+   .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
+
+  $('#cCat').textContent = nb(S.vueCat.length)+' affiché'+(S.vueCat.length>1?'s':'');
+  var l=$('#lCat'); l.innerHTML=''; S.nCat=0;
+  if(!S.vueCat.length){ l.appendChild(el('div','vide','Rien ne correspond.')); $('#plusCat').hidden=true; peindrePied(); return; }
+  suiteCat(); peindrePied();
+}
+function suiteCat(){
+  var f=document.createDocumentFragment(), fin=Math.min(S.nCat+LOT,S.vueCat.length);
+  for(var i=S.nCat;i<fin;i++) f.appendChild(ligneCat(S.vueCat[i]));
+  $('#lCat').appendChild(f); S.nCat=fin;
+  $('#plusCat').hidden = S.nCat>=S.vueCat.length;
+  $('#plusCat').textContent = 'Afficher la suite ('+nb(S.vueCat.length-S.nCat)+' restants)';
+}
+
+/* ══════════════════════════ RELECTURE ══════════════════════════ */
+function valDe(f){ var k=f.lang+'|'+f.titre; return S.validations[k]||'neutre'; }
+function enLigne(f){ return f.rec.p && String(f.rec.p) <= new Date().toISOString().slice(0,10); }
+
+function filtrerRel(){
+  var q=plier($('#qR').value.trim()), lg=$('#fLang').value, u=$('#fUniR').value, vf=$('#fVal').value;
+  S.vueRel = S.fiches.filter(function(f){
+    if(lg && f.lang!==lg) return false;
+    if(u && f.uni!==u) return false;
+    if(vf==='enligne'){ if(!enLigne(f)) return false; }
+    else if(vf && valDe(f)!==vf) return false;
+    if(q){
+      if(!f._f) f._f = plier([f.titre,f.rec.t,f.rec.x,f.rec.r].filter(Boolean).join(' '));
+      if(f._f.indexOf(q)<0) return false;
+    }
+    return true;
+  });
+  S.vueRel.sort(function(a,b){ return (b.rec.s||0)-(a.rec.s||0); });
+}
+
+function ficheHtml(f){
+  var uni=NOMS[f.uni]||[f.uni,200], v=valDe(f), l=enLigne(f);
+  var n=el('article','fiche'+(v==='valide'?' valide':''));
+
+  var meta=el('div','meta');
+  var h='<i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i><span>'+esc(uni[0])+'</span>'
+      + '<span class="lg">'+f.lang.toUpperCase()+'</span>'
+      + '<b class="note">'+(f.rec.s==null?'—':f.rec.s+'/10')+'</b>'
+      + (l ? '<b class="e-publie">en ligne</b>' : '<b class="e-ecrit">en réserve</b>')
+      + (f.rec.v==='quarantaine' ? '<b class="e-retire">quarantaine</b>' : '');
+  meta.innerHTML=h;
+
+  var g=el('span','gestes');
+  [['valide','valider','on-v'],['refaire','à refaire','on-r'],['retire','retirer','on-r']].forEach(function(x){
+    var b=el('button','g'+(v===x[0]?' '+x[2]:''),x[1]); b.type='button';
+    b.addEventListener('click', function(){
+      var k=f.lang+'|'+f.titre;
+      if(S.validations[k]===x[0]) delete S.validations[k]; else S.validations[k]=x[0];
+      S.sale=true; memoriser(); peindreRel();
+    });
+    g.appendChild(b);
+  });
+  meta.appendChild(g);
+  n.appendChild(meta);
+
+  n.appendChild(el('h2',null,esc(f.rec.t||f.titre)));
+  var url = f.rec.u || ('https://'+f.lang+'.wikipedia.org/wiki/'+encodeURIComponent(f.titre.replace(/ /g,'_')));
+  n.appendChild(el('p','art','d’après <a href="'+esc(url)+'" target="_blank" rel="noopener">'+esc(f.titre)+'</a>'));
+
+  var corps=el('div','corps');
+  var paras=String(f.rec.x||'').split(/\n{2,}/).filter(function(p){ return p.trim(); });
+  var court = paras.length>2;
+  paras.forEach(function(p,i){
+    var pn=el('p',null,esc(p.trim()).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>'));
+    if(court && i>=2) pn.hidden=true;
+    corps.appendChild(pn);
+  });
+  n.appendChild(corps);
+  if(court){
+    var b=el('button','replier','Lire la suite ('+(paras.length-2)+' paragraphes)');
+    b.type='button';
+    b.addEventListener('click', function(){
+      var caches=corps.querySelectorAll('p[hidden]');
+      if(caches.length){ [].forEach.call(caches,function(p){p.hidden=false;}); b.textContent='Replier'; }
+      else { [].forEach.call(corps.querySelectorAll('p'),function(p,i){ if(i>=2) p.hidden=true; });
+             b.textContent='Lire la suite ('+(paras.length-2)+' paragraphes)'; }
+    });
+    n.appendChild(b);
+  }
+  if(f.rec.r) n.appendChild(el('div','raconter','<span>la phrase à raconter</span>'+esc(f.rec.r)));
+  return n;
+}
+
+function peindreRel(){
+  filtrerRel();
+  var c={total:S.fiches.length,valide:0,refaire:0,retire:0,neutre:0,ligne:0};
+  S.fiches.forEach(function(f){ c[valDe(f)]++; if(enLigne(f)) c.ligne++; });
+  var box=$('#chRel'); box.innerHTML='';
+  [['k',c.total,'fiches écrites'],['v',c.valide,'validées'],['o',c.refaire,'à refaire'],
+   ['r',c.retire,'à retirer'],['',c.neutre,'pas relues'],['k',c.ligne,'en ligne']]
+   .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
+
+  $('#cRel').textContent = nb(S.vueRel.length)+' affichée'+(S.vueRel.length>1?'s':'');
+  var l=$('#lRel'); l.innerHTML=''; S.nRel=0;
+  if(!S.vueRel.length){
+    l.appendChild(el('div','vide', S.fiches.length
+      ? 'Rien ne correspond.'
+      : 'Aucune fiche écrite pour l’instant.<br>Retenez des sujets dans le catalogue, puis lancez l’écriture.'));
+    $('#plusRel').hidden=true; peindrePied(); return;
+  }
+  suiteRel(); peindrePied();
+}
+function suiteRel(){
+  var f=document.createDocumentFragment(), fin=Math.min(S.nRel+12,S.vueRel.length);
+  for(var i=S.nRel;i<fin;i++) f.appendChild(ficheHtml(S.vueRel[i]));
+  $('#lRel').appendChild(f); S.nRel=fin;
+  $('#plusRel').hidden = S.nRel>=S.vueRel.length;
+  $('#plusRel').textContent = 'Afficher la suite ('+nb(S.vueRel.length-S.nRel)+' restantes)';
+}
+
+/* ══════════════════════════ la barre du bas ══════════════════════════ */
+function peindrePied(){
+  var r=$('#resume'), a=$('#actions'); a.innerHTML='';
+  if(!S.connecte){
+    var ret0=0, val0=0;
+    S.sujets.forEach(function(s){ if(decDe(s)==='retenu') ret0++; });
+    S.fiches.forEach(function(f){ if(valDe(f)==='valide') val0++; });
+    var fait = S.onglet==='cat' ? (nb(ret0)+' retenus') : (nb(val0)+' validées');
+    r.innerHTML = '<b>'+fait+'</b>, gardés dans ce navigateur. '
+                + '<b>Connectez votre dépôt</b> pour les enregistrer et lancer les actions.';
+    var b=el('button','btn p','Connecter le dépôt');
+    b.addEventListener('click',function(){ $('#reglages').hidden=false; window.scrollTo(0,0); });
+    a.appendChild(b); return;
+  }
+  if(S.onglet==='cat'){
+    var ret=0, eca=0;
+    S.sujets.forEach(function(s){ var d=decDe(s); if(d==='retenu')ret++; else if(d==='ecarte')eca++; });
+    var aEcrire = S.sujets.filter(function(s){ return decDe(s)==='retenu' && etatDe(s)==='aecrire'; }).length;
+    r.innerHTML = '<b>'+nb(ret)+'</b> retenus · <b>'+nb(eca)+'</b> écartés'
+                + (S.sale ? ' · <span style="color:var(--or)">non enregistré</span>' : '');
+    var b1=el('button','btn'+(S.sale?' p':''),'Enregistrer mes décisions');
+    b1.addEventListener('click', enregistrerDecisions);
+    var b2=el('button','btn o','Écrire les '+nb(aEcrire)+' retenus');
+    b2.disabled = !aEcrire;
+    b2.addEventListener('click', envoyerEcriture);
+    a.appendChild(b1); a.appendChild(b2);
+  }else{
+    var val=0, ref=0, ret2=0;
+    S.fiches.forEach(function(f){ var v=valDe(f); if(v==='valide')val++; else if(v==='refaire')ref++; else if(v==='retire')ret2++; });
+    r.innerHTML = '<b>'+nb(val)+'</b> validées · '+nb(ref)+' à refaire · '+nb(ret2)+' à retirer'
+                + (S.sale ? ' · <span style="color:var(--or)">non enregistré</span>' : '');
+    var c1=el('button','btn'+(S.sale?' p':''),'Enregistrer ma relecture');
+    c1.addEventListener('click', enregistrerValidations);
+    var c2=el('button','btn v','Publier les '+nb(val)+' validées');
+    c2.disabled = !val;
+    c2.addEventListener('click', envoyerPublication);
+    a.appendChild(c1); a.appendChild(c2);
+  }
+}
+
+/* ══════════════════════════ les quatre gestes qui écrivent ══════════════════════════ */
+function enregistrerDecisions(){
+  dit('Enregistrement…','info');
+  var txt = JSON.stringify(S.decisions, null, 1);
+  return ecrireFichier('consignes/decisions.json', txt, S.decSha,
+      'console : décisions de curation (' + Object.keys(S.decisions).length + ' sujets)')
+    .then(function(sha){ S.decSha=sha; S.sale=false; memoriser(); peindrePied();
+      dit('Décisions enregistrées dans le dépôt.','ok'); })
+    .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+}
+function enregistrerValidations(){
+  dit('Enregistrement…','info');
+  var txt = JSON.stringify(S.validations, null, 1);
+  return ecrireFichier('consignes/validations.json', txt, S.valSha,
+      'console : relecture (' + Object.keys(S.validations).length + ' fiches)')
+    .then(function(sha){ S.valSha=sha; S.sale=false; memoriser(); peindrePied();
+      dit('Relecture enregistrée dans le dépôt.','ok'); })
+    .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+}
+function envoyerEcriture(){
+  var n = S.sujets.filter(function(s){ return decDe(s)==='retenu' && etatDe(s)==='aecrire'; }).length;
+  var budget = window.prompt(
+    n + ' sujet(s) retenus restent à écrire, soit ' + (n*2) + ' fiches.\n\n'
+    + 'Budget de cette tranche, en euros ?\n'
+    + '(≈ ' + Math.ceil(n*2*0.036/1.08) + ' € pour tout écrire)', '30');
+  if(budget===null) return;
+  dit('Enregistrement des décisions, puis lancement…','info');
+  enregistrerDecisions().then(function(){
+    return lancerAction('2-ecrire.yml', { budget:String(budget), estimer:'false', modele:'' });
+  }).then(function(){
+    dit('L’écriture est lancée. Suivez-la dans l’onglet <b>Actions</b> de votre dépôt ; '
+      + 'revenez ici dans un moment, les fiches apparaîtront dans <b>Relecture</b>.','ok');
+  }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
+}
+function envoyerPublication(){
+  var n = S.fiches.filter(function(f){ return valDe(f)==='valide'; }).length;
+  if(!window.confirm('Publier définitivement ' + n + ' fiche(s) validée(s) ?\n\n'
+    + 'Elles apparaîtront sur le site. Les fiches marquées « à refaire » ou « à retirer » '
+    + 'seront traitées en conséquence.')) return;
+  dit('Enregistrement de la relecture, puis publication…','info');
+  enregistrerValidations().then(function(){
+    return lancerAction('5-publier.yml', { operation:'valider', combien:'', titre:'' });
+  }).then(function(){
+    dit('La publication est lancée. Elle applique votre relecture : les validées partent en ligne, '
+      + 'les « à refaire » repassent à écrire, les « à retirer » sortent.','ok');
+  }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
+}
+
+/* ══════════════════════════ branchements ══════════════════════════ */
+function onglet(nom){
+  S.onglet=nom;
+  $('#ongCat').className = nom==='cat'?'on':'';
+  $('#ongRel').className = nom==='rel'?'on':'';
+  $('#vueCat').hidden = nom!=='cat';
+  $('#vueRel').hidden = nom!=='rel';
+  peindrePied();
+}
+$('#ongCat').addEventListener('click',function(){ onglet('cat'); });
+$('#ongRel').addEventListener('click',function(){ onglet('rel'); });
+/* La moisson tourne chaque nuit à minuit. Ce bouton est là pour les fois où
+   l'on ne veut pas attendre : on vient d'ajouter des sujets phares, ou de
+   brancher un subreddit, et on veut voir le résultat maintenant. */
+$('#moissonner').addEventListener('click',function(){
+  if(!S.connecte){ dit('Connectez votre dépôt d’abord : la moisson se lance par l’API GitHub.','ko');
+    $('#reglages').hidden=false; window.scrollTo(0,0); return; }
+  if(!window.confirm('Lancer la moisson maintenant ?\n\n'
+    + 'Elle est gratuite. Comptez quelques minutes — une demi-heure la toute première fois.\n'
+    + 'Elle tourne de toute façon chaque nuit à minuit.')) return;
+  dit('Lancement…','info');
+  lancerAction('1-moissonner.yml', {}).then(function(){
+    dit('La moisson est lancée. Suivez-la dans l’onglet <b>Actions</b> de votre dépôt, '
+      + 'puis rechargez cette page quand elle est verte.','ok');
+  }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
+});
+$('#ouvrirReg').addEventListener('click',function(){ var r=$('#reglages'); r.hidden=!r.hidden; });
+$('#regOk').addEventListener('click',function(){
+  S.cfg.owner=$('#rOwner').value.trim(); S.cfg.repo=$('#rRepo').value.trim();
+  S.cfg.branch=$('#rBranch').value.trim()||'main'; S.cfg.token=$('#rToken').value.trim();
+  ecrireCfg();
+  if(!S.cfg.owner||!S.cfg.repo||!S.cfg.token){ dit('Compte, dépôt et jeton sont nécessaires.','ko'); return; }
+  dit('Vérification…','info');
+  chargerDecisions().then(function(){
+    if(S.connecte){ dit('Connectée à <b>'+esc(S.cfg.owner+'/'+S.cfg.repo)+'</b>.','ok'); $('#reglages').hidden=true;
+      peindreCat(); peindreRel(); }
+  });
+});
+$('#regOubli').addEventListener('click',function(){
+  S.cfg.token=''; $('#rToken').value=''; ecrireCfg(); marquerCx(false);
+  dit('Jeton oublié. La console repasse en lecture seule.','ok');
+});
+['q','fUni','fSrc','fDec','fEtat','fTri'].forEach(function(id){
+  var n=document.getElementById(id);
+  n.addEventListener(id==='q'?'input':'change', peindreCat);
+});
+['qR','fLang','fUniR','fVal'].forEach(function(id){
+  var n=document.getElementById(id);
+  n.addEventListener(id==='qR'?'input':'change', peindreRel);
+});
+$('#plusCat').addEventListener('click', suiteCat);
+$('#plusRel').addEventListener('click', suiteRel);
+$('#toutRetenir').addEventListener('click',function(){
+  S.vueCat.forEach(function(s){ S.decisions[s.qid]='retenu'; }); S.sale=true; memoriser(); peindreCat(); });
+$('#toutEcarter').addEventListener('click',function(){
+  S.vueCat.forEach(function(s){ S.decisions[s.qid]='ecarte'; }); S.sale=true; memoriser(); peindreCat(); });
+$('#toutNeutre').addEventListener('click',function(){
+  S.vueCat.forEach(function(s){ delete S.decisions[s.qid]; }); S.sale=true; memoriser(); peindreCat(); });
+$('#toutValider').addEventListener('click',function(){
+  S.vueRel.forEach(function(f){ S.validations[f.lang+'|'+f.titre]='valide'; }); S.sale=true; memoriser(); peindreRel(); });
+$('#toutReplier').addEventListener('click',function(){
+  [].forEach.call(document.querySelectorAll('#lRel .corps'),function(c){
+    [].forEach.call(c.querySelectorAll('p'),function(p,i){ if(i>=2) p.hidden=true; }); }); });
+
+window.addEventListener('beforeunload',function(e){
+  if(S.sale){ e.preventDefault(); e.returnValue=''; }
+});
+
+lireCfg(); relireBrouillon(); peindreCfg();
+if(S.cfg.token) marquerCx(false,'vérification…');
+chargerTout();
+})();
+</script>
+</body>
+</html>

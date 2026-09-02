@@ -1,0 +1,149 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  CURIO — 5 · PUBLIER
+#
+#  Le stock est ecrit d avance ; il sort au compte-gouttes. C est ce qui donne
+#  au lecteur la sensation d une application qui vit, alors que tout est deja
+#  dans le depot et qu aucun appel paye n est fait.
+#
+#  CETTE ACTION TOURNE TOUTE SEULE, tous les jours a 6 h UTC. Le nombre de
+#  sujets par passage se regle dans consignes/publication.txt — vous changez
+#  un chiffre sur GitHub, c est tout. La frequence, elle, est la ligne
+#  « cron » ci-dessous.
+#
+#  A la main, vous pouvez aussi :
+#     valider   applique la relecture faite dans la console : les fiches
+#               validees partent en ligne, les « a refaire » repassent a
+#               ecrire, les « a retirer » sortent. C est ce que la console
+#               declenche quand vous cliquez « Publier les validees ».
+#     etat      voir ou en est le stock, sans rien publier
+#     publier   sortir maintenant le nombre que vous indiquez
+#     retirer   le SUJET n a pas sa place : il sort definitivement, les deux
+#               langues, et son titre va dans consignes/exclusions.txt
+#     refaire   le sujet est bon mais le TEXTE ne va pas : on efface les
+#               fiches et le sujet repasse « a ecrire ». La prochaine tranche
+#               le reprendra en priorite.
+#     rendre    annuler un retrait
+# ═══════════════════════════════════════════════════════════════════════════
+name: 5 · Publier
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Que fait-on ?"
+        required: true
+        default: valider
+        type: choice
+        options:
+          - valider
+          - publier
+          - etat
+          - retirer
+          - refaire
+          - rendre
+      combien:
+        description: "Publier : combien de sujets (vide = ce que dit consignes/publication.txt)"
+        default: ""
+      titre:
+        description: "Retirer / refaire / rendre : le titre exact de l article, ou l accroche de la fiche"
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  curio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CURIO_CONTACT: "https://github.com/${{ github.repository }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: tools/.cache
+          key: curio-cache-${{ github.run_id }}
+          restore-keys: |
+            curio-cache-
+      - name: Verifier les scripts
+        run: |
+          for f in tools/build-catalog.mjs tools/write-anecdotes.mjs tools/controler.mjs tools/publier.mjs; do
+            [ -f "$f" ] || { echo "::error::$f est absent du depot. Importez le dossier tools/ en entier."; exit 1; }
+            node --check "$f"
+          done
+
+      - name: Publier
+        run: |
+          set -o pipefail
+          OP="${{ github.event.inputs.operation }}"
+          [ -z "$OP" ] && OP="publier"
+          case "$OP" in
+            valider)
+              node tools/publier.mjs --valider 2>&1 | tee curio.log
+              node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
+            etat)
+              node tools/publier.mjs --etat 2>&1 | tee curio.log ;;
+            retirer)
+              if [ -z "${{ github.event.inputs.titre }}" ]; then
+                echo "::error::Indiquez le titre a retirer."; exit 1; fi
+              node tools/publier.mjs --retirer "${{ github.event.inputs.titre }}" 2>&1 | tee curio.log
+              node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
+            refaire)
+              if [ -z "${{ github.event.inputs.titre }}" ]; then
+                echo "::error::Indiquez le titre a refaire."; exit 1; fi
+              node tools/publier.mjs --refaire "${{ github.event.inputs.titre }}" 2>&1 | tee curio.log
+              node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
+            rendre)
+              if [ -z "${{ github.event.inputs.titre }}" ]; then
+                echo "::error::Indiquez le titre a rendre."; exit 1; fi
+              node tools/publier.mjs --rendre "${{ github.event.inputs.titre }}" 2>&1 | tee curio.log
+              node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
+            *)
+              C=""; if [ -n "${{ github.event.inputs.combien }}" ]; then C="--combien ${{ github.event.inputs.combien }}"; fi
+              node tools/publier.mjs $C 2>&1 | tee curio.log
+              node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
+          esac
+
+      - name: Compte rendu
+        if: always()
+        run: |
+          {
+            echo "## Curio — publication"
+            echo ""
+            echo '```'
+            tail -70 curio.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Enregistrer
+        if: always()
+        run: |
+          git config user.name  "curio-bot"
+          git config user.email "curio-bot@users.noreply.github.com"
+          rm -f curio.log
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json anecdotes controle.csv consignes/exclusions.txt; do
+            if [ -e "$p" ]; then
+              git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
+            fi
+          done
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau a enregistrer."
+            echo "> Rien de nouveau a enregistrer." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git commit -m "curio: publication"
+          git pull --rebase --autostash || true
+          if git push; then
+            echo "Enregistre et publie."
+          else
+            echo "::error::Le push a echoue. Settings -> Actions -> General -> Workflow permissions -> Read and write."
+            exit 1
+          fi

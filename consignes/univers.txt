@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# AJOUTER UN UNIVERS — sans rien refaire
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Les huit univers de Curio sont dans le code, mais ils ne sont pas une
+# limite. Une ligne ici, et le neuvième existe : la moisson l'accepte dans
+# sujets-phares.txt, et l'application le découvre toute seule en lisant
+# catalog.json. Rien de ce qui existe n'est touché, aucun fichier à refaire.
+#
+# FORMAT
+#   identifiant | teinte | nom FR | description FR | nom EN | description EN
+#
+#   · identifiant : lettres et chiffres, sans espace ni accent. C'est lui
+#     que vous écrirez dans la deuxième colonne de sujets-phares.txt.
+#   · teinte : 0 à 360. C'est la couleur de la pastille et du dégradé.
+#         0 rouge · 30 orange · 45 or · 150 vert · 195 cyan · 265 violet
+#         320 rose. Évitez les teintes déjà prises : 196 cosmos, 148 vivant,
+#         28 histoire, 320 esprit, 262 sciences, 8 mystères, 178 terre,
+#         44 arts.
+#   · les deux derniers champs sont facultatifs : sans eux, l'anglais reprend
+#     le français.
+#
+# EXEMPLE, à décommenter le jour venu :
+#
+# reddit | 16 | Histoires vraies | Ce que les gens racontent quand ils croient que personne ne les lit. | True Stories | What people tell when they think nobody is reading.
+#
+# ═══════════════════════════════════════════════════════════════════════════

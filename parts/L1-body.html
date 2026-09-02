@@ -1,0 +1,125 @@
+<div id="grain" aria-hidden="true"></div>
+
+<nav class="nav">
+  <div class="wrap">
+    <div class="brand"><b>Curio</b><i data-t="tag">Le monde est plus étrange</i></div>
+    <div class="navlinks">
+      <a href="#univers" data-t="nav1">Univers</a>
+      <a href="#tarifs" data-t="nav2">Tarifs</a>
+      <a href="#faq" data-t="nav3">Questions</a>
+    </div>
+    <button class="mini" id="langBtn">FR</button>
+    <button class="mini" id="paletteBtn" title="Jeu de couleurs : bleu nuit ou encre d'origine">BLEU</button>
+    <button class="mini" id="themeBtn" aria-label="Thème">
+      <svg id="thIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <canvas class="bg" id="heroBg" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div>
+      <span class="kicker" id="kicker" data-t="kicker">Une anecdote à la fois</span>
+      <h1 data-th="h1">Le monde est <em>plus étrange</em> que vous ne le pensez.</h1>
+      <p class="sub" data-t="sub">Des faits vrais, écrits pour être lus : deux minutes par anecdote, une par écran, huit univers. Pas de fil sans fin, pas de publicité, rien à faire défiler pour rien.</p>
+      <div class="cta-row">
+        <a class="btn btn--primary" href="app.html">
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <span data-t="cta1">Essayer gratuitement</span>
+        </a>
+        <a class="btn btn--ghost" href="#tarifs" data-t="cta2">Voir les formules</a>
+      </div>
+      <div class="reassure">
+        <span><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span data-t="r1">10 anecdotes offertes chaque jour</span></span>
+        <span><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span data-t="r2">Aucune inscription</span></span>
+        <span><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span data-t="r3">Sans publicité</span></span>
+      </div>
+    </div>
+
+    <div class="deck" id="deck">
+      <span class="deck__ghost deck__ghost--2" aria-hidden="true"></span>
+      <span class="deck__ghost deck__ghost--1" aria-hidden="true"></span>
+      <article class="deck__card" id="deckCard">
+        <canvas id="phBg" aria-hidden="true"></canvas>
+        <div class="deck__body">
+          <div class="peyebrow"><span id="phTheme">Cosmos</span><i id="phMin">2 min</i></div>
+          <h3 id="phTitle">Le Grand Attracteur</h3>
+          <p id="phText"></p>
+        </div>
+        <div class="dots" id="phDots"></div>
+      </article>
+    </div>
+  </div>
+</header>
+
+<section id="comment">
+  <div class="wrap">
+    <p class="eyebrow" data-t="howEye">Comment ça marche</p>
+    <h2 data-t="howTitle">Trois gestes, et le savoir devient une habitude.</h2>
+    <p class="lead" data-t="howLead">Curio n'est pas une encyclopédie de plus. C'est un rythme : quelque chose de vrai, de court et de mémorable, chaque jour.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="num">01</span>
+        <h3 data-t="s1t">Choisissez vos univers</h3>
+        <p data-t="s1p">Cosmos, vivant, histoire oubliée, mystères… Vous composez le flux qui vous ressemble, et vous le modifiez quand vous voulez.</p>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <h3 data-t="s2t">Lisez</h3>
+        <p data-t="s2p">Une anecdote par écran, deux minutes de lecture, un fond dessiné pour l'univers. Le texte a un début, un mécanisme et une chute — pas un résumé qui s'arrête au milieu.</p>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <h3 data-t="s3t">Gardez ce qui vous marque</h3>
+        <p data-t="s3p">Un geste pour ajouter à votre collection, un autre pour partager. Votre série de jours consécutifs vous ramène chaque matin.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="univers">
+  <div class="wrap">
+    <p class="eyebrow" data-t="uEye">Les univers</p>
+    <h2 data-t="uTitle">Huit mondes, des sujets choisis pour ce qu’ils racontent.</h2>
+    <p class="lead" data-t="uLead">Les huit sont ouverts, dès la version gratuite. Ce qui change avec l'abonnement, c'est le compteur : dix par jour, ou autant que vous voulez.</p>
+    <div class="unis" id="unis"></div>
+  </div>
+</section>
+
+<section id="tarifs">
+  <div class="wrap">
+    <p class="eyebrow" data-t="pEye">Tarifs</p>
+    <h2 data-t="pTitle">Payez une fois, ou chaque mois. Jamais avec votre attention.</h2>
+    <p class="lead" data-t="pLead">Pas de publicité, pas de revente de données, pas de flux « recommandé » qui vous garde captif. Juste un abonnement honnête — ou un achat définitif.</p>
+    <div class="plans" id="plans"></div>
+    <p class="note" data-t="pNote">Paiement sécurisé, résiliable à tout moment, sans justification. L'achat à vie inclut les huit univers et toutes les anecdotes à venir. Aucune publicité, aucune revente de données.</p>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <p class="eyebrow" data-t="fEye">Questions</p>
+    <h2 data-t="fTitle">Ce qu'on nous demande le plus souvent.</h2>
+    <div class="faq" id="faqList"></div>
+  </div>
+</section>
+
+<section class="final">
+  <canvas id="finalBg" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <h2 data-t="fin1">Vous avez appris quelque chose aujourd'hui ?</h2>
+    <p class="lead" style="margin:0" data-t="fin2">Dix anecdotes vous attendent. Elles ne coûtent rien.</p>
+    <a class="btn btn--primary" href="app.html">
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      <span data-t="fin3">Ouvrir Curio</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr">2026</span> Curio</span>
+    <span data-t="foot1">Anecdotes écrites et vérifiées une par une.</span>
+  </div>
+</footer>

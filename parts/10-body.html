@@ -1,0 +1,249 @@
+<div id="grain" aria-hidden="true"></div>
+
+<header class="topbar" id="topbar">
+  <!-- Une seule ligne, toujours. Ce qui ne tient pas sur un téléphone passe
+       derrière le bouton « … », qui se déplie en dessous. -->
+  <div class="brand"><b>Curio</b><span class="planbadge" id="planTag">Gratuit</span></div>
+
+  <button class="counter" id="tocBtn" title="Sommaire">
+    <b id="tocCount">0</b>
+    <span class="lab" id="tocLabel">anecdotes</span>
+    <i class="fresh" id="tocNew" hidden></i>
+  </button>
+
+  <button class="chip chip--uni" id="uniBtn">
+    <span class="sw" id="uniSw"></span>
+    <span class="lb" id="uniLabel">Cosmos</span>
+    <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
+  </button>
+
+  <div class="quota" id="quota">
+    <span class="gauge"><i id="gaugeFill" style="width:100%"></i></span>
+    <span id="quotaTxt"><b>10</b><em> restantes</em></span>
+  </div>
+
+  <span class="tbgap"></span>
+
+  <button class="iconbtn iconbtn--size" id="sizeBtn" title="Taille du texte" aria-label="Taille du texte" aria-expanded="false">
+    <svg viewBox="0 0 24 24"><path d="M3.5 18.5L8 6l4.5 12.5M5.2 14.5h5.6"/><path d="M14 18.5L17 10l3 8.5M15.2 16h3.6"/></svg>
+  </button>
+  <div class="sizepop" id="sizePop" role="group" aria-label="Taille du texte">
+    <span class="sizepop__lb" data-i18n="size.label">Taille du texte</span>
+    <div class="sizer" id="sizer">
+      <button data-size="0.9"  aria-label="Petit">A</button>
+      <button data-size="1"    class="on" aria-label="Normal">A</button>
+      <button data-size="1.15" aria-label="Grand">A</button>
+      <button data-size="1.32" aria-label="Très grand">A</button>
+    </div>
+  </div>
+  <button class="iconbtn" id="libBtn" title="Ma collection" aria-label="Ma collection">
+    <svg viewBox="0 0 24 24"><path d="M6.5 3.5h11a1.5 1.5 0 011.5 1.5v15.2l-7-3.6-7 3.6V5a1.5 1.5 0 011.5-1.5z"/></svg>
+    <i class="dot" id="libDot" hidden></i>
+  </button>
+  <button class="iconbtn iconbtn--more" id="moreBtn" title="Plus" aria-label="Plus" aria-expanded="false">
+    <svg viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
+  </button>
+
+  <div class="tbmore" id="tbMore">
+    <button class="iconbtn" id="searchBtn" title="Rechercher" aria-label="Rechercher">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+    </button>
+    <button class="langbtn" id="langBtn" title="Langue / Language">FR</button>
+    <button class="iconbtn" id="themeBtn" title="Thème clair / sombre" aria-label="Basculer le thème">
+      <svg viewBox="0 0 24 24" id="themeIcon"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
+    </button>
+    <button class="langbtn" id="paletteBtn" title="Jeu de couleurs : bleu nuit ou encre d'origine">BLEU</button>
+    <button class="chip" id="shuffleBtn">
+      <svg viewBox="0 0 24 24"><path d="M3 6h4l10 12h4M3 18h4l3-3.6M14.5 8.6L17 6h4M18 3l3 3-3 3M18 15l3 3-3 3"/></svg>
+      <span data-i18n="shuffle">Tout mélanger</span>
+    </button>
+    <!-- La version qui tourne réellement, lue dans la balise <meta> gravée par
+         build.sh. Sans elle, impossible de savoir si le navigateur exécute le
+         dernier déploiement ou une copie en cache. -->
+    <span class="tbver" id="tbVer" title="Version de Curio"></span>
+    <div class="streak" id="streakBox" title="Série de jours consécutifs">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.6 3.4.6 5.4-.8 7C9.4 11 8 12.6 8 15a4 4 0 008 0c0-1.4-.5-2.4-1-3.2 2.4 1 4 3.2 4 5.9A7 7 0 015 17.7C5 11.7 12 10 12 2z"/></svg>
+      <span id="streakN">1</span>
+    </div>
+    <span class="offline" id="offlineTag" data-i18n="offline">Collection embarquée</span>
+  </div>
+</header>
+
+<main class="feed" id="feed" tabindex="-1"></main>
+
+
+
+<!-- ====================== ONBOARDING ====================== -->
+<section class="sheet" id="onboard" role="dialog" aria-modal="true">
+  <div class="hero">
+    <div class="hero__in">
+      <span class="kicker" data-i18n="ob.kicker">2 640 000 articles · une anecdote à la fois</span>
+      <h1 data-i18n-html="ob.title">Le monde est <em>plus étrange</em> que vous ne le pensez.</h1>
+      <p data-i18n="ob.sub">Des faits vrais, écrits pour être lus : deux minutes par anecdote, une par écran. Choisissez vos univers pour commencer.</p>
+      <div class="picks">
+        <div class="universes" id="obUniverses"></div>
+      </div>
+      <button class="btn btn--primary" id="obStart" data-i18n="ob.cta">Commencer à explorer</button>
+      <p class="fineprint" data-i18n="ob.note">10 anecdotes offertes chaque jour. Aucune inscription requise.</p>
+      <p class="fineprint fineprint--src" data-i18n="ob.source">Chaque anecdote est écrite pour Curio à partir de faits vérifiés, puis relue avant publication.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== UNIVERS ====================== -->
+<section class="sheet" id="uniSheet" role="dialog" aria-modal="true">
+  <div class="sheet__inner">
+    <div class="sheet__head">
+      <div>
+        <h2 data-i18n="uni.title">Vos univers</h2>
+        <p data-i18n="uni.sub">Sélectionnez les mondes qui alimentent votre flux. Vous pouvez en combiner autant que vous voulez.</p>
+      </div>
+      <button class="iconbtn sheet__close" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="universes" id="uniGrid"></div>
+    <div style="margin-top:26px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn--primary" data-close data-i18n="uni.apply">Appliquer</button>
+      <button class="btn btn--ghost" id="uniAll" data-i18n="uni.all">Tout sélectionner</button>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== PAYWALL ====================== -->
+<section class="sheet" id="paywall" role="dialog" aria-modal="true">
+  <div class="sheet__inner">
+    <div class="sheet__head">
+      <div>
+        <h2 id="payTitle" data-i18n="pay.title">Passez en illimité</h2>
+        <p id="paySub" data-i18n="pay.sub">Tous les univers, sans compteur, hors ligne, et les nouvelles collections dès leur sortie.</p>
+      </div>
+      <button class="iconbtn sheet__close" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="plans" id="plans"></div>
+    <p class="fineprint" data-i18n="pay.fine">Paiement sécurisé. Résiliable à tout moment, sans justification. L'achat à vie inclut les huit univers et toutes les anecdotes à venir.</p>
+    <div class="keyrow">
+      <input id="keyInput" placeholder="CURIO-XXXX-XXXX" aria-label="Clé de licence" />
+      <button class="btn btn--ghost" id="keyBtn" data-i18n="pay.key">Activer ma clé</button>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== BIBLIOTHÈQUE ====================== -->
+<section class="sheet" id="libSheet" role="dialog" aria-modal="true">
+  <div class="sheet__inner">
+    <div class="sheet__head">
+      <div>
+        <h2 data-i18n="lib.title">Ma collection</h2>
+        <p data-i18n="lib.sub">Les anecdotes que vous avez mises de côté.</p>
+      </div>
+      <button class="iconbtn sheet__close" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="list" id="libList"></div>
+  </div>
+</section>
+
+<!-- ====================== RECHERCHE ====================== -->
+<section class="sheet" id="searchSheet" role="dialog" aria-modal="true">
+  <div class="sheet__inner">
+    <div class="sheet__head">
+      <div>
+        <h2 data-i18n="find.title">Chercher un sujet</h2>
+        <p data-i18n="find.sub">Un mot, un nom, un lieu — Curio remonte ce qu'il a de plus surprenant sur le sujet.</p>
+      </div>
+      <button class="iconbtn sheet__close" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="searchbar">
+      <input id="qInput" placeholder="Antikythère, tardigrade, Voynich…" aria-label="Recherche" />
+      <button class="btn btn--primary" id="qBtn" data-i18n="find.go">Chercher</button>
+    </div>
+    <div class="list" id="qList"></div>
+  </div>
+</section>
+
+<!-- ====================== SOMMAIRE ====================== -->
+<section class="sheet" id="tocSheet" role="dialog" aria-modal="true">
+  <div class="sheet__inner">
+    <div class="sheet__head">
+      <div>
+        <h2 data-i18n="toc.title">Sommaire</h2>
+        <p id="tocSub" data-i18n="toc.sub">Tous les sujets de votre catalogue. Touchez-en un pour l'ouvrir.</p>
+      </div>
+      <button class="iconbtn sheet__close" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="searchbar">
+      <input id="tocQ" placeholder="Filtrer…" aria-label="Filtrer le sommaire" />
+    </div>
+    <div id="tocBody"></div>
+  </div>
+</section>
+
+<!-- ====================== CURATION (accès privé) ====================== -->
+<section class="sheet" id="curSheet" role="dialog" aria-modal="true">
+  <div class="sheet__inner sheet__inner--wide">
+    <div class="sheet__head">
+      <div>
+        <h2 id="curTitle">Curation</h2>
+        <p id="curSub">Cochez les fiches, exportez votre sélection, relancez la rédaction dessus.</p>
+      </div>
+      <button class="iconbtn sheet__close" id="curClose" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <!-- L'état du stock, en direct : ce qui est fait, ce qui reste. -->
+    <div class="curstats" id="curStats"></div>
+
+    <div class="curtabs" role="tablist">
+      <button class="curtab on" id="curTabCat" role="tab" aria-selected="true">Catalogue</button>
+      <button class="curtab" id="curTabSrc" role="tab" aria-selected="false">Mes sources</button>
+    </div>
+
+    <div id="curPanCat">
+      <div class="curbar">
+        <input id="curQ" placeholder="Chercher : méduse, nyos, galaxie…" aria-label="Chercher" />
+        <select id="curLang" aria-label="Langue">
+          <option value="tous">Les deux langues</option>
+          <option value="fr">Français</option>
+          <option value="en">Anglais</option>
+        </select>
+        <select id="curUni" aria-label="Univers"></select>
+        <select id="curEtat" aria-label="État">
+          <option value="tous">Toutes les fiches</option>
+          <option value="vierge">À écrire</option>
+          <option value="redige">Déjà rédigées</option>
+        </select>
+        <select id="curTri" aria-label="Tri">
+          <option value="potentiel">Trier par potentiel</option>
+          <option value="insolite">Trier par note obtenue</option>
+          <option value="etat">Trier par état</option>
+          <option value="titre">Trier par titre</option>
+          <option value="univers">Trier par univers</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="curPanSrc" hidden>
+      <p class="curhelp" id="curSrcHelp">Collez l'adresse d'un article — d'où qu'il vienne — et il entrera dans la rédaction au même titre que les sujets du catalogue. Une adresse par ligne.</p>
+      <div class="curaddrow">
+        <input id="curSrcUrl" type="url" placeholder="https://…" aria-label="Adresse de l'article" />
+        <select id="curSrcUni" aria-label="Univers de la source"></select>
+        <button class="btn btn--primary btn--sm" id="curSrcAdd">Ajouter</button>
+      </div>
+      <div id="curSrcList" class="cursrclist"></div>
+    </div>
+
+    <div class="curactions">
+      <span id="curCount">0 sélectionnée</span>
+      <button class="btn btn--ghost btn--sm" id="curAll">Tout cocher</button>
+      <button class="btn btn--ghost btn--sm" id="curNone">Tout décocher</button>
+      <button class="btn btn--primary btn--sm" id="curCopy">Copier la sélection</button>
+      <button class="btn btn--brass btn--sm" id="curDl">Télécharger selection.csv</button>
+      <button class="btn btn--ghost btn--sm" id="curRefus">Copier pour exclusions.txt</button>
+    </div>
+    <textarea id="curRaw" class="curraw" hidden readonly spellcheck="false"
+              aria-label="Sélection au format CSV"></textarea>
+
+    <!-- Liste virtualisée : seules les lignes visibles existent dans le DOM,
+         ce qui permet d'en afficher des dizaines de milliers sans plafond. -->
+    <div id="curList" class="curlist"><div id="curRail" class="curlist__rail"></div></div>
+  </div>
+</section>
+
+<div id="toast" role="status" aria-live="polite"></div>

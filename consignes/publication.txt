@@ -1,0 +1,43 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# LE RYTHME DE PUBLICATION
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Les anecdotes sont écrites d'avance et gardées en réserve. Ce fichier dit
+# combien en sortent à chaque passage de l'action programmée. Changez le
+# chiffre ici, sur GitHub, et c'est réglé : aucune modification de code.
+#
+# UN SUJET, PAS UNE FICHE. Publier « Lac Nyos » met en ligne le français ET
+# l'anglais le même jour.
+#
+# ─────────────────────────────────────────────────────────────────────────
+# COMBIEN de sujets à chaque passage
+# ─────────────────────────────────────────────────────────────────────────
+parPassage: 3
+
+# ─────────────────────────────────────────────────────────────────────────
+# DANS QUEL ORDRE
+#   potentiel   les sujets les plus prometteurs d'abord (défaut)
+#   note        les mieux notés par le rédacteur d'abord — garde le meilleur
+#               pour tout de suite, quitte à s'appauvrir avec le temps
+#   hasard      au hasard — la réserve se vide uniformément
+# ─────────────────────────────────────────────────────────────────────────
+ordre: potentiel
+
+# ─────────────────────────────────────────────────────────────────────────
+# PUBLIER MÊME CE QUI EST EN QUARANTAINE ? Non, évidemment. Ne mettez « oui »
+# que si vous savez exactement pourquoi.
+# ─────────────────────────────────────────────────────────────────────────
+quarantaine: non
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LA FRÉQUENCE, elle, est dans .github/workflows/5-publier.yml, ligne
+# « cron ». Par défaut : tous les jours à 6 h UTC (7 h ou 8 h en France).
+#
+#     0 6 * * *      tous les jours à 6 h        ← par défaut
+#     0 6 * * 1      tous les lundis à 6 h
+#     0 6 */2 * *    un jour sur deux
+#     0 6,18 * * *   deux fois par jour
+#
+# Vous pouvez aussi publier à la main quand vous voulez :
+# Actions → « 5 · Publier » → Run workflow, en indiquant un nombre.
+# ═══════════════════════════════════════════════════════════════════════════

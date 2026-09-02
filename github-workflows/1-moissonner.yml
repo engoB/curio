@@ -1,0 +1,114 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  CURIO — 1 · MOISSONNER
+#
+#  Construit LE CATALOGUE MAITRE : la liste de reference, unique, verifiee.
+#  Quatre sources rapprochees — vos sujets phares, les listes d articles
+#  insolites, « Le saviez-vous ? » — ramenees a un identifiant Wikidata par
+#  sujet. C est ce qui rend les doublons impossibles.
+#
+#  Reddit entre dans la meme moisson des que consignes/reddit.txt liste des
+#  subreddits. Vide par defaut : rien ne se passe tant que vous ne l activez
+#  pas.
+#
+#  Produit  catalogue-maitre.json   la nomenclature
+#           catalogue-maitre.csv    la meme chose, pour votre tableur
+#           catalog.json            la vue de l application
+#
+#  RELANCER NE DETRUIT RIEN. Les sujets deja presents gardent leur etat —
+#  ecrit, publie, retire — et seuls les nouveaux sont ajoutes. Le journal dit
+#  combien, et pourquoi les autres ont ete refuses.
+#
+#  Gratuit. Aucun appel paye. Comptez une demi-heure la premiere fois,
+#  quelques minutes ensuite.
+#
+#  ELLE TOURNE TOUTE SEULE chaque nuit. Vous n avez a la lancer a la
+#  main que si vous venez de modifier consignes/sujets-phares.txt et que vous
+#  ne voulez pas attendre dimanche.
+# ═══════════════════════════════════════════════════════════════════════════
+name: 1 · Moissonner
+
+# CHAQUE NUIT A MINUIT UTC, toute seule. Vous n avez rien a declencher : la
+# liste se tient a jour, et le journal dit ce qui est arrive de neuf. La
+# premiere execution dure une demi-heure ; les suivantes quelques minutes,
+# le cache faisant le reste.
+# Pour changer la cadence, modifiez la ligne « cron » ci-dessous :
+#     0 0 * * *     chaque nuit a minuit        <- par defaut
+#     0 0 * * 0     tous les dimanches
+#     0 0 1 * *     le 1er de chaque mois
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  curio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      REDDIT_ID: ${{ secrets.REDDIT_ID }}
+      REDDIT_SECRET: ${{ secrets.REDDIT_SECRET }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CURIO_CONTACT: "https://github.com/${{ github.repository }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: tools/.cache
+          key: curio-cache-${{ github.run_id }}
+          restore-keys: |
+            curio-cache-
+      - name: Verifier les scripts
+        run: |
+          for f in tools/build-catalog.mjs tools/write-anecdotes.mjs tools/controler.mjs tools/publier.mjs; do
+            [ -f "$f" ] || { echo "::error::$f est absent du depot. Importez le dossier tools/ en entier."; exit 1; }
+            node --check "$f"
+          done
+
+      - name: Moissonner
+        run: |
+          set -o pipefail
+          node tools/build-catalog.mjs --maitre 2>&1 | tee curio.log
+
+      - name: Compte rendu
+        if: always()
+        run: |
+          {
+            echo "## Curio — catalogue maitre"
+            echo ""
+            echo '```'
+            tail -70 curio.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Enregistrer
+        if: always()
+        run: |
+          git config user.name  "curio-bot"
+          git config user.email "curio-bot@users.noreply.github.com"
+          rm -f curio.log
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json anecdotes controle.csv consignes/exclusions.txt; do
+            if [ -e "$p" ]; then
+              git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
+            fi
+          done
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau a enregistrer."
+            echo "> Rien de nouveau a enregistrer." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git commit -m "curio: moisson"
+          git pull --rebase --autostash || true
+          if git push; then
+            echo "Enregistre et publie."
+          else
+            echo "::error::Le push a echoue. Settings -> Actions -> General -> Workflow permissions -> Read and write."
+            exit 1
+          fi

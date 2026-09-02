@@ -1,0 +1,124 @@
+CURIO 8.3 — REDDIT COMME SOURCE, ET LA MOISSON À LA DEMANDE
+============================================================
+
+VOS DEUX QUESTIONS
+==================
+
+1. LA MOISSON PEUT-ELLE SE LANCER À LA MAIN ?  Oui, de trois façons.
+
+   · Bouton « MOISSONNER MAINTENANT » dans la barre haute de la console.
+     C'est le plus simple, et c'est nouveau.
+   · Actions → 1 · Moissonner → Run workflow, comme avant.
+   · Et de toute façon, chaque nuit à minuit, toute seule.
+
+   Le bouton sert aux fois où vous venez d'ajouter des sujets phares ou de
+   brancher un subreddit et que vous ne voulez pas attendre.
+
+
+2. REDDIT À LA MAIN ? SÛREMENT PAS.
+
+   Vous avez raison, et j'avais mal cadré. consignes/ajouts.json est fait
+   pour le cas PONCTUEL — un article de presse, vos notes. Ce n'est pas
+   là que vivent les histoires Reddit.
+
+   Reddit est désormais UNE SOURCE, au même titre que « Le saviez-vous ? ».
+   Elle tourne dans la même moisson, chaque nuit, et alimente le même
+   catalogue maître.
+
+
+COMMENT L'ACTIVER
+=================
+
+    consignes/reddit.txt
+
+Le fichier est livré VIDE : rien ne touche à Reddit tant que vous n'y
+listez pas de subreddit. Décommentez ce que vous voulez :
+
+    tifu                     | histoire
+    UnresolvedMysteries      | mysteres
+    todayilearned            | sciences
+    LetsNotMeet              | mysteres
+
+    votes: 2000
+    longueurMini: 1200
+    longueurMaxi: 9000
+    periode: year
+    parSub: 100
+
+C'est tout. À la moisson suivante, ils entrent au catalogue avec le badge
+REDDIT et suivent exactement le même chemin : vous décidez dans la console,
+vous écrivez une tranche, vous relisez, vous publiez.
+
+
+CE QUI ENTRE, ET CE QUI N'ENTRE PAS
+====================================
+
+N'entrent que les billets AUTOPORTANTS :
+
+  · du TEXTE, pas un lien ni une image — c'est ce texte que le rédacteur
+    lira, exactement comme il lirait un article de Wikipédia ;
+  · au-dessus de votre seuil de votes. C'est votre garde-fou : un billet
+    très voté a été jugé remarquable par des milliers de gens avant vous ;
+  · entre 1 200 et 9 000 caractères. En dessous il n'y a pas de quoi écrire,
+    au-dessus on ne saura pas résumer.
+
+Sont écartés d'office : les supprimés, les NSFW, les spoilers, les épinglés,
+et tout ce que vous avez déjà — l'identifiant Reddit sert de clé, donc
+relancer n'ajoute jamais deux fois le même billet.
+
+Le markdown est nettoyé : entités HTML, liens aplatis, citations retirées
+(elles ne sont pas de l'auteur), titres enlevés.
+
+
+POUR UN QUOTA CONFORTABLE
+==========================
+
+Sans rien, la moisson utilise l'accès public de Reddit. Ça suffit pour
+quelques centaines de billets par nuit, mais Reddit finit par ralentir.
+
+  1. reddit.com/prefs/apps → Create another app… → type « script »
+  2. notez le client id et le secret
+  3. dépôt → Settings → Secrets and variables → Actions → New secret :
+         REDDIT_ID       le client id
+         REDDIT_SECRET   le secret
+
+La moisson les détecte seule et bascule sur le jeton. Le journal le dit :
+« jeton d'application obtenu ».
+
+
+UN UNIVERS DÉDIÉ, SI VOUS VOULEZ
+=================================
+
+Une ligne dans consignes/univers.txt :
+
+    reddit | 16 | Histoires vraies | Ce que les gens racontent quand ils croient que personne ne les lit.
+
+puis « univers: reddit » dans reddit.txt. L'application découvre le nouvel
+univers toute seule, sans que rien de l'existant ne bouge.
+
+
+UNE PRÉCISION HONNÊTE
+======================
+
+Reddit et Wikipédia sont tous deux inaccessibles depuis l'environnement où
+ce code a été écrit. Le lecteur de configuration, le filtrage des billets et
+le nettoyage du markdown sont éprouvés sur des cas fabriqués — huit sur huit.
+Mais le PREMIER APPEL RÉEL se fera dans l'action, chez vous.
+
+Son journal dira tout :
+
+    ▸ Reddit — 4 subreddit(s), billets de plus de 2000 votes
+      · jeton d'application obtenu.
+      · r/tifu : 100 lus, +38 retenus
+      · r/UnresolvedMysteries : 100 lus, +51 retenus
+      → 89 billet(s) ajouté(s), 0 déjà présent(s), 111 écarté(s).
+
+Si quelque chose cloche, envoyez-moi ces lignes.
+
+
+INSTALLATION
+============
+
+Add file → Upload files, glissez tout le contenu de ce zip.
+Rappel : supprimez curio.yml, 1-collecter.yml, 3-estimer.yml, 4-ecrire.yml
+s'ils traînent encore.
