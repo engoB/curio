@@ -1,0 +1,95 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  CURIO — 3 · CONTROLER
+#
+#  Rien ne part en ligne sans etre passe par ici. Le controle verifie la
+#  STRUCTURE de chaque fiche : longueur, paragraphes, ouverture, titre, note,
+#  phrase « a raconter », image, source, langue, accroches en double,
+#  presence au catalogue maitre.
+#
+#  Avec « mettre en quarantaine », ce qui echoue est marque et ne sera JAMAIS
+#  publie. Rien n est supprime : corrigez, relancez, ca repasse en vert.
+#
+#  La liste complete part dans controle.csv, ouvrable dans un tableur.
+#  Gratuit, sans reseau.
+# ═══════════════════════════════════════════════════════════════════════════
+name: 3 · Controler
+
+on:
+  workflow_dispatch:
+    inputs:
+      quarantaine:
+        description: "Mettre en quarantaine ce qui echoue"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  curio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CURIO_CONTACT: "https://github.com/${{ github.repository }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: tools/.cache
+          key: curio-cache-${{ github.run_id }}
+          restore-keys: |
+            curio-cache-
+      - name: Verifier les scripts
+        run: |
+          for f in tools/build-catalog.mjs tools/write-anecdotes.mjs tools/controler.mjs tools/publier.mjs; do
+            [ -f "$f" ] || { echo "::error::$f est absent du depot. Importez le dossier tools/ en entier."; exit 1; }
+            node --check "$f"
+          done
+
+      - name: Controler
+        run: |
+          set -o pipefail
+          R=""; if [ "${{ github.event.inputs.quarantaine }}" = "true" ]; then R="--reparer"; fi
+          node tools/controler.mjs $R 2>&1 | tee curio.log
+
+      - name: Compte rendu
+        if: always()
+        run: |
+          {
+            echo "## Curio — controle"
+            echo ""
+            echo '```'
+            tail -70 curio.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Enregistrer
+        if: always()
+        run: |
+          git config user.name  "curio-bot"
+          git config user.email "curio-bot@users.noreply.github.com"
+          rm -f curio.log
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json anecdotes controle.csv consignes/exclusions.txt; do
+            if [ -e "$p" ]; then
+              git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
+            fi
+          done
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau a enregistrer."
+            echo "> Rien de nouveau a enregistrer." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git commit -m "curio: controle"
+          git pull --rebase --autostash || true
+          if git push; then
+            echo "Enregistre et publie."
+          else
+            echo "::error::Le push a echoue. Settings -> Actions -> General -> Workflow permissions -> Read and write."
+            exit 1
+          fi

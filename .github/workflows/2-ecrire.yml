@@ -1,0 +1,108 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  CURIO — 2 · ECRIRE UNE TRANCHE
+#
+#  Un seul reglage : le budget, en euros. On prend les meilleurs sujets non
+#  encore ecrits du catalogue maitre, autant que la tranche permet, et on
+#  ecrit le francais ET l anglais.
+#
+#  Plus de selection a coller — GitHub refusait les grandes (« Provided
+#  inputs are too large ») — plus de langue ni d univers a choisir.
+#
+#  Cochez « estimer seulement » pour voir le plan sans depenser un centime.
+#  Rien n est visible sur le site tant que « 3 · Controler » et « 5 · Publier »
+#  ne sont pas passes.
+# ═══════════════════════════════════════════════════════════════════════════
+name: 2 · Ecrire une tranche
+
+on:
+  workflow_dispatch:
+    inputs:
+      budget:
+        description: "Budget de la tranche, en euros"
+        required: true
+        default: "30"
+      estimer:
+        description: "Estimer seulement, sans rien depenser"
+        type: boolean
+        default: false
+      modele:
+        description: "Modele (vide = claude-opus-5)"
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  curio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CURIO_CONTACT: "https://github.com/${{ github.repository }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: tools/.cache
+          key: curio-cache-${{ github.run_id }}
+          restore-keys: |
+            curio-cache-
+      - name: Verifier les scripts
+        run: |
+          for f in tools/build-catalog.mjs tools/write-anecdotes.mjs tools/controler.mjs tools/publier.mjs; do
+            [ -f "$f" ] || { echo "::error::$f est absent du depot. Importez le dossier tools/ en entier."; exit 1; }
+            node --check "$f"
+          done
+
+      - name: Ecrire
+        run: |
+          set -o pipefail
+          E=""; if [ "${{ github.event.inputs.estimer }}" = "true" ]; then E="--estimer"; fi
+          if [ -z "$E" ] && [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::Aucune cle API. Settings -> Secrets and variables -> Actions -> ANTHROPIC_API_KEY."
+            exit 1
+          fi
+          M=""; if [ -n "${{ github.event.inputs.modele }}" ]; then M="--modele ${{ github.event.inputs.modele }}"; fi
+          P=""; if [ -z "$ANTHROPIC_API_KEY" ] && [ -n "$OPENAI_API_KEY" ]; then P="--fournisseur openai"; fi
+          node tools/write-anecdotes.mjs --budget "${{ github.event.inputs.budget }}" $E $M $P 2>&1 | tee curio.log
+
+      - name: Compte rendu
+        if: always()
+        run: |
+          {
+            echo "## Curio — tranche de ${{ github.event.inputs.budget }} EUR"
+            echo ""
+            echo '```'
+            tail -70 curio.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Enregistrer
+        if: always()
+        run: |
+          git config user.name  "curio-bot"
+          git config user.email "curio-bot@users.noreply.github.com"
+          rm -f curio.log
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json anecdotes controle.csv consignes/exclusions.txt; do
+            if [ -e "$p" ]; then
+              git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
+            fi
+          done
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau a enregistrer."
+            echo "> Rien de nouveau a enregistrer." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git commit -m "curio: ecriture"
+          git pull --rebase --autostash || true
+          if git push; then
+            echo "Enregistre et publie."
+          else
+            echo "::error::Le push a echoue. Settings -> Actions -> General -> Workflow permissions -> Read and write."
+            exit 1
+          fi
