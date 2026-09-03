@@ -11,6 +11,12 @@
 #    accorder    (re)mesure l accord entre votre phrase et l article, et
 #                allume le badge « a verifier » sur ceux qui n ont aucun mot
 #                en commun. Instantane, gratuit, ne retire rien.
+#    auditer     LA PASSE QUALITE. Reprend un par un les seuls sujets que
+#                vous avez RETENUS dans la console, verifie que l article
+#                existe toujours, qu il est assez fourni, que ce n est pas une
+#                page d homonymie, que votre phrase parle bien de cet
+#                article-la. Ecrit audit-retenus.csv. Ne supprime rien.
+#                Cochez « appliquer » pour ecarter d un coup ce qui echoue.
 #    ranger      remet chaque sujet dans son univers d apres son article.
 #                Les archives « Le saviez-vous ? » ont des sections datees,
 #                qui ne disent rien du sujet : tout tombait dans Mysteres.
@@ -37,6 +43,12 @@ on:
           - reclasser
           - accorder
           - ranger
+          - auditer
+      appliquer:
+        description: "auditer : ecarter ce qui echoue (sinon on ne fait que lire)"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -79,6 +91,7 @@ jobs:
             reclasser) node tools/build-catalog.mjs --reclasser 2>&1 | tee curio.log ;;
             accorder)  node tools/build-catalog.mjs --accorder  2>&1 | tee curio.log ;;
             ranger)    node tools/build-catalog.mjs --ranger    2>&1 | tee curio.log ;;
+            auditer)   node tools/build-catalog.mjs --auditer ${{ github.event.inputs.appliquer == 'true' && '--appliquer' || '' }} 2>&1 | tee curio.log ;;
           esac
 
       - name: Compte rendu
@@ -98,7 +111,7 @@ jobs:
           git config user.name  "curio-bot"
           git config user.email "curio-bot@users.noreply.github.com"
           rm -f curio.log
-          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt; do
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv audit-retenus.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json; do
             if [ -e "$p" ]; then
               git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
             fi
