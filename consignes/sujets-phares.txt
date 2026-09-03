@@ -503,7 +503,7 @@ Chaser | vivant | Cette chienne connaissait le nom propre de mille vingt-deux jo
 Tahlequah | vivant | Cette orque a porté le cadavre de son nouveau-né à la surface pendant dix-sept jours et mille six cents kilomètres.
 Baleine à 52 hertz | vivant | Depuis 1989, un chant de baleine est enregistré sur une fréquence qu'aucune autre baleine n'utilise ni, semble-t-il, n'entend.
 Hvaldimir | vivant | Ce béluga est apparu en Norvège harnaché d'un support de caméra estampillé « Equipment St. Petersburg », et savait rapporter des objets sur commande.
-Inky | vivant | Ce poulpe a soulevé le couvercle de son bac la nuit, traversé le sol de l'aquarium et plongé dans un tuyau d'évacuation vers l'océan.
+Inky (octopus) | vivant | Ce poulpe a soulevé le couvercle de son bac la nuit, traversé le sol de l'aquarium et plongé dans un tuyau d'évacuation vers l'océan.
 Georges le solitaire | vivant | Dernier de sa sous-espèce, il a refusé pendant quarante ans toutes les femelles qu'on lui présentait et l'a emportée avec lui en 2012.
 Jonathan | vivant | Cette tortue née vers 1832 broute encore la pelouse du gouverneur de Sainte-Hélène, aveugle et sans odorat, mais parfaitement vigoureuse.
 Magawa | vivant | Ce rat géant a détecté soixante et onze mines antipersonnel au Cambodge, trop léger pour les déclencher, et a reçu une médaille d'or.

@@ -8,6 +8,9 @@
 #    verifier    controle que les articles existent toujours sur Wikipedia
 #    nettoyer    retire les doublons herites des versions anterieures
 #    reclasser   recalcule les potentiels de l ancien catalog.json
+#    accorder    (re)mesure l accord entre votre phrase et l article, et
+#                allume le badge « a verifier » sur ceux qui n ont aucun mot
+#                en commun. Instantane, gratuit, ne retire rien.
 #
 #  Les deux derniers ne servent qu aux depots anterieurs a la version 8 :
 #  le catalogue maitre ne peut plus contenir de doublon.
@@ -28,6 +31,7 @@ on:
           - verifier
           - nettoyer
           - reclasser
+          - accorder
 
 permissions:
   contents: write
@@ -68,6 +72,7 @@ jobs:
             verifier)  node tools/build-catalog.mjs --verifier  2>&1 | tee curio.log ;;
             nettoyer)  node tools/build-catalog.mjs --nettoyer  2>&1 | tee curio.log ;;
             reclasser) node tools/build-catalog.mjs --reclasser 2>&1 | tee curio.log ;;
+            accorder)  node tools/build-catalog.mjs --accorder  2>&1 | tee curio.log ;;
           esac
 
       - name: Compte rendu
@@ -87,7 +92,7 @@ jobs:
           git config user.name  "curio-bot"
           git config user.email "curio-bot@users.noreply.github.com"
           rm -f curio.log
-          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json anecdotes controle.csv consignes/exclusions.txt; do
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt; do
             if [ -e "$p" ]; then
               git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
             fi

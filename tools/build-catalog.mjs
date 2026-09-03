@@ -66,6 +66,7 @@ const RECLASSER = !!opt('reclasser', false);   // recalculer les potentiels, san
 const NETTOYER  = !!opt('nettoyer', false);   // retirer les doublons deja entres, sans reseau
 const MODE_MAITRE = !!opt('maitre', false);   // construire le catalogue maitre (la reference)
 const PURGER    = !!opt('purger', false);     // sortir du maitre tout ce qui est dans exclusions.txt
+const ACCORDER  = !!opt('accorder', false);   // (re)mesurer l accord phrase/article, sans reseau
 
 /* ------------------------------------------------------- univers & racines
    Huit univers, les mêmes que dans parts/20-data.js — identifiants, teintes,
@@ -199,10 +200,16 @@ const MINUTES = parseFloat(opt('minutes', '40')) || 40;
 const DEPART  = Date.now();
 const ECHEANCE = DEPART + MINUTES * 60000;
 let budgetAnnonce = false;
+/* Vrai dès que quoi que ce soit a été remis à la passe suivante — temps
+   écoulé, plafond de vérification, recherches reportées. Le nettoyage du
+   fichier de sujets phares s'en sert pour ne pas confondre « passe
+   écourtée », qui est normal, et « incident réseau », qui ne l'est pas. */
+let passePartielle = false;
 
 function tempsRestant(){ return ECHEANCE - Date.now(); }
 function tempsEcoule(){
   if (Date.now() < ECHEANCE) return false;
+  passePartielle = true;
   if (!budgetAnnonce){
     budgetAnnonce = true;
     console.log(`\n⏱  Les ${MINUTES} minutes de cette passe sont écoulées.`);
@@ -808,7 +815,7 @@ async function pageviews(lang, title){
    a renvoyé. Avec mille sujets phares à résoudre, un appel par titre ferait
    deux mille requêtes ; celui-ci en fait quarante. Les redirections et les
    normalisations sont remontées jusqu'au titre d'origine. */
-async function qidsParTitre(lang, titres){
+async function qidsParTitre(lang, titres, cibles){
   const out = new Map();
   for (const batch of chunk(titres, 25)){
     // le budget prime : ce qui n'est pas identifié ce soir le sera demain
@@ -832,7 +839,12 @@ async function qidsParTitre(lang, titres){
       let cur = t, n = 0;
       while (alias.has(cur) && n++ < 5) cur = alias.get(cur);
       const q = parTitre.get(cur);
-      if (q) out.set(t, q);
+      /* On retient AUSSI où la redirection a mené. « Inky » existe sur
+         Wikipédia, mais c'est un fantôme de Pac-Man : le titre est exact,
+         l'article n'est pas le bon. Sans cette information, l'erreur est
+         indétectable — c'est elle qui a mis un poulpe sur une fiche
+         « Pac-Man ». */
+      if (q){ out.set(t, q); if (cibles) cibles.set(t, cur); }
     }
   }
   return out;
@@ -899,6 +911,28 @@ function titresProches(demande, trouve){
   return (jaccard >= 0.7 || (couverture === 1 && b.size - a.size <= 1)) && (mLong || a.size === b.size);
 }
 
+/* Combien de mots signifiants la phrase et l'article ont-ils en commun ?
+   Zéro, c'est le signe qu'ils ne parlent pas de la même chose. Ce chiffre
+   ne refuse rien : il se range dans le catalogue, s'affiche dans le CSV, et
+   sert à trier ce qui mérite un coup d'œil avant d'être écrit.            */
+function motsPartages(phrase, intro){
+  if (!phrase || !intro) return 0;
+  const attendu = new Set(motsDe(phrase).filter(m => m.length >= 5 || /^\d{3,}$/.test(m)));
+  if (!attendu.size) return 0;
+  const dans = new Set(motsDe(intro));
+  let n = 0;
+  for (const m of attendu) if (dans.has(m)) n++;
+  return n;
+}
+
+/* Deux écritures du même titre ? Accents, majuscules, tirets, underscores :
+   Wikipédia normalise, et cette normalisation-là n'est pas un déplacement.
+   « lac nyos » et « Lac Nyos » sont le même titre ; « Inky » et « Pac-Man »
+   ne le sont pas. */
+function memeTitre(a, b){
+  return motsDe(a).join(' ') === motsDe(b).join(' ');
+}
+
 /* L'article trouvé parle-t-il de la même chose que votre phrase ? On compte
    les mots signifiants partagés — noms propres, termes rares, nombres — entre
    ce que VOUS avez écrit et l'introduction de l'article. Zéro recoupement,
@@ -949,14 +983,39 @@ async function passePhares(ctx){
   const qid = new Map();
   const restants = () => demandes.filter(d => !qid.has(d.titre)).map(d => d.titre);
 
+  /* Où chaque titre a réellement abouti. Un titre peut exister et pointer
+     ailleurs : c'est une redirection, et Wikipédia en compte des millions. */
+  const cible = new Map();
+  const detourne = new Map();              // titre demandé → titre d'arrivée
+
   for (const lang of ['fr', 'en']){
     const reste = restants();
     if (!reste.length) break;
-    const m = await qidsParTitre(lang, reste);
+    const m = await qidsParTitre(lang, reste, cible);
     for (const [t, q] of m) if (!qid.has(t)) qid.set(t, q);
   }
   const exacts = qid.size;
   console.log(`  · ${exacts}/${demandes.length} résolus directement.`);
+
+  /* ---- les redirections qui changent de sujet -------------------------
+     « Inky » existe : c'est un fantôme de Pac-Man. La ligne visait le
+     poulpe évadé de l'aquarium de Napier. Le titre était exact, l'article
+     était faux, et rien ne le voyait : la deuxième barrière ne s'appliquait
+     qu'aux titres devinés par la recherche. Elle s'applique désormais à
+     toute redirection qui n'atterrit pas sur un titre voisin.            */
+  for (const d of demandes){
+    const arrivee = cible.get(d.titre);
+    if (!arrivee) continue;
+    if (memeTitre(d.titre, arrivee) || titresProches(d.titre, arrivee)) continue;
+    detourne.set(d.titre, arrivee);
+  }
+  if (detourne.size)
+    console.log(`  · ${detourne.size} titre(s) redirigés vers un autre article : leur phrase sera confrontée à l'introduction.`);
+
+  /* Le compte rendu, ligne à ligne. Une erreur trouvée par hasard veut dire
+     qu'il y en a d'autres : ce fichier les montre toutes, d'un coup d'œil,
+     sans qu'il faille relire le journal. */
+  const rapport = [];
 
   let repeches = 0, refuses = 0;
   const parRecherche = new Set();          // ces titres-là seront re-vérifiés
@@ -967,7 +1026,7 @@ async function passePhares(ctx){
     /* Chaque recherche coûte deux à quatre appels. Sur mille cinq cents
        titres approximatifs, c'est une heure. On en fait ce qu'on peut, le
        reste attend demain — et le cache fera que demain ira vite. */
-    if (tempsEcoule() || tempsRestant() < 5 * 60000){ reportes = aChercher.length - vus; break; }
+    if (tempsEcoule() || tempsRestant() < 5 * 60000){ reportes = aChercher.length - vus; passePartielle = true; break; }
     if (++vus % 50 === 0) console.log(`    … ${vus}/${aChercher.length}  (${minutesFaites()} min)`);
     for (const lang of ['fr', 'en']){
       const trouve = await chercherTitre(lang, t);
@@ -976,6 +1035,7 @@ async function passePhares(ctx){
          Sans elle, « Enfants Sodder » devenait « Markus Söder ». */
       if (!titresProches(t, trouve)){
         console.log(`  ✗ « ${t} » → « ${trouve} » : trop loin du titre demandé, refusé.`);
+        rapport.push([t, 'recherche ' + lang, trouve, '', 'refusé', 'titre trop éloigné']);
         refuses++;
         continue;
       }
@@ -991,7 +1051,10 @@ async function passePhares(ctx){
 
   const trouves = demandes.filter(d => qid.has(d.titre)).map(d => ({ ...d, qid: qid.get(d.titre) }));
   const manquants = restants();
-  for (const t of manquants) console.log(`  ! « ${t} » : introuvable, même par recherche. Corrigez la ligne.`);
+  for (const t of manquants){
+    console.log(`  ! « ${t} » : introuvable, même par recherche. Corrigez la ligne.`);
+    rapport.push([t, '—', '', '', 'introuvable', 'aucun article de ce nom']);
+  }
   console.log(`  · ${exacts} titre(s) exact(s), ${repeches} rattrapé(s) par la recherche, ${refuses} refusé(s) comme hors sujet, ${manquants.length} introuvable(s).`);
   if (reportes) console.log(`  ⏱ ${reportes} titre(s) reportés à la prochaine passe, faute de temps.`);
   if (!trouves.length) return 0;
@@ -1016,6 +1079,7 @@ async function passePhares(ctx){
 
   let n = 0, deja = 0, rejetes = 0, horsSujet = 0, doublons = 0;
   const vusQid = new Set();
+  const voie = (t) => detourne.has(t) ? 'redirection' : parRecherche.has(t) ? 'recherche' : 'exact';
   for (const d of trouves){
     const r = parQid.get(d.qid);
     if (!r){ console.log(`  ! « ${d.titre} » : introuvable côté Wikidata.`); continue; }
@@ -1023,23 +1087,30 @@ async function passePhares(ctx){
     /* ---- un sujet, une seule fois, dans un seul univers ---------------- */
     if (vusQid.has(r.qid)){
       console.log(`  = « ${d.titre} » : même article qu'une ligne précédente (${r.fr || r.en}). Ignoré.`);
+      rapport.push([d.titre, voie(d.titre), r.fr || r.en, d.uni, 'doublon', 'une autre ligne désigne le même article']);
       doublons++; continue;
     }
     vusQid.add(r.qid);
     const ailleurs = (r.fr && ouEstDeja.get('fr|' + r.fr)) || (r.en && ouEstDeja.get('en|' + r.en)) || null;
     if (ailleurs && ailleurs !== d.uni){
       console.log(`  = « ${r.fr || r.en} » est déjà dans « ${ailleurs} » : on ne le met pas aussi dans « ${d.uni} ».`);
+      rapport.push([d.titre, voie(d.titre), r.fr || r.en, ailleurs, 'doublon', `déjà classé dans « ${ailleurs} »`]);
       doublons++; continue;
     }
-    if (claimed.has(r.qid) && !ailleurs){ deja++; continue; }
+    if (claimed.has(r.qid) && !ailleurs){
+      rapport.push([d.titre, voie(d.titre), r.fr || r.en, d.uni, 'déjà au catalogue', '']);
+      deja++; continue;
+    }
 
     /* ---- deuxième barrière : l'article parle-t-il de votre sujet ? ------
        Elle ne s'applique qu'aux titres rattrapés par la recherche : un titre
        exact est digne de confiance, un titre deviné ne l'est pas. */
-    if (parRecherche.has(d.titre)){
+    if (parRecherche.has(d.titre) || detourne.has(d.titre)){
       const intro = [introFr.get(r.fr) || '', introEn.get(r.en) || ''].join(' ');
       if (!memeSujet(d.phrase, d.titre, intro)){
-        console.log(`  ✗ « ${d.titre} » → « ${r.fr || r.en} » : l'article ne parle pas de ce que dit votre phrase. Refusé.`);
+        const via = detourne.has(d.titre) ? 'redirection' : 'recherche';
+        console.log(`  ✗ « ${d.titre} » → « ${r.fr || r.en} » (${via}) : l'article ne parle pas de ce que dit votre phrase. Refusé.`);
+        rapport.push([d.titre, via, r.fr || r.en, d.uni, 'refusé', 'article étranger à votre phrase']);
         horsSujet++; continue;
       }
     }
@@ -1067,16 +1138,39 @@ async function passePhares(ctx){
       index[d.uni] = (index[d.uni] || []).concat([r.qid]);
       n++;
       console.log(`  ★ ${d.uni} : ${r.fr || r.en}`);
+      rapport.push([d.titre, voie(d.titre), r.fr || r.en, d.uni, 'retenu', '']);
     } else if ((r.fr && listeFr.includes(r.fr)) || (r.en && listeEn.includes(r.en))){
+      rapport.push([d.titre, voie(d.titre), r.fr || r.en, d.uni, 'déjà au catalogue', '']);
       deja++;
     } else {
+      rapport.push([d.titre, voie(d.titre), r.fr || r.en, d.uni, 'refusé', 'article trop maigre ou introuvable dans les deux langues']);
       rejetes++;
     }
   }
   console.log(`  → ${n} nouveau(x), ${deja} déjà au catalogue, ${doublons} doublon(s) écarté(s), `
             + `${horsSujet} hors sujet refusé(s), ${rejetes} sans article assez fourni.`);
   if (!n && deja) console.log(`  · Rien de neuf : vos sujets phares sont déjà tous là. C'est normal à partir de la deuxième collecte.`);
+  await ecrireRapportPhares(rapport);
   return n;
+}
+
+/* Le compte rendu des sujets phares, en tableur. Une ligne par ligne de
+   votre fichier, et la colonne « verdict » dit ce qu'elle est devenue. On
+   trie les ennuis en premier : ce sont les seules lignes à relire.        */
+async function ecrireRapportPhares(rapport){
+  if (!rapport.length) return;
+  const rang = { 'refusé':0, 'introuvable':1, 'doublon':2, 'retenu':3, 'déjà au catalogue':4 };
+  rapport.sort((a, b) => (rang[a[4]] ?? 9) - (rang[b[4]] ?? 9)
+                      || String(a[0]).localeCompare(String(b[0]), 'fr'));
+  const esc = (x) => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"';
+  const csv = ['﻿ligne_demandee;resolution;article_retenu;univers;verdict;motif']
+    .concat(rapport.map(l => l.map(esc).join(';')))
+    .join('\n') + '\n';
+  try{
+    await fs.writeFile(path.join(process.cwd(), 'rapport-phares.csv'), csv, 'utf8');
+    const ennuis = rapport.filter(l => l[4] === 'refusé' || l[4] === 'introuvable' || l[4] === 'doublon').length;
+    console.log(`  ✎ rapport-phares.csv écrit — ${rapport.length} ligne(s), dont ${ennuis} à relire (en tête du fichier).`);
+  }catch(e){ console.log(`  ! rapport-phares.csv non écrit : ${e.message}`); }
 }
 
 /* ─── passe 1 : les sujets curés, ceux dont on sait déjà qu'ils étonnent ─── */
@@ -1433,7 +1527,14 @@ async function nettoyerPhares(phares, qidDe, retenus){
   console.log(`  · ${gardees.length} ligne(s) vérifiée(s) sur ${phares.length}.`);
   if (part < 0.5){
     console.log(`  ! Moins de la moitié ont survécu : le fichier n'est PAS réécrit.`);
-    console.log(`    C'est probablement un incident réseau. Relancez la moisson.`);
+    if (passePartielle){
+      console.log(`    Rien d'anormal : cette passe s'est arrêtée avant d'avoir tout vérifié.`);
+      console.log(`    Le fichier ne sera réécrit que le jour où une passe ira jusqu'au bout,`);
+      console.log(`    pour ne jamais effacer des lignes qui n'ont simplement pas eu leur tour.`);
+    } else {
+      console.log(`    La passe est pourtant allée jusqu'au bout : c'est un incident réseau.`);
+      console.log(`    Relancez la moisson.`);
+    }
     return;
   }
 
@@ -1767,13 +1868,13 @@ async function construireMaitre(){
   const hors = await lireExclusions();
   const nouveaux = [...sujets.values()].filter(s => !deja.has(s.qid));
   console.log(`\n▸ comparaison avec le catalogue maître`);
-  console.log(`  · ${deja.size} sujet(s) déjà connus, ${nouveaux.length} nouveau(x) à vérifier.`);
+  console.log(`  · ${deja.size} sujet(s) déjà connus, ${nouveaux.length} nouveau(x) à trier.`);
   if (!nouveaux.length){
     console.log('  → Rien de neuf. Votre catalogue maître est à jour.');
   }
 
   /* ---- vérification : l'article existe-t-il vraiment ? ------------------ */
-  let ajoutes = 0, refusDef = 0, refusFaible = 0, refusArticle = 0, refusExclu = 0;
+  let ajoutes = 0, refusDef = 0, refusFaible = 0, refusArticle = 0, refusExclu = 0, sansAccord = 0;
   if (nouveaux.length){
     console.log('\n▸ vérification des articles');
     /* Vérifier coûte un appel par vingt articles, dans chaque langue. Sur
@@ -1781,10 +1882,46 @@ async function construireMaitre(){
        mieux, une heure si Wikipédia nous freine. On en prend autant que le
        temps restant permet, et le reste attend la prochaine passe : ils sont
        déjà identifiés, ils ne se perdront pas. */
+    /* ---- le tri qui ne coûte rien, AVANT celui qui coûte le réseau ------
+       Sur cent mille sujets identifiés, quatre-vingt-dix mille n'ont aucune
+       phrase de contributeur : ils seront écartés de toute façon, plus bas,
+       par la même règle. Les vérifier d'abord revenait à dépenser tout le
+       budget réseau pour finir par les jeter — cent nuits pour un catalogue
+       qui en demande trois. On applique donc les règles gratuites en
+       premier, et le réseau ne voit que ce qui a une chance d'entrer.   */
+    const recevable = (s) => {
+      if (estDefinition(s.phrase)) return 'definition';
+      const m = String(s.phrase || '').trim().split(/\s+/).filter(Boolean).length;
+      if (s.sources.has('phare')) return s.phrase ? '' : 'sans-phrase';
+      return m < 8 ? 'sans-phrase' : '';
+    };
+    let ecarteDef = 0, ecarteFaible = 0;
+    const eligibles = [];
+    for (const s of nouveaux){
+      const r = recevable(s);
+      if (r === 'definition'){ ecarteDef++; continue; }
+      if (r === 'sans-phrase'){ ecarteFaible++; continue; }
+      eligibles.push(s);
+    }
+    if (ecarteDef + ecarteFaible)
+      console.log(`  · ${ecarteDef + ecarteFaible} sujet(s) écartés sans un seul appel réseau `
+                + `(${ecarteDef} définitions, ${ecarteFaible} sans phrase exploitable).`);
+
+    /* Et on commence par les meilleurs : vos phares, puis les sujets que
+       deux ou trois sources indépendantes désignent. Si une passe s'arrête
+       en route, ce qui est entré est ce qui valait le plus. */
+    eligibles.sort((a, b) => (b.sources.has('phare') - a.sources.has('phare'))
+                          || (b.sources.size - a.sources.size)
+                          || ((b.qualite || 0) - (a.qualite || 0)));
+
     const parPasse = Math.max(200, Math.round(tempsRestant() / 1000 * 4));
-    const aVerifier = nouveaux.slice(0, parPasse);
-    if (aVerifier.length < nouveaux.length)
-      console.log(`  · ${aVerifier.length} sur ${nouveaux.length} cette fois — le temps restant ne permet pas plus.`);
+    const aVerifier = eligibles.slice(0, parPasse);
+    if (aVerifier.length < eligibles.length){
+      passePartielle = true;
+      console.log(`  · ${aVerifier.length} sur ${eligibles.length} recevables cette fois — le temps restant ne permet pas plus.`);
+    } else if (eligibles.length){
+      console.log(`  · ${eligibles.length} sujet(s) recevables à vérifier.`);
+    }
 
     const qids = aVerifier.map(s => s.qid);
     const lignes = [];
@@ -1840,6 +1977,15 @@ async function construireMaitre(){
       const apercu = deuxPhrases(brutIntro) || deuxPhrases(introEn.get(r.en) || '');
       const apercuLang = brutIntro ? 'fr' : (introEn.get(r.en) ? 'en' : '');
 
+      /* L'accord : combien de mots signifiants la phrase partage-t-elle avec
+         l'article ? C'est ce chiffre qui aurait crié « Pac-Man » — la phrase
+         parlait d'un poulpe, l'article d'un jeu d'arcade, zéro mot commun.
+         On ne refuse rien là-dessus : une phrase peut légitimement raconter
+         un épisode que l'introduction ne mentionne pas. On le MESURE, on
+         l'écrit dans le CSV et dans le catalogue, et vous triez dessus.  */
+      const accord = motsPartages(s.phrase, brutIntro + ' ' + (introEn.get(r.en) || ''));
+      if (!accord) sansAccord++;
+
       deja.set(s.qid, {
         qid: s.qid,
         fr: okFr ? r.fr : '',
@@ -1849,6 +1995,7 @@ async function construireMaitre(){
         phrase: s.phrase,
         phraseLang: s.phraseLang,
         apercu, apercuLang,
+        accord,
         potentiel: p,
         editions: r.n || 0,
         ajoute: new Date().toISOString().slice(0, 10),
@@ -1857,11 +2004,14 @@ async function construireMaitre(){
       });
       ajoutes++;
     }
-    const reste = nouveaux.length - aVerifier.length;
+    const reste = eligibles.length - aVerifier.length;
     console.log(`\n  → ${ajoutes} sujet(s) ajouté(s) au catalogue maître.`);
-    if (reste > 0) console.log(`     ${reste} sujet(s) identifiés mais pas encore vérifiés : la prochaine passe s'en charge.`);
+    if (reste > 0) console.log(`     ${reste} sujet(s) recevables pas encore vérifiés : la prochaine passe s'en charge.`);
     console.log(`     ${refusArticle} sans article utilisable, ${refusDef} définitions écartées, `
               + `${refusFaible} sans signal d'anecdote, ${refusExclu} exclus par vos soins.`);
+    if (sansAccord)
+      console.log(`     ${sansAccord} dont la phrase ne partage AUCUN mot avec l'article : colonne « accord » `
+                + `du CSV à 0, à regarder en premier.`);
   }
 
   await passeAjouts(deja);
@@ -1876,9 +2026,10 @@ async function construireMaitre(){
   await fs.rename(MAITRE + '.tmp', MAITRE);
 
   const esc = (x) => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"';
-  const csv = ['﻿qid;univers;titre_fr;titre_en;sources;potentiel;statut;ajoute;ecrit;publie;phrase;apercu']
+  const csv = ['﻿qid;univers;titre_fr;titre_en;sources;potentiel;accord;statut;ajoute;ecrit;publie;phrase;apercu']
     .concat(liste.map(s => [s.qid, s.uni, esc(s.fr), esc(s.en), esc((s.sources || []).join('+')),
-                            s.potentiel, s.statut, s.ajoute || '', s.ecrit || '', s.publie || '',
+                            s.potentiel, (s.accord == null ? '' : s.accord),
+                            s.statut, s.ajoute || '', s.ecrit || '', s.publie || '',
                             esc(s.phrase), esc(s.apercu)].join(';')));
   await fs.writeFile(path.join(process.cwd(), 'catalogue-maitre.csv'), csv.join('\n') + '\n', 'utf8');
 
@@ -1997,6 +2148,46 @@ async function main(){
   /* ---- LE MODE PRINCIPAL : construire le catalogue maître ---- */
   if (MODE_MAITRE){
     await construireMaitre();
+    return;
+  }
+
+  /* ═══════════ accorder : mesurer l'accord phrase / article ══════════════
+     Pour les sujets entrés AVANT la version 8.4 : ils n'ont pas de note
+     d'accord, donc rien ne les signale dans la console. On la calcule ici à
+     partir de l'aperçu que le catalogue conserve déjà — instantané, gratuit,
+     sans un seul appel réseau. Un accord de 0 ne retire rien : il allume le
+     badge « ⚠ à vérifier » et remplit le filtre du même nom.             */
+  if (ACCORDER){
+    const maitre = await lireMaitre();
+    if (!maitre.sujets || !maitre.sujets.length){
+      console.log('Aucun catalogue maître. Lancez « 1 · Moissonner ».');
+      return;
+    }
+    let zero = 0, calcules = 0;
+    const exemples = [];
+    for (const s of maitre.sujets){
+      /* L'aperçu, ce sont les deux premières phrases de l'article : moins
+         que l'introduction entière, mais c'est ce que le catalogue garde,
+         et c'est là que l'article dit de quoi il parle. */
+      s.accord = motsPartages(s.phrase, s.apercu || '');
+      calcules++;
+      if (s.accord === 0){
+        zero++;
+        if (exemples.length < 25) exemples.push(`${(s.uni || '').padEnd(10)} ${s.fr || s.en}`);
+      }
+    }
+    maitre.genere = new Date().toISOString();
+    await fs.writeFile(MAITRE + '.tmp', JSON.stringify(maitre, null, 1), 'utf8');
+    await fs.rename(MAITRE + '.tmp', MAITRE);
+    console.log(`\n✓ ${calcules} sujet(s) mesurés. ${zero} n'ont AUCUN mot en commun entre votre phrase et l'article.`);
+    if (exemples.length){
+      console.log(`\n  Les premiers à regarder — console.html → « ⚠ À vérifier » :`);
+      for (const e of exemples) console.log('   · ' + e);
+      if (zero > exemples.length) console.log(`   … et ${zero - exemples.length} autre(s).`);
+    }
+    console.log(`\n  Rien n'a été retiré. Un accord à 0 est un doute, pas un verdict :`);
+    console.log(`  une phrase peut raconter un épisode que l'introduction ne mentionne pas.`);
+    console.log(`  Pour sortir vraiment un sujet : consignes/exclusions.txt puis « purger ».`);
     return;
   }
 

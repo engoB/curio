@@ -19,6 +19,7 @@ section en favori — c'est tout ce dont vous vous servez au quotidien.
 | **La curation** *(privé)* | `https://VOTRE-COMPTE.github.io/curio/app.html?curation=1` |
 | **Les actions** | `https://github.com/VOTRE-COMPTE/curio/actions` |
 | **Le catalogue maître** | `https://github.com/VOTRE-COMPTE/curio/blob/main/catalogue-maitre.csv` |
+| **Le rapport sur vos sujets phares** | `https://github.com/VOTRE-COMPTE/curio/blob/main/rapport-phares.csv` |
 | **Vos réglages** | `https://github.com/VOTRE-COMPTE/curio/tree/main/consignes` |
 
 Les cinq actions, directement :
@@ -28,7 +29,7 @@ Les cinq actions, directement :
 .../actions/workflows/2-ecrire.yml         écrire une tranche de N euros
 .../actions/workflows/3-controler.yml      contrôler avant mise en ligne
 .../actions/workflows/5-publier.yml        publier — tourne seule chaque jour
-.../actions/workflows/entretien.yml        purger, recompter, vérifier
+.../actions/workflows/entretien.yml        purger, recompter, accorder…
 ```
 
 Sur chacune : bouton **Run workflow**, en haut à droite.
@@ -47,6 +48,14 @@ minuit, toute seule). Vous lisez, vous retenez ou vous écartez, à la main.
 Deux boutons en bas : **Enregistrer mes décisions**, qui les écrit dans le
 dépôt, et **Écrire les retenus**, qui lance l'écriture avec le budget que vous
 indiquez.
+
+**Les boutons de lot agissent sur le filtre en cours, et le disent.** Filtrez
+sur *Articles insolites*, et le bouton devient **Retenir ces 114** ; la ligne
+sous les boutons nomme le filtre et rappelle où en est la sélection —
+« 114 retenus, 0 écarté, 814 sans décision ». Sans filtre, un lot de plus de
+cinquante sujets demande confirmation. **Tout oublier** efface toutes les
+décisions si une manœuvre ancienne a brouillé le compte : le catalogue et les
+fiches écrites ne bougent pas.
 
 **Relecture** — les fiches écrites, en entier : titre, texte complet, note,
 phrase à raconter. Vous validez une par une ou d'un bloc, et **Publier les
@@ -102,8 +111,20 @@ C'est la page à mettre en favori.
 
 **Dans un tableur** — ouvrez `catalogue-maitre.csv`. Une ligne par sujet :
 identifiant, univers, titre français, titre anglais, sources, potentiel,
-statut, dates, la phrase du contributeur et un **aperçu français** de
-l'article. Trois mille lignes se parcourent vite avec un filtre.
+**accord**, statut, dates, la phrase du contributeur et un **aperçu français**
+de l'article. Trois mille lignes se parcourent vite avec un filtre.
+
+**La colonne `accord`** compte les mots signifiants que votre phrase partage
+avec l'article. **Zéro veut dire qu'ils ne parlent peut-être pas de la même
+chose** — c'est ce chiffre qui aurait signalé la fiche « Pac-Man » portant
+l'histoire d'un poulpe évadé. Filtrez dessus : `console.html` et
+`catalogue.html` ont le badge ⚠ **à vérifier**, le filtre et le tri « les moins
+sûrs d'abord ». Rien n'est retiré pour autant : c'est un doute, pas un verdict.
+
+**Et `rapport-phares.csv`** dit, ligne par ligne de votre fichier de sujets
+phares, comment elle a été résolue (`exact`, `redirection`, `recherche`), où
+elle a abouti et ce qu'elle est devenue. Les ennuis sont en tête du fichier :
+ce sont les seules lignes à relire.
 
 **Dans la curation** — `app.html?curation=1`. Chaque ligne porte sa provenance
 (★ phare · liste insolite · le saviez-vous), son potentiel, son état, et deux
@@ -143,6 +164,7 @@ relisent à chaque exécution.
 |---|---|---|
 | `catalogue-maitre.json` | 1 · Moissonner | **la vérité du projet** : un enregistrement par sujet, identifié par Wikidata |
 | `catalogue-maitre.csv` | 1 · Moissonner | la même chose, pour votre tableur |
+| `rapport-phares.csv` | 1 · Moissonner | vos sujets phares, ligne par ligne, et ce qu'ils sont devenus |
 | `catalogue.html` | *(livré)* | le tableau de bord : il lit le maître, il ne l'écrit pas |
 | `catalog.json` | 1 · Moissonner | la vue dont l'application a besoin |
 | `anecdotes/*.json` | 2 · Écrire | les fiches, une par langue et par univers |

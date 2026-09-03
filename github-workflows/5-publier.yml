@@ -129,7 +129,7 @@ jobs:
           git config user.name  "curio-bot"
           git config user.email "curio-bot@users.noreply.github.com"
           rm -f curio.log
-          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json anecdotes controle.csv consignes/exclusions.txt; do
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt; do
             if [ -e "$p" ]; then
               git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
             fi

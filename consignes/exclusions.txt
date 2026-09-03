@@ -11,3 +11,14 @@
 #
 # Le titre attendu est celui de l'article Wikipédia (français ou anglais).
 # ═══════════════════════════════════════════════════════════════════════════
+
+# ── ajouté par la version 8.4.0 ────────────────────────────────────────────
+# La ligne « Inky » de vos sujets phares visait le poulpe évadé de l'aquarium
+# de Napier. Mais « Inky » est aussi un fantôme de Pac-Man, et Wikipédia y
+# redirigeait : votre catalogue a donc reçu une fiche « Pac-Man » portant la
+# phrase du poulpe. La ligne est corrigée en « Inky (octopus) », et les deux
+# titres ci-dessous sortent le mauvais sujet de votre catalogue actuel.
+#
+# Si un jour vous voulez Pac-Man pour lui-même, retirez ces deux lignes.
+Pac-Man
+Pac-Man (jeu vidéo)

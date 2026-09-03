@@ -1,4 +1,165 @@
-# Curio 8.3.2 — ce qui a changé depuis v6
+# Curio 8.4.1 — ce qui a changé depuis v6
+
+## 8.4.1 — « Retenir ce qui est affiché » dit maintenant combien, et sur quoi
+
+**Le symptôme.** « Si je filtre insolite avec 114 entrées et que je fais
+retenir ce qui est affiché, ça m'enregistre toutes les fiches au lieu des 114
+filtrées. »
+
+**Ce que la reproduction a montré.** Catalogue synthétique de 928 sujets dont
+114 marqués `insolite`, filtre posé, clic sur le bouton : **114 décisions
+écrites, pas une de plus**. Le filtre était respecté — le bouton n'a jamais agi
+sur autre chose que `S.vueCat`, c'est-à-dire la vue filtrée.
+
+**Ce qui trompait, en revanche, est réel et valait correction :**
+
+- le bouton disait « tout ce qui est affiché », sans chiffre — et la liste ne
+  peint que cinquante lignes à la fois, donc « affiché » n'était pas lisible ;
+- les six compteurs du haut comptent le **catalogue entier**, pas la vue : 928
+  au catalogue, alors que 114 seulement viennent d'être touchés ;
+- les décisions d'une session précédente **restent en mémoire dans le
+  navigateur** — y compris sans jeton, où rien ne les relit depuis le dépôt. Un
+  « écarter tout » posé sans filtre un autre jour est toujours là, invisible ;
+- le message de commit annonçait `décisions de curation (928 sujets)` : le
+  nombre de **clés du fichier**, retenus et écartés confondus. De quoi croire
+  que tout venait d'être sélectionné.
+
+**Le remède — la portée est écrite, pas devinée.**
+
+| | avant | maintenant |
+|---|---|---|
+| libellé | « Retenir tout ce qui est affiché » | « **Retenir ces 114** » |
+| portée | implicite | une ligne sous les boutons : *« agissent sur les 114 sujets du filtre Articles insolites, pas sur les autres »* |
+| sans filtre | même bouton, même silence | mention en or *« Aucun filtre »*, et confirmation au-delà de 50 sujets, annonçant combien de décisions déjà prises seront écrasées |
+| après le clic | rien | *« 114 sujets retenus — filtre : Articles insolites. Au total : 114 retenus, 0 écartés. »* |
+| état courant | invisible | *« Décidé pour l'instant : 114 retenus, 0 écarté, 814 sans décision »* |
+| repartir de zéro | impossible | bouton **Tout oublier (N)**, avec confirmation |
+| commit | `décisions de curation (928 sujets)` | `console : 114 retenus, 0 écartés` |
+
+L'onglet Relecture reçoit le même traitement : « Valider ces 80 », une
+confirmation au-delà de cinquante, et un message qui donne le total des deux
+langues.
+
+Éprouvé au navigateur sur 928 sujets synthétiques : filtre à 114 → 114
+décisions ; lot sans filtre → confirmation annonçant les 114 décisions
+écrasées ; « Tout oublier » → 0. Aucune erreur JavaScript.
+
+**Ce que la mise à jour ne touche pas** : le catalogue maître, les décisions
+déjà enregistrées, les fiches écrites, le fichier de sujets phares. Seuls
+`console.html` et le numéro de version changent.
+
+## 8.4.0 — la fiche « Pac-Man », et les quatre-vingt-dix mille sujets vérifiés pour rien
+
+### 1. Un poulpe sur une fiche Pac-Man
+
+**Le symptôme.** Dans la curation, une fiche intitulée **Pac-Man**, classée
+dans *Le Vivant*, portant cette phrase : « Ce poulpe a soulevé le couvercle de
+son bac la nuit, traversé le sol de l'aquarium et plongé dans un tuyau
+d'évacuation vers l'océan. »
+
+**La cause.** La ligne 506 de `consignes/sujets-phares.txt` disait `Inky`. Le
+poulpe évadé de l'aquarium de Napier s'appelle Inky — mais **Inky est aussi un
+des quatre fantômes de Pac-Man**, et Wikipédia y redirige. Le titre demandé
+existait, la redirection était silencieuse, et le QID récupéré était celui du
+jeu d'arcade.
+
+Ce qui aurait dû l'arrêter — `memeSujet()`, qui confronte votre phrase à
+l'introduction de l'article — ne s'appliquait **qu'aux titres devinés par la
+recherche**. Le commentaire du code disait : « un titre exact est digne de
+confiance ». C'était faux : un titre exact peut mener ailleurs.
+
+**Le remède.** `qidsParTitre()` retient désormais *où* chaque titre a abouti.
+Toute redirection qui n'atterrit pas sur un titre voisin (`memeTitre()` pour
+les accents et la casse, `titresProches()` pour un synonyme raisonnable) passe
+par la même barrière que les titres devinés : la phrase est confrontée à
+l'introduction, et le désaccord vaut refus.
+
+Éprouvé sur une Wikipédia miniature reproduisant les quatre cas :
+
+| ligne demandée | aboutit à | verdict |
+|---|---|---|
+| `Inky` | Pac-Man | **refusé** — l'article ne parle pas de votre phrase |
+| `lac nyos` | Lac Nyos | retenu — simple normalisation de casse |
+| `Larme batavique` | Goutte du prince Rupert | retenu — redirection légitime, phrase concordante |
+| `Turritopsis dohrnii` | lui-même | retenu — titre exact |
+
+La ligne est corrigée en `Inky (octopus)`, et `Pac-Man` est inscrit dans
+`consignes/exclusions.txt` pour sortir la fiche de votre catalogue actuel
+(*Entretien → purger*).
+
+### 2. `rapport-phares.csv` — parce qu'il y en a d'autres
+
+Une erreur trouvée par hasard veut dire qu'il y en a d'autres. Chaque moisson
+écrit maintenant **une ligne par ligne de votre fichier de sujets phares** :
+
+```
+ligne_demandee ; resolution ; article_retenu ; univers ; verdict ; motif
+"Inky" ; "redirection" ; "Pac-Man" ; "vivant" ; "refusé" ; "article étranger à votre phrase"
+```
+
+`resolution` dit comment le titre a été résolu — `exact`, `redirection`,
+`recherche` — et les ennuis sont triés **en tête du fichier** : refusés,
+introuvables, doublons. Ce sont les seules lignes à relire.
+
+Le fichier compte 386 titres d'un seul mot, dont 110 de six lettres ou moins
+(`Inky`, `Dolly`, `Sudan`, `Mir`, `Rage`, `Koko`, `Chaser`…). Ce sont
+exactement les titres exposés au piège. Le rapport les nommera.
+
+### 3. La colonne « accord » et le badge ⚠ à vérifier
+
+Le chiffre qui aurait crié « Pac-Man » dès la première curation : **combien de
+mots signifiants votre phrase partage-t-elle avec l'article ?** Zéro pour le
+poulpe et le jeu d'arcade ; trois pour le lac Nyos et sa catastrophe.
+
+Il est calculé pour chaque sujet à la vérification — sans un seul appel de
+plus, l'introduction étant déjà téléchargée —, écrit dans `accord` du
+catalogue maître et du CSV, et affiché dans **console.html** et
+**catalogue.html** : un badge rouge « ⚠ à vérifier », un filtre du même nom, un
+tri « les moins sûrs d'abord », un compteur.
+
+Il ne refuse rien : une phrase peut légitimement raconter un épisode que
+l'introduction ne mentionne pas. C'est un doute affiché, pas un verdict.
+
+Pour les sujets déjà entrés avant cette version : *Entretien → **accorder***
+le calcule sur tout le catalogue, instantanément, sans réseau.
+
+### 4. Le tri gratuit avant le tri qui coûte le réseau
+
+**Le symptôme, dans votre journal.** `981 sur 101006 cette fois`. À ce
+rythme-là, le catalogue demandait une centaine de nuits.
+
+**La cause.** La vérification prenait les `parPasse` premiers sujets **avant**
+d'appliquer les règles qui ne coûtent rien. Or sur 88 300 entrées anglaises
+« Le saviez-vous ? », **10 263 seulement portent une phrase de contributeur** :
+les autres étaient rejetées de toute façon, quelques lignes plus bas, par
+`mots < 8`. Le budget réseau partait vérifier des sujets condamnés d'avance.
+
+**Le remède.** Les règles gratuites — définition, phrase absente ou trop
+courte — s'appliquent **d'abord**. Le réseau ne voit plus que ce qui a une
+chance d'entrer, et les sujets sont triés : vos phares en tête, puis ceux que
+deux ou trois sources indépendantes désignent.
+
+Mesuré sur mille sujets dont cent recevables (la proportion de votre dépôt) :
+
+| | appels réseau | sujets ajoutés |
+|---|---|---|
+| 8.3.2 | 165 | 100 |
+| 8.4.0 | **53** | 100 |
+
+Même résultat, un tiers du réseau. Sur votre dépôt, l'horizon passe d'une
+centaine de passes à une quinzaine — et si une passe s'arrête en route, ce qui
+est entré est ce qui valait le plus.
+
+### 5. Deux corrections de vérité
+
+- `nettoyerPhares` annonçait « c'est probablement un incident réseau » alors
+  que la passe avait simplement été écourtée. Il distingue maintenant les deux
+  et le dit. Le refus de réécrire le fichier, lui, était correct et le reste.
+- **Les workflows n'enregistraient pas `consignes/sujets-phares.txt`.** La
+  moisson le réécrivait proprement… et le dépôt n'en gardait rien. Corrigé, en
+  même temps que `rapport-phares.csv` et la sauvegarde
+  `sujets-phares.avant-nettoyage.txt`.
+
 
 ## 8.3.2 — la moisson ne peut plus s'éterniser
 

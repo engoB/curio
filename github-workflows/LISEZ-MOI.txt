@@ -1,0 +1,12 @@
+Ce dossier contient une copie du fichier .github/workflows/curio.yml.
+
+Pourquoi : le dossier .github commence par un point, donc iOS et Android le
+masquent, et l'import GitHub le saute silencieusement. Ce dossier-ci, dont le
+nom est visible, monte normalement.
+
+À faire une seule fois, sur GitHub :
+  Add file -> Create new file
+  Nom du fichier :  .github/workflows/curio.yml
+  Collez le contenu de curio.yml, puis Commit changes.
+
+L'action apparaît ensuite dans l'onglet Actions, sous le nom "Curio".

@@ -59,6 +59,7 @@ h1{font-size:23px;margin:0 0 4px;letter-spacing:-.01em}
 .bloc span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--texte-3);margin-top:5px}
 .bloc.k b{color:var(--accent)}
 .bloc.o b{color:var(--or)}
+.bloc.r b{color:var(--rouge)}
 
 /* ---------- les commandes ---------- */
 .commandes{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px;align-items:center}
@@ -98,6 +99,7 @@ input[type=search]:focus,select:focus{outline:2px solid var(--accent);outline-of
 .et-quarantaine{background:var(--rouge);color:#2A0509}
 .et-retire{border:1px solid var(--line);color:var(--texte-3);text-decoration:line-through}
 .et-aecrire{border:1px solid var(--line);color:var(--texte-3)}
+.doute{background:var(--rouge);color:#2A0509}
 
 .item h2{font-size:15.5px;margin:0 0 2px;font-weight:650;letter-spacing:-.005em}
 .item h2 a{color:inherit;text-decoration:none}
@@ -171,6 +173,18 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;colo
             <b>Entretien → purger</b>. Ils sortent du catalogue.</td>
       </tr>
       <tr>
+        <td>La phrase ne parle pas du bon sujet</td>
+        <td>C’est le cas <b>Pac-Man</b> : la ligne <code>Inky</code> visait le
+            poulpe évadé, mais Inky est aussi un fantôme de Pac-Man et Wikipédia
+            y redirigeait. Filtrez sur <b>⚠ à vérifier</b> : ce sont les sujets
+            dont la phrase ne partage aucun mot avec l’article. Corrigez la
+            ligne dans <code>consignes/sujets-phares.txt</code> — en précisant
+            le titre, par exemple <code>Inky (octopus)</code> — puis excluez
+            l’intrus et lancez <b>Entretien → purger</b>.<br>
+            <code>rapport-phares.csv</code> liste toutes les lignes douteuses,
+            les ennuis en tête.</td>
+      </tr>
+      <tr>
         <td>Deux lignes pour le même sujet</td>
         <td>Cela ne devrait pas arriver : l’identité d’un sujet est son
             identifiant Wikidata, pas son titre. Si vous en voyez une,
@@ -204,10 +218,12 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;colo
       <option value="ecrit">Écrit</option>
       <option value="publie">En ligne</option>
       <option value="retire">Retiré</option>
+      <option value="suspect">⚠ À vérifier — phrase sans rapport</option>
     </select>
     <select id="tri" aria-label="Tri">
       <option value="potentiel">Trier par potentiel</option>
       <option value="sources">Trier par nombre de sources</option>
+      <option value="accord">Les moins sûrs d’abord</option>
       <option value="titre">Trier par titre</option>
       <option value="recent">Les derniers arrivés</option>
     </select>
@@ -261,8 +277,9 @@ function charger(){
 
 function compter(){
   var c = { total:sujets.length, phare:0, insolite:0, saviez:0, croise:0,
-            aecrire:0, ecrit:0, publie:0, retire:0, bilingue:0 };
+            aecrire:0, ecrit:0, publie:0, retire:0, bilingue:0, doute:0 };
   sujets.forEach(function(s){
+    if(s.accord === 0) c.doute++;
     var src = s.sources || [];
     if(src.indexOf('phare') >= 0) c.phare++;
     if(src.indexOf('insolite') >= 0) c.insolite++;
@@ -284,7 +301,8 @@ function peindreChiffres(){
     ['',  c.saviez, 'le saviez-vous ?'],
     ['k', c.publie, 'en ligne'],
     ['',  c.ecrit, 'écrits, en réserve'],
-    ['',  c.aecrire, 'restent à écrire']
+    ['',  c.aecrire, 'restent à écrire'],
+    ['r', c.doute, 'à vérifier']
   ];
   var box = $('#chiffres'); box.innerHTML = '';
   blocs.forEach(function(b){
@@ -301,7 +319,11 @@ function filtrer(){
     var src = s.sources || [];
     if(sf === 'croise'){ if(src.length < 2) return false; }
     else if(sf && src.indexOf(sf) < 0) return false;
-    if(ef && etatDe(s) !== ef) return false;
+    /* « à vérifier » n'est pas un état, c'est un doute : la phrase et
+       l'article ne partagent pas un seul mot. C'est ce filtre qui aurait
+       montré la fiche « Pac-Man » portant l'histoire d'un poulpe. */
+    if(ef === 'suspect'){ if(s.accord !== 0) return false; }
+    else if(ef && etatDe(s) !== ef) return false;
     if(q){
       if(!s._foin) s._foin = plier([s.fr, s.en, s.phrase, s.apercu,
         (NOMS[s.uni]||[''])[0]].filter(Boolean).join(' '));
@@ -310,7 +332,10 @@ function filtrer(){
     return true;
   });
 
-  if(tri === 'titre') vue.sort(function(a,b){
+  if(tri === 'accord') vue.sort(function(a,b){
+    var x = (a.accord == null ? 99 : a.accord), y = (b.accord == null ? 99 : b.accord);
+    return x - y || b.potentiel - a.potentiel; });
+  else if(tri === 'titre') vue.sort(function(a,b){
     return String(a.fr||a.en).localeCompare(String(b.fr||b.en),'fr'); });
   else if(tri === 'sources') vue.sort(function(a,b){
     return (b.sources||[]).length - (a.sources||[]).length || b.potentiel - a.potentiel; });
@@ -345,6 +370,7 @@ function ligne(s){
   src.forEach(function(x){ meta += '<b class="src-'+x+'">'+esc(x === 'saviez' ? 'le saviez-vous' : x)+'</b>'; });
   if(src.length >= 2) meta += '<b class="croise">'+src.length+' sources</b>';
   meta += '<b class="et-'+et+'">'+ETIQ[et]+'</b>';
+  if(s.accord === 0) meta += '<b class="doute" title="La phrase ne partage aucun mot avec l’article : à regarder de près.">⚠ à vérifier</b>';
 
   var n = el('article','item');
   var mrow = el('div','meta', meta);

@@ -46,20 +46,48 @@ classement, et le CSV vous le dit : la colonne `sources` affiche
 **Ce qui n'entre pas :** ce qui n'a pas d'article vérifié avec une vraie
 introduction ; ce dont la phrase n'est qu'une définition (« X est une commune
 française du département de… ») ; ce qui est dans `consignes/exclusions.txt` ;
-ce qui y est déjà.
+ce qui y est déjà. Ces règles-là ne coûtent rien : elles sont appliquées
+**avant** d'interroger Wikipédia, pour que le temps de la passe aille aux
+sujets qui ont une chance d'entrer, vos phares en premier.
 
 **Relancer ne détruit rien.** Les sujets déjà présents gardent leur état —
 écrit, publié, retiré. Seuls les nouveaux sont ajoutés, et le journal dit
 combien. C'est votre outil de comparaison : dans six mois, relancez, et vous
 saurez exactement ce que Wikipédia a produit de neuf depuis.
 
-Trois fichiers sortent :
+Quatre fichiers sortent :
 
 - **`catalogue-maitre.json`** — la nomenclature. C'est la vérité du projet.
 - **`catalogue-maitre.csv`** — la même chose dans un tableur : qid, univers,
   titre FR, titre EN, sources, potentiel, statut, dates, phrase.
 - **`catalog.json`** — la vue dont l'application a besoin. Régénérée depuis le
   maître, jamais l'inverse.
+- **`rapport-phares.csv`** — une ligne par ligne de votre fichier de sujets
+  phares, et ce qu'elle est devenue. Voir plus bas.
+
+---
+
+### Le doute affiché : la colonne « accord »
+
+Une fiche intitulée **Pac-Man** portant l'histoire d'un poulpe. C'est arrivé :
+votre ligne disait `Inky`, et Inky est aussi un fantôme de Pac-Man. Wikipédia
+y redirigeait sans rien dire.
+
+Deux choses ont changé. La première est une barrière : toute redirection qui
+change de sujet est désormais confrontée à votre phrase, et refusée si elle
+n'a rien à voir. La seconde est un chiffre, **l'accord** : combien de mots
+signifiants votre phrase partage-t-elle avec l'article ?
+
+    poulpe évadé  ×  jeu d'arcade Pac-Man        accord 0
+    lac qui souffle × catastrophe du lac Nyos    accord 3
+
+Un accord de zéro n'écarte rien — une phrase peut raconter un épisode que
+l'introduction ne mentionne pas. Il **allume un badge** ⚠ à vérifier dans
+`console.html` et `catalogue.html`, remplit un filtre du même nom, et donne un
+tri « les moins sûrs d'abord ». Vous regardez, vous tranchez.
+
+Pour les sujets entrés avant la version 8.4 : *Entretien → **accorder***
+calcule la colonne sur tout le catalogue, instantanément, sans réseau.
 
 ---
 
@@ -77,6 +105,20 @@ ne doit pas vider votre fichier.
 
 Après la première moisson, ce fichier est propre : tous les titres existent,
 tous sont orthographiés comme Wikipédia les écrit, aucun n'y figure deux fois.
+
+**Et `rapport-phares.csv` vous dit ce qui s'est passé, ligne par ligne :**
+
+| colonne | ce qu'elle dit |
+|---|---|
+| `ligne_demandee` | ce que vous avez écrit |
+| `resolution` | `exact`, `redirection` ou `recherche` |
+| `article_retenu` | où ça a abouti |
+| `verdict` | retenu · déjà au catalogue · doublon · refusé · introuvable |
+| `motif` | pourquoi, quand c'est un refus |
+
+Les ennuis sont **en tête du fichier** : ce sont les seules lignes à relire.
+Une ligne refusée ou introuvable se corrige dans `sujets-phares.txt`, et la
+moisson suivante la reprend.
 
 ---
 

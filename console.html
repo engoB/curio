@@ -91,6 +91,12 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .cmd input[type=search]{flex:1 1 220px;width:auto}
 .cmd select{width:auto}
 .cmd .compte{margin-left:auto;font-size:13px;color:var(--texte-2);font-variant-numeric:tabular-nums}
+/* La portée des boutons de lot, écrite noir sur blanc au-dessus de la liste :
+   « ce qui est affiché » ne doit jamais être une devinette. */
+.portee{font-size:13px;line-height:1.6;color:var(--texte-2);background:var(--ink-2);
+  border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-bottom:12px}
+.portee b{color:var(--texte);font-variant-numeric:tabular-nums}
+.portee .tout{color:var(--or)}
 .btn{font:inherit;font-size:13px;font-weight:600;border-radius:9px;padding:8px 14px;cursor:pointer;
   border:1px solid var(--line-fort);background:var(--ink-2);color:var(--texte-2)}
 .btn:hover{color:var(--texte);border-color:var(--accent)}
@@ -120,6 +126,7 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .e-ecrit{background:var(--or-doux);color:var(--or)}
 .e-aecrire{border:1px solid var(--line);color:var(--texte-3)}
 .e-retire{border:1px solid var(--line);color:var(--texte-3);text-decoration:line-through}
+.doute{background:var(--rouge);color:#2A0509}
 .item h2{font-size:15.5px;margin:0 0 2px;font-weight:650}
 .item h2 a{color:inherit;text-decoration:none} .item h2 a:hover{color:var(--accent)}
 .autre{font-size:12px;color:var(--texte-3);margin:0 0 5px}
@@ -254,20 +261,24 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
         <option value="aecrire">À écrire</option>
         <option value="ecrit">Écrit</option>
         <option value="publie">En ligne</option>
+        <option value="suspect">⚠ À vérifier — phrase sans rapport</option>
       </select>
       <select id="fTri">
         <option value="potentiel">Par potentiel</option>
         <option value="sources">Par nombre de sources</option>
+        <option value="accord">Les moins sûrs d'abord</option>
         <option value="recent">Les derniers arrivés</option>
         <option value="titre">Par titre</option>
       </select>
       <span class="compte" id="cCat"></span>
     </div>
     <div class="cmd">
-      <button class="btn v" id="toutRetenir">Retenir tout ce qui est affiché</button>
-      <button class="btn" id="toutEcarter">Écarter tout ce qui est affiché</button>
-      <button class="btn" id="toutNeutre">Remettre à zéro l’affichage</button>
+      <button class="btn v" id="toutRetenir">Retenir ce qui est affiché</button>
+      <button class="btn" id="toutEcarter">Écarter ce qui est affiché</button>
+      <button class="btn" id="toutNeutre">Oublier ces décisions</button>
+      <button class="btn" id="toutOublier">Tout oublier</button>
     </div>
+    <div class="portee" id="portee"></div>
     <div class="liste" id="lCat"></div>
     <button class="btn plus" id="plusCat" hidden>Afficher la suite</button>
   </section>
@@ -519,14 +530,21 @@ function filtrerCat(){
     if(sf==='croise'){ if(src.length<2) return false; }
     else if(sf && src.indexOf(sf)<0) return false;
     if(df && decDe(s)!==df) return false;
-    if(ef && etatDe(s)!==ef) return false;
+    /* « à vérifier » n'est pas un état : c'est un doute. La phrase et
+       l'article ne partagent pas un seul mot signifiant — c'est ce qui
+       trahit une fiche « Pac-Man » portant l'histoire d'un poulpe. */
+    if(ef==='suspect'){ if(s.accord!==0) return false; }
+    else if(ef && etatDe(s)!==ef) return false;
     if(q){
       if(!s._f) s._f = plier([s.fr,s.en,s.phrase,s.apercu,(NOMS[s.uni]||[''])[0]].filter(Boolean).join(' '));
       if(s._f.indexOf(q)<0) return false;
     }
     return true;
   });
-  if(tri==='titre') S.vueCat.sort(function(a,b){ return String(a.fr||a.en).localeCompare(String(b.fr||b.en),'fr'); });
+  if(tri==='accord') S.vueCat.sort(function(a,b){
+    var x=(a.accord==null?99:a.accord), y=(b.accord==null?99:b.accord);
+    return x-y || b.potentiel-a.potentiel; });
+  else if(tri==='titre') S.vueCat.sort(function(a,b){ return String(a.fr||a.en).localeCompare(String(b.fr||b.en),'fr'); });
   else if(tri==='sources') S.vueCat.sort(function(a,b){ return (b.sources||[]).length-(a.sources||[]).length || b.potentiel-a.potentiel; });
   else if(tri==='recent') S.vueCat.sort(function(a,b){ return String(b.ajoute||'').localeCompare(String(a.ajoute||'')) || b.potentiel-a.potentiel; });
   else S.vueCat.sort(function(a,b){ return b.potentiel-a.potentiel || (b.sources||[]).length-(a.sources||[]).length; });
@@ -545,6 +563,7 @@ function ligneCat(s){
   src.forEach(function(x){ h += '<b class="s-'+x+'">'+esc(x==='saviez'?'le saviez-vous':x)+'</b>'; });
   if(src.length>=2) h += '<b class="croise">'+src.length+' sources</b>';
   h += '<b class="e-'+et+'">'+ETIQ[et]+'</b>';
+  if(s.accord===0) h += '<b class="doute" title="La phrase ne partage aucun mot avec l\u2019article : \u00e0 regarder de pr\u00e8s avant d\u2019\u00e9crire.">\u26a0 \u00e0 v\u00e9rifier</b>';
   meta.innerHTML = h;
 
   var g = el('span','gestes');
@@ -577,9 +596,72 @@ function peindreCat(){
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
 
   $('#cCat').textContent = nb(S.vueCat.length)+' affiché'+(S.vueCat.length>1?'s':'');
+  peindrePortee(c);
   var l=$('#lCat'); l.innerHTML=''; S.nCat=0;
   if(!S.vueCat.length){ l.appendChild(el('div','vide','Rien ne correspond.')); $('#plusCat').hidden=true; peindrePied(); return; }
   suiteCat(); peindrePied();
+}
+
+/* ══════════════ la portée des boutons de lot ══════════════
+   « Retenir tout ce qui est affiché » ne disait pas combien, ni sur quoi. La
+   liste ne montre que les cinquante premiers, les décisions déjà prises ne se
+   voient pas, et le doute s'installe : ai-je retenu mes 114 insolites, ou tout
+   le catalogue ? Désormais les boutons portent le chiffre, une ligne dit le
+   filtre en vigueur, et un lot sans filtre demande confirmation. */
+function filtresActifs(){
+  var f=[], t=function(id){ var n=$(id); return n.options[n.selectedIndex].textContent.trim(); };
+  if($('#q').value.trim())  f.push('recherche « '+$('#q').value.trim()+' »');
+  if($('#fUni').value)      f.push(t('#fUni'));
+  if($('#fSrc').value)      f.push(t('#fSrc'));
+  if($('#fDec').value)      f.push(t('#fDec'));
+  if($('#fEtat').value)     f.push(t('#fEtat'));
+  return f;
+}
+function peindrePortee(c){
+  var n = S.vueCat.length, f = filtresActifs(), p = $('#portee');
+  var mot = function(x, s, pl){ return nb(x)+' '+(x>1?(pl||s+'s'):s); };
+  $('#toutRetenir').textContent = 'Retenir ces '+nb(n);
+  $('#toutEcarter').textContent = 'Écarter ces '+nb(n);
+  $('#toutNeutre').textContent  = 'Oublier ces '+nb(n);
+  $('#toutRetenir').disabled = $('#toutEcarter').disabled = $('#toutNeutre').disabled = !n;
+  /* Le fichier peut porter des décisions sur des sujets qui ne sont plus au
+     catalogue (purge, exclusion) : c'est le nombre de clés qui fait foi. */
+  var decidees = Object.keys(S.decisions).length;
+  $('#toutOublier').textContent = 'Tout oublier ('+nb(decidees)+')';
+  $('#toutOublier').disabled = !decidees;
+  p.innerHTML = (f.length
+      ? 'Les trois boutons ci-dessus agissent sur les <b>'+nb(n)+'</b> sujets du filtre '
+        + '<b>'+esc(f.join(' + '))+'</b>, pas sur les autres.'
+      : '<span class="tout">Aucun filtre.</span> Les trois boutons ci-dessus agissent sur '
+        + '<b>tout le catalogue — '+nb(n)+' sujets</b>. Filtrez d’abord si ce n’est pas ce que vous voulez.')
+    + '<br>Décidé pour l’instant : <b>'+mot(c.retenu,'retenu')+'</b>, <b>'+mot(c.ecarte,'écarté')+'</b>, '
+    + nb(c.neutre)+' sans décision.'
+    + (decidees ? ' <i>Tout oublier</i> les efface toutes et repart de zéro.' : '');
+}
+/* Une action de lot : on la chiffre, on la fait dire ce qu'elle a fait, et on
+   demande confirmation quand elle porte sur tout le catalogue. */
+function lot(quoi, verbe){
+  var n = S.vueCat.length, f = filtresActifs();
+  if(!n) return;
+  /* Ce qu'on écrase compte autant que ce qu'on décide : un lot sans filtre
+     peut retourner un travail de sélection déjà fait. On le dit avant. */
+  var ecrases = 0;
+  S.vueCat.forEach(function(s){ var d=decDe(s); if(d!=='neutre' && d!==quoi) ecrases++; });
+  if(!f.length && n > 50 && !window.confirm(
+      'Aucun filtre n’est actif.\n\n' + verbe + ' les ' + nb(n)
+      + ' sujets du catalogue entier ?'
+      + (ecrases ? '\n\nCela change ' + nb(ecrases) + ' décision(s) déjà prise(s).' : '')
+      + '\n\nAnnulez pour filtrer d’abord.')) return;
+  S.vueCat.forEach(function(s){
+    if(quoi) S.decisions[s.qid] = quoi; else delete S.decisions[s.qid];
+  });
+  S.sale = true; memoriser(); peindreCat();
+  var r=0, e=0;
+  S.sujets.forEach(function(s){ var d=decDe(s); if(d==='retenu')r++; else if(d==='ecarte')e++; });
+  dit('<b>'+nb(n)+'</b> sujet(s) ' + (quoi==='retenu'?'retenus':quoi==='ecarte'?'écartés':'remis sans décision')
+    + (f.length ? ' — filtre : '+esc(f.join(' + ')) : ' — <b>aucun filtre : tout le catalogue</b>')
+    + '.<br>Au total : <b>'+nb(r)+'</b> retenus, <b>'+nb(e)+'</b> écartés. '
+    + 'C’est exactement ce que <i>Enregistrer mes décisions</i> écrira dans <code>decisions.json</code>.', 'ok');
 }
 function suiteCat(){
   var f=document.createDocumentFragment(), fin=Math.min(S.nCat+LOT,S.vueCat.length);
@@ -672,6 +754,9 @@ function peindreRel(){
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
 
   $('#cRel').textContent = nb(S.vueRel.length)+' affichée'+(S.vueRel.length>1?'s':'');
+  /* Même règle que dans le catalogue : le bouton dit combien. */
+  $('#toutValider').textContent = 'Valider ces '+nb(S.vueRel.length);
+  $('#toutValider').disabled = !S.vueRel.length;
   var l=$('#lRel'); l.innerHTML=''; S.nRel=0;
   if(!S.vueRel.length){
     l.appendChild(el('div','vide', S.fiches.length
@@ -693,10 +778,10 @@ function suiteRel(){
 function peindrePied(){
   var r=$('#resume'), a=$('#actions'); a.innerHTML='';
   if(!S.connecte){
-    var ret0=0, val0=0;
-    S.sujets.forEach(function(s){ if(decDe(s)==='retenu') ret0++; });
+    var ret0=0, eca0=0, val0=0;
+    S.sujets.forEach(function(s){ var d=decDe(s); if(d==='retenu')ret0++; else if(d==='ecarte')eca0++; });
     S.fiches.forEach(function(f){ if(valDe(f)==='valide') val0++; });
-    var fait = S.onglet==='cat' ? (nb(ret0)+' retenus') : (nb(val0)+' validées');
+    var fait = S.onglet==='cat' ? (nb(ret0)+' retenus · '+nb(eca0)+' écartés') : (nb(val0)+' validées');
     r.innerHTML = '<b>'+fait+'</b>, gardés dans ce navigateur. '
                 + 'Enregistrez-les : par le jeton, ou en déposant le fichier vous-même.';
     if(S.onglet==='cat')
@@ -759,11 +844,13 @@ function boutonFichier(nom, donnees, quoi){
 /* ══════════════════════════ les quatre gestes qui écrivent ══════════════════════════ */
 function enregistrerDecisions(){
   dit('Enregistrement…','info');
-  var txt = JSON.stringify(S.decisions, null, 1);
+  var txt = JSON.stringify(S.decisions, null, 1), r=0, e=0;
+  S.sujets.forEach(function(s){ var d=decDe(s); if(d==='retenu')r++; else if(d==='ecarte')e++; });
   return ecrireFichier('consignes/decisions.json', txt, S.decSha,
-      'console : décisions de curation (' + Object.keys(S.decisions).length + ' sujets)')
+      'console : ' + r + ' retenus, ' + e + ' écartés')
     .then(function(sha){ S.decSha=sha; S.sale=false; memoriser(); peindrePied();
-      dit('Décisions enregistrées dans le dépôt.','ok'); })
+      dit('Enregistré dans le dépôt : <b>'+nb(r)+'</b> retenus, <b>'+nb(e)+'</b> écartés. '
+        + 'L’écriture ne touchera que les retenus.','ok'); })
     .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
 }
 function enregistrerValidations(){
@@ -856,14 +943,27 @@ $('#regOubli').addEventListener('click',function(){
 });
 $('#plusCat').addEventListener('click', suiteCat);
 $('#plusRel').addEventListener('click', suiteRel);
-$('#toutRetenir').addEventListener('click',function(){
-  S.vueCat.forEach(function(s){ S.decisions[s.qid]='retenu'; }); S.sale=true; memoriser(); peindreCat(); });
-$('#toutEcarter').addEventListener('click',function(){
-  S.vueCat.forEach(function(s){ S.decisions[s.qid]='ecarte'; }); S.sale=true; memoriser(); peindreCat(); });
-$('#toutNeutre').addEventListener('click',function(){
-  S.vueCat.forEach(function(s){ delete S.decisions[s.qid]; }); S.sale=true; memoriser(); peindreCat(); });
+$('#toutRetenir').addEventListener('click',function(){ lot('retenu','Retenir'); });
+$('#toutEcarter').addEventListener('click',function(){ lot('ecarte','Écarter'); });
+$('#toutNeutre').addEventListener('click',function(){ lot('','Oublier la décision de'); });
+$('#toutOublier').addEventListener('click',function(){
+  var n = Object.keys(S.decisions).length;
+  if(!n || !window.confirm('Effacer les '+nb(n)+' décisions du catalogue — retenus et écartés — '
+    + 'et repartir d’une page blanche ?\n\nAucune fiche écrite n’est touchée.')) return;
+  S.decisions = {}; S.sale=true; memoriser(); peindreCat();
+  dit('Les '+nb(n)+' décisions sont effacées. <b>Enregistrer mes décisions</b> videra aussi '
+    + '<code>decisions.json</code> dans le dépôt.', 'ok');
+});
 $('#toutValider').addEventListener('click',function(){
-  S.vueRel.forEach(function(f){ S.validations[f.lang+'|'+f.titre]='valide'; }); S.sale=true; memoriser(); peindreRel(); });
+  var n=S.vueRel.length, lg=$('#fLang').value==='fr'?'françaises':'anglaises';
+  if(!n) return;
+  if(n>50 && !window.confirm('Valider les '+nb(n)+' fiches '+lg+' affichées ?\n\n'
+    + 'Elles partiront en publication au prochain passage.')) return;
+  S.vueRel.forEach(function(f){ S.validations[f.lang+'|'+f.titre]='valide'; });
+  S.sale=true; memoriser(); peindreRel();
+  var v=0; S.fiches.forEach(function(f){ if(valDe(f)==='valide') v++; });
+  dit('<b>'+nb(n)+'</b> fiche(s) '+lg+' validées. Au total : <b>'+nb(v)+'</b> validées, '
+    + 'les deux langues confondues.','ok'); });
 $('#toutReplier').addEventListener('click',function(){
   [].forEach.call(document.querySelectorAll('#lRel .corps'),function(c){
     [].forEach.call(c.querySelectorAll('p'),function(p,i){ if(i>=2) p.hidden=true; }); }); });
