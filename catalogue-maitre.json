@@ -1,7 +1,7 @@
 {
  "version": 1,
- "genere": "2026-09-03T16:29:38.230Z",
- "total": 16185,
+ "genere": "2026-09-03T16:30:27.304Z",
+ "total": 16184,
  "sujets": [
   {
    "qid": "Q596",
@@ -41501,27 +41501,6 @@
    "apercuLang": "en",
    "potentiel": 7,
    "editions": 1,
-   "ajoute": "2026-09-03",
-   "statut": "a-ecrire",
-   "ecrit": null,
-   "publie": null,
-   "accord": 0
-  },
-  {
-   "qid": "Q173626",
-   "fr": "Pac-Man",
-   "en": "Pac-Man",
-   "uni": "vivant",
-   "sources": [
-    "phare",
-    "saviez"
-   ],
-   "phrase": "Ce poulpe a soulevé le couvercle de son bac la nuit, traversé le sol de l'aquarium et plongé dans un tuyau d'évacuation vers l'océan.",
-   "phraseLang": "fr",
-   "apercu": "Pac-Man (パックマン, Pakkuman) (initialement intitulé Puckman) est un jeu vidéo créé par Tōru Iwatani pour l’entreprise japonaise bandai Namco, sorti au Japon le 22 mai 1980.",
-   "apercuLang": "fr",
-   "potentiel": 7,
-   "editions": 71,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
