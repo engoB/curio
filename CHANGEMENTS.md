@@ -1,4 +1,55 @@
-# Curio 8.4.2 — ce qui a changé depuis v6
+# Curio 8.4.3 — ce qui a changé depuis v6
+
+## 8.4.3 — la passe qualité, sur les seuls sujets retenus
+
+**La demande.** « Est-il possible d'avoir encore une passe de vérification de
+qualité uniquement sur les sujets retenus ? »
+
+Oui, et c'est le bon endroit pour la mettre. La moisson vérifie des dizaines
+de milliers de sujets, vite et grossièrement — c'est ce que permet le budget.
+Ce que vous vous apprêtez à **payer**, c'est quelques centaines. Ceux-là
+méritent un examen sérieux, et comme ils sont peu nombreux, il tient en
+quelques minutes de réseau.
+
+**`Entretien → auditer`**, ou le bouton **« Vérifier les N retenus »** dans la
+console, entre *Enregistrer mes décisions* et *Écrire*. Il reprend chaque sujet
+retenu à zéro et pose huit questions :
+
+| contrôle | verdict |
+|---|---|
+| l'article existe-t-il encore sur Wikidata ? | **grave** |
+| son introduction est-elle assez fournie, dans au moins une langue ? | **grave** |
+| est-ce une page d'homonymie (« peut désigner », « may refer to ») ? | **grave** |
+| la phrase est-elle une définition d'encyclopédie ? | **grave** |
+| y a-t-il une phrase, et fait-elle huit mots ? | **grave** |
+| le titre est-il en double, ou dans `exclusions.txt` ? | **grave** |
+| la phrase partage-t-elle un mot avec l'article ? | **doute** |
+| l'article a-t-il été renommé depuis la moisson ? | **doute** |
+
+Deux niveaux, et la distinction est délibérée : **grave** veut dire « ce sujet
+n'a rien à faire dans une tranche payante » ; **doute** veut dire « c'est
+peut-être très bien, mais regardez-le ». Un accord à zéro reste un doute — une
+phrase peut légitimement raconter un épisode que l'introduction ne mentionne
+pas.
+
+**Rien n'est jamais supprimé.** Par défaut l'audit ne fait que dire : il écrit
+`audit-retenus.csv`, les ennuis en tête, une ligne par sujet avec son motif.
+Coché **appliquer** (ou *OK* dans la fenêtre du bouton), il fait une seule
+chose de plus : passer les **graves** en « écarté » dans `decisions.json`. Les
+sujets restent au catalogue, et un clic dans la console les reprend.
+
+Au passage, l'audit **rafraîchit le catalogue** sur ce qu'il vient de
+télécharger : l'accord est recalculé sur l'introduction entière — plus fiable
+que sur les deux phrases conservées —, l'aperçu et les titres renommés sont
+mis à jour.
+
+Éprouvé sur une Wikipédia miniature reproduisant les huit défauts plus trois
+sujets sains : **8 graves sur 8 détectés, 3 doutes, 3 sans réserve**, le sujet
+non retenu jamais touché, et `--appliquer` écarte exactement les huit.
+
+Corrigé en même temps : **les workflows n'enregistraient pas
+`consignes/decisions.json`**. Un audit appliqué — ou toute écriture du fichier
+par une action — n'aurait rien laissé dans le dépôt.
 
 ## 8.4.2 — quatre sujets sur cinq dans « Mystères », et le filtre qui manquait
 

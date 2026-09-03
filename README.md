@@ -20,6 +20,7 @@ section en favori — c'est tout ce dont vous vous servez au quotidien.
 | **Les actions** | `https://github.com/VOTRE-COMPTE/curio/actions` |
 | **Le catalogue maître** | `https://github.com/VOTRE-COMPTE/curio/blob/main/catalogue-maitre.csv` |
 | **Le rapport sur vos sujets phares** | `https://github.com/VOTRE-COMPTE/curio/blob/main/rapport-phares.csv` |
+| **L'audit des sujets retenus** | `https://github.com/VOTRE-COMPTE/curio/blob/main/audit-retenus.csv` |
 | **Vos réglages** | `https://github.com/VOTRE-COMPTE/curio/tree/main/consignes` |
 
 Les cinq actions, directement :
@@ -29,7 +30,7 @@ Les cinq actions, directement :
 .../actions/workflows/2-ecrire.yml         écrire une tranche de N euros
 .../actions/workflows/3-controler.yml      contrôler avant mise en ligne
 .../actions/workflows/5-publier.yml        publier — tourne seule chaque jour
-.../actions/workflows/entretien.yml        ranger, accorder, purger, recompter…
+.../actions/workflows/entretien.yml        auditer, ranger, accorder, purger…
 ```
 
 Sur chacune : bouton **Run workflow**, en haut à droite.
@@ -63,6 +64,14 @@ cinquante sujets demande confirmation. **Tout oublier** efface toutes les
 décisions si une manœuvre ancienne a brouillé le compte : le catalogue et les
 fiches écrites ne bougent pas.
 
+**La passe qualité, avant de payer.** Le bouton **Vérifier les N retenus**
+reprend chaque sujet retenu : l'article existe-t-il encore, son introduction
+est-elle assez fournie, n'est-ce pas une page d'homonymie, votre phrase
+parle-t-elle bien de cet article ? Il écrit `audit-retenus.csv`, les ennuis en
+tête, et ne supprime rien — il ne fait que dire, sauf si vous lui demandez
+d'écarter ce qui échoue. C'est le geste à faire entre la sélection et
+l'écriture.
+
 **Relecture** — les fiches écrites, en entier : titre, texte complet, note,
 phrase à raconter. Vous validez une par une ou d'un bloc, et **Publier les
 validées** les met en ligne. Ce que vous marquez « à refaire » repasse à
@@ -87,9 +96,11 @@ un en une minute.
 ## La chaîne, en cinq gestes
 
 ```
-   1 · Moissonner   →  catalogue-maitre.json     gratuit, ~30 min, une fois
+   1 · Moissonner   →  catalogue-maitre.json     gratuit, ~40 min, chaque nuit
         ↓
-   [ vous regardez ]  catalogue-maitre.csv, ou la curation
+   [ vous choisissez ]  console.html, filtre par potentiel → Retenir
+        ↓
+   [ on vérifie ]     Vérifier les N retenus     gratuit, quelques minutes
         ↓
    2 · Écrire       →  une tranche de N euros    FR + EN, toujours les deux
         ↓
@@ -112,8 +123,7 @@ Deux façons, aucune ne coûte un centime.
 **Sur une page** — ouvrez **`catalogue.html`**. C'est le tableau de bord :
 les compteurs en haut, la liste complète en dessous, une recherche qui ignore
 les accents, et un filtre par univers, par provenance, par état et par
-**potentiel**. Elle ne
-fait rien — pas de case à cocher, pas de bouton qui engage — elle montre.
+**potentiel**. Elle ne fait rien — pas de case à cocher, pas de bouton qui engage — elle montre.
 C'est la page à mettre en favori.
 
 **Dans un tableur** — ouvrez `catalogue-maitre.csv`. Une ligne par sujet :
@@ -172,6 +182,7 @@ relisent à chaque exécution.
 | `catalogue-maitre.json` | 1 · Moissonner | **la vérité du projet** : un enregistrement par sujet, identifié par Wikidata |
 | `catalogue-maitre.csv` | 1 · Moissonner | la même chose, pour votre tableur |
 | `rapport-phares.csv` | 1 · Moissonner | vos sujets phares, ligne par ligne, et ce qu'ils sont devenus |
+| `audit-retenus.csv` | Entretien → auditer | la passe qualité sur les seuls sujets retenus, ennuis en tête |
 | `catalogue.html` | *(livré)* | le tableau de bord : il lit le maître, il ne l'écrit pas |
 | `catalog.json` | 1 · Moissonner | la vue dont l'application a besoin |
 | `anecdotes/*.json` | 2 · Écrire | les fiches, une par langue et par univers |

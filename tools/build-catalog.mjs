@@ -68,6 +68,8 @@ const MODE_MAITRE = !!opt('maitre', false);   // construire le catalogue maitre 
 const PURGER    = !!opt('purger', false);     // sortir du maitre tout ce qui est dans exclusions.txt
 const ACCORDER  = !!opt('accorder', false);   // (re)mesurer l accord phrase/article, sans reseau
 const RANGER    = !!opt('ranger', false);     // remettre chaque sujet dans son univers, sans reseau
+const AUDITER   = !!opt('auditer', false);    // passe qualite sur les seuls sujets RETENUS
+const APPLIQUER = !!opt('appliquer', false);  // ... et ecarter ceux qui echouent
 
 /* ------------------------------------------------------- univers & racines
    Huit univers, les mêmes que dans parts/20-data.js — identifiants, teintes,
@@ -1497,6 +1499,12 @@ async function lireMaitre(){
   catch{ return { version:1, genere:null, sujets:[] }; }
 }
 
+const DECISIONS = path.join(process.cwd(), 'consignes', 'decisions.json');
+async function lireDecisions(){
+  try{ return JSON.parse(await fs.readFile(DECISIONS, 'utf8')) || {}; }
+  catch{ return {}; }
+}
+
 /* Les entrées brutes des trois sources, ramenées à une seule liste.
    Chaque entrée porte : titre, langue, univers, phrase, origine. */
 async function rassembler(){
@@ -2289,6 +2297,172 @@ async function main(){
     console.log(`\n  Rien n'a été retiré. Un accord à 0 est un doute, pas un verdict :`);
     console.log(`  une phrase peut raconter un épisode que l'introduction ne mentionne pas.`);
     console.log(`  Pour sortir vraiment un sujet : consignes/exclusions.txt puis « purger ».`);
+    return;
+  }
+
+  /* ═══════════ auditer : la passe qualité sur les seuls RETENUS ══════════
+     La moisson vérifie des dizaines de milliers de sujets, vite. Ce que vous
+     vous apprêtez à PAYER, c'est quelques centaines. Ceux-là méritent un
+     examen sérieux — et comme ils sont peu nombreux, il tient en trois
+     minutes de réseau.
+
+     On reprend chaque sujet retenu à zéro : l'article existe-t-il toujours,
+     son introduction est-elle assez fournie, n'est-ce pas une page
+     d'homonymie, la phrase parle-t-elle bien de cet article-là, n'est-ce pas
+     une définition d'encyclopédie, le titre a-t-il été renommé depuis la
+     moisson ?
+
+     Deux niveaux de verdict, et c'est délibéré :
+       · GRAVE  — le sujet n'a rien à faire dans une tranche payante ;
+       · DOUTE  — c'est peut-être très bien, mais regardez-le.
+     Rien n'est jamais supprimé. Sans --appliquer, l'audit ne fait que dire ;
+     avec, les GRAVES passent en « écarté » dans decisions.json — c'est-à-dire
+     que l'écriture ne les prendra pas, et rien d'autre.                   */
+  if (AUDITER){
+    const maitre = await lireMaitre();
+    if (!maitre.sujets || !maitre.sujets.length){
+      console.log('Aucun catalogue maître. Lancez « 1 · Moissonner ».');
+      return;
+    }
+    const decisions = await lireDecisions();
+    const retenus = maitre.sujets.filter(s => decisions[s.qid] === 'retenu');
+    if (!retenus.length){
+      console.log('Aucun sujet retenu dans consignes/decisions.json.');
+      console.log('Ouvrez console.html, filtrez (par exemple « Potentiel 9 et plus »),');
+      console.log('cliquez « Retenir ces N », puis « Enregistrer mes décisions ».');
+      return;
+    }
+    console.log(`\n▸ audit qualité de ${retenus.length} sujet(s) retenu(s)`);
+    console.log(`  (le reste du catalogue n'est pas touché, et rien n'est supprimé)`);
+
+    const hors = await lireExclusions();
+    const verdicts = new Map();     // qid -> { niveau, motif }
+    const noter = (q, niveau, motif) => {
+      const v = verdicts.get(q);
+      if (!v || (v.niveau === 'doute' && niveau === 'grave')) verdicts.set(q, { niveau, motif });
+    };
+
+    /* ---- 1. ce qui se voit sans réseau ---------------------------------- */
+    const vus = new Map();          // titre normalisé -> premier qid vu
+    for (const s of retenus){
+      const mots = String(s.phrase || '').trim().split(/\s+/).filter(Boolean).length;
+      if (!s.fr && !s.en)                     noter(s.qid, 'grave', 'aucun titre');
+      else if (!s.phrase)                     noter(s.qid, 'grave', 'aucune phrase : on ne saurait pas quoi raconter');
+      else if (estDefinition(s.phrase))       noter(s.qid, 'grave', 'la phrase est une définition, pas une anecdote');
+      else if (mots < 8)                      noter(s.qid, 'grave', `phrase trop courte (${mots} mots)`);
+      const t = String(s.fr || s.en).toLowerCase();
+      if (hors.has(t) || (s.fr && hors.has(s.fr.toLowerCase())) || (s.en && hors.has(s.en.toLowerCase())))
+        noter(s.qid, 'grave', 'présent dans consignes/exclusions.txt');
+      if (vus.has(t)) noter(s.qid, 'grave', 'doublon de titre avec ' + vus.get(t));
+      else vus.set(t, s.qid);
+      if ((s.potentiel || 0) <= 5)            noter(s.qid, 'doute', `potentiel faible (${s.potentiel || '?'})`);
+      if (s.statut && s.statut !== 'a-ecrire') noter(s.qid, 'doute', 'déjà écrit : l\'écriture le sautera');
+    }
+
+    /* ---- 2. ce que seul le réseau peut dire ----------------------------- */
+    const qids = retenus.map(s => s.qid);
+    const lignes = [];
+    let interroges = 0;
+    for (let i = 0; i < qids.length; i += 400){
+      if (tempsEcoule()) break;
+      lignes.push(...await fromWikidata(qids.slice(i, i + 400)));
+      interroges = Math.min(i + 400, qids.length);
+      console.log(`  · Wikidata ${interroges}/${qids.length}  (${minutesFaites()} min)`);
+    }
+    const parQid = new Map(lignes.map(r => [r.qid, r]));
+    const introFr = new Map(), introEn = new Map();
+    const frKeep = await verify('fr', lignes.map(r => r.fr).filter(Boolean), true, introFr);
+    const enKeep = await verify('en', lignes.map(r => r.en).filter(Boolean), true, introEn);
+    console.log(`  · ${frKeep.size} article(s) FR et ${enKeep.size} EN utilisables.  (${minutesFaites()} min)`);
+
+    /* Une page d'homonymie n'est pas un sujet : son introduction le dit. */
+    const HOMONYMIE = /(peut (?:d[ée]signer|faire r[ée]f[ée]rence)|may refer to|can refer to|est un (?:nom|pr[ée]nom) (?:de famille|port[ée])|is a (?:surname|given name))/i;
+
+    let vusReseau = 0, renommes = 0;
+    for (const s of retenus){
+      if (interroges < qids.length && qids.indexOf(s.qid) >= interroges) continue;  // pas regardé
+      vusReseau++;
+      const r = parQid.get(s.qid);
+      if (!r){ noter(s.qid, 'grave', 'article introuvable sur Wikidata (supprimé ou fusionné)'); continue; }
+      const okFr = r.fr && frKeep.has(r.fr), okEn = r.en && enKeep.has(r.en);
+      if (!okFr && !okEn){ noter(s.qid, 'grave', 'article trop maigre ou disparu dans les deux langues'); continue; }
+
+      const iFr = introFr.get(r.fr) || '', iEn = introEn.get(r.en) || '';
+      if (HOMONYMIE.test(iFr) || HOMONYMIE.test(iEn))
+        noter(s.qid, 'grave', 'page d\'homonymie : ce n\'est pas un sujet');
+
+      /* le titre a pu changer depuis la moisson — on le remet à jour */
+      if ((r.fr && r.fr !== s.fr) || (r.en && r.en !== s.en)){
+        renommes++;
+        noter(s.qid, 'doute', `renommé depuis la moisson → « ${r.fr || r.en} »`);
+        s.fr = okFr ? r.fr : s.fr; s.en = okEn ? r.en : s.en;
+      }
+
+      /* l'accord, recalculé sur l'introduction ENTIÈRE — plus fiable que sur
+         les deux phrases que le catalogue conserve. C'est la barrière qui
+         aurait crié « Pac-Man ». */
+      const accord = motsPartages(s.phrase, iFr + ' ' + iEn);
+      s.accord = accord;
+      s.apercu = deuxPhrases(iFr) || deuxPhrases(iEn) || s.apercu;
+      s.apercuLang = iFr ? 'fr' : (iEn ? 'en' : s.apercuLang);
+      if (accord === 0)
+        noter(s.qid, 'doute', 'la phrase ne partage aucun mot avec l\'article');
+    }
+
+    /* ---- 3. le rapport --------------------------------------------------- */
+    const rang = { grave:0, doute:1, ok:2 };
+    const lignesCsv = retenus.map(s => {
+      const v = verdicts.get(s.qid) || { niveau:'ok', motif:'' };
+      return [s.qid, s.fr || '', s.en || '', s.uni, s.potentiel, (s.accord == null ? '' : s.accord),
+              v.niveau, v.motif];
+    }).sort((a, b) => (rang[a[6]] - rang[b[6]]) || (b[4] - a[4])
+                   || String(a[1] || a[2]).localeCompare(String(b[1] || b[2]), 'fr'));
+    const esc = (x) => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"';
+    const csv = ['﻿qid;titre_fr;titre_en;univers;potentiel;accord;verdict;motif']
+      .concat(lignesCsv.map(l => l.map(esc).join(';'))).join('\n') + '\n';
+    await fs.writeFile(path.join(process.cwd(), 'audit-retenus.csv'), csv, 'utf8');
+
+    const graves = lignesCsv.filter(l => l[6] === 'grave');
+    const doutes = lignesCsv.filter(l => l[6] === 'doute');
+    const parMotif = {};
+    for (const l of graves.concat(doutes)) parMotif[l[7]] = (parMotif[l[7]] || 0) + 1;
+
+    /* le catalogue garde les accords et les titres rafraîchis */
+    maitre.genere = new Date().toISOString();
+    await fs.writeFile(MAITRE + '.tmp', JSON.stringify(maitre, null, 1), 'utf8');
+    await fs.rename(MAITRE + '.tmp', MAITRE);
+    await vueApplication(maitre.sujets);
+    await ecrireCsvMaitre(maitre.sujets);
+
+    console.log(`\n╔══ AUDIT DES SUJETS RETENUS ═══════════════════════════════`);
+    console.log(`║  ${retenus.length} retenu(s), ${vusReseau} passé(s) au réseau.`);
+    console.log(`║  ${retenus.length - graves.length - doutes.length} sans réserve`
+              + `  ·  ${doutes.length} à regarder  ·  ${graves.length} à écarter`);
+    if (renommes) console.log(`║  ${renommes} article(s) renommé(s) depuis la moisson : titres mis à jour.`);
+    console.log(`╠══ motifs ─────────────────────────────────────────────────`);
+    for (const [m, n] of Object.entries(parMotif).sort((a, b) => b[1] - a[1]))
+      console.log(`║  ${String(n).padStart(5)}  ${m}`);
+    console.log(`╚═══════════════════════════════════════════════════════════`);
+    if (interroges < qids.length)
+      console.log(`\n  ⏱ ${qids.length - interroges} sujet(s) non regardés faute de temps : relancez l'audit.`);
+
+    if (graves.length){
+      console.log(`\n  Les premiers à écarter :`);
+      for (const l of graves.slice(0, 20)) console.log(`   · ${(l[1] || l[2])} — ${l[7]}`);
+      if (graves.length > 20) console.log(`   … et ${graves.length - 20} autre(s), dans audit-retenus.csv.`);
+    }
+
+    if (APPLIQUER && graves.length){
+      for (const l of graves) decisions[l[0]] = 'ecarte';
+      await fs.writeFile(DECISIONS, JSON.stringify(decisions, null, 1), 'utf8');
+      console.log(`\n✓ ${graves.length} sujet(s) passés en « écarté » dans consignes/decisions.json.`);
+      console.log(`  Il reste ${retenus.length - graves.length} sujet(s) retenus. Rien n'est supprimé :`);
+      console.log(`  ils restent au catalogue, et vous pouvez les reprendre dans la console.`);
+    } else if (graves.length){
+      console.log(`\n  Pour les écarter d'un coup : relancez avec « appliquer » coché.`);
+      console.log(`  Sans cela, l'audit ne fait que dire — vos décisions sont intactes.`);
+    }
+    console.log(`\n  Le détail complet, ligne par ligne : audit-retenus.csv`);
     return;
   }
 

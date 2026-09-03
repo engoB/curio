@@ -819,10 +819,18 @@ function peindrePied(){
                 + (S.sale ? ' · <span style="color:var(--or)">non enregistré</span>' : '');
     var b1=el('button','btn'+(S.sale?' p':''),'Enregistrer mes décisions');
     b1.addEventListener('click', enregistrerDecisions);
+    /* La passe qualité, entre la sélection et la dépense. Elle ne coûte que
+       du réseau, et elle ne porte que sur les retenus — c'est-à-dire sur ce
+       que vous êtes sur le point de payer. */
+    var bA=el('button','btn','Vérifier les '+nb(ret)+' retenus');
+    bA.disabled = !ret;
+    bA.title = 'Reprend chaque sujet retenu : l’article existe-t-il toujours, '
+             + 'est-il assez fourni, votre phrase parle-t-elle bien de lui ?';
+    bA.addEventListener('click', envoyerAudit);
     var b2=el('button','btn o','Écrire les '+nb(aEcrire)+' retenus');
     b2.disabled = !aEcrire;
     b2.addEventListener('click', envoyerEcriture);
-    a.appendChild(b1); a.appendChild(b2);
+    a.appendChild(b1); a.appendChild(bA); a.appendChild(b2);
   }else{
     var val=0, ref=0, ret2=0;
     S.fiches.forEach(function(f){ var v=valDe(f); if(v==='valide')val++; else if(v==='refaire')ref++; else if(v==='retire')ret2++; });
@@ -880,6 +888,26 @@ function enregistrerValidations(){
     .then(function(sha){ S.valSha=sha; S.sale=false; memoriser(); peindrePied();
       dit('Relecture enregistrée dans le dépôt.','ok'); })
     .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+}
+/* La passe qualité sur les seuls retenus. On enregistre d'abord — l'audit lit
+   decisions.json dans le dépôt, pas ce navigateur — puis on lance l'action. */
+function envoyerAudit(){
+  var n = S.sujets.filter(function(s){ return decDe(s)==='retenu'; }).length;
+  var dur = window.confirm(
+    'Vérifier la qualité des ' + n + ' sujets retenus.\n\n'
+    + 'L’audit reprend chaque sujet : l’article existe-t-il toujours, est-il assez\n'
+    + 'fourni, n’est-ce pas une page d’homonymie, votre phrase parle-t-elle bien\n'
+    + 'de cet article ? Gratuit, il ne supprime rien.\n\n'
+    + 'OK  = écarter automatiquement ce qui échoue gravement.\n'
+    + 'Annuler = faire l’audit sans rien changer, et lire le rapport.');
+  dit('Enregistrement des décisions, puis lancement de l’audit…','info');
+  enregistrerDecisions().then(function(){
+    return lancerAction('entretien.yml', { operation:'auditer', appliquer: dur ? 'true' : 'false' });
+  }).then(function(){
+    dit('L’audit est lancé' + (dur ? ' — il écartera ce qui échoue' : ' en lecture seule')
+      + '. Suivez-le dans <b>Actions → Entretien</b> ; le rapport complet sera dans '
+      + '<code>audit-retenus.csv</code>, les ennuis en tête.','ok');
+  }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
 }
 function envoyerEcriture(){
   var n = S.sujets.filter(function(s){ return decDe(s)==='retenu' && etatDe(s)==='aecrire'; }).length;

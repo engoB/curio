@@ -1,96 +1,46 @@
-CURIO 8.4.2 — RANGER LES 16 185, ET NE GARDER QUE LES MEILLEURS
-================================================================
+CURIO 8.4.3 — LA PASSE QUALITÉ SUR LES SEULS SUJETS RETENUS
+============================================================
 
-Rien de ce que vous avez moissonné n'est perdu ni touché. Cette mise à jour
-range, filtre et corrige — elle ne supprime rien.
-
-
-CE QUE VOTRE JOURNAL DISAIT
-===========================
-
-    mysteres 12810 · arts 1017 · sciences 603 · vivant 523
-    histoire  395 · esprit 282 · cosmos 279 · terre 276
-
-Quatre sujets sur cinq dans un seul univers. Ce n'est pas votre catalogue qui
-est mal fait : c'est le rangement qui était faux.
-
-L'univers venait du TITRE DE LA SECTION de la page moissonnée. Sur les listes
-d'articles insolites, ces titres sont parlants — « Science », « Animals »,
-« Places » — et le rangement marchait. Sur les archives de « Le saviez-vous ? »
-— la source qui apporte maintenant les deux tiers de votre catalogue — les
-sections sont des DATES. « Janvier 2015 » ne dit rien du sujet. Faute de
-mieux, tout tombait dans « Mystères ».
+Rien de ce que vous avez moissonné ou décidé n'est perdu. Cette version
+ajoute une vérification, un filtre et un rangement.
 
 
-CE QUI CHANGE
-=============
+LA RÉPONSE À VOTRE QUESTION : OUI
+=================================
 
-1. C'EST L'ARTICLE QUI DÉCIDE, PLUS LA PAGE
+La moisson vérifie des dizaines de milliers de sujets, vite et grossièrement.
+Ce que vous vous apprêtez à PAYER, c'est quelques centaines. Ceux-là méritent
+un examen sérieux — et comme ils sont peu nombreux, il tient en quelques
+minutes.
 
-   Quand la section ne dit rien, on lit le titre, votre phrase et
-   l'introduction de l'article. Tout est DÉJÀ téléchargé par la vérification :
-   ce classement ne coûte pas un seul appel réseau, pas une seconde de plus.
+    Console -> bouton « Vérifier les N retenus »
+    ou   Actions -> Entretien -> operation = auditer
 
-   Éprouvé sur douze sujets réels, français et anglais — 12 sur 12 :
+Il reprend chaque sujet retenu à zéro et pose huit questions :
 
-     Grand Attracteur ............ cosmos
-     Turritopsis dohrnii ......... vivant
-     Inky (octopus) .............. vivant
-     Lac Nyos .................... terre
-     Concile cadavérique ......... histoire
-     Emu War ..................... histoire
-     Aphantasie .................. esprit
-     Goutte de poix .............. sciences
-     Manuscrit de Voynich ........ arts
-     Yves Klein .................. arts
-     Tamám Shud .................. mystères
-     Hubble Space Telescope ...... cosmos
+    GRAVE   l'article existe-t-il encore ?
+    GRAVE   son introduction est-elle assez fournie ?
+    GRAVE   est-ce une page d'homonymie (« peut désigner… ») ?
+    GRAVE   la phrase est-elle une définition d'encyclopédie ?
+    GRAVE   y a-t-il une phrase, et fait-elle huit mots ?
+    GRAVE   le titre est-il en double, ou déjà exclu ?
+    DOUTE   la phrase partage-t-elle un mot avec l'article ?
+    DOUTE   l'article a-t-il été renommé depuis la moisson ?
 
-   Un article sans aucun signal reste en « Mystères ». C'est redevenu un
-   univers, ce n'est plus un dépotoir.
+GRAVE = ce sujet n'a rien à faire dans une tranche payante.
+DOUTE = c'est peut-être très bien, mais regardez-le.
 
-2. VOTRE CATALOGUE ACTUEL SE RANGE EN UNE ACTION
+RIEN N'EST SUPPRIMÉ. Par défaut l'audit ne fait que dire : il écrit
+audit-retenus.csv, les ennuis en tête, une ligne par sujet avec son motif.
+Si vous cochez « appliquer » (ou répondez OK à la fenêtre du bouton), il fait
+une seule chose de plus : passer les GRAVES en « écarté » dans decisions.json.
+Les sujets restent au catalogue, un clic les reprend.
 
-   Actions -> Entretien -> operation = ranger -> Run workflow.
+Au passage, il rafraîchit ce qu'il vient de télécharger : l'accord recalculé
+sur l'introduction entière, l'aperçu, et les titres renommés.
 
-   Instantané, gratuit, sans réseau. Il ne touche QUE les sujets rangés dans
-   « Mystères ». Jamais un sujet phare — l'univers y est le vôtre. Jamais une
-   fiche déjà écrite. Le journal affiche la répartition avant et après.
-
-3. LE FILTRE PAR POTENTIEL — CE QUE VOUS DEMANDIEZ
-
-   Il y avait un TRI par potentiel, pas de FILTRE. Sur 16 185 lignes, trier ne
-   suffit pas. Dans console.html ET catalogue.html, un menu de plus :
-
-     Potentiel 10 seulement  ....  119 sujets
-     Potentiel 9 et plus  .......  451
-     Potentiel 8 et plus  ...... 1 015
-     Potentiel 7 et plus  ...... 2 449
-     Potentiel 6 et moins  .... 13 736
-
-   Votre sélection devient trois gestes :
-
-     a) filtre « Potentiel 7 et plus »
-     b) bouton « Retenir ces 2 449 »
-     c) « Enregistrer mes décisions »
-
-   Et si vous voulez commencer plus serré : « Potentiel 9 et plus », 451
-   sujets, soit 902 textes — une trentaine d'euros. Vous élargirez ensuite,
-   le reste ne bouge pas.
-
-   L'inverse marche aussi : filtre « 6 et moins », « Écarter ces 13 736 ».
-   Rien n'est supprimé, ils sortent simplement de votre chemin, et l'écriture
-   ne les prendra jamais.
-
-4. LA MOISSON UTILISE ENFIN TOUT SON TEMPS
-
-   Votre dernière passe : 12,6 minutes sur 40 allouées, et 6 973 sujets remis
-   à plus tard sans raison. Le nombre de sujets à vérifier était ESTIMÉ
-   d'avance, avec une règle calibrée avant le tri gratuit de 8.4.0.
-
-   On ne devine plus : la vérification avance par tranches de deux mille et en
-   reprend une tant qu'il reste de quoi la finir. Une ou deux passes de plus
-   devraient suffire à vider votre file d'attente.
+Éprouvé sur une Wikipédia miniature reproduisant les huit défauts : 8 sur 8
+détectés, et le sujet non retenu jamais touché.
 
 
 CE QUE VOUS FAITES, DANS L'ORDRE
@@ -98,20 +48,48 @@ CE QUE VOUS FAITES, DANS L'ORDRE
 
 1. Importez ce zip : Add file -> Upload files, tout déposer, Commit.
 
-   VÉRIFIEZ QUE .github/ EST BIEN PASSÉ. Le dossier commence par un point et
+   VÉRIFIEZ QUE .github/ EST BIEN PASSÉ — le dossier commence par un point et
    certains navigateurs le sautent. Ouvrez :
    github.com/VOTRE-COMPTE/curio/blob/main/.github/workflows/entretien.yml
-   et cherchez « ranger » dans la liste des options. S'il n'y est pas, copiez
+   et cherchez « auditer » dans la liste des options. S'il n'y est pas, copiez
    le contenu de github-workflows/entretien.yml par-dessus (crayon, tout
    sélectionner, coller, Commit).
 
-2. Actions -> Entretien -> ranger.        Vos 12 810 « Mystères » se répartissent.
-3. Actions -> Entretien -> accorder.      Allume le badge « à vérifier ».
-4. Actions -> Entretien -> purger.        Sort « Pac-Man » du catalogue.
+2. Entretien -> ranger      vos 12 810 « Mystères » se répartissent
+3. Entretien -> purger      sort « Pac-Man » du catalogue
 
-5. Ouvrez console.html. Filtre « Potentiel 9 et plus ». Regardez une vingtaine
-   de fiches. Si elles vous plaisent : « Retenir ces 451 », puis
-   « Enregistrer mes décisions », puis « Écrire les 451 retenus ».
+4. Console : filtre « Potentiel 9 et plus » -> « Retenir ces 451 »
+   -> « Enregistrer mes décisions »
 
-C'est la première tranche qui vous dira si le catalogue tient ses promesses —
-pas les 16 185 lignes, qu'aucun être humain ne peut relire.
+5. Console : « Vérifier les 451 retenus ».
+   Répondez ANNULER la première fois : vous lirez le rapport avant de laisser
+   quoi que ce soit être écarté.
+
+6. Ouvrez audit-retenus.csv à la racine du dépôt. Les GRAVES sont en tête.
+   Si les motifs vous paraissent justes, relancez avec « appliquer ».
+
+7. Alors seulement : « Écrire les N retenus ».
+
+C'est la première tranche écrite qui vous dira si le catalogue tient ses
+promesses — pas les 16 185 lignes, qu'aucun être humain ne peut relire.
+
+
+CE QUE 8.4.2 AVAIT APPORTÉ, SI VOUS NE L'AVEZ PAS ENCORE IMPORTÉ
+=================================================================
+
+  · LE FILTRE PAR POTENTIEL, dans console.html et catalogue.html :
+    10 seulement (119) · 9 et plus (451) · 8 et plus (1 015) ·
+    7 et plus (2 449) · 6 et moins (13 736).
+
+  · L'UNIVERS VIENT DE L'ARTICLE, plus du titre de la section de la page.
+    Les archives « Le saviez-vous ? » ont des sections datées : « Janvier
+    2015 » ne dit rien du sujet, et tout tombait dans « Mystères ».
+    Entretien -> ranger répare le catalogue existant, sans réseau.
+
+  · LA MOISSON UTILISE SES 40 MINUTES. Elle estimait d'avance combien de
+    sujets elle aurait le temps de vérifier ; elle avance maintenant par
+    tranches de deux mille tant qu'il reste du temps.
+
+  · LES BOUTONS DE LOT DISENT COMBIEN : « Retenir ces 451 », la portée du
+    filtre écrite sous les boutons, une confirmation quand aucun filtre n'est
+    actif, et « Tout oublier » pour repartir de zéro.

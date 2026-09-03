@@ -111,6 +111,39 @@ sujet phare — l'univers y est le vôtre — ni une fiche déjà écrite.
 
 ---
 
+### La passe qualité, entre la sélection et la dépense
+
+La moisson vérifie des dizaines de milliers de sujets, vite. Ce que vous vous
+apprêtez à **payer**, c'est quelques centaines. *Entretien → **auditer***, ou
+le bouton **Vérifier les N retenus** dans la console, reprend ces
+quelques centaines une par une.
+
+| contrôle | verdict |
+|---|---|
+| l'article existe-t-il encore sur Wikidata ? | **grave** |
+| son introduction est-elle assez fournie ? | **grave** |
+| est-ce une page d'homonymie (« peut désigner… ») ? | **grave** |
+| la phrase est-elle une définition d'encyclopédie ? | **grave** |
+| y a-t-il une phrase, et fait-elle huit mots ? | **grave** |
+| le titre est-il en double, ou dans `exclusions.txt` ? | **grave** |
+| la phrase partage-t-elle un mot avec l'article ? | doute |
+| l'article a-t-il été renommé depuis la moisson ? | doute |
+
+**Grave** veut dire « ce sujet n'a rien à faire dans une tranche payante ».
+**Doute** veut dire « c'est peut-être très bien, mais regardez-le ».
+
+Le résultat va dans **`audit-retenus.csv`**, les ennuis en tête, une ligne par
+sujet avec son motif. Par défaut **rien n'est modifié** : l'audit ne fait que
+dire. Coché *appliquer*, il passe les **graves** en « écarté » dans
+`decisions.json` — les sujets restent au catalogue, et un clic dans la console
+les reprend.
+
+Au passage il rafraîchit ce qu'il vient de télécharger : l'accord recalculé
+sur l'introduction entière, l'aperçu, et les titres renommés depuis la
+moisson.
+
+---
+
 ### Ne garder que les meilleurs
 
 Le **potentiel** est une note de 1 à 10 posée à la moisson : signal
