@@ -11,6 +11,10 @@
 #    accorder    (re)mesure l accord entre votre phrase et l article, et
 #                allume le badge « a verifier » sur ceux qui n ont aucun mot
 #                en commun. Instantane, gratuit, ne retire rien.
+#    ranger      remet chaque sujet dans son univers d apres son article.
+#                Les archives « Le saviez-vous ? » ont des sections datees,
+#                qui ne disent rien du sujet : tout tombait dans Mysteres.
+#                Ne touche ni vos sujets phares ni les fiches deja ecrites.
 #
 #  Les deux derniers ne servent qu aux depots anterieurs a la version 8 :
 #  le catalogue maitre ne peut plus contenir de doublon.
@@ -32,6 +36,7 @@ on:
           - nettoyer
           - reclasser
           - accorder
+          - ranger
 
 permissions:
   contents: write
@@ -73,6 +78,7 @@ jobs:
             nettoyer)  node tools/build-catalog.mjs --nettoyer  2>&1 | tee curio.log ;;
             reclasser) node tools/build-catalog.mjs --reclasser 2>&1 | tee curio.log ;;
             accorder)  node tools/build-catalog.mjs --accorder  2>&1 | tee curio.log ;;
+            ranger)    node tools/build-catalog.mjs --ranger    2>&1 | tee curio.log ;;
           esac
 
       - name: Compte rendu
