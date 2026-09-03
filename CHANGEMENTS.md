@@ -1,4 +1,109 @@
-# Curio 8.4.1 — ce qui a changé depuis v6
+# Curio 8.4.2 — ce qui a changé depuis v6
+
+## 8.4.2 — quatre sujets sur cinq dans « Mystères », et le filtre qui manquait
+
+### 1. L'univers venait du titre de la section, qui est une date
+
+**Le symptôme, dans votre journal.**
+
+```
+mysteres 12810 · arts 1017 · sciences 603 · vivant 523
+histoire 395 · esprit 282 · cosmos 279 · terre 276
+```
+
+Quatre sujets sur cinq dans un seul univers, et sept univers quasi vides.
+
+**La cause.** L'univers était déduit du **titre de la section** de la page
+moissonnée. Sur les listes d'articles insolites, ces titres sont parlants
+(« Science », « Animals », « Places ») et le classement marchait. Sur les
+archives de « Le saviez-vous ? » — la source qui apporte désormais les deux
+tiers du catalogue — les sections sont des **dates** : « Janvier 2015 » ne dit
+rien du sujet. Et `universDeSection()` renvoyait `mysteres` faute de mieux.
+Le fourre-tout était devenu le dépotoir.
+
+**Le remède : c'est l'article qui décide.** Faute de signal dans la section,
+on lit le titre, votre phrase et l'introduction — **tout est déjà téléchargé
+par la vérification**, ce classement ne coûte donc pas un seul appel réseau.
+Chaque univers a son vocabulaire, français et anglais ; le mieux servi gagne ;
+l'égalité ou le silence laissent « Mystères », qui redevient ce qu'il doit
+être : un univers, pas un défaut.
+
+Éprouvé sur douze sujets réels, français et anglais : **12/12**.
+
+| sujet | rangé dans |
+|---|---|
+| Grand Attracteur | cosmos |
+| Turritopsis dohrnii · Inky (octopus) | vivant |
+| Lac Nyos | terre |
+| Concile cadavérique · Emu War | histoire |
+| Aphantasie | esprit |
+| Expérience de la goutte de poix | sciences |
+| Manuscrit de Voynich · Yves Klein | arts |
+| Tamám Shud | mystères |
+
+Un texte sans aucun signal renvoie « je ne sais pas » plutôt qu'un rangement
+inventé.
+
+**Pour le catalogue que vous avez déjà** : *Entretien → **ranger***.
+Instantané, sans réseau, à partir de l'aperçu que le catalogue conserve. Il ne
+touche **que** les sujets rangés dans « Mystères », jamais un sujet phare —
+l'univers y est le vôtre — ni une fiche déjà écrite, dont les textes vivent
+dans le fichier de son univers. Le journal affiche la répartition avant et
+après, et `catalog.json` comme `catalogue-maitre.csv` sont régénérés.
+
+Éprouvé sur 640 sujets fabriqués : 381 déplacés, 191 laissés en « Mystères »
+faute de signal, 28 intouchables (phares et fiches écrites) — et les 40 déjà
+bien rangés n'ont pas bougé.
+
+### 2. Douze minutes utilisées sur quarante
+
+`9168 sur 16141 cette fois — le temps restant ne permet pas plus`, puis
+`Passe terminée en 12.6 minute(s) sur 40 allouées`. Vingt-sept minutes
+perdues, et 6 973 sujets remis à plus tard sans raison.
+
+**La cause.** Le nombre de sujets à vérifier était **estimé** d'avance —
+quatre par seconde restante —, une calibration faite quand le réseau voyait
+passer tous les sujets. Depuis que le tri gratuit filtre en amont (8.4.0), la
+cadence réelle est trois à quatre fois meilleure. L'estimation était devenue
+un plafond arbitraire.
+
+**Le remède : on ne devine plus.** La vérification avance par **tranches de
+deux mille**, et en reprend une tant qu'il reste de quoi la finir. Le budget
+est rempli, jamais dépassé. Deux garde-fous : la réserve est proportionnelle
+au budget — une passe courte lancée à la main doit rapporter quelque chose —
+et la première tranche part toujours.
+
+Et une correction de vérité au passage : quand l'échéance tombait au milieu
+d'une tranche, les sujets dont le QID n'avait pas été demandé étaient comptés
+« sans article utilisable ». Ils n'avaient pas été regardés. Ils retournent à
+la file.
+
+Éprouvé sur une Wikipédia miniature (20 archives, 1 200 sujets) : 600
+recevables, 600 vérifiés, 400 rangés par leur article, aucun sujet perdu.
+
+### 3. Le filtre par potentiel
+
+« Je ne veux que les meilleurs, et je ne peux pas classer pour n'avoir que les
+10, que les 9, 8 et 7. » Il y avait un **tri** par potentiel, pas de
+**filtre** : sur 16 185 lignes, trier ne suffit pas.
+
+`console.html` et `catalogue.html` reçoivent donc : **Potentiel 10 seulement ·
+9 et plus · 8 et plus · 7 et plus · 6 et moins**. Sur votre catalogue :
+
+| filtre | sujets |
+|---|---|
+| 10 seulement | 119 |
+| 9 et plus | 451 |
+| 8 et plus | 1 015 |
+| **7 et plus** | **2 449** |
+| 6 et moins | 13 736 |
+
+Combiné aux boutons de lot de 8.4.1, la sélection devient un geste :
+*Potentiel 7 et plus* → **Retenir ces 2 449** → *Enregistrer mes décisions*.
+Et *6 et moins* → **Écarter ces 13 736** met le reste hors du chemin sans rien
+supprimer. Éprouvé au navigateur sur la distribution exacte de votre journal :
+les cinq filtres donnent les cinq chiffres ci-dessus, et le lot enregistre
+2 449 décisions, pas une de plus.
 
 ## 8.4.1 — « Retenir ce qui est affiché » dit maintenant combien, et sur quoi
 

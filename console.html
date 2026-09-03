@@ -263,6 +263,14 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
         <option value="publie">En ligne</option>
         <option value="suspect">⚠ À vérifier — phrase sans rapport</option>
       </select>
+      <select id="fPot">
+        <option value="">Tous potentiels</option>
+        <option value="10">Potentiel 10 seulement</option>
+        <option value="9">Potentiel 9 et plus</option>
+        <option value="8">Potentiel 8 et plus</option>
+        <option value="7">Potentiel 7 et plus</option>
+        <option value="-7">Potentiel 6 et moins</option>
+      </select>
       <select id="fTri">
         <option value="potentiel">Par potentiel</option>
         <option value="sources">Par nombre de sources</option>
@@ -523,9 +531,19 @@ function decDe(s){ return S.decisions[s.qid] || 'neutre'; }
 
 function filtrerCat(){
   var q=plier($('#q').value.trim()), u=$('#fUni').value, sf=$('#fSrc').value,
-      df=$('#fDec').value, ef=$('#fEtat').value, tri=$('#fTri').value;
+      df=$('#fDec').value, ef=$('#fEtat').value, tri=$('#fTri').value,
+      pf=$('#fPot').value;
   S.vueCat = S.sujets.filter(function(s){
     if(u && s.uni!==u) return false;
+    /* Le potentiel : « je ne veux que les meilleurs ». 10 seul, ou un
+       plancher. La valeur négative isole le bas du panier, pour l'écarter
+       d'un geste. */
+    if(pf){
+      var p = s.potentiel || 1, n = parseInt(pf, 10);
+      if(pf==='10'){ if(p!==10) return false; }
+      else if(n < 0){ if(p >= -n) return false; }
+      else if(p < n) return false;
+    }
     var src=s.sources||[];
     if(sf==='croise'){ if(src.length<2) return false; }
     else if(sf && src.indexOf(sf)<0) return false;
@@ -615,6 +633,7 @@ function filtresActifs(){
   if($('#fSrc').value)      f.push(t('#fSrc'));
   if($('#fDec').value)      f.push(t('#fDec'));
   if($('#fEtat').value)     f.push(t('#fEtat'));
+  if($('#fPot').value)      f.push(t('#fPot'));
   return f;
 }
 function peindrePortee(c){
@@ -933,7 +952,7 @@ $('#regOubli').addEventListener('click',function(){
   S.cfg.token=''; $('#rToken').value=''; ecrireCfg(); marquerCx(false);
   dit('Jeton oublié. La console repasse en lecture seule.','ok');
 });
-['q','fUni','fSrc','fDec','fEtat','fTri'].forEach(function(id){
+['q','fUni','fSrc','fDec','fEtat','fPot','fTri'].forEach(function(id){
   var n=document.getElementById(id);
   n.addEventListener(id==='q'?'input':'change', peindreCat);
 });

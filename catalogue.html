@@ -220,6 +220,14 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;colo
       <option value="retire">Retiré</option>
       <option value="suspect">⚠ À vérifier — phrase sans rapport</option>
     </select>
+    <select id="pot" aria-label="Potentiel">
+      <option value="">Tous potentiels</option>
+      <option value="10">Potentiel 10 seulement</option>
+      <option value="9">Potentiel 9 et plus</option>
+      <option value="8">Potentiel 8 et plus</option>
+      <option value="7">Potentiel 7 et plus</option>
+      <option value="-7">Potentiel 6 et moins</option>
+    </select>
     <select id="tri" aria-label="Tri">
       <option value="potentiel">Trier par potentiel</option>
       <option value="sources">Trier par nombre de sources</option>
@@ -313,9 +321,18 @@ function peindreChiffres(){
 function filtrer(){
   var q = plier($('#q').value.trim());
   var u = $('#uni').value, sf = $('#src').value, ef = $('#etat').value, tri = $('#tri').value;
+  var pf = $('#pot').value;
 
   vue = sujets.filter(function(s){
     if(u && s.uni !== u) return false;
+    /* Le potentiel : ne garder que le haut du panier. 10 seul, ou un
+       plancher ; la valeur négative isole le bas. */
+    if(pf){
+      var p = s.potentiel || 1, n = parseInt(pf, 10);
+      if(pf === '10'){ if(p !== 10) return false; }
+      else if(n < 0){ if(p >= -n) return false; }
+      else if(p < n) return false;
+    }
     var src = s.sources || [];
     if(sf === 'croise'){ if(src.length < 2) return false; }
     else if(sf && src.indexOf(sf) < 0) return false;
@@ -428,7 +445,7 @@ function demarrer(doc){
   peindreChiffres();
   filtrer();
 
-  ['q','uni','src','etat','tri'].forEach(function(id){
+  ['q','uni','src','etat','pot','tri'].forEach(function(id){
     var n = document.getElementById(id);
     n.addEventListener(id === 'q' ? 'input' : 'change', filtrer);
   });

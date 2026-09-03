@@ -91,6 +91,43 @@ calcule la colonne sur tout le catalogue, instantanément, sans réseau.
 
 ---
 
+### L'univers vient de l'article, pas de la page où il a été trouvé
+
+Les listes d'articles insolites ont des sections parlantes — « Science »,
+« Animals », « Places » — et le classement en découle. Les archives de « Le
+saviez-vous ? », qui apportent les deux tiers du catalogue, ont des sections
+**datées** : « Janvier 2015 » ne dit rien du sujet. Tout tombait donc dans
+« Mystères » : 12 810 sujets sur 16 185.
+
+Faute de signal dans la section, l'univers est maintenant lu dans l'article
+lui-même — titre, votre phrase, introduction. Tout est déjà téléchargé par la
+vérification : **aucun appel réseau de plus**. Un article qui ne donne aucun
+signal reste en « Mystères », qui redevient un univers plutôt qu'un
+fourre-tout.
+
+Pour un catalogue déjà constitué : *Entretien → **ranger***. Instantané, sans
+réseau. Il ne touche que les sujets rangés dans « Mystères », **jamais** un
+sujet phare — l'univers y est le vôtre — ni une fiche déjà écrite.
+
+---
+
+### Ne garder que les meilleurs
+
+Le **potentiel** est une note de 1 à 10 posée à la moisson : signal
+d'anecdote dans la phrase, sujet phare, nombre de sources qui se rejoignent.
+Ce n'est pas la **note**, qui n'existe qu'après écriture et juge le texte.
+
+`console.html` et `catalogue.html` le filtrent : *10 seulement · 9 et plus ·
+8 et plus · 7 et plus · 6 et moins*. Sur un catalogue de 16 185 sujets, cela
+donne 119, 451, 1 015, 2 449 et 13 736.
+
+La sélection tient alors en trois gestes : filtre **Potentiel 7 et plus**,
+bouton **Retenir ces 2 449**, **Enregistrer mes décisions**. Et l'inverse
+range le bas du panier hors du chemin sans rien supprimer : filtre **6 et
+moins**, **Écarter ces 13 736**.
+
+---
+
 ### Votre fichier de sujets phares est nettoyé au passage
 
 Les 2 506 lignes ont été écrites de mémoire : certaines ne désignent aucun

@@ -1,163 +1,117 @@
-CURIO 8.4.1 — LA FICHE PAC-MAN, ET LA SÉLECTION QUI DIT CE QU'ELLE FAIT
-========================================================================
+CURIO 8.4.2 — RANGER LES 16 185, ET NE GARDER QUE LES MEILLEURS
+================================================================
 
-Rien de ce que vous avez moissonné, décidé ou écrit n'est touché par cette
-mise à jour. Elle corrige du code et de l'affichage, pas vos données.
+Rien de ce que vous avez moissonné n'est perdu ni touché. Cette mise à jour
+range, filtre et corrige — elle ne supprime rien.
 
 
-CE QUE VOUS AVEZ TROUVÉ
-=======================
+CE QUE VOTRE JOURNAL DISAIT
+===========================
 
-    Le Vivant · 7/10 · phare · le saviez-vous
-    Pac-Man
-    Ce poulpe a soulevé le couvercle de son bac la nuit…
+    mysteres 12810 · arts 1017 · sciences 603 · vivant 523
+    histoire  395 · esprit 282 · cosmos 279 · terre 276
 
-Vous aviez raison de le signaler, et raison de penser qu'il y en a d'autres.
+Quatre sujets sur cinq dans un seul univers. Ce n'est pas votre catalogue qui
+est mal fait : c'est le rangement qui était faux.
 
-Voici l'enchaînement exact. Votre ligne 506 disait « Inky ». Le poulpe évadé
-de l'aquarium de Napier s'appelle bien Inky — mais Inky est AUSSI un des
-quatre fantômes de Pac-Man, et Wikipédia y redirige. Le titre existait, la
-redirection était silencieuse, et c'est le jeu d'arcade qui est entré au
-catalogue avec votre phrase sur le dos.
-
-Le garde-fou qui aurait dû l'arrêter existait déjà : il confronte votre phrase
-à l'introduction de l'article. Mais il ne s'appliquait qu'aux titres devinés
-par la recherche. Le code disait, noir sur blanc : « un titre exact est digne
-de confiance ». C'était faux.
+L'univers venait du TITRE DE LA SECTION de la page moissonnée. Sur les listes
+d'articles insolites, ces titres sont parlants — « Science », « Animals »,
+« Places » — et le rangement marchait. Sur les archives de « Le saviez-vous ? »
+— la source qui apporte maintenant les deux tiers de votre catalogue — les
+sections sont des DATES. « Janvier 2015 » ne dit rien du sujet. Faute de
+mieux, tout tombait dans « Mystères ».
 
 
 CE QUI CHANGE
 =============
 
-1. LA BARRIÈRE COUVRE LES REDIRECTIONS
+1. C'EST L'ARTICLE QUI DÉCIDE, PLUS LA PAGE
 
-   Toute redirection qui change de sujet passe désormais par la même épreuve
-   que les titres devinés. Éprouvé sur les quatre cas de figure :
+   Quand la section ne dit rien, on lit le titre, votre phrase et
+   l'introduction de l'article. Tout est DÉJÀ téléchargé par la vérification :
+   ce classement ne coûte pas un seul appel réseau, pas une seconde de plus.
 
-     Inky                → Pac-Man                    REFUSÉ
-     lac nyos            → Lac Nyos                   retenu (casse)
-     Larme batavique     → Goutte du prince Rupert    retenu (vraie redirection)
-     Turritopsis dohrnii → lui-même                   retenu (titre exact)
+   Éprouvé sur douze sujets réels, français et anglais — 12 sur 12 :
 
-   Votre ligne est corrigée en « Inky (octopus) », et « Pac-Man » est inscrit
-   dans consignes/exclusions.txt pour sortir la fiche de votre catalogue.
+     Grand Attracteur ............ cosmos
+     Turritopsis dohrnii ......... vivant
+     Inky (octopus) .............. vivant
+     Lac Nyos .................... terre
+     Concile cadavérique ......... histoire
+     Emu War ..................... histoire
+     Aphantasie .................. esprit
+     Goutte de poix .............. sciences
+     Manuscrit de Voynich ........ arts
+     Yves Klein .................. arts
+     Tamám Shud .................. mystères
+     Hubble Space Telescope ...... cosmos
 
-2. rapport-phares.csv — TOUTES LES AUTRES
+   Un article sans aucun signal reste en « Mystères ». C'est redevenu un
+   univers, ce n'est plus un dépotoir.
 
-   Chaque moisson écrit une ligne par ligne de votre fichier de sujets phares :
-   comment elle a été résolue (exact / redirection / recherche), où elle a
-   abouti, et ce qu'elle est devenue. Les ennuis sont EN TÊTE du fichier.
+2. VOTRE CATALOGUE ACTUEL SE RANGE EN UNE ACTION
 
-   Votre fichier compte 386 titres d'un seul mot, dont 110 de six lettres ou
-   moins : Inky, Dolly, Sudan, Mir, Rage, Koko, Chaser, Roar, Chips… Ce sont
-   exactement les titres exposés au même piège. Le rapport les nommera un par
-   un, avec le nom de l'article où ils ont réellement atterri.
+   Actions -> Entretien -> operation = ranger -> Run workflow.
 
-3. LE BADGE « ⚠ À VÉRIFIER »
+   Instantané, gratuit, sans réseau. Il ne touche QUE les sujets rangés dans
+   « Mystères ». Jamais un sujet phare — l'univers y est le vôtre. Jamais une
+   fiche déjà écrite. Le journal affiche la répartition avant et après.
 
-   Un chiffre nouveau, l'ACCORD : combien de mots signifiants votre phrase
-   partage-t-elle avec l'article ?
+3. LE FILTRE PAR POTENTIEL — CE QUE VOUS DEMANDIEZ
 
-       poulpe évadé     ×  jeu d'arcade Pac-Man       →  0
-       lac qui souffle  ×  catastrophe du lac Nyos    →  3
+   Il y avait un TRI par potentiel, pas de FILTRE. Sur 16 185 lignes, trier ne
+   suffit pas. Dans console.html ET catalogue.html, un menu de plus :
 
-   Zéro allume un badge rouge dans console.html et catalogue.html, avec un
-   filtre « ⚠ à vérifier », un tri « les moins sûrs d'abord » et un compteur.
-   Il ne retire rien : une phrase peut raconter un épisode que l'introduction
-   ne mentionne pas. C'est un doute affiché, à vous de trancher.
+     Potentiel 10 seulement  ....  119 sujets
+     Potentiel 9 et plus  .......  451
+     Potentiel 8 et plus  ...... 1 015
+     Potentiel 7 et plus  ...... 2 449
+     Potentiel 6 et moins  .... 13 736
 
+   Votre sélection devient trois gestes :
 
-4. « RETENIR CE QUI EST AFFICHÉ » DIT MAINTENANT COMBIEN, ET SUR QUOI
+     a) filtre « Potentiel 7 et plus »
+     b) bouton « Retenir ces 2 449 »
+     c) « Enregistrer mes décisions »
 
-   J'ai reproduit votre manœuvre : filtre « Articles insolites », 114 sujets,
-   clic. Le bouton n'a bien enregistré que 114 décisions — le filtre était
-   respecté. Ce qui vous a trompé, c'est que rien ne le disait : le bouton
-   annonçait « tout ce qui est affiché », les compteurs du haut comptent le
-   catalogue ENTIER, et les décisions d'une session précédente restent en
-   mémoire dans votre navigateur, invisibles, y compris sans jeton.
+   Et si vous voulez commencer plus serré : « Potentiel 9 et plus », 451
+   sujets, soit 902 textes — une trentaine d'euros. Vous élargirez ensuite,
+   le reste ne bouge pas.
 
-   Donc :
+   L'inverse marche aussi : filtre « 6 et moins », « Écarter ces 13 736 ».
+   Rien n'est supprimé, ils sortent simplement de votre chemin, et l'écriture
+   ne les prendra jamais.
 
-     · les boutons portent le chiffre exact :  Retenir ces 114
-     · une ligne sous les boutons nomme le filtre en vigueur, et dit combien
-       de sujets sont déjà retenus, écartés, ou sans décision ;
-     · sans aucun filtre, un lot de plus de cinquante sujets demande
-       confirmation, en annonçant combien de décisions déjà prises il écrase ;
-     · après le clic, un message dit ce qui vient d'être fait ET le total :
-       « c'est exactement ce que decisions.json contiendra » ;
-     · un bouton « Tout oublier (N) » efface toutes les décisions d'un coup,
-       si une manœuvre ancienne a pollué votre sélection ;
-     · le message de commit ne dit plus « 928 sujets » mais
-       « 214 retenus, 714 écartés ».
+4. LA MOISSON UTILISE ENFIN TOUT SON TEMPS
 
-   Même traitement dans l'onglet Relecture : « Valider ces 80 ».
+   Votre dernière passe : 12,6 minutes sur 40 allouées, et 6 973 sujets remis
+   à plus tard sans raison. Le nombre de sujets à vérifier était ESTIMÉ
+   d'avance, avec une règle calibrée avant le tri gratuit de 8.4.0.
 
-   Si vous avez un doute sur l'état actuel : filtre « Décisions → Retenus ».
-   Le compteur en haut à droite vous donne le nombre exact. Et l'écriture ne
-   touche JAMAIS un sujet écarté, ni un sujet sans décision quand au moins un
-   sujet est retenu.
-
-
-CE QUI RÉPOND À VOTRE QUESTION : COMMENT AVOIR LE CATALOGUE LE PLUS COMPLET
-===========================================================================
-
-Dans votre journal, une seule ligne comptait :
-
-    · 981 sur 101006 cette fois — le temps restant ne permet pas plus.
-
-À ce rythme, il fallait une centaine de nuits. Ce n'était pas une fatalité,
-c'était un défaut : la vérification prenait les 981 premiers sujets AVANT
-d'appliquer les règles qui ne coûtent rien. Or sur vos 88 300 entrées
-anglaises « Le saviez-vous ? », 10 263 seulement portent une phrase — les
-autres étaient rejetées de toute façon quelques lignes plus bas. Le réseau
-partait vérifier des sujets condamnés d'avance.
-
-Désormais le tri gratuit passe en premier, et les sujets sont classés : vos
-phares d'abord, puis ceux que deux ou trois sources désignent ensemble.
-
-    Mesuré sur mille sujets dont cent recevables :
-
-        8.3.2 :  165 appels réseau  →  100 sujets
-        8.4.0 :   53 appels réseau  →  100 sujets
-
-Même résultat, un tiers du réseau. Sur votre dépôt, l'horizon passe d'une
-centaine de passes à une quinzaine. Et si une passe s'arrête en route, ce qui
-est entré est ce qui valait le plus.
-
-Deux corrections de vérité au passage :
-
-  · « c'est probablement un incident réseau » s'affichait alors que la passe
-    avait simplement été écourtée. Les deux cas sont maintenant distingués.
-  · les actions n'enregistraient pas consignes/sujets-phares.txt : la moisson
-    le nettoyait proprement, et le dépôt n'en gardait rien. Corrigé.
+   On ne devine plus : la vérification avance par tranches de deux mille et en
+   reprend une tant qu'il reste de quoi la finir. Une ou deux passes de plus
+   devraient suffire à vider votre file d'attente.
 
 
 CE QUE VOUS FAITES, DANS L'ORDRE
 ================================
 
-1. Importez ce zip : Add file → Upload files, déposez tout, Commit.
+1. Importez ce zip : Add file -> Upload files, tout déposer, Commit.
 
-2. Actions → Entretien → operation = accorder → Run workflow.
-   Instantané, gratuit. Il calcule la colonne « accord » sur vos
-   928 sujets actuels et vous nomme ceux dont la phrase ne colle pas.
+   VÉRIFIEZ QUE .github/ EST BIEN PASSÉ. Le dossier commence par un point et
+   certains navigateurs le sautent. Ouvrez :
+   github.com/VOTRE-COMPTE/curio/blob/main/.github/workflows/entretien.yml
+   et cherchez « ranger » dans la liste des options. S'il n'y est pas, copiez
+   le contenu de github-workflows/entretien.yml par-dessus (crayon, tout
+   sélectionner, coller, Commit).
 
-3. Actions → Entretien → operation = purger → Run workflow.
-   Sort « Pac-Man » de votre catalogue.
+2. Actions -> Entretien -> ranger.        Vos 12 810 « Mystères » se répartissent.
+3. Actions -> Entretien -> accorder.      Allume le badge « à vérifier ».
+4. Actions -> Entretien -> purger.        Sort « Pac-Man » du catalogue.
 
-4. Actions → 1 · Moissonner → Run workflow. Relancez-la autant de fois que
-   vous voulez : chaque passe reprend où la précédente s'est arrêtée, et le
-   cache rend les suivantes beaucoup plus rapides. Le champ « minutes »
-   accepte 60, 90, ce que vous voulez (montez timeout-minutes si vous
-   dépassez 75).
+5. Ouvrez console.html. Filtre « Potentiel 9 et plus ». Regardez une vingtaine
+   de fiches. Si elles vous plaisent : « Retenir ces 451 », puis
+   « Enregistrer mes décisions », puis « Écrire les 451 retenus ».
 
-5. Ouvrez console.html, filtre « ⚠ À vérifier ». C'est votre liste de doutes.
-   Ouvrez rapport-phares.csv, tri par défaut. Ce sont vos lignes à corriger.
-
-6. Toujours dans console.html : regardez la ligne sous les boutons. Elle vous
-   dit en une phrase où en est votre sélection. Si le compte des retenus ne
-   correspond pas à ce que vous croyez avoir fait, « Tout oublier » remet le
-   compteur à zéro sans toucher au catalogue ni aux fiches écrites.
-
-Envoyez-moi les vingt premières lignes de rapport-phares.csv après cette
-moisson : j'y verrai les autres « Inky » de votre fichier, et je vous les
-corrigerai d'un coup.
+C'est la première tranche qui vous dira si le catalogue tient ses promesses —
+pas les 16 185 lignes, qu'aucun être humain ne peut relire.

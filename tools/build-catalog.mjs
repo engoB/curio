@@ -67,6 +67,7 @@ const NETTOYER  = !!opt('nettoyer', false);   // retirer les doublons deja entre
 const MODE_MAITRE = !!opt('maitre', false);   // construire le catalogue maitre (la reference)
 const PURGER    = !!opt('purger', false);     // sortir du maitre tout ce qui est dans exclusions.txt
 const ACCORDER  = !!opt('accorder', false);   // (re)mesurer l accord phrase/article, sans reseau
+const RANGER    = !!opt('ranger', false);     // remettre chaque sujet dans son univers, sans reseau
 
 /* ------------------------------------------------------- univers & racines
    Huit univers, les mêmes que dans parts/20-data.js — identifiants, teintes,
@@ -342,9 +343,50 @@ const SECTION_UNIVERS = [
   [/culture|art|music|musique|cin[ée]ma|film|t[ée]l[ée]|language|langue|litt[ée]rature/i,          'arts'],
   [/esprit|mind|psycho|cerveau|brain|corps|body|m[ée]dec|health/i,                                'esprit']
 ];
+/* Rien trouvé = on ne sait pas. Surtout pas « mystères » par défaut : les
+   archives de « Le saviez-vous ? » ont des sections datées (« Janvier 2015 »),
+   qui ne disent rien du sujet. Renvoyer le fourre-tout ici, c'était y verser
+   les dizaines de milliers d'entrées de cette source — 12 810 sujets sur
+   16 185 dans un seul univers, et sept univers vides. On renvoie une chaîne
+   vide, et c'est l'article lui-même qui décidera, plus bas. */
 function universDeSection(titre){
   for (const [re, id] of SECTION_UNIVERS) if (re.test(titre || '')) return id;
-  return 'mysteres';
+  return '';
+}
+
+/* ═══════════ ranger un sujet d'après l'article, pas d'après la page ═══════
+   Quand la section ne dit rien, on lit ce qu'on a déjà sous la main : le
+   titre, la phrase du contributeur et l'introduction de l'article — tout est
+   déjà téléchargé par la vérification, donc ce classement ne coûte pas un
+   seul appel réseau.
+
+   Chaque univers a son vocabulaire, français et anglais. On compte les mots
+   trouvés, l'univers le mieux servi gagne, et l'égalité ou le silence
+   renvoient une chaîne vide : mieux vaut « je ne sais pas » qu'un rangement
+   inventé. Les mots sont volontairement spécifiques — « étoile » range dans
+   le cosmos, « musée » dans les arts — et les mots trop courants (« monde »,
+   « premier », « année ») en sont absents : ils ne discriminent rien.      */
+const MOTS_UNIVERS = {
+  cosmos: /\b(?:astronom|astrophys|cosmolog|galaxie|galax|[ée]toile|stellar|star|plan[èe]te|planet|com[èe]te|comet|ast[ée]ro[ïi]d|asteroid|m[ée]t[ée]orite|meteor|nébuleuse|nebula|trou noir|black hole|supernova|quasar|pulsar|satellite|orbit|lunaire|lunar|solaire|solar|spatial|spacecraft|space|nasa|telescope|t[ée]lescope|univers|universe|big bang|voie lact[ée]e|milky way|exoplan)/i,
+  vivant:  /\b(?:esp[èe]ce|species|animal|animaux|mammif[èe]re|mammal|oiseau|bird|poisson|fish|insecte|insect|araign[ée]e|spider|reptile|amphibien|serpent|snake|requin|shark|baleine|whale|poulpe|octopus|m[ée]duse|jellyfish|primate|singe|monkey|plante|plant|arbre|tree|champignon|fungus|fungi|bact[ée]rie|bacteri|virus|[ée]volution|evolution|g[ée]n[ée]tique|genetic|zoo|botani|plumage|pr[ée]dateur|predator|parasite|nid|nest|migration|reproduction|habitat)/i,
+  histoire:/\b(?:guerre|war|bataille|battle|arm[ée]e|army|soldat|soldier|empire|roi\b|king\b|reine|queen|empereur|emperor|dynastie|dynasty|r[ée]volution|si[èe]cle|century|m[ée]di[ée]val|medieval|moyen [aâ]ge|antiquit|ancient rome|romain|roman empire|napol[ée]on|trait[ée]|treaty|colonie|colonial|esclav|slave|nazi|ss\b|wehrmacht|1[0-9]{3}\b|18[0-9]{2}|19[0-4][0-9]|pape\b|pope\b|croisade|crusade|r[ée]publique|monarch|assassinat|assassinat)/i,
+  esprit:  /\b(?:cerveau|brain|neurolog|neurone|neuron|psycholog|psychiatr|m[ée]moire|memory|conscience|consciousness|perception|hallucination|sommeil|sleep|r[êe]ve|dream|maladie|disease|patient|m[ée]decin|physician|chirurg|surgery|sympt[ôo]me|symptom|diagnostic|diagnosis|syndrome|virus humain|[ée]pid[ée]mi|epidemi|vaccin|anesth[ée]si|douleur|pain|corps humain|human body|sang|blood|c[œoe]ur\b|heart\b|placebo|phobie|phobia|amn[ée]si|autis|d[ée]pression)/i,
+  sciences:/\b(?:physique|physics|quantique|quantum|chimie|chemistr|mol[ée]cule|molecul|atome|atom|[ée]lectron|electron|math[ée]mati|mathemat|th[ée]or[èe]me|theorem|[ée]quation|equation|algorithme|algorithm|ordinateur|computer|informatique|logiciel|software|internet|invention|invent|brevet|patent|ing[ée]nieur|engineer|machine|moteur|engine|[ée]lectricit|electricit|laser|radioactiv|nucl[ée]aire|nuclear|exp[ée]rience de|experiment|laboratoire|laborator|prix nobel|nobel prize|mat[ée]riau|alliage|robot)/i,
+  mysteres:/\b(?:disparition|disappear|disparu|missing|non [ée]lucid|unsolved|unexplained|inexpliqu|myst[èe]re|myster|[ée]nigme|enigma|canular|hoax|l[ée]gende|legend|folklore|surnaturel|supernatural|fant[ôo]me|ghost|paranormal|conspiration|conspirac|secret|cach[ée]|hidden|code non|undeciphered|ind[ée]chiffr|cryptid|monstre du|rumeur|rumour|rumor|jamais identifi|never identified|jamais retrouv|culte|cult\b|rituel|ritual|superstition|malédiction|curse)/i,
+  terre:   /\b(?:volcan|volcano|s[ée]isme|earthquake|tsunami|g[ée]olog|geolog|min[ée]ral|mineral|roche|rock formation|montagne|mountain|glacier|iceberg|d[ée]sert|desert|oc[ée]an|ocean|mer\b|sea\b|lac\b|lake\b|rivi[èe]re|river|[îi]le\b|island|grotte|cave|cavern|climat|climate|m[ée]t[ée]orolog|meteorolog|ouragan|hurricane|tornade|tornado|temp[êe]te|storm|s[ée]cheresse|drought|inondation|flood|atmosph[èe]re|antarcti|arctique|arctic|foss[ii]le|fossil|tectoni)/i,
+  arts:    /\b(?:peintre|painter|peinture|painting|tableau|sculpture|sculpteur|mus[ée]e|museum|galerie|gallery|artiste|artist|architecte|architect|architectur|cath[ée]drale|cathedral|temple|monument|arch[ée]olog|archaeolog|archeolog|fouille|excavation|manuscrit|manuscript|litt[ée]rat|literatur|roman\b|novel\b|po[èe]me|poem|po[ée]sie|poetr|[ée]crivain|writer|musique|music|compositeur|composer|symphonie|symphony|op[ée]ra|chanson|song|film\b|cin[ée]ma|cinema|acteur|actor|th[ée][âa]tre|theatre|theater|danse|dance|photograph)/i
+};
+function universDeTexte(texte){
+  const t = String(texte || '');
+  if (t.length < 20) return '';
+  let meilleur = '', score = 0, exaequo = false;
+  for (const [id, re] of Object.entries(MOTS_UNIVERS)){
+    const g = new RegExp(re.source, 'gi');
+    const n = (t.match(g) || []).length;
+    if (n > score){ meilleur = id; score = n; exaequo = false; }
+    else if (n === score && n > 0 && id !== meilleur) exaequo = true;
+  }
+  return (score > 0 && !exaequo) ? meilleur : '';
 }
 
 /* Récupère le wikitexte d'une page, quel que soit son espace de noms. */
@@ -1848,8 +1890,12 @@ async function construireMaitre(){
     s.sources.add(e.origine);
     s.titres.add(e.titre);
     s.qualite = Math.max(s.qualite, e.qualite || 0);
-    // l'univers : le phare décide, sinon la première source qui parle
+    /* L'univers : le phare décide — c'est le vôtre —, sinon la première
+       source qui en propose un. Une source qui n'en propose aucun (les
+       archives « Le saviez-vous ? », dont les sections sont des dates)
+       laisse la place vide : l'article la remplira à la vérification. */
     if (e.origine === 'phare') s.uni = e.uni;
+    else if (!s.uni && e.uni) s.uni = e.uni;
     /* La phrase : celle du phare d'abord (c'est la vôtre), puis la française,
        puis la plus longue. Une phrase vaut mieux qu'aucune. */
     const mieux = (e.origine === 'phare' && s.phraseSource !== 'phare')
@@ -1875,6 +1921,7 @@ async function construireMaitre(){
 
   /* ---- vérification : l'article existe-t-il vraiment ? ------------------ */
   let ajoutes = 0, refusDef = 0, refusFaible = 0, refusArticle = 0, refusExclu = 0, sansAccord = 0;
+  let rangesParArticle = 0;
   if (nouveaux.length){
     console.log('\n▸ vérification des articles');
     /* Vérifier coûte un appel par vingt articles, dans chaque langue. Sur
@@ -1914,22 +1961,54 @@ async function construireMaitre(){
                           || (b.sources.size - a.sources.size)
                           || ((b.qualite || 0) - (a.qualite || 0)));
 
-    const parPasse = Math.max(200, Math.round(tempsRestant() / 1000 * 4));
-    const aVerifier = eligibles.slice(0, parPasse);
-    if (aVerifier.length < eligibles.length){
-      passePartielle = true;
-      console.log(`  · ${aVerifier.length} sur ${eligibles.length} recevables cette fois — le temps restant ne permet pas plus.`);
-    } else if (eligibles.length){
-      console.log(`  · ${eligibles.length} sujet(s) recevables à vérifier.`);
-    }
+    /* ---- par tranches, tant que le temps le permet ----------------------
+       Une estimation du nombre de sujets qu'on aurait le temps de vérifier
+       était forcément fausse : elle valait 4 sujets par seconde restante,
+       calibrée quand le réseau voyait tout passer. Depuis que le tri gratuit
+       filtre en amont, la vraie cadence est trois à quatre fois meilleure —
+       et la passe s'arrêtait à 9 168 sujets sur 16 141 après 12 minutes sur
+       40 allouées, en laissant 27 minutes inutilisées.
+
+       On ne devine plus : on traite par tranches de deux mille, et on en
+       reprend une tant qu'il reste de quoi la finir. Le budget est rempli,
+       jamais dépassé, et le reste attend la passe suivante.              */
+    const TRANCHE = 2000;
+    /* La réserve : de quoi finir une tranche et enregistrer. Proportionnelle
+       au budget — sinon une passe courte, celle qu'on lance à la main pour
+       voir, n'entrerait jamais dans la boucle et ne rapporterait rien. Et la
+       première tranche part toujours : une tranche entamée puis interrompue
+       enregistre ce qu'elle a fait, ce qui vaut mieux que rien. */
+    const RESERVE = Math.min(4 * 60000, MINUTES * 60000 * 0.25);
+    let traites = 0, numTranche = 0;
+    if (eligibles.length) console.log(`  · ${eligibles.length} sujet(s) recevables à vérifier.`);
+
+    while (traites < eligibles.length){
+      if (tempsEcoule() || (traites && tempsRestant() < RESERVE)){
+        passePartielle = true;
+        break;
+      }
+      let aVerifier = eligibles.slice(traites, traites + TRANCHE);
+      numTranche++;
+      if (eligibles.length > TRANCHE)
+        console.log(`  ▪ tranche ${numTranche} : ${aVerifier.length} sujet(s)  (${minutesFaites()} min)`);
 
     const qids = aVerifier.map(s => s.qid);
     const lignes = [];
+    let interroges = 0;
     for (let i = 0; i < qids.length; i += 400){
       if (tempsEcoule()) break;
       const lot = await fromWikidata(qids.slice(i, i + 400));
       lignes.push(...lot);
-      console.log(`  · Wikidata ${Math.min(i + 400, qids.length)}/${qids.length}  (${minutesFaites()} min)`);
+      interroges = Math.min(i + 400, qids.length);
+      console.log(`  · Wikidata ${interroges}/${qids.length}  (${minutesFaites()} min)`);
+    }
+    /* Si l'échéance tombe au milieu, les sujets dont le QID n'a pas été
+       demandé ne sont pas « sans article » : ils n'ont pas été regardés. On
+       les rend à la file au lieu de les compter en refus — sans quoi le
+       journal accuserait Wikipédia d'un manque qui n'est que le nôtre. */
+    if (interroges < qids.length){
+      aVerifier = aVerifier.slice(0, interroges);
+      passePartielle = true;
     }
     const parQid = new Map(lignes.map(r => [r.qid, r]));
 
@@ -1986,11 +2065,20 @@ async function construireMaitre(){
       const accord = motsPartages(s.phrase, brutIntro + ' ' + (introEn.get(r.en) || ''));
       if (!accord) sansAccord++;
 
+      /* L'univers, quand la source n'en désignait aucun : on le lit dans
+         l'article. Le titre, votre phrase et les deux introductions sont là,
+         déjà téléchargés. Faute de signal, « mystères » reste le fourre-tout
+         — mais il ne l'est plus par défaut, seulement en dernier recours. */
+      const uni = s.uni
+              || universDeTexte([r.fr, r.en, s.phrase, brutIntro, introEn.get(r.en) || ''].join(' '))
+              || 'mysteres';
+      if (!s.uni) rangesParArticle += (uni === 'mysteres' ? 0 : 1);
+
       deja.set(s.qid, {
         qid: s.qid,
         fr: okFr ? r.fr : '',
         en: okEn ? r.en : '',
-        uni: s.uni,
+        uni,
         sources: [...s.sources].sort(),
         phrase: s.phrase,
         phraseLang: s.phraseLang,
@@ -2004,8 +2092,14 @@ async function construireMaitre(){
       });
       ajoutes++;
     }
-    const reste = eligibles.length - aVerifier.length;
+      traites += aVerifier.length;
+    }   /* fin de la tranche */
+
+    const reste = eligibles.length - traites;
     console.log(`\n  → ${ajoutes} sujet(s) ajouté(s) au catalogue maître.`);
+    if (rangesParArticle)
+      console.log(`     ${rangesParArticle} rangé(s) dans leur univers d'après l'article lui-même `
+                + `(la source ne le disait pas).`);
     if (reste > 0) console.log(`     ${reste} sujet(s) recevables pas encore vérifiés : la prochaine passe s'en charge.`);
     console.log(`     ${refusArticle} sans article utilisable, ${refusDef} définitions écartées, `
               + `${refusFaible} sans signal d'anecdote, ${refusExclu} exclus par vos soins.`);
@@ -2025,14 +2119,7 @@ async function construireMaitre(){
   await fs.writeFile(MAITRE + '.tmp', JSON.stringify(doc, null, 1), 'utf8');
   await fs.rename(MAITRE + '.tmp', MAITRE);
 
-  const esc = (x) => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"';
-  const csv = ['﻿qid;univers;titre_fr;titre_en;sources;potentiel;accord;statut;ajoute;ecrit;publie;phrase;apercu']
-    .concat(liste.map(s => [s.qid, s.uni, esc(s.fr), esc(s.en), esc((s.sources || []).join('+')),
-                            s.potentiel, (s.accord == null ? '' : s.accord),
-                            s.statut, s.ajoute || '', s.ecrit || '', s.publie || '',
-                            esc(s.phrase), esc(s.apercu)].join(';')));
-  await fs.writeFile(path.join(process.cwd(), 'catalogue-maitre.csv'), csv.join('\n') + '\n', 'utf8');
-
+  await ecrireCsvMaitre(liste);
   await vueApplication(liste);
   await nettoyerPhares(phares, qidDe, deja);
 
@@ -2077,6 +2164,20 @@ async function construireMaitre(){
 /* Le catalogue maître est la vérité ; catalog.json n'en est que la vue dont
    l'application a besoin. On le régénère intégralement à partir du maître,
    jamais l'inverse. */
+/* Le tableur du catalogue maître. Sorti de construireMaitre pour que les
+   opérations d'entretien qui changent le catalogue — ranger, purger — le
+   régénèrent elles aussi, au lieu de laisser un CSV qui dit autre chose que
+   le catalogue. */
+async function ecrireCsvMaitre(liste){
+  const esc = (x) => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"';
+  const csv = ['﻿qid;univers;titre_fr;titre_en;sources;potentiel;accord;statut;ajoute;ecrit;publie;phrase;apercu']
+    .concat(liste.map(s => [s.qid, s.uni, esc(s.fr), esc(s.en), esc((s.sources || []).join('+')),
+                            s.potentiel, (s.accord == null ? '' : s.accord),
+                            s.statut, s.ajoute || '', s.ecrit || '', s.publie || '',
+                            esc(s.phrase), esc(s.apercu)].join(';')));
+  await fs.writeFile(path.join(process.cwd(), 'catalogue-maitre.csv'), csv.join('\n') + '\n', 'utf8');
+}
+
 async function vueApplication(liste){
   const sources = {}, scores = {}, index = {}, pairs = [];
   for (const s of liste){
@@ -2188,6 +2289,61 @@ async function main(){
     console.log(`\n  Rien n'a été retiré. Un accord à 0 est un doute, pas un verdict :`);
     console.log(`  une phrase peut raconter un épisode que l'introduction ne mentionne pas.`);
     console.log(`  Pour sortir vraiment un sujet : consignes/exclusions.txt puis « purger ».`);
+    return;
+  }
+
+  /* ═══════════ ranger : remettre chaque sujet dans son univers ═══════════
+     Les archives « Le saviez-vous ? » ont des sections datées — « Janvier
+     2015 » ne dit rien du sujet. Jusqu'en 8.4.1, faute de signal, tout
+     tombait dans « Mystères » : 12 810 sujets sur 16 185 dans un seul
+     univers, et sept univers vides.
+
+     Ceci répare un catalogue déjà constitué, à partir de l'aperçu et de la
+     phrase que le catalogue conserve : instantané, sans un seul appel
+     réseau. On ne touche QUE les sujets rangés dans « Mystères », jamais un
+     sujet phare — l'univers y est le vôtre —, jamais un sujet déjà écrit ou
+     publié : ses fiches vivent dans le fichier de son univers, les déplacer
+     casserait le lien.                                                    */
+  if (RANGER){
+    const maitre = await lireMaitre();
+    if (!maitre.sujets || !maitre.sujets.length){
+      console.log('Aucun catalogue maître. Lancez « 1 · Moissonner ».');
+      return;
+    }
+    const avant = {}, apres = {};
+    let deplaces = 0, gardes = 0, intouchables = 0;
+    for (const s of maitre.sujets){
+      avant[s.uni] = (avant[s.uni] || 0) + 1;
+      const phare = (s.sources || []).includes('phare');
+      const ecrit = s.statut && s.statut !== 'a-ecrire';
+      if (s.uni !== 'mysteres' || phare || ecrit){
+        if (s.uni === 'mysteres' && (phare || ecrit)) intouchables++;
+        apres[s.uni] = (apres[s.uni] || 0) + 1;
+        continue;
+      }
+      const u = universDeTexte([s.fr, s.en, s.phrase, s.apercu].filter(Boolean).join(' '));
+      if (u && u !== 'mysteres'){ s.uni = u; deplaces++; }
+      else gardes++;
+      apres[s.uni] = (apres[s.uni] || 0) + 1;
+    }
+    maitre.genere = new Date().toISOString();
+    await fs.writeFile(MAITRE + '.tmp', JSON.stringify(maitre, null, 1), 'utf8');
+    await fs.rename(MAITRE + '.tmp', MAITRE);
+    await vueApplication(maitre.sujets);
+    await ecrireCsvMaitre(maitre.sujets);
+    console.log(`\n✓ ${deplaces} sujet(s) rangés dans leur univers d'après leur article.`);
+    console.log(`  ${gardes} restent en « Mystères » : l'article ne donne aucun signal, `
+              + `et c'est souvent justifié (disparitions, énigmes, canulars).`);
+    if (intouchables)
+      console.log(`  ${intouchables} laissés tels quels : sujets phares (l'univers est le vôtre) `
+                + `ou fiches déjà écrites.`);
+    const cles = [...new Set([...Object.keys(avant), ...Object.keys(apres)])]
+      .sort((a, b) => (apres[b] || 0) - (apres[a] || 0));
+    console.log(`\n  univers          avant     après`);
+    for (const k of cles)
+      console.log(`  ${String(k).padEnd(14)} ${String(avant[k] || 0).padStart(6)} ${String(apres[k] || 0).padStart(9)}`);
+    console.log(`\n  catalog.json et catalogue-maitre.csv sont régénérés : la console et `
+              + `l'application voient le nouveau classement tout de suite.`);
     return;
   }
 

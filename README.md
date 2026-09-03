@@ -29,7 +29,7 @@ Les cinq actions, directement :
 .../actions/workflows/2-ecrire.yml         écrire une tranche de N euros
 .../actions/workflows/3-controler.yml      contrôler avant mise en ligne
 .../actions/workflows/5-publier.yml        publier — tourne seule chaque jour
-.../actions/workflows/entretien.yml        purger, recompter, accorder…
+.../actions/workflows/entretien.yml        ranger, accorder, purger, recompter…
 ```
 
 Sur chacune : bouton **Run workflow**, en haut à droite.
@@ -48,6 +48,12 @@ minuit, toute seule). Vous lisez, vous retenez ou vous écartez, à la main.
 Deux boutons en bas : **Enregistrer mes décisions**, qui les écrit dans le
 dépôt, et **Écrire les retenus**, qui lance l'écriture avec le budget que vous
 indiquez.
+
+**Six filtres, dont le potentiel.** Univers, provenance, décision, état,
+**potentiel** (*10 seulement · 9 et plus · 8 et plus · 7 et plus · 6 et
+moins*) et recherche. C'est le potentiel qui répond à « je ne veux que les
+meilleurs » : sur 16 185 sujets, *7 et plus* en garde 2 449, *9 et plus* en
+garde 451.
 
 **Les boutons de lot agissent sur le filtre en cours, et le disent.** Filtrez
 sur *Articles insolites*, et le bouton devient **Retenir ces 114** ; la ligne
@@ -105,7 +111,8 @@ Deux façons, aucune ne coûte un centime.
 
 **Sur une page** — ouvrez **`catalogue.html`**. C'est le tableau de bord :
 les compteurs en haut, la liste complète en dessous, une recherche qui ignore
-les accents, et un filtre par univers, par provenance et par état. Elle ne
+les accents, et un filtre par univers, par provenance, par état et par
+**potentiel**. Elle ne
 fait rien — pas de case à cocher, pas de bouton qui engage — elle montre.
 C'est la page à mettre en favori.
 
