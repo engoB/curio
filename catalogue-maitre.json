@@ -1,6 +1,6 @@
 {
  "version": 1,
- "genere": "2026-09-03T16:30:27.304Z",
+ "genere": "2026-09-03T19:45:22.359Z",
  "total": 16184,
  "sujets": [
   {
@@ -22,7 +22,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q242309",
@@ -43,7 +43,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q7259",
@@ -64,7 +64,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q23901473",
@@ -85,7 +85,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q736374",
@@ -107,7 +107,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q630678",
@@ -129,7 +129,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 6
   },
   {
    "qid": "Q999",
@@ -150,7 +150,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q22718",
@@ -172,7 +172,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q3040",
@@ -214,7 +214,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q152872",
@@ -278,7 +278,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q48328",
@@ -299,7 +299,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q211453",
@@ -320,7 +320,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q620634",
@@ -342,7 +342,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q732267",
@@ -364,7 +364,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q17069410",
@@ -386,7 +386,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q7514916",
@@ -428,7 +428,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q1550228",
@@ -449,7 +449,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 6
   },
   {
    "qid": "Q386074",
@@ -470,7 +470,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q492386",
@@ -492,7 +492,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 6
   },
   {
    "qid": "Q193330",
@@ -513,7 +513,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q391632",
@@ -535,7 +535,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q1022918",
@@ -557,7 +557,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1414811",
@@ -579,7 +579,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q2658232",
@@ -621,7 +621,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q4205186",
@@ -642,7 +642,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 6
   },
   {
    "qid": "Q465338",
@@ -664,7 +664,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q254117",
@@ -685,7 +685,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q232505",
@@ -706,7 +706,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q8753",
@@ -727,7 +727,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q1356041",
@@ -812,7 +812,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q1161218",
@@ -834,7 +834,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q2051704",
@@ -855,7 +855,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q833975",
@@ -877,7 +877,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q223085",
@@ -920,7 +920,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q180381",
@@ -941,7 +941,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q18207282",
@@ -1007,7 +1007,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q43284",
@@ -1049,7 +1049,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q1129089",
@@ -1113,7 +1113,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q1054482",
@@ -1135,7 +1135,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q730222",
@@ -1179,7 +1179,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q44822",
@@ -1223,7 +1223,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 7
   },
   {
    "qid": "Q216876",
@@ -1266,7 +1266,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q738556",
@@ -1309,7 +1309,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q373767",
@@ -1352,7 +1352,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q1294046",
@@ -1373,7 +1373,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q182260",
@@ -1416,7 +1416,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 5
   },
   {
    "qid": "Q595140",
@@ -1438,7 +1438,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 5
+   "accord": 6
   },
   {
    "qid": "Q1544731",
@@ -1502,7 +1502,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q179492",
@@ -1524,7 +1524,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q574464",
@@ -1546,7 +1546,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q1139250",
@@ -1567,7 +1567,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q1757822",
@@ -1631,7 +1631,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q10934",
@@ -1652,7 +1652,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q2126",
@@ -1757,7 +1757,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 5
+   "accord": 7
   },
   {
    "qid": "Q422326",
@@ -1779,7 +1779,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 5
   },
   {
    "qid": "Q2739742",
@@ -1801,7 +1801,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 6
   },
   {
    "qid": "Q205073",
@@ -1844,7 +1844,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q207669",
@@ -1866,7 +1866,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q412",
@@ -1908,7 +1908,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 5
   },
   {
    "qid": "Q70458",
@@ -1930,7 +1930,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q3305462",
@@ -1951,7 +1951,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q32980",
@@ -1972,7 +1972,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 5
   },
   {
    "qid": "Q105494",
@@ -1993,7 +1993,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q12029714",
@@ -2015,7 +2015,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q187484",
@@ -2036,7 +2036,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q206137",
@@ -2057,7 +2057,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q209764",
@@ -2078,7 +2078,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q434846",
@@ -2121,7 +2121,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q33297",
@@ -2143,7 +2143,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q1049",
@@ -2186,7 +2186,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 8
   },
   {
    "qid": "Q13229",
@@ -2207,7 +2207,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q5194",
@@ -2228,7 +2228,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q745767",
@@ -2250,7 +2250,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q1077741",
@@ -2293,7 +2293,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q23986556",
@@ -2314,7 +2314,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q219217",
@@ -2336,7 +2336,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q36931",
@@ -2379,7 +2379,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q676802",
@@ -2422,7 +2422,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q1192659",
@@ -2443,7 +2443,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 5
+   "accord": 8
   },
   {
    "qid": "Q248404",
@@ -2464,7 +2464,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q2060108",
@@ -2506,7 +2506,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q156926",
@@ -2527,7 +2527,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q901206",
@@ -2570,7 +2570,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q211498",
@@ -2591,7 +2591,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q12030",
@@ -2613,7 +2613,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 6
   },
   {
    "qid": "Q50668",
@@ -2633,7 +2633,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q249302",
@@ -2653,7 +2653,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1421821",
@@ -2675,7 +2675,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q113382",
@@ -2696,7 +2696,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q475736",
@@ -2716,7 +2716,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q13420313",
@@ -2736,7 +2736,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q133868166",
@@ -2756,7 +2756,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q1049105",
@@ -2817,7 +2817,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q24628",
@@ -2839,7 +2839,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q76323",
@@ -2880,7 +2880,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q2278545",
@@ -2920,7 +2920,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q26387",
@@ -2940,7 +2940,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q285563",
@@ -2961,7 +2961,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q19606402",
@@ -3044,7 +3044,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q43653",
@@ -3065,7 +3065,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q674275",
@@ -3107,7 +3107,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q177524",
@@ -3128,7 +3128,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q4804942",
@@ -3148,7 +3148,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1549160",
@@ -3168,7 +3168,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q662865",
@@ -3188,7 +3188,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q804566",
@@ -3231,7 +3231,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q2309898",
@@ -3252,7 +3252,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q1066650",
@@ -3272,7 +3272,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q2415309",
@@ -3293,7 +3293,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q178799",
@@ -3336,7 +3336,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q863253",
@@ -3441,7 +3441,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 6
   },
   {
    "qid": "Q665328",
@@ -3526,7 +3526,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 5
   },
   {
    "qid": "Q2026998",
@@ -3569,7 +3569,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1888",
@@ -3610,7 +3610,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q1136557",
@@ -3674,7 +3674,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 8
   },
   {
    "qid": "Q76948",
@@ -3695,7 +3695,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q1048357",
@@ -3715,7 +3715,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q513300",
@@ -3735,7 +3735,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q188533",
@@ -3756,7 +3756,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q118081",
@@ -3797,7 +3797,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q715027",
@@ -3819,7 +3819,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 7
   },
   {
    "qid": "Q106187",
@@ -3860,7 +3860,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q2963649",
@@ -3920,7 +3920,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q34221",
@@ -3983,7 +3983,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q244932",
@@ -4003,7 +4003,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q837314",
@@ -4023,7 +4023,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q129809",
@@ -4084,7 +4084,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q11774391",
@@ -4104,7 +4104,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q3699867",
@@ -4126,7 +4126,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q18873",
@@ -4189,7 +4189,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q386827",
@@ -4231,7 +4231,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q47141",
@@ -4251,7 +4251,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q133548",
@@ -4271,7 +4271,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q751479",
@@ -4292,7 +4292,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q20117",
@@ -4334,7 +4334,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q157094",
@@ -4416,7 +4416,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q152856",
@@ -4436,7 +4436,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q601388",
@@ -4456,7 +4456,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q723510",
@@ -4478,7 +4478,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q312307",
@@ -4519,7 +4519,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q452825",
@@ -4539,7 +4539,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q177519",
@@ -4580,7 +4580,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q696077",
@@ -4601,7 +4601,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q2578715",
@@ -4643,7 +4643,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q3295141",
@@ -4665,7 +4665,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q778218",
@@ -4686,7 +4686,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1332211",
@@ -4706,7 +4706,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q1368833",
@@ -4747,7 +4747,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q2305641",
@@ -4831,7 +4831,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q327968",
@@ -4871,7 +4871,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q202009",
@@ -4892,7 +4892,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q1136743",
@@ -4955,7 +4955,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q112070",
@@ -4977,7 +4977,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q51476459",
@@ -5041,7 +5041,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q311604",
@@ -5062,7 +5062,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q7799533",
@@ -5083,7 +5083,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q842110",
@@ -5143,7 +5143,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q189193",
@@ -5163,7 +5163,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q913640",
@@ -5184,7 +5184,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q837561",
@@ -5227,7 +5227,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q117346",
@@ -5248,7 +5248,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q172125",
@@ -5269,7 +5269,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q15903",
@@ -5353,7 +5353,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q186486",
@@ -5478,7 +5478,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q72296",
@@ -5519,7 +5519,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q828646",
@@ -5621,7 +5621,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q23408",
@@ -5663,7 +5663,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q681389",
@@ -5685,7 +5685,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q1506857",
@@ -5769,7 +5769,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q3123",
@@ -5790,7 +5790,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q982102",
@@ -5811,7 +5811,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q2981660",
@@ -5832,7 +5832,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 5
   },
   {
    "qid": "Q186447",
@@ -5886,7 +5886,7 @@
    ],
    "phrase": "Il s'est sanglé sur un chariot-fusée et a encaissé quarante-six fois son poids pour prouver qu'un pilote pouvait survivre à un choc.",
    "phraseLang": "fr",
-   "apercu": "John Paul Stapp (11 juillet 1910-13 novembre 1999) était un colonel de l'US Air Force et un des pionniers sur l'étude des effets des forces d'accélération et de décélération sur le corps humain.",
+   "apercu": "John Paul Stapp (né le 11 juillet 1910 à Salvador de Bahia au Brésil et mort le 13 novembre 1999 à Alamogordo au Nouveau-Mexique) était un colonel américain de l'US Air Force et un des pionniers sur l'étude des effets des forces d'accélération et de décélération sur le corps humain.",
    "apercuLang": "fr",
    "potentiel": 9,
    "editions": 13,
@@ -5935,7 +5935,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q3307784",
@@ -5975,7 +5975,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q21104086",
@@ -6017,7 +6017,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q1147168",
@@ -6143,7 +6143,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q432131",
@@ -6163,7 +6163,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q53662",
@@ -6184,7 +6184,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q203726",
@@ -6205,7 +6205,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q1891077",
@@ -6225,7 +6225,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q189698",
@@ -6288,7 +6288,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q1868889",
@@ -6310,7 +6310,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q1648468",
@@ -6351,7 +6351,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q3269752",
@@ -6371,7 +6371,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q91461627",
@@ -6391,7 +6391,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q49664",
@@ -6411,7 +6411,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q321267",
@@ -6452,7 +6452,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q150474",
@@ -6472,7 +6472,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q79925",
@@ -6493,7 +6493,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q910180",
@@ -6535,7 +6535,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 5
   },
   {
    "qid": "Q510292",
@@ -6555,7 +6555,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 8
   },
   {
    "qid": "Q5484",
@@ -6576,7 +6576,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q169274",
@@ -6618,7 +6618,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q1288729",
@@ -6640,7 +6640,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q739692",
@@ -6683,7 +6683,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q1418152",
@@ -6725,7 +6725,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1570153",
@@ -6745,7 +6745,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q3346128",
@@ -6788,7 +6788,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q139931",
@@ -6829,7 +6829,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q81232062",
@@ -6850,7 +6850,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q749811",
@@ -6872,7 +6872,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q3841718",
@@ -6893,7 +6893,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q29630",
@@ -6913,7 +6913,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q497179",
@@ -6933,7 +6933,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 6
   },
   {
    "qid": "Q332",
@@ -6954,7 +6954,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q190529",
@@ -7036,7 +7036,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q56436",
@@ -7077,7 +7077,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q190035",
@@ -7120,7 +7120,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q3359049",
@@ -7140,7 +7140,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q3361199",
@@ -7183,7 +7183,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q921090",
@@ -7225,7 +7225,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q737851",
@@ -7247,7 +7247,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 6
   },
   {
    "qid": "Q231620",
@@ -7268,7 +7268,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q899091",
@@ -7288,7 +7288,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q151922",
@@ -7310,7 +7310,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 5
   },
   {
    "qid": "Q57203",
@@ -7351,7 +7351,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q528135",
@@ -7393,7 +7393,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q1451",
@@ -7414,7 +7414,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q1116374",
@@ -7435,7 +7435,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q22133699",
@@ -7496,7 +7496,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q5180360",
@@ -7560,7 +7560,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q213098",
@@ -7602,7 +7602,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q168572",
@@ -7646,7 +7646,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q1322029",
@@ -7666,7 +7666,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q2421024",
@@ -7686,7 +7686,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 6
   },
   {
    "qid": "Q7263664",
@@ -7707,7 +7707,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q83373",
@@ -7769,7 +7769,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q535297",
@@ -7854,7 +7854,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q321087",
@@ -7875,7 +7875,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q436648",
@@ -7895,7 +7895,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q102527",
@@ -7916,7 +7916,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q157322",
@@ -7937,7 +7937,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q48572",
@@ -7958,7 +7958,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q13203",
@@ -7978,7 +7978,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 6
   },
   {
    "qid": "Q226843",
@@ -7999,7 +7999,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q4118844",
@@ -8040,7 +8040,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q48435",
@@ -8101,7 +8101,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q1892745",
@@ -8121,7 +8121,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q893453",
@@ -8143,7 +8143,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q226007",
@@ -8184,7 +8184,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q194230",
@@ -8269,7 +8269,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q7487374",
@@ -8330,7 +8330,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q778699",
@@ -8350,7 +8350,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 8
   },
   {
    "qid": "Q357951",
@@ -8393,7 +8393,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q170754",
@@ -8414,7 +8414,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q648581",
@@ -8434,7 +8434,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q788017",
@@ -8456,7 +8456,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q130966",
@@ -8476,7 +8476,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q1913422",
@@ -8496,7 +8496,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q1286554",
@@ -8516,7 +8516,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q756442",
@@ -8578,7 +8578,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q15809070",
@@ -8619,7 +8619,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q2916584",
@@ -8660,7 +8660,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q42915945",
@@ -8681,7 +8681,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q669822",
@@ -8701,7 +8701,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q425832",
@@ -8743,7 +8743,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q2157202",
@@ -8763,7 +8763,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q184410",
@@ -8784,7 +8784,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q2346348",
@@ -8825,7 +8825,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q36846",
@@ -8867,7 +8867,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q472953",
@@ -8911,7 +8911,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q6334",
@@ -8932,7 +8932,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q17579",
@@ -9017,7 +9017,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q855198",
@@ -9058,7 +9058,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q55111925",
@@ -9079,7 +9079,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q755286",
@@ -9100,7 +9100,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q133057",
@@ -9162,7 +9162,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q61266859",
@@ -9204,7 +9204,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q182524",
@@ -9225,7 +9225,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q156315",
@@ -9246,7 +9246,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q668921",
@@ -9266,7 +9266,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q557077",
@@ -9286,7 +9286,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q57461",
@@ -9327,7 +9327,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q122701",
@@ -9348,7 +9348,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q190510",
@@ -9493,7 +9493,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q42313338",
@@ -9514,7 +9514,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q4631879",
@@ -9555,7 +9555,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q4658263",
@@ -9596,7 +9596,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q5309982",
@@ -9617,7 +9617,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q384291",
@@ -9678,7 +9678,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q2822496",
@@ -9759,7 +9759,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 6
   },
   {
    "qid": "Q85501541",
@@ -9779,7 +9779,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q279012",
@@ -9904,7 +9904,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q1997428",
@@ -9924,7 +9924,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q37064",
@@ -10007,7 +10007,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q13080",
@@ -10170,7 +10170,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q58213413",
@@ -10212,7 +10212,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q209625",
@@ -10233,7 +10233,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q139796",
@@ -10295,7 +10295,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q188433",
@@ -10854,7 +10854,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q3270204",
@@ -11368,8 +11368,8 @@
    ],
    "phrase": "Interdit de tourner par l'Iran, Panahi a filmé son assignation à résidence et fait sortir le fichier caché dans un gâteau.",
    "phraseLang": "fr",
-   "apercu": "Ceci n'est pas un film (en persan : این فیلم نیست, In film nist) est un film documentaire iranien réalisé par Jafar Panahi et Mojtaba Mirtahmasb, sorti en 2011.",
-   "apercuLang": "fr",
+   "apercu": "This Is Not a Film (Persian: In film nist - این فیلم نیست) is an Iranian documentary film by Jafar Panahi and Mojtaba Mirtahmasb. It was released on 28 September 2011 in France, distributed by Kanibal Films Distribution.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 13,
    "ajoute": "2026-09-03",
@@ -11389,8 +11389,8 @@
    ],
    "phrase": "Elle a découvert que les étoiles sont faites d'hydrogène, et on l'a convaincue d'écrire dans sa thèse que ce résultat était sûrement faux.",
    "phraseLang": "fr",
-   "apercu": "Cecilia Payne-Gaposchkin, née le 10 mai 1900 à Wendover en Angleterre et morte le 7 décembre 1979 à Cambridge dans le Massachusetts, est une astronome et astrophysicienne anglo-américaine.",
-   "apercuLang": "fr",
+   "apercu": "Cecilia Payne-Gaposchkin (born Cecilia Helena Payne; (1900-05-10)May 10, 1900 – (1979-12-07)December 7, 1979) was a British-born American astronomer and astrophysicist.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 58,
    "ajoute": "2026-09-03",
@@ -11410,8 +11410,8 @@
    ],
    "phrase": "Le pathologiste l'a emporté sans autorisation, découpé en 240 blocs, et gardé des décennies dans des bocaux à cidre.",
    "phraseLang": "fr",
-   "apercu": "Le cerveau d'Albert Einstein a été le thème de nombreuses recherches et spéculations. Le cerveau du physicien a été retiré dans les sept heures et demie suivant sa mort.",
-   "apercuLang": "fr",
+   "apercu": "The brain of Albert Einstein has been a subject of much research and speculation. Albert Einstein's brain was removed shortly after his death.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 24,
    "ajoute": "2026-09-03",
@@ -11431,8 +11431,8 @@
    ],
    "phrase": "Dans la pièce la plus silencieuse du monde, on entend ses articulations et le sang dans ses oreilles ; presque personne n'y tient une heure.",
    "phraseLang": "fr",
-   "apercu": "Une chambre anéchoïque (ou « chambre sourde ») est une salle d'expérimentation dont les parois absorbent les ondes sonores ou électromagnétiques, en reproduisant des conditions de champ libre et ne provoquant donc pas d'écho pouvant perturber les mesures.",
-   "apercuLang": "fr",
+   "apercu": "An anechoic chamber (an-echoic meaning \"non-reflective\" or \"without echoes\") is a room designed to stop reflections or echoes of either sound or electromagnetic waves.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 27,
    "ajoute": "2026-09-03",
@@ -11452,15 +11452,15 @@
    ],
    "phrase": "Ces poissons antarctiques ont un sang blanc et transparent : ils sont les seuls vertébrés à vivre sans une seule molécule d'hémoglobine.",
    "phraseLang": "fr",
-   "apercu": "Les Channichthyidae (poissons des glaces) sont une famille de poissons perciformes trouvés dans les eaux froides autour de l'Antarctique et le sud de l'Amérique du Sud.",
-   "apercuLang": "fr",
+   "apercu": "The crocodile icefish or white-blooded fish comprise a family (Channichthyidae) of notothenioid fish found in the Southern Ocean around Antarctica. They are one of the few known vertebrates to lack hemoglobin in their blood as adults.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 29,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 0
   },
   {
    "qid": "Q663109",
@@ -11474,8 +11474,8 @@
    ],
    "phrase": "On réveillait les veufs remariés à coups de casseroles et de cornes des nuits entières, jusqu'à ce qu'ils paient à boire à tout le village.",
    "phraseLang": "fr",
-   "apercu": "Un charivari est un rituel observé en France depuis le XIVe siècle, dans lequel un groupe de personnes masquées se rassemble la nuit devant chez quelqu'un afin de faire beaucoup de bruit et ainsi lui donner la honte.",
-   "apercuLang": "fr",
+   "apercu": "Charivari (, UK also , US also , alternatively spelled shivaree or chivaree and also called a skimmington) was a European and North American folk custom designed to shame a member of the community, in which a mock parade was staged through the settlement accompanied by a discordant mock serenade.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 20,
    "ajoute": "2026-09-03",
@@ -11515,8 +11515,8 @@
    ],
    "phrase": "Produit de six générations de mariages consanguins, il pouvait à peine mâcher, et son autopsie n'aurait trouvé presque aucune goutte de sang.",
    "phraseLang": "fr",
-   "apercu": "Charles II (Carlos II von Habsburg ou Carlos II, Rey de España en espagnol), dit l'Ensorcelé, né le 6 novembre 1661 à Madrid et mort le 1er novembre 1700 dans la même ville, fils de Philippe IV et de Marianne d'Autriche, a été roi d’Espagne, des Indes, de Naples, de Sardaigne et de Sicile, duc de Bo",
-   "apercuLang": "fr",
+   "apercu": "Charles II (6 November 1661 – 1 November 1700) was King of Spain from 1665 to 1700. The last monarch from the House of Habsburg, which had ruled Spain since 1516, his death without children resulted in the 1701 to 1714 War of the Spanish Succession.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 80,
    "ajoute": "2026-09-03",
@@ -11536,15 +11536,15 @@
    ],
    "phrase": "Il promettait cinquante pour cent en quarante-cinq jours grâce à des coupons-réponses postaux, et payait les anciens clients avec l'argent des nouveaux.",
    "phraseLang": "fr",
-   "apercu": "Charles Ponzi, né Carlo Pietro Giovanni Guglielmo Tebaldo Ponzi le 3 mars 1882 à Lugo en Italie, et mort le 18 janvier 1949 à Rio de Janeiro au Brésil, est un escroc italien, connu pour avoir organisé un système d'escroquerie élaboré sur une chaîne d'emprunts de 1919 à 1920.",
-   "apercuLang": "fr",
+   "apercu": "Charles Ponzi (; Italian: [ˈpontsi]; born Carlo Pietro Giovanni Guglielmo Tebaldo Ponzi; 3 March 1882 – 18 January 1949) was an Italian charlatan and con artist who operated in the United States and Canada.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 35,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q5083115",
@@ -11597,15 +11597,15 @@
    ],
    "phrase": "La première réaction en chaîne contrôlée a été obtenue sous les gradins d'un stade universitaire, en pleine ville, sans aucune enceinte de confinement.",
    "phraseLang": "fr",
-   "apercu": "La Chicago Pile-1 est la première pile atomique au monde — c'est-à-dire le premier réacteur nucléaire artificiel — à réaliser une réaction en chaine auto-entretenue et contrôlée.",
-   "apercuLang": "fr",
+   "apercu": "Chicago Pile-1 (CP-1) was the first artificial nuclear reactor. On 2 December 1942, the first human-made self-sustaining nuclear chain reaction was initiated in CP-1 during an experiment led by Enrico Fermi.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 28,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 1
   },
   {
    "qid": "Q450317",
@@ -11701,8 +11701,8 @@
    ],
    "phrase": "L'étoile nouvelle observée en 1670 par les astronomes européens n'a été comprise qu'en 2018 : deux étoiles s'étaient percutées.",
    "phraseLang": "fr",
-   "apercu": "CK Vulpeculae (en abrégé CK Vul), aussi nommée 11 Vulpeculae (11 Vul), AAVSO 1943+27 ou encore Nova Vulpeculae 1670 (N Vul 1670), est une étoile variable de la constellation boréale du Petit Renard.",
-   "apercuLang": "fr",
+   "apercu": "CK Vulpeculae (also Nova Vulpeculae 1670) is an object whose exact nature is unknown. It was once considered to be the oldest reliably-documented nova.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 10,
    "ajoute": "2026-09-03",
@@ -11742,15 +11742,15 @@
    ],
    "phrase": "Fils de fermier sans diplôme universitaire, il a comparé des millions de points sur des plaques photographiques jusqu'à trouver Pluton.",
    "phraseLang": "fr",
-   "apercu": "Clyde William Tombaugh, né le 4 février 1906 à Streator dans l'Illinois et mort le 17 janvier 1997 à Las Cruces au Nouveau-Mexique, est un astronome américain. Il est notamment connu pour avoir découvert la planète naine Pluton en 1930.",
-   "apercuLang": "fr",
+   "apercu": "Clyde William Tombaugh (; February 4, 1906 – January 17, 1997) was an American astronomer and telescope maker, best known for discovering Pluto in 1930, marking the first detection of what would eventually be recognized as the Kuiper belt.",
+   "apercuLang": "en",
    "potentiel": 8,
    "editions": 68,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 0
   },
   {
    "qid": "Q212180",
@@ -12288,7 +12288,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q168694",
@@ -12309,7 +12309,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 6
   },
   {
    "qid": "Q217223",
@@ -12433,7 +12433,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q909397",
@@ -12538,7 +12538,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q207047",
@@ -12580,7 +12580,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q333987",
@@ -12643,7 +12643,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q273219",
@@ -12726,7 +12726,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 6
   },
   {
    "qid": "Q181728",
@@ -12767,7 +12767,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q1049294",
@@ -12809,7 +12809,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q18343",
@@ -12830,7 +12830,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 5
   },
   {
    "qid": "Q169399",
@@ -12892,7 +12892,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q43182",
@@ -13016,7 +13016,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q367196",
@@ -13078,7 +13078,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q788771",
@@ -13098,7 +13098,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 6
   },
   {
    "qid": "Q261538",
@@ -13180,7 +13180,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q402915",
@@ -13222,7 +13222,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q3106901",
@@ -13244,7 +13244,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q1386318",
@@ -13266,7 +13266,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q66811868",
@@ -13307,7 +13307,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 7
   },
   {
    "qid": "Q5445320",
@@ -13475,7 +13475,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q3169",
@@ -13496,7 +13496,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 6
   },
   {
    "qid": "Q76951",
@@ -13539,7 +13539,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q12998",
@@ -13559,7 +13559,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q216862",
@@ -13621,7 +13621,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q53752",
@@ -13663,7 +13663,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q23000947",
@@ -13683,7 +13683,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 6
   },
   {
    "qid": "Q214944",
@@ -13849,7 +13849,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q370444",
@@ -13892,7 +13892,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q374096",
@@ -13974,7 +13974,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q856168",
@@ -14079,7 +14079,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q126167",
@@ -14100,7 +14100,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q28270",
@@ -14207,7 +14207,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q275444",
@@ -14227,7 +14227,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q695224",
@@ -14268,7 +14268,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 6
   },
   {
    "qid": "Q180556",
@@ -14436,7 +14436,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q640037",
@@ -14583,7 +14583,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q168776",
@@ -14645,7 +14645,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q3244543",
@@ -14706,7 +14706,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q2783102",
@@ -14809,7 +14809,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q687168",
@@ -14934,7 +14934,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q95273",
@@ -15035,7 +15035,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q660787",
@@ -15056,7 +15056,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q6334918",
@@ -15097,7 +15097,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q188698",
@@ -15137,7 +15137,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q296790",
@@ -15200,7 +15200,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q1785742",
@@ -15448,7 +15448,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q161528",
@@ -15510,7 +15510,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q2657071",
@@ -15593,7 +15593,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q2543762",
@@ -15801,7 +15801,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 5
+   "accord": 7
   },
   {
    "qid": "Q207684",
@@ -15821,7 +15821,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q970308",
@@ -15841,7 +15841,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q411827",
@@ -15901,7 +15901,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q18808368",
@@ -15964,7 +15964,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q23361",
@@ -16109,7 +16109,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q16066644",
@@ -16150,7 +16150,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q305970",
@@ -16440,7 +16440,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q48604",
@@ -16481,7 +16481,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q20350",
@@ -16584,7 +16584,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q620860",
@@ -16726,7 +16726,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q740541",
@@ -16746,7 +16746,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q19574",
@@ -16910,7 +16910,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q192794",
@@ -16971,7 +16971,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 6
   },
   {
    "qid": "Q214696",
@@ -17095,7 +17095,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q610076",
@@ -17135,7 +17135,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q15343",
@@ -17156,7 +17156,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q287253",
@@ -17362,7 +17362,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q1466166",
@@ -17509,7 +17509,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q411216",
@@ -17571,7 +17571,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q498231",
@@ -17613,7 +17613,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q132999",
@@ -17675,7 +17675,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q167910",
@@ -17695,7 +17695,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q339",
@@ -17716,7 +17716,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q7886194",
@@ -17884,7 +17884,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q5962343",
@@ -17904,7 +17904,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q3909800",
@@ -17966,7 +17966,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q219698",
@@ -17987,7 +17987,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1156392",
@@ -18009,7 +18009,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q898068",
@@ -18031,7 +18031,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 6
   },
   {
    "qid": "Q621882",
@@ -18052,7 +18052,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 5
   },
   {
    "qid": "Q590010",
@@ -18136,7 +18136,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q905750",
@@ -18178,7 +18178,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 7
   },
   {
    "qid": "Q105887055",
@@ -18469,7 +18469,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q286587",
@@ -18693,7 +18693,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q1372364",
@@ -18817,7 +18817,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q191521",
@@ -18880,7 +18880,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q2604355",
@@ -19065,7 +19065,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q903412",
@@ -19147,7 +19147,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q254652",
@@ -19209,7 +19209,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q1376201",
@@ -19272,7 +19272,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q179959",
@@ -19459,7 +19459,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1069110",
@@ -19480,7 +19480,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q911160",
@@ -19521,7 +19521,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q8363",
@@ -19543,7 +19543,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q13258",
@@ -19687,7 +19687,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 6
+   "accord": 8
   },
   {
    "qid": "Q133506",
@@ -19727,7 +19727,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q662051",
@@ -19747,7 +19747,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q214689",
@@ -19873,7 +19873,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q324992",
@@ -19895,7 +19895,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q25173",
@@ -19937,7 +19937,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q20085576",
@@ -19997,7 +19997,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q199938",
@@ -20039,7 +20039,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q39054",
@@ -20101,7 +20101,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q2447023",
@@ -20245,7 +20245,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q1181185",
@@ -20346,7 +20346,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q634171",
@@ -20408,7 +20408,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q221392",
@@ -20428,7 +20428,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q104154",
@@ -20489,7 +20489,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q152800",
@@ -20531,7 +20531,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q155825",
@@ -20552,7 +20552,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q482828",
@@ -20615,7 +20615,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 6
   },
   {
    "qid": "Q321",
@@ -20636,7 +20636,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q370555",
@@ -20739,7 +20739,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q7997465",
@@ -20926,7 +20926,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q4666317",
@@ -21173,7 +21173,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q118931",
@@ -21193,7 +21193,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q2016260",
@@ -21616,7 +21616,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q499066",
@@ -21676,7 +21676,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q28189",
@@ -22158,7 +22158,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q51716436",
@@ -22238,7 +22238,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q5830",
@@ -22661,7 +22661,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q1073798",
@@ -22902,7 +22902,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q37395",
@@ -22943,7 +22943,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q51",
@@ -23003,7 +23003,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q360312",
@@ -23064,7 +23064,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q296198",
@@ -23246,7 +23246,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q12942",
@@ -23448,7 +23448,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q899438",
@@ -23894,7 +23894,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1431020",
@@ -24460,7 +24460,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q856544",
@@ -24743,7 +24743,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q783460",
@@ -24805,7 +24805,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1332677",
@@ -25049,7 +25049,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q565663",
@@ -25250,7 +25250,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q526278",
@@ -25352,7 +25352,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q125784086",
@@ -25553,7 +25553,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q138416",
@@ -25955,7 +25955,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q741255",
@@ -25975,7 +25975,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q1061092",
@@ -26055,7 +26055,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q1062302",
@@ -26377,7 +26377,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q173265",
@@ -27267,7 +27267,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q598887",
@@ -27430,7 +27430,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q130187",
@@ -27976,7 +27976,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q510109",
@@ -28036,7 +28036,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q28842723",
@@ -28279,7 +28279,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q208231",
@@ -28360,7 +28360,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q207916",
@@ -28400,7 +28400,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q2354694",
@@ -28622,7 +28622,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q134351",
@@ -28663,7 +28663,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q4154473",
@@ -29148,7 +29148,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q5329876",
@@ -29208,7 +29208,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q273426",
@@ -29289,7 +29289,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q16867",
@@ -29389,7 +29389,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q1542752",
@@ -29410,7 +29410,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q262038",
@@ -29430,7 +29430,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q16303139",
@@ -29450,7 +29450,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q384176",
@@ -29471,7 +29471,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q586031",
@@ -29792,7 +29792,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q3051481",
@@ -29894,7 +29894,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q3052073",
@@ -30094,7 +30094,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q154408",
@@ -30195,7 +30195,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q1361380",
@@ -30579,7 +30579,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q610172",
@@ -30640,7 +30640,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q1032485",
@@ -30843,7 +30843,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q888234",
@@ -30946,7 +30946,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q173481",
@@ -31232,7 +31232,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q1206847",
@@ -31454,7 +31454,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q716243",
@@ -31737,7 +31737,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q861",
@@ -31859,7 +31859,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q550093",
@@ -31960,7 +31960,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q7458514",
@@ -32000,7 +32000,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q57192",
@@ -32645,7 +32645,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q683632",
@@ -32968,7 +32968,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q868337",
@@ -33254,7 +33254,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q5645741",
@@ -33437,7 +33437,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q49034",
@@ -33560,7 +33560,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q44205",
@@ -34126,7 +34126,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1466972",
@@ -34167,7 +34167,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q657819",
@@ -34208,7 +34208,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q15037",
@@ -34431,7 +34431,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q31063",
@@ -34553,7 +34553,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q647205",
@@ -34736,7 +34736,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q6974267",
@@ -34878,7 +34878,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q2303482",
@@ -35403,7 +35403,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q171136",
@@ -35424,7 +35424,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q232407",
@@ -36860,7 +36860,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1416440",
@@ -37629,7 +37629,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q204221",
@@ -37811,7 +37811,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q6678867",
@@ -38173,7 +38173,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q7573232",
@@ -38246,8 +38246,8 @@
    ],
    "phrase": "Une population a survécu sur l'île Wrangel jusqu'à environ 1700 avant notre ère, soit après l'achèvement de la pyramide de Khéops.",
    "phraseLang": "fr",
-   "apercu": "Le Mammouth laineux (Mammuthus primigenius) est une espèce éteinte de la famille des éléphantidés ayant vécu dans les steppes d'Eurasie et d'Amérique du Nord durant le Pléistocène et, pour ses derniers représentants, au cours de l'Holocène, il y a seulement 4 000 ans, durant l'Antiquité égyptienne.",
-   "apercuLang": "fr",
+   "apercu": "The woolly mammoth (Mammuthus primigenius) is an extinct species of mammoth that lived from the Middle Pleistocene until its extinction in the Holocene epoch. It was one of the last in a line of mammoth species, beginning with the African Mammuthus subplanifrons in the early Pliocene.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 61,
    "ajoute": "2026-09-03",
@@ -38267,8 +38267,8 @@
    ],
    "phrase": "Sa sève brûle la peau, sa fumée aveugle, et s'abriter sous ses branches pendant la pluie suffit à provoquer des cloques.",
    "phraseLang": "fr",
-   "apercu": "Hippomane mancinella, le mancenillier, aussi appelé médecinier aux Saintes, est une espèce de plantes à fleurs de la famille des Euphorbiaceae. C'est un petit arbre très toxique qui pousse dans les régions équatoriales d'Amérique, dans des sols secs et sableux.",
-   "apercuLang": "fr",
+   "apercu": "The manchineel tree (Hippomane mancinella), also known as the tree of death, is a species of flowering plant in the spurge family (Euphorbiaceae). Its native range stretches from tropical southern North America to northern South America.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 44,
    "ajoute": "2026-09-03",
@@ -38287,15 +38287,15 @@
    ],
    "phrase": "Le mâle jeûne cent quinze jours en couvant un œuf sur ses pattes, en plein hiver antarctique, à moins soixante et sous des vents de deux cents kilomètres-heure.",
    "phraseLang": "fr",
-   "apercu": "Le Manchot empereur (Aptenodytes forsteri) est une espèce d'oiseaux de la famille des Spheniscidae endémique de l'Antarctique, et le plus grand et le plus lourd de tous les manchots.",
-   "apercuLang": "fr",
+   "apercu": "The emperor penguin (Aptenodytes forsteri) is the tallest and heaviest of all living penguin species and lives exclusively in Antarctica. The male and female are similar in plumage and size, reaching 100 cm (39 in) in length and weighing from 22 to 45 kg (49 to 99 lb).",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 81,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 0
   },
   {
    "qid": "Q12352241",
@@ -38409,15 +38409,15 @@
    ],
    "phrase": "Plusieurs États américains ont obligé les fabricants à teindre la margarine en rose vif pour protéger les producteurs de beurre.",
    "phraseLang": "fr",
-   "apercu": "La margarine est une préparation culinaire inventée par Hippolyte Mege-Mouries, à la suite d'un concours organisé par Napoléon III en 1869 afin de trouver un produit susceptible de remplacer le beurre, qui était une denrée rare et coûteuse.",
-   "apercuLang": "fr",
+   "apercu": "Margarine is a spread used for flavoring, baking, and cooking. It is most often used as a substitute for butter.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 74,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 1
   },
   {
    "qid": "Q5997182",
@@ -38629,8 +38629,8 @@
    ],
    "phrase": "Ses capteurs ont confondu la secousse du déploiement des jambes avec un atterrissage et coupé les moteurs à 40 mètres du sol.",
    "phraseLang": "fr",
-   "apercu": "Mars Polar Lander (Mars Surveyor '98 Lander) est une des deux sondes spatiales de l'agence spatiale américaine, la NASA, lancée en 1998 pour étudier la planète Mars.",
-   "apercuLang": "fr",
+   "apercu": "The Mars Polar Lander, also known as the Mars Surveyor '98 Lander, was a 290-kilogram uncrewed spacecraft lander launched by NASA on January 3, 1999, to study the soil and climate of Planum Australe, a region near the south pole on Mars.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 38,
    "ajoute": "2026-09-03",
@@ -39116,15 +39116,15 @@
    ],
    "phrase": "Envoyé en 1974 vers un amas d'étoiles situé à 25 000 années-lumière, il arrivera à un endroit que l'amas aura quitté.",
    "phraseLang": "fr",
-   "apercu": "Le message d'Arecibo est un message radio de 1 679 bits émis vers l'espace le 16 novembre 1974 à l'occasion de la transformation du radiotélescope d'Arecibo. Il est envoyé vers l'amas globulaire M13 (plus communément appelé Amas d'Hercule), qui se trouve à environ 22 200 années-lumière.",
-   "apercuLang": "fr",
+   "apercu": "The Arecibo message is an interstellar radio message carrying basic information about humanity and Earth that was sent to the globular cluster Messier 13 (M13) in 1974.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 48,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 2
   },
   {
    "qid": "Q431381",
@@ -39136,15 +39136,15 @@
    ],
    "phrase": "Daniel Barringer a englouti sa fortune pendant vingt-six ans à forer sous ce cratère, en quête d'un bloc de fer qui s'était vaporisé à l'impact.",
    "phraseLang": "fr",
-   "apercu": "Meteor Crater est un cratère d'impact situé environ 60 km à l'est de Flagstaff, en Arizona (ouest des États-Unis). Il est aussi appelé cratère Barringer, en souvenir de l'ingénieur des mines Daniel Moreau Barringer qui acheta le site en 1903.",
-   "apercuLang": "fr",
+   "apercu": "Meteor Crater, or Barringer Crater, is an impact crater about 37 mi (60 km) east of Flagstaff and 18 mi (29 km) west of Winslow in the desert of northern Arizona, United States.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 46,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 2
   },
   {
    "qid": "Q1930079",
@@ -39156,8 +39156,8 @@
    ],
    "phrase": "Elle renferme des grains de poussière fabriqués par des étoiles mortes avant même que le Soleil existe.",
    "phraseLang": "fr",
-   "apercu": "La météorite d'Allende, ou simplement Allende, est la plus grosse météorite chondrite carbonée jamais trouvée sur Terre. Au moment de sa chute le 8 février 1969 dans l'État de Chihuahua au Mexique, elle pesait près de deux tonnes.",
-   "apercuLang": "fr",
+   "apercu": "The Allende meteorite is the largest carbonaceous chondrite ever found on Earth. The fireball was witnessed at 01:05 on February 8, 1969, falling over the Mexican state of Chihuahua.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 19,
    "ajoute": "2026-09-03",
@@ -39176,8 +39176,8 @@
    ],
    "phrase": "Tombée en Alsace en 1492, elle fut enchaînée dans une église pour l'empêcher de repartir : la plus ancienne chute conservée d'Europe.",
    "phraseLang": "fr",
-   "apercu": "La météorite d'Ensisheim, ou simplement Ensisheim, est une météorite tombée en 1492 à proximité du village d'Ensisheim (alors en Autriche antérieure ; aujourd'hui en France, dans le Haut-Rhin).",
-   "apercuLang": "fr",
+   "apercu": "The Ensisheim meteorite is a stony meteorite that fell on November 7, 1492 in a wheat field outside the walled town of Ensisheim in then Alsace, Further Germany (now France).",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 16,
    "ajoute": "2026-09-03",
@@ -39196,15 +39196,15 @@
    ],
    "phrase": "Cette pierre tombée en Australie transportait plus de quatre-vingts acides aminés, dont la plupart n'existent nulle part sur Terre.",
    "phraseLang": "fr",
-   "apercu": "La météorite de Murchison, ou simplement Murchison, est une météorite tombée le 28 septembre 1969 près du village de Murchison, en Australie, à une centaine de kilomètres au nord de Melbourne.",
-   "apercuLang": "fr",
+   "apercu": "The Murchison meteorite is a meteorite that fell in Australia in 1969 near Murchison, Victoria. It belongs to the carbonaceous chondrite class, a group of meteorites rich in organic compounds.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 40,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 0
   },
   {
    "qid": "Q1082769",
@@ -39477,8 +39477,8 @@
    ],
    "phrase": "Ce virus si gros qu'on l'avait pris pour une bactérie possède plus de mille gènes et attrape lui-même des virus qui le parasitent.",
    "phraseLang": "fr",
-   "apercu": "Mimivirus est un genre de virus à ADN. Les virus de ce taxon sont particulièrement grands, souvent plus gros que bien des bactéries, et de ce fait on les qualifie de girus — techniquement ils en sont le holotype.",
-   "apercuLang": "fr",
+   "apercu": "Mimivirus is a genus of giant viruses, in the family Mimiviridae. It is believed that Amoeba serve as their natural hosts.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 29,
    "ajoute": "2026-09-03",
@@ -39558,15 +39558,15 @@
    ],
    "phrase": "Pendant soixante-dix ans, le Soleil n'a presque plus eu de taches, et l'Europe a grelotté sous des hivers extrêmes.",
    "phraseLang": "fr",
-   "apercu": "En astronomie, le minimum de Maunder correspond à une époque approximativement située entre 1645 et 1715, durant laquelle le nombre de taches solaires (et l'activité de surface du Soleil) était significativement plus faible qu'aujourd'hui.",
-   "apercuLang": "fr",
+   "apercu": "The Maunder Minimum, also known as the \"prolonged sunspot minimum\", was a period around 1645 to 1715 during which sunspots became exceedingly rare. During the 28-year period 1672–1699 within the minimum, observations revealed fewer than 50 sunspots.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 30,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 0
   },
   {
    "qid": "Q39142381",
@@ -39598,8 +39598,8 @@
    ],
    "phrase": "Cette étoile variable traîne derrière elle une queue de matière de treize années-lumière, découverte seulement en 2007.",
    "phraseLang": "fr",
-   "apercu": "Mira (ο Cet / ο Ceti / Omicron Ceti) est une étoile binaire de la constellation de la Baleine, constituée d'une géante rouge, Mira A ou simplement Mira, et une naine blanche, Mira B ou VZ Ceti.",
-   "apercuLang": "fr",
+   "apercu": "Mira (pronounced , MY-rə) is a binary star system in the constellation Cetus. It has the Bayer designation Omicron Ceti, which is Latinized from ο Ceti, and abbreviated Omicron Cet or ο Cet.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 57,
    "ajoute": "2026-09-03",
@@ -39759,8 +39759,8 @@
    ],
    "phrase": "Un mot japonais ambigu dans la réponse à l'ultimatum de Potsdam a peut-être été compris comme un refus méprisant.",
    "phraseLang": "fr",
-   "apercu": "Mokusatsu (黙殺) est un mot japonais. Il se compose de deux kanjis : 黙 (moku, litt.",
-   "apercuLang": "fr",
+   "apercu": "Mokusatsu (黙殺) is a Japanese word meaning \"ignore\", \"take no notice of\" or \"treat with silent contempt\". It is written with two kanji: 黙 (moku \"silence\") and 殺 (satsu \"killing\").",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 8,
    "ajoute": "2026-09-03",
@@ -40202,8 +40202,8 @@
    ],
    "phrase": "Des régiments français sont montés en ligne en bêlant comme des moutons; on a fusillé quarante-neuf hommes, puis amélioré les permissions et l'ordinaire.",
    "phraseLang": "fr",
-   "apercu": "Les mutineries de 1917 désignent généralement la série de révoltes ayant eu lieu au sein des forces armées françaises de mai à juin 1917, pendant la Première Guerre mondiale.",
-   "apercuLang": "fr",
+   "apercu": "The 1917 French Army mutinies took place amongst French Army troops on the Western Front in northern France during World War I. They started just after the unsuccessful and costly Second Battle of the Aisne, the main action in the Nivelle Offensive in April 1917.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 14,
    "ajoute": "2026-09-03",
@@ -40304,8 +40304,8 @@
    ],
    "phrase": "En refroidissant, elle finira par cristalliser en une sphère de carbone de la taille de la Terre — un cadavre en diamant.",
    "phraseLang": "fr",
-   "apercu": "Une naine blanche est un objet céleste de forte densité, issu de l'évolution d'une étoile de masse modérée (de trois à quatre masses solaires au maximum) après la phase où se produisent des réactions thermonucléaires.",
-   "apercuLang": "fr",
+   "apercu": "A white dwarf is a very dense type of star: in an Earth-sized volume, it packs a mass that is comparable to the Sun. A white dwarf radiates light from residual heat and eventual crystallization, not from nuclear fusion.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 91,
    "ajoute": "2026-09-03",
@@ -40465,15 +40465,15 @@
    ],
    "phrase": "Ce champignon brésilien allume sa lumière verte selon une horloge interne, la nuit seulement, pour attirer les insectes qui disperseront ses spores.",
    "phraseLang": "fr",
-   "apercu": "Neonothopanus gardneri, connu localement sous le nom de Fleur de coco (Flor de coco en portugais), est une espèce de champignons bioluminescents de la famille des Omphalotaceae, originaire des États de Goiás, Piauí et Tocantins au Brésil.",
-   "apercuLang": "fr",
+   "apercu": "Neonothopanus gardneri, locally known as flor de coco, is a bioluminescent fungus native to Goiás, Piauí and Tocantins states in Brazil. The fungus was first discovered in 1839 by the English botanist George Gardner, after he came across some youths playing with glowing material in the streets of Villa de Natividade in Goiás state in Brazil.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 5,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q148744",
@@ -40486,15 +40486,15 @@
    ],
    "phrase": "Cette plante carnivore a renoncé aux insectes : sa urne est un perchoir à toilettes pour musaraignes, qui la nourrissent de leurs excréments pendant qu'elles lèchent son nectar.",
    "phraseLang": "fr",
-   "apercu": "Nepenthes lowii est une espèce de plantes à fleurs de la famille des Nepenthaceae. C'est une plante carnivore endémique de l'Île de Bornéo en Asie du Sud-Est.",
-   "apercuLang": "fr",
+   "apercu": "Nepenthes lowii (), commonly called Low's pitcher plant, is a tropical pitcher plant endemic to Borneo. It is named after Hugh Low, who discovered it on Mount Kinabalu.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 19,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 0
   },
   {
    "qid": "Q1456827",
@@ -40514,7 +40514,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q6041401",
@@ -40918,7 +40918,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q320638",
@@ -40938,7 +40938,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q25375",
@@ -41079,7 +41079,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q95068",
@@ -41221,7 +41221,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q93379227",
@@ -41262,7 +41262,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q2026436",
@@ -41302,7 +41302,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q572368",
@@ -41465,7 +41465,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q109547100",
@@ -41607,7 +41607,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q14084932",
@@ -41729,7 +41729,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q19806",
@@ -42195,7 +42195,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 7
   },
   {
    "qid": "Q3377087",
@@ -42437,7 +42437,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q969351",
@@ -42960,7 +42960,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q168700",
@@ -43082,7 +43082,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q18645284",
@@ -43102,7 +43102,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q898555",
@@ -43263,7 +43263,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q165316",
@@ -43343,7 +43343,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q528",
@@ -43363,7 +43363,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q867906",
@@ -43563,7 +43563,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 6
   },
   {
    "qid": "Q327590",
@@ -43623,7 +43623,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q1827255",
@@ -43664,7 +43664,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q161888",
@@ -43685,7 +43685,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q7284629",
@@ -44070,7 +44070,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q181078",
@@ -44111,7 +44111,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q1569226",
@@ -44232,7 +44232,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q53706",
@@ -44654,7 +44654,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q76375549",
@@ -44674,7 +44674,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q3133742",
@@ -44868,7 +44868,7 @@
    ],
    "phrase": "Un nuage hexagonal parfait de trente mille kilomètres de côté tourne au pôle nord de Saturne depuis au moins quarante ans.",
    "phraseLang": "fr",
-   "apercu": "L'hexagone de Saturne est un motif nuageux hexagonal qui tourne en permanence au-dessus du pôle Nord de la planète Saturne",
+   "apercu": "L'hexagone de Saturne est un motif nuageux hexagonal qui tourne en permanence au-dessus du pôle Nord de la planète Saturne.",
    "apercuLang": "fr",
    "potentiel": 7,
    "editions": 26,
@@ -44897,7 +44897,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q678156",
@@ -44998,7 +44998,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q36204",
@@ -45280,7 +45280,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q3181898",
@@ -45481,7 +45481,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q1570745",
@@ -45604,7 +45604,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q3962041",
@@ -45786,7 +45786,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q842813",
@@ -45846,7 +45846,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q4428661",
@@ -45867,7 +45867,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q185552",
@@ -45927,7 +45927,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q1474378",
@@ -46051,7 +46051,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q80811",
@@ -46132,7 +46132,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q7393526",
@@ -46414,7 +46414,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q1229899",
@@ -46446,8 +46446,8 @@
    ],
    "phrase": "Une seule pourrait stériliser toute planète dans un rayon de plusieurs milliers d'années-lumière si son jet nous visait.",
    "phraseLang": "fr",
-   "apercu": "Une supernova superlumineuse (SNSL, ou SLSN pour l'anglais superluminous supernova), supernova superpuissante ou hypernova est une explosion qui libérerait l'énergie de plus de 100 supernovas, soit environ 1046 joules.",
-   "apercuLang": "fr",
+   "apercu": "A hypernova is a very energetic supernova which is believed to result from an extreme core collapse scenario. In this case, a massive star (>30 solar masses) collapses to form a rotating black hole emitting twin astrophysical jets and surrounded by an accretion disk.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 47,
    "ajoute": "2026-09-03",
@@ -46648,8 +46648,8 @@
    ],
    "phrase": "Cette plante produit assez de chaleur pour maintenir vingt degrés dans son enveloppe et faire fondre la neige autour d'elle pendant deux semaines de février.",
    "phraseLang": "fr",
-   "apercu": "Symplocarpus foetidus, le symplocarpe fétide, chou puant (au Québec) ou skunk cabbage en anglais est une espèce de la famille des Araceae. Elle doit son nom vernaculaire à son feuillage qui apparaît après la floraison.",
-   "apercuLang": "fr",
+   "apercu": "Symplocarpus foetidus, commonly known as skunk cabbage or eastern skunk cabbage (also swamp cabbage, clumpfoot cabbage, or meadow cabbage, foetid pothos or polecat weed), is a low-growing plant that grows in wetlands and moist hill slopes of eastern North America.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 23,
    "ajoute": "2026-09-03",
@@ -46688,8 +46688,8 @@
    ],
    "phrase": "Des adolescents dorment vingt heures par jour pendant des semaines, se réveillent affamés et hébétés, puis redeviennent parfaitement normaux pendant des mois.",
    "phraseLang": "fr",
-   "apercu": "Le syndrome de Kleine-Levin (KLS) est un trouble du sommeil diurne faisant partie des hypersomnies récurrentes.",
-   "apercuLang": "fr",
+   "apercu": "Kleine–Levin syndrome (KLS) is a rare neurological disorder characterized by persistent episodic hypersomnia accompanied by cognitive and behavioral changes. These changes may include disinhibition (failure to inhibit actions or words), sometimes manifested through hypersexuality, hyperphagia or emotional lability, and other symptoms, such as derealization.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 29,
    "ajoute": "2026-09-03",
@@ -46717,7 +46717,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q856736",
@@ -46730,8 +46730,8 @@
    ],
    "phrase": "Après un AVC, des gens se réveillent en parlant leur langue maternelle avec ce que tout le monde prend pour un accent norvégien ou chinois.",
    "phraseLang": "fr",
-   "apercu": "Le syndrome de l'accent étranger (en anglais : foreign accent syndrome, souvent rapporté sous l'abréviation de FAS) est une affection médicale rare qui se produit généralement comme un effet indésirable d'un choc à la tête ou d'une blessure au cerveau.",
-   "apercuLang": "fr",
+   "apercu": "Foreign accent syndrome is an extremely rare medical condition in which patients develop speech patterns that are perceived as a foreign accent that is different from their native accent, without having acquired it in the perceived accent's place of origin.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 29,
    "ajoute": "2026-09-03",
@@ -46751,15 +46751,15 @@
    ],
    "phrase": "Une main qui agit contre la volonté de son propriétaire, et parfois contre l'autre main.",
    "phraseLang": "fr",
-   "apercu": "Le syndrome de la main étrangère, en anglais : Alien Hand Syndrome (AHS), est une affection neurologique rare — une cinquantaine de cas décrits entre 1909 et 2006 —, parfois également appelée « syndrome de la main anarchique », « syndrome du Dr Strangelove » (traduit et adapté en français : « syndro",
-   "apercuLang": "fr",
+   "apercu": "Alien hand syndrome (AHS) or Dr. Strangelove syndrome or Alien Limb Syndrome is a category of conditions in which a person experiences their limbs acting seemingly on their own, without conscious control over the actions.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 34,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 0
   },
   {
    "qid": "Q180242",
@@ -46791,15 +46791,15 @@
    ],
    "phrase": "Des personnes lourdement handicapées récitent des annuaires, rejouent un concerto après une seule écoute, ou donnent le jour de la semaine de n'importe quelle date.",
    "phraseLang": "fr",
-   "apercu": "Le syndrome du savant, également appelé savantisme, n'est pas un diagnostic médicalement reconnu, mais le psychiatre américain Darold Treffert le définit comme un syndrome rare dans lequel les personnes avec des troubles du développement et des troubles du spectre de l'autisme ont un ou plusieurs do",
-   "apercuLang": "fr",
+   "apercu": "Savant syndrome ( SAV-ənt, sa-VAHNT, US also sə-VAHNT) is a phenomenon where someone demonstrates exceptional aptitude in one domain, such as art or mathematics, but with some form of social or intellectual impairment.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 47,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 0
   },
   {
    "qid": "Q1124410",
@@ -46812,8 +46812,8 @@
    ],
    "phrase": "Des touristes sans aucun antécédent psychiatrique se drapent dans des draps d'hôtel et se mettent à prêcher, puis redeviennent normaux une fois rentrés.",
    "phraseLang": "fr",
-   "apercu": "Le syndrome du voyageur est un trouble psychique généralement passager que rencontrent certains voyageurs confrontés à des aspects de la réalité du pays visité, par exemple l'abondance d'œuvres d'art (syndrome de Stendhal), de symboles religieux (syndrome de Jérusalem), ou l'écart entre des cultures.",
-   "apercuLang": "fr",
+   "apercu": "Jerusalem syndrome is a group of mental phenomena involving the presence of religiously themed ideas or experiences that are triggered by a visit to the city of Jerusalem.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 37,
    "ajoute": "2026-09-03",
@@ -46912,8 +46912,8 @@
    ],
    "phrase": "Votre intestin abrite des centaines de millions de neurones et continue de fonctionner même détaché de toute connexion avec le cerveau.",
    "phraseLang": "fr",
-   "apercu": "Le système nerveux entérique est la partie du système nerveux autonome qui contrôle le système digestif aussi bien pour l'activité motrice (péristaltisme, vomissements, complexes moteurs migrants, réflexes entériques) que pour les sécrétions et la vascularisation.",
-   "apercuLang": "fr",
+   "apercu": "The enteric nervous system (ENS) is one of the three divisions of the autonomic nervous system (ANS), the others being the sympathetic nervous system (SNS) and parasympathetic nervous system (PSNS).",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 30,
    "ajoute": "2026-09-03",
@@ -46952,8 +46952,8 @@
    ],
    "phrase": "Cette orque a porté le cadavre de son nouveau-né à la surface pendant dix-sept jours et mille six cents kilomètres.",
    "phraseLang": "fr",
-   "apercu": "La ville de Tahlequah (en anglais [ˈtæləkwɑː], en cheyenne ᏓᎵᏆ) est le siège du comté de Cherokee, dans l’État d’Oklahoma, aux États-Unis. Sa population s’élevait à 15 753 habitants lors du recensement de 2010, estimée à 16 736 habitants en 2017.",
-   "apercuLang": "fr",
+   "apercu": "Tahlequah ( TAL-ə-kwah; Cherokee: ᏓᎵᏆ, daligwa [dàlígʷá]) is a city in Cherokee County, Oklahoma located at the foothills of the Ozark Mountains.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 50,
    "ajoute": "2026-09-03",
@@ -47121,7 +47121,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 0
   },
   {
    "qid": "Q6127215",
@@ -47658,8 +47658,8 @@
    ],
    "phrase": "Impossible de se chatouiller soi-même : le cervelet prédit votre geste et annule la sensation avant qu'elle n'arrive.",
    "phraseLang": "fr",
-   "apercu": "Le chatouillement est l'excitation de la peau par des attouchements légers et répétés, ou de la zone du diaphragme[pas clair], produisant une sensation agréable ou désagréable et pouvant entraîner un rire convulsif.",
-   "apercuLang": "fr",
+   "apercu": "Tickling is the act of touching a part of a person's body in a way that causes involuntary twitching movements or laughter. The word evolved from the Middle English tikelen, perhaps frequentative of ticken, to touch lightly.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 44,
    "ajoute": "2026-09-03",
@@ -47678,15 +47678,15 @@
    ],
    "phrase": "Les chercheurs ont choisi une strate de trois cent soixante-quinze millions d'années sur une carte, ont creusé, et y ont trouvé le poisson à poignet qu'ils prédisaient.",
    "phraseLang": "fr",
-   "apercu": "Tiktaalik (en inuktitut : ᑎᒃᑖᓕᒃ, littéralement « grand poisson des basses eaux ») est un genre fossile de sarcoptérygiens ayant vécu durant la fin du Dévonien (Frasnien), dans ce qui est aujourd'hui le nord-est du Canada.",
-   "apercuLang": "fr",
+   "apercu": "Tiktaalik (; Inuktitut: ᑎᒃᑖᓕᒃ [tiktaːlik]) is a monospecific genus of extinct sarcopterygian (lobe-finned fish) from the late Devonian Period, about 375 Mya (million years ago), having many features similar to those of tetrapods (four-legged animals).",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 37,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 0
   },
   {
    "qid": "Q205129",
@@ -47740,8 +47740,8 @@
    ],
    "phrase": "Il y pleut du méthane, les rivières creusent des canyons et la gravité est si faible qu'un humain pourrait y voler avec des ailes.",
    "phraseLang": "fr",
-   "apercu": "Titan, aussi appelé Saturne VI, est le plus grand satellite naturel de Saturne. D'un diamètre 6 % plus grand que celui de Mercure, Titan est par la taille au deuxième rang des satellites du Système solaire, après Ganymède, le plus gros satellite de Jupiter.",
-   "apercuLang": "fr",
+   "apercu": "Titan is the largest moon of Saturn and the second largest in the Solar System. It is the only moon that is known to have a dense atmosphere (denser than that of Earth), and is the only known object in the Solar System besides Earth with clear evidence of stable bodies of surface liquid.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 115,
    "ajoute": "2026-09-03",
@@ -47841,8 +47841,8 @@
    ],
    "phrase": "Ce poisson de douze centimètres sculpte pendant une semaine, avec ses nageoires, un cercle géométrique de deux mètres pour séduire une femelle.",
    "phraseLang": "fr",
-   "apercu": "Torquigener albomaculosus est une espèce de poissons-ballons tropicaux marins de la famille des Tetraodontidae.",
-   "apercuLang": "fr",
+   "apercu": "Torquigener albomaculosus, or the white-spotted pufferfish, is the 20th discovered species of the genus Torquigener. The species was discovered in the ocean waters around the Ryukyu Islands in Japan off the south coast of Amami Ōshima Island.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 12,
    "ajoute": "2026-09-03",
@@ -47942,8 +47942,8 @@
    ],
    "phrase": "Ce poisson abat un insecte à deux mètres avec un jet d'eau, en corrigeant la déviation de la lumière à la surface.",
    "phraseLang": "fr",
-   "apercu": "Toxotes, du grec ancien Τοξότης qui signifie « archer » est un genre de poissons de la famille des Toxotidés. Il vit dans les eaux légèrement saumâtre des estuaires et des mangroves en Asie du Sud-Est et en Océanie.",
-   "apercuLang": "fr",
+   "apercu": "Toxotes is a genus of archerfish found in tropical Asia and northern Australasia. It contains a majority of species in the family, and was previously thought to be the only genus of archerfish until the genus Protoxotes was revived and split from this genus in 2022.",
+   "apercuLang": "en",
    "potentiel": 7,
    "editions": 38,
    "ajoute": "2026-09-03",
@@ -48031,7 +48031,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q639717",
@@ -48376,7 +48376,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q36620",
@@ -48476,7 +48476,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 6
   },
   {
    "qid": "Q652479",
@@ -48580,7 +48580,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q11707311",
@@ -48780,7 +48780,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 6
   },
   {
    "qid": "Q313",
@@ -48801,7 +48801,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q2092096",
@@ -48841,7 +48841,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q339657",
@@ -48881,7 +48881,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q2522514",
@@ -49184,7 +49184,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q1427012",
@@ -49448,7 +49448,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q160852",
@@ -49489,7 +49489,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q21466609",
@@ -49612,7 +49612,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q2732136",
@@ -49792,7 +49792,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q561213",
@@ -49914,7 +49914,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q8052009",
@@ -50074,7 +50074,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q220361",
@@ -50195,7 +50195,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1955755",
@@ -51243,7 +51243,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q3512519",
@@ -51647,7 +51647,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q1763092",
@@ -51667,7 +51667,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q2615876",
@@ -52772,7 +52772,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q124036381",
@@ -53515,7 +53515,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q2851348",
@@ -53837,7 +53837,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q1502847",
@@ -53857,7 +53857,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q4781363",
@@ -58064,7 +58064,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q919692",
@@ -58727,7 +58727,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q111459288",
@@ -58967,7 +58967,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q111207767",
@@ -59772,7 +59772,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q1065775",
@@ -60274,7 +60274,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q116330",
@@ -61861,7 +61861,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q365463",
@@ -62628,7 +62628,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q632107",
@@ -63553,7 +63553,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q185128",
@@ -63673,7 +63673,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q42377987",
@@ -63917,7 +63917,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q872951",
@@ -65850,7 +65850,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q18570",
@@ -67099,7 +67099,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q326477",
@@ -67826,7 +67826,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q4205333",
@@ -69276,7 +69276,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1619388",
@@ -70098,7 +70098,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q19881047",
@@ -70703,7 +70703,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q556883",
@@ -72331,7 +72331,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q1322079",
@@ -72840,7 +72840,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q17077413",
@@ -72981,7 +72981,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q216930",
@@ -73103,7 +73103,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q18164968",
@@ -73623,7 +73623,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q499584",
@@ -74265,7 +74265,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1064449",
@@ -74710,7 +74710,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q5954107",
@@ -74730,7 +74730,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 6
   },
   {
    "qid": "Q193003",
@@ -74810,7 +74810,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q8609",
@@ -74830,7 +74830,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q179677",
@@ -74850,7 +74850,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q65120496",
@@ -75373,7 +75373,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q2460379",
@@ -76402,7 +76402,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q2086893",
@@ -78402,15 +78402,15 @@
    ],
    "phrase": "Ce bonobo a appris le langage symbolique par-dessus l'épaule de sa mère, qui, elle, n'y arrivait pas, et taillait ses propres outils de pierre.",
    "phraseLang": "fr",
-   "apercu": "Kanzi est un singe bonobo mâle, né le 28 octobre 1980 dans le zoo de San Diego, aux États-Unis et mort le 18 mars 2025. Très doué en particulier pour le langage, ce primate fait l'objet de recherches à l'Université d'État de Géorgie par le Dr.",
-   "apercuLang": "fr",
+   "apercu": "Kanzi (October 28, 1980 – March 18, 2025) was a male bonobo who was the subject of numerous studies on great ape language and cognition. According to Sue Savage-Rumbaugh, a primatologist who has studied the bonobo since the 1990s, Kanzi exhibited advanced linguistic aptitude.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 17,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 1
   },
   {
    "qid": "Q95530210",
@@ -78443,15 +78443,15 @@
    ],
    "phrase": "Un ingénieur chargé de traquer un parasite téléphonique a découvert que le centre de la Galaxie émet des ondes radio.",
    "phraseLang": "fr",
-   "apercu": "Karl Guthe Jansky, né à Normand (Oklahoma) le 22 octobre 1905 et mort le 14 février 1950, est un physicien et ingénieur radio américain. Il découvre en 1932 que notre galaxie émet des ondes radio, marquant ainsi la naissance de la radioastronomie.",
-   "apercuLang": "fr",
+   "apercu": "Karl Guthe Jansky (October 22, 1905 – February 14, 1950) was an American physicist and radio engineer who in April 1933 first announced his discovery of radio waves emanating from the Milky Way in the constellation Sagittarius.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 44,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 1
   },
   {
    "qid": "Q3193401",
@@ -78623,8 +78623,8 @@
    ],
    "phrase": "Ce perroquet de montagne démonte les joints de pare-brise des voitures, résout des tests logiques, et son cri de jeu est contagieux comme un rire.",
    "phraseLang": "fr",
-   "apercu": "Le nestor kéa ou plus simplement kéa (Nestor notabilis) est une espèce de perroquets montagnards, endémique de l'île du Sud (Nouvelle-Zélande). Son nom commun tire son origine de son puissant cri : « keee-aa ».",
-   "apercuLang": "fr",
+   "apercu": "The kea ( KEE-ə; Māori: [kɛ.a]; Nestor notabilis) is a species of large parrot in the family Strigopidae that is endemic to the forested and alpine regions of the South Island of New Zealand.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 62,
    "ajoute": "2026-09-03",
@@ -78944,15 +78944,15 @@
    ],
    "phrase": "Avant les réveille-matin, des gens payés pour cela tapaient aux fenêtres avec de longues perches pour réveiller les ouvriers.",
    "phraseLang": "fr",
-   "apercu": "Le knocker-up était un métier apparu en Angleterre et en Irlande pendant la révolution industrielle consistant à réveiller les gens à l'aide d'un bâton. Les knocker upper utilisaient le plus souvent un long bâton en bambou, ou un petit bâton assez lourd qu'ils lançaient pour atteindre les fenêtres de chaque étage.",
-   "apercuLang": "fr",
+   "apercu": "A knocker-up or knocker-upper had the job of rousing sleeping people so they could get to work on time. The role started during the Industrial Revolution, in Britain, the Netherlands, Ireland and some other countries, when alarm clocks were neither cheap nor reliable.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 13,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 0
   },
   {
    "qid": "Q819123",
@@ -79024,15 +79024,15 @@
    ],
    "phrase": "Un atterrisseur conçu pour Vénus est resté coincé en orbite terrestre pendant un demi-siècle avant de retomber intact sur nous.",
    "phraseLang": "fr",
-   "apercu": "Cosmos 482 (en russe : Космос 482) est une sonde spatiale lancée le 31 mars 1972, et destinée à atteindre Vénus dans le cadre du programme Venera. Elle ne réussit pas à quitter l’orbite basse terrestre et tombe dans l'océan Indien le 10 mai 2025, après 53 ans d'errance en orbite.",
-   "apercuLang": "fr",
+   "apercu": "Kosmos 482 (Russian: \"Космос 482\" meaning Cosmos 482) was an attempted Soviet Venus probe. Launched 31 March 1972, at 04:02:33 UTC, it failed to escape low Earth orbit.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 29,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 2
   },
   {
    "qid": "Q126599",
@@ -79689,15 +79689,15 @@
    ],
    "phrase": "Ce petit poisson nettoyeur, marqué d'une tache colorée, va se frotter contre le fond en la regardant dans un miroir, comme s'il se reconnaissait.",
    "phraseLang": "fr",
-   "apercu": "Labroides dimidiatus, communément appelé Labre nettoyeur commun ou Poisson nettoyeur, est une espèce de poissons des mers tropicales de l'Indo-Pacifique qui entretient des relations inter-espèces mutualistes particulières : les espèces marines plus grandes laissent ce poisson les débarrasser de leur",
-   "apercuLang": "fr",
+   "apercu": "The bluestreak cleaner wrasse (Labroides dimidiatus) is one of several species of cleaner wrasses found on coral reefs from Eastern Africa and the Red Sea to French Polynesia.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 28,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 0
   },
   {
    "qid": "Q654515",
@@ -80690,8 +80690,8 @@
    ],
    "phrase": "Ce mégapode entretient un tas de compost comme un incubateur, y plonge le bec pour en mesurer la température et ajoute ou retire du sable au degré près.",
    "phraseLang": "fr",
-   "apercu": "Le Léipoa ocellé (Leipoa ocellata) (en anglais : Malleefowl) est une espèce d'oiseau endémique de l'Australie vivant sur le sol, sensiblement de la taille d'un poulet domestique.",
-   "apercuLang": "fr",
+   "apercu": "The malleefowl (Leipoa ocellata) is a stocky ground-dwelling Australian bird about the size of a domestic chicken (to which it is distantly related). It is notable for the large nesting mounds constructed by the males and lack of parental care after the chicks hatch.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 35,
    "ajoute": "2026-09-03",
@@ -81211,15 +81211,15 @@
    ],
    "phrase": "Le scarabée jaune du pectoral de Toutânkhamon est taillé dans un verre né d'un impact cosmique en plein désert.",
    "phraseLang": "fr",
-   "apercu": "Le verre libyque est une sorte de verre naturel présent sur 6 500 km2 du désert Libyque.",
-   "apercuLang": "fr",
+   "apercu": "Libyan desert glass or Great Sand Sea glass is an impactite, made mostly of lechatelierite, found in areas in the eastern Sahara, in the deserts of eastern Libya and western Egypt.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 17,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 1
   },
   {
    "qid": "Q231376",
@@ -81413,8 +81413,8 @@
    ],
    "phrase": "Votre peau est parcourue de rayures invisibles, tracées par la migration des cellules de l'embryon, que certaines maladies font soudain apparaître.",
    "phraseLang": "fr",
-   "apercu": "Les lignes de Blaschko sont des motifs cutanés non aléatoires et normalement invisibles sur la peau et des phanères, mais qui peuvent, de manière très rare, devenir visibles chez l'être humain.",
-   "apercuLang": "fr",
+   "apercu": "Blaschko's lines, also called the lines of Blaschko, are lines of normal cell development in the skin. These lines are only visible in those with a mosaic skin condition or in chimeras where different cell lines contain different genes.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 18,
    "ajoute": "2026-09-03",
@@ -81935,15 +81935,15 @@
    ],
    "phrase": "Une formule sans aucune justification physique a désigné une planète manquante entre Mars et Jupiter — on y a trouvé les astéroïdes.",
    "phraseLang": "fr",
-   "apercu": "La loi de Titius-Bode ou Rang des planètes, souvent appelée loi de Bode, est une relation empirique entre les rayons des orbites des planètes du Système solaire, qui utilise une suite arithmético-géométrique de raison 2.",
-   "apercuLang": "fr",
+   "apercu": "The Titius–Bode law (sometimes termed simply Bode's law) is a formulaic prediction of spacing between planets in any given planetary system. The formula suggests that, extending outward, each planet should be approximately twice as far from the Sun as the one before.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 49,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 0
   },
   {
    "qid": "Q4677783",
@@ -82599,15 +82599,15 @@
    ],
    "phrase": "Le rover soviétique abandonné sur la Lune a été vendu aux enchères chez Sotheby's : quelqu'un possède légalement un véhicule posé là-haut.",
    "phraseLang": "fr",
-   "apercu": "Lunokhod 2 est le deuxième des deux rovers envoyés à la surface de la Lune par l'Union soviétique dans le cadre du programme Lunokhod. Le rover est lancé en 1973 au cours de la mission Luna 21.",
-   "apercuLang": "fr",
+   "apercu": "Lunokhod 2 (Russian: Луноход-2 (\"Moonwalker 2\"), also known as Аппарат 8ЕЛ № 204 (\"Device 8EL No. 204\")) was the second of two uncrewed lunar rovers that landed on the Moon by the Soviet Union as part of the Lunokhod programme.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 26,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 1
   },
   {
    "qid": "Q1996933",
@@ -82667,7 +82667,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q188965",
@@ -83391,7 +83391,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 4
   },
   {
    "qid": "Q133151703",
@@ -83511,7 +83511,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q203801",
@@ -83712,7 +83712,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q6773722",
@@ -83885,15 +83885,15 @@
    ],
    "phrase": "Cette araignée fabrique une boule collante au bout d'un fil et émet le parfum sexuel des papillons femelles pour attirer les mâles à portée de lasso.",
    "phraseLang": "fr",
-   "apercu": "Mastophora est un genre d'araignées aranéomorphes de la famille des Araneidae. Il est placé dans la sous-famille des Cyrtarachninae dans la tribu des Mastophorini, avec les genres Cladomelea et Acantharachne (Afrique), Ordgarius (Océanie).",
-   "apercuLang": "fr",
+   "apercu": "Mastophora, also known as bolas spiders, is a genus of orb-weaver spiders first described by E. L. Holmberg in 1876.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 12,
    "ajoute": "2026-09-03",
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q465072",
@@ -85301,7 +85301,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q21818623",
@@ -85494,8 +85494,8 @@
    ],
    "phrase": "Les enfants de ces nomades des mers voient net sous l'eau en contractant leur pupille, et n'importe quel enfant peut apprendre à le faire.",
    "phraseLang": "fr",
-   "apercu": "Les Moken de Birmanie (îles Mergui) et de Thaïlande (îles Surin) sont un peuple nomade maritime d'Asie du Sud-Est. Il ne faut pas les confondre avec les Moklen du littoral et des îles voisines, dont le mode de vie est semi-sédentaire.",
-   "apercuLang": "fr",
+   "apercu": "The Moken (also Mawken or Morgan; Burmese: ဆလုံ လူမျိုး; Thai: ชาวเล, romanized: chao le, lit. 'sea people') are an Austronesian people of the Mergui Archipelago, a group of approximately 800 islands claimed by both Myanmar and Thailand, and the Surin Islands.",
+   "apercuLang": "en",
    "potentiel": 6,
    "editions": 29,
    "ajoute": "2026-09-03",
@@ -85683,7 +85683,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1503358",
@@ -85724,7 +85724,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q1337859",
@@ -86389,7 +86389,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q2072138",
@@ -86732,7 +86732,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1058",
@@ -86872,7 +86872,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 5
   },
   {
    "qid": "Q305160",
@@ -87153,7 +87153,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q515229",
@@ -87642,7 +87642,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q149300",
@@ -87662,7 +87662,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q719524",
@@ -88368,7 +88368,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q29027021",
@@ -88932,7 +88932,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q89383",
@@ -89155,7 +89155,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q3361183",
@@ -89356,7 +89356,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 5
   },
   {
    "qid": "Q897194",
@@ -89396,7 +89396,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1142663",
@@ -89456,7 +89456,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q17638329",
@@ -89557,7 +89557,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q148752",
@@ -90363,7 +90363,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q1049487",
@@ -91266,7 +91266,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q57343",
@@ -92575,7 +92575,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 4
   },
   {
    "qid": "Q184253",
@@ -92858,7 +92858,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q24896809",
@@ -92878,7 +92878,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q7251064",
@@ -94003,7 +94003,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q1307214",
@@ -94805,7 +94805,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q737",
@@ -94925,7 +94925,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 5
   },
   {
    "qid": "Q27671737",
@@ -95288,7 +95288,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 4
   },
   {
    "qid": "Q216838",
@@ -96913,7 +96913,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q4990607",
@@ -99592,7 +99592,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 3
   },
   {
    "qid": "Q622901",
@@ -99612,7 +99612,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q1235785",
@@ -99712,7 +99712,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 3
   },
   {
    "qid": "Q12457",
@@ -100275,7 +100275,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 2
   },
   {
    "qid": "Q1523836",
@@ -101988,7 +101988,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q7831313",
@@ -102508,7 +102508,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 3
   },
   {
    "qid": "Q1481210",
@@ -102590,7 +102590,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q18657",
@@ -102630,7 +102630,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q194790",
@@ -102933,7 +102933,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q156081",
@@ -102953,7 +102953,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 3
+   "accord": 4
   },
   {
    "qid": "Q1021583",
@@ -103860,7 +103860,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q2622578",
@@ -104402,7 +104402,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q4267091",
@@ -104824,7 +104824,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 0
+   "accord": 1
   },
   {
    "qid": "Q113040463",
@@ -105673,7 +105673,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 2
   },
   {
    "qid": "Q8043726",
@@ -105733,7 +105733,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 4
+   "accord": 6
   },
   {
    "qid": "Q3068034",
