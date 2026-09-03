@@ -183,13 +183,36 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
   <div class="reglages" id="reglages" hidden>
     <h3>Se connecter à votre dépôt</h3>
     <p>
-      Il faut un jeton GitHub pour que cette page puisse enregistrer vos décisions
-      et lancer les actions. <b>Il ne quitte jamais votre navigateur</b> : il est rangé
-      dans le stockage local de cette page, sur cette machine.<br>
-      Créez-le sur <a id="lienJeton" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com → jeton à portée fine</a>,
-      limité à ce seul dépôt, avec les permissions <code>Contents: Read and write</code>
-      et <code>Actions: Read and write</code>. Donnez-lui une expiration courte : vous le
-      recréerez en trente secondes.
+      Le jeton sert à enregistrer vos décisions et à lancer les actions d’ici.
+      <b>Il ne quitte jamais votre navigateur</b> : il est rangé dans le stockage local
+      de cette page, sur cette machine. Ni moi ni personne ne le voit.
+      <b>Ne le collez jamais dans une conversation.</b>
+    </p>
+    <details style="margin:0 0 12px">
+      <summary style="cursor:pointer;font-size:13px;color:var(--accent)">Je n’en ai pas — le créer en une minute</summary>
+      <ol style="font-size:12.5px;color:var(--texte-2);line-height:1.75;padding-left:20px;margin:10px 0 0">
+        <li>Ouvrez <a id="lienJeton" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>
+            <span style="color:var(--texte-3)">(ou : votre photo → Settings → Developer settings, tout en bas → Personal access tokens → Fine-grained tokens)</span></li>
+        <li><b>Token name</b> : <code>curio-console</code></li>
+        <li><b>Expiration</b> : 90 jours. Vous le refabriquerez en une minute.</li>
+        <li><b>Repository access</b> : <i>Only select repositories</i> → choisissez votre dépôt <code>curio</code>.</li>
+        <li><b>Permissions</b> → <i>Repository permissions</i>, deux lignes à passer sur <i>Read and write</i> :
+            <br><code>Contents</code> &nbsp;et&nbsp; <code>Actions</code>. Laissez tout le reste sur <i>No access</i>.</li>
+        <li><b>Generate token</b>, puis copiez-le : GitHub ne le montre qu’une fois.</li>
+        <li>Collez-le ci-dessous, et <b>Enregistrer et vérifier</b>.</li>
+      </ol>
+      <p style="font-size:12.5px;color:var(--texte-2);margin:12px 0 0">
+        Ce jeton ne peut rien faire d’autre que lire et écrire dans ce dépôt-là, et
+        lancer ses actions. Il ne donne accès ni à vos autres dépôts, ni à votre compte.
+        Si vous le perdez ou le doutez, révoquez-le sur la même page : rien n’est cassé,
+        vous en refaites un.
+      </p>
+    </details>
+    <p style="font-size:12.5px;color:var(--texte-2);margin:0 0 12px">
+      <b>Vous pouvez aussi vous en passer.</b> Sans jeton, la console montre tout et garde
+      vos décisions dans ce navigateur ; le bouton <i>Télécharger decisions.json</i> vous
+      donne le fichier, que vous déposez sur GitHub par <i>Add file → Upload files</i>.
+      Le résultat est identique — ce sont ces fichiers que les outils lisent.
     </p>
     <div class="champs">
       <div><label for="rOwner">Compte GitHub</label><input id="rOwner" placeholder="votre-compte"></div>
@@ -675,7 +698,11 @@ function peindrePied(){
     S.fiches.forEach(function(f){ if(valDe(f)==='valide') val0++; });
     var fait = S.onglet==='cat' ? (nb(ret0)+' retenus') : (nb(val0)+' validées');
     r.innerHTML = '<b>'+fait+'</b>, gardés dans ce navigateur. '
-                + '<b>Connectez votre dépôt</b> pour les enregistrer et lancer les actions.';
+                + 'Enregistrez-les : par le jeton, ou en déposant le fichier vous-même.';
+    if(S.onglet==='cat')
+      a.appendChild(boutonFichier('decisions.json', S.decisions, '<b>2 · Écrire</b>'));
+    else
+      a.appendChild(boutonFichier('validations.json', S.validations, '<b>5 · Publier → valider</b>'));
     var b=el('button','btn p','Connecter le dépôt');
     b.addEventListener('click',function(){ $('#reglages').hidden=false; window.scrollTo(0,0); });
     a.appendChild(b); return;
@@ -704,6 +731,29 @@ function peindrePied(){
     c2.addEventListener('click', envoyerPublication);
     a.appendChild(c1); a.appendChild(c2);
   }
+}
+
+/* ══════════════ sans jeton : le fichier, à déposer soi-même ═══════════════
+   Le jeton n'est pas obligatoire. Sans lui, on télécharge le fichier et on le
+   dépose sur GitHub — Add file → Upload files — dans consignes/. Le résultat
+   est exactement le même : ce sont ces fichiers que les outils lisent, pas
+   la console. C'est deux clics de plus, et aucune raison d'être bloqué. */
+function telecharger(nom, texte){
+  var b = new Blob([texte], { type:'application/json;charset=utf-8' });
+  var u = URL.createObjectURL(b), a = document.createElement('a');
+  a.href = u; a.download = nom; document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(u); a.remove(); }, 1500);
+}
+function boutonFichier(nom, donnees, quoi){
+  var b = el('button','btn','Télécharger ' + nom);
+  b.title = 'Sans jeton : déposez ce fichier dans consignes/ sur GitHub';
+  b.addEventListener('click', function(){
+    telecharger(nom, JSON.stringify(donnees, null, 1));
+    dit('<b>' + nom + '</b> téléchargé. Déposez-le sur GitHub dans le dossier '
+      + '<code>consignes/</code> — <i>Add file → Upload files</i> — puis lancez '
+      + quoi + ' depuis l’onglet Actions.', 'ok');
+  });
+  return b;
 }
 
 /* ══════════════════════════ les quatre gestes qui écrivent ══════════════════════════ */

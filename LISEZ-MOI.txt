@@ -1,124 +1,101 @@
-CURIO 8.3 — REDDIT COMME SOURCE, ET LA MOISSON À LA DEMANDE
-============================================================
+CURIO 8.3.2 — POURQUOI VOS DEUX MOISSONS ONT ÉTÉ ANNULÉES
+==========================================================
 
-VOS DEUX QUESTIONS
+CE QUI S'EST PASSÉ
 ==================
 
-1. LA MOISSON PEUT-ELLE SE LANCER À LA MAIN ?  Oui, de trois façons.
+    Status    Cancelled
+    Duration  5h 50m 31s
 
-   · Bouton « MOISSONNER MAINTENANT » dans la barre haute de la console.
-     C'est le plus simple, et c'est nouveau.
-   · Actions → 1 · Moissonner → Run workflow, comme avant.
-   · Et de toute façon, chaque nuit à minuit, toute seule.
+Ce n'est pas un blocage. 5 h 50 min, c'est EXACTEMENT la limite de temps que
+j'avais mise sur l'action (350 minutes). GitHub l'a tuée en arrivant au bout.
 
-   Le bouton sert aux fois où vous venez d'ajouter des sujets phares ou de
-   brancher un subreddit et que vous ne voulez pas attendre.
-
-
-2. REDDIT À LA MAIN ? SÛREMENT PAS.
-
-   Vous avez raison, et j'avais mal cadré. consignes/ajouts.json est fait
-   pour le cas PONCTUEL — un article de presse, vos notes. Ce n'est pas
-   là que vivent les histoires Reddit.
-
-   Reddit est désormais UNE SOURCE, au même titre que « Le saviez-vous ? ».
-   Elle tourne dans la même moisson, chaque nuit, et alimente le même
-   catalogue maître.
+Et comme l'enregistrement se faisait à la fin, ces six heures n'ont rien
+laissé. Deux fois. C'est ma faute, et le remède est dans ce zip.
 
 
-COMMENT L'ACTIVER
-=================
+POURQUOI C'ÉTAIT SI LONG
+=========================
 
-    consignes/reddit.txt
+Wikipédia impose une cadence : 260 millisecondes entre deux appels, et
+jusqu'à trois secondes dès qu'elle nous freine. Or une moisson complète, ce
+sont des dizaines de milliers d'appels :
 
-Le fichier est livré VIDE : rien ne touche à Reddit tant que vous n'y
-listez pas de subreddit. Décommentez ce que vous voulez :
+  · les archives de « Le saviez-vous ? », français et anglais ;
+  · la résolution de vos 2 506 sujets phares, dont beaucoup passent par la
+    recherche — deux à quatre appels chacun ;
+  · l'identification puis la vérification de milliers de sujets.
 
-    tifu                     | histoire
-    UnresolvedMysteries      | mysteres
-    todayilearned            | sciences
-    LetsNotMeet              | mysteres
+Plusieurs heures, structurellement. Impossible à faire tenir dans une seule
+exécution.
 
-    votes: 2000
-    longueurMini: 1200
-    longueurMaxi: 9000
-    periode: year
-    parSub: 100
-
-C'est tout. À la moisson suivante, ils entrent au catalogue avec le badge
-REDDIT et suivent exactement le même chemin : vous décidez dans la console,
-vous écrivez une tranche, vous relisez, vous publiez.
+Et un amplificateur que je n'avais pas vu : quand un appel échouait, le code
+réessayait huit fois avec des pauses croissantes — quarante secondes pour un
+seul appel raté.
 
 
-CE QUI ENTRE, ET CE QUI N'ENTRE PAS
-====================================
+LE REMÈDE : UNE PASSE DURE 40 MINUTES, ET ELLE ENREGISTRE
+==========================================================
 
-N'entrent que les billets AUTOPORTANTS :
+Chaque moisson se donne maintenant un temps, s'y tient, et enregistre ce
+qu'elle a fait avant de s'arrêter. Le journal le dit en clair :
 
-  · du TEXTE, pas un lien ni une image — c'est ce texte que le rédacteur
-    lira, exactement comme il lirait un article de Wikipédia ;
-  · au-dessus de votre seuil de votes. C'est votre garde-fou : un billet
-    très voté a été jugé remarquable par des milliers de gens avant vous ;
-  · entre 1 200 et 9 000 caractères. En dessous il n'y a pas de quoi écrire,
-    au-dessus on ne saura pas résumer.
+    ⏱  Les 40 minutes de cette passe sont écoulées.
+       On enregistre ce qui est fait ; la prochaine reprendra la suite.
+      ⏱ 87 page(s) non lues cette fois — la prochaine passe les prendra.
 
-Sont écartés d'office : les supprimés, les NSFW, les spoilers, les épinglés,
-et tout ce que vous avez déjà — l'identifiant Reddit sert de clé, donc
-relancer n'ajoute jamais deux fois le même billet.
+CE N'EST PAS UNE ERREUR. Le catalogue est additif, le cache des réponses est
+conservé d'une exécution à l'autre, et la passe suivante repart exactement où
+celle-ci s'est arrêtée — plus vite, puisque ce qui est déjà lu ne coûte plus
+rien.
 
-Le markdown est nettoyé : entités HTML, liens aplatis, citations retirées
-(elles ne sont pas de l'auteur), titres enlevés.
-
-
-POUR UN QUOTA CONFORTABLE
-==========================
-
-Sans rien, la moisson utilise l'accès public de Reddit. Ça suffit pour
-quelques centaines de billets par nuit, mais Reddit finit par ralentir.
-
-  1. reddit.com/prefs/apps → Create another app… → type « script »
-  2. notez le client id et le secret
-  3. dépôt → Settings → Secrets and variables → Actions → New secret :
-         REDDIT_ID       le client id
-         REDDIT_SECRET   le secret
-
-La moisson les détecte seule et bascule sur le jeton. Le journal le dit :
-« jeton d'application obtenu ».
+Votre catalogue s'agrandit nuit après nuit. Trois nuits qui aboutissent
+valent mieux qu'une exécution de six heures qui n'aboutit jamais.
 
 
-UN UNIVERS DÉDIÉ, SI VOUS VOULEZ
-=================================
+SI VOUS NE VOULEZ PAS ATTENDRE
+===============================
 
-Une ligne dans consignes/univers.txt :
-
-    reddit | 16 | Histoires vraies | Ce que les gens racontent quand ils croient que personne ne les lit.
-
-puis « univers: reddit » dans reddit.txt. L'application découvre le nouvel
-univers toute seule, sans que rien de l'existant ne bouge.
-
-
-UNE PRÉCISION HONNÊTE
-======================
-
-Reddit et Wikipédia sont tous deux inaccessibles depuis l'environnement où
-ce code a été écrit. Le lecteur de configuration, le filtrage des billets et
-le nettoyage du markdown sont éprouvés sur des cas fabriqués — huit sur huit.
-Mais le PREMIER APPEL RÉEL se fera dans l'action, chez vous.
-
-Son journal dira tout :
-
-    ▸ Reddit — 4 subreddit(s), billets de plus de 2000 votes
-      · jeton d'application obtenu.
-      · r/tifu : 100 lus, +38 retenus
-      · r/UnresolvedMysteries : 100 lus, +51 retenus
-      → 89 billet(s) ajouté(s), 0 déjà présent(s), 111 écarté(s).
-
-Si quelque chose cloche, envoyez-moi ces lignes.
+  · Relancez la moisson plusieurs fois de suite. Chaque passe avance, et les
+    suivantes vont vite grâce au cache.
+  · Ou lancez-la à la main avec un temps plus long : Actions → 1 · Moissonner
+    → le champ « minutes » accepte 60, 90, ce que vous voulez. La limite du
+    job est maintenant à 75 minutes, montez-la si vous dépassez.
 
 
-INSTALLATION
-============
+CE QUI A CHANGÉ DANS L'ACTION
+==============================
 
-Add file → Upload files, glissez tout le contenu de ce zip.
-Rappel : supprimez curio.yml, 1-collecter.yml, 3-estimer.yml, 4-ecrire.yml
-s'ils traînent encore.
+  timeout-minutes : 350 → 75      elle échoue vite au lieu de brûler six heures
+  minutes         : nouveau champ, 40 par défaut
+  concurrency     : une seule moisson à la fois. Deux exécutions simultanées
+                    pouvaient se voler le catalogue en s'enregistrant l'une
+                    après l'autre.
+
+
+VÉRIFIÉ
+=======
+
+Sur une Wikipédia simulée de 800 pages :
+
+  budget 0,5 min → passe terminée en 0,5 min, 114 pages lues,
+                   « 87 pages non lues », fichiers écrits
+  passe 2        → 201 pages FR terminées, l'anglais commencé
+  passe 3        → 143 pages EN
+
+Chacune dans son budget, chacune reprenant la précédente.
+
+
+CE QUE VOUS FAITES MAINTENANT
+==============================
+
+1. Importez ce zip (Add file → Upload files).
+2. Actions → 1 · Moissonner → Run workflow.
+   Elle durera 40 minutes et se terminera EN VERT.
+3. Regardez la fin du journal : elle vous dira ce qu'elle a fait et ce qui
+   reste. Relancez si vous voulez avancer plus vite.
+4. Ouvrez console.html : le catalogue commence à se remplir.
+
+Envoyez-moi la fin du journal de cette première passe — les lignes qui
+commencent par ✓, ⏱ et →. J'y verrai si les 40 minutes sont bien calibrées
+pour votre dépôt.

@@ -180,6 +180,39 @@ let calls = 0, waited = 0;
    On sérialise tous les appels avec un intervalle minimum, ajusté à la hausse
    dès qu'un 429 apparaît, et redescendu doucement quand tout va bien. */
 let interval = parseInt(opt('intervalle', '260'), 10) || 260;   // ms entre deux appels
+
+/* ═══════════════ LE BUDGET DE TEMPS ═══════════════════════════════════════
+   Wikipédia impose une cadence — 260 ms entre deux appels, et jusqu'à trois
+   secondes quand elle nous freine. Une moisson complète, c'est des dizaines
+   de milliers d'appels : elle NE PEUT PAS tenir dans une exécution, et il ne
+   faut surtout pas la laisser essayer. Une exécution de six heures tuée par
+   la limite de GitHub, c'est six heures perdues et rien d'enregistré.
+
+   On se donne donc un temps, et on s'y tient. Ce qui n'a pas été fait sera
+   fait à la prochaine passe : le catalogue maître est ADDITIF, et la nuit
+   suivante reprend là où on s'est arrêté. Trois nuits valent mieux qu'une
+   exécution qui n'aboutit jamais.
+
+   Le cache des réponses, lui, est conservé d'une exécution à l'autre : la
+   deuxième nuit ne refait pas le travail de la première, elle le prolonge. */
+const MINUTES = parseFloat(opt('minutes', '40')) || 40;
+const DEPART  = Date.now();
+const ECHEANCE = DEPART + MINUTES * 60000;
+let budgetAnnonce = false;
+
+function tempsRestant(){ return ECHEANCE - Date.now(); }
+function tempsEcoule(){
+  if (Date.now() < ECHEANCE) return false;
+  if (!budgetAnnonce){
+    budgetAnnonce = true;
+    console.log(`\n⏱  Les ${MINUTES} minutes de cette passe sont écoulées.`);
+    console.log(`   On enregistre ce qui est fait ; la prochaine reprendra la suite.`);
+    console.log(`   Ce n'est pas une erreur : c'est ainsi qu'une grosse moisson se fait,`);
+    console.log(`   en plusieurs nuits, sans jamais rien perdre.`);
+  }
+  return true;
+}
+function minutesFaites(){ return ((Date.now() - DEPART) / 60000).toFixed(1); }
 let lastCall = 0;
 async function gate(){
   const wait = Math.max(0, lastCall + interval - Date.now());
@@ -190,6 +223,11 @@ async function gate(){
 async function api(url, tries = 8){
   let last = 'inconnue';
   for (let i = 0; i < tries; i++){
+    /* Huit tentatives espacées, c'est quarante secondes pour UN appel qui
+       échoue. Multiplié par quelques centaines d'appels malheureux, c'est là
+       que passaient les heures. Quand le budget est épuisé, on renonce tout
+       de suite : l'appelant enregistrera ce qu'il a. */
+    if (i > 0 && tempsEcoule()) break;
     await gate();
     try{
       const r = await fetch(url, { headers:{ 'User-Agent': UA, 'Accept':'application/json' } });
@@ -606,7 +644,9 @@ async function moissonInsolite(lang, quoi){
   const brutes = [];          // entrées non tranchées : plusieurs candidats chacune
   const out = [];
 
+  let coupee = false;
   while (file.length){
+    if (tempsEcoule()){ coupee = true; break; }
     const page = file.shift();
     if (lues.has(page)) continue;
     lues.add(page);
@@ -680,6 +720,7 @@ async function moissonInsolite(lang, quoi){
   } else {
     const avecPhrase = out.filter(e => e.pourquoi).length;
     console.log(`  ✓ ${lang} : ${out.length} sujets « ${etiquette} » sur ${lues.size} page(s), dont ${avecPhrase} avec la phrase du contributeur.`);
+    if (coupee) console.log(`  ⏱ ${file.length} page(s) non lues cette fois — la prochaine passe les prendra.`);
   }
   return out;
 }
@@ -703,6 +744,7 @@ async function toQids(titles, lang = 'en'){
 async function fromWikidata(qids){
   const rows = [];
   for (const batch of chunk(qids, 40)){
+    if (tempsEcoule()) break;
     const j = await cached('wd_' + batch[0] + '_' + batch.length, () => api(
       'https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=sitelinks&ids=' + batch.join('%7C')));
     const ents = j?.entities || {};
@@ -726,6 +768,7 @@ async function fromWikidata(qids){
 async function verify(lang, titles, souple, intros){
   const keep = new Set();
   for (const batch of chunk(titles, 20)){
+    if (tempsEcoule()) break;
     let j;
     try{
       j = await cached('v_' + lang + '_' + batch[0] + '_' + batch.length, () => api(
@@ -768,6 +811,8 @@ async function pageviews(lang, title){
 async function qidsParTitre(lang, titres){
   const out = new Map();
   for (const batch of chunk(titres, 25)){
+    // le budget prime : ce qui n'est pas identifié ce soir le sera demain
+    if (tempsEcoule()) break;
     let j;
     try{
       j = await cached('ppq_' + lang + '_' + batch[0] + '_' + batch.length, () => api(
@@ -917,9 +962,13 @@ async function passePhares(ctx){
   const parRecherche = new Set();          // ces titres-là seront re-vérifiés
   const aChercher = restants();
   if (aChercher.length) console.log(`  · ${aChercher.length} titre(s) sans article exact : recherche en cours…`);
-  let vus = 0;
+  let vus = 0, reportes = 0;
   for (const t of aChercher){
-    if (++vus % 50 === 0) console.log(`    … ${vus}/${aChercher.length}`);
+    /* Chaque recherche coûte deux à quatre appels. Sur mille cinq cents
+       titres approximatifs, c'est une heure. On en fait ce qu'on peut, le
+       reste attend demain — et le cache fera que demain ira vite. */
+    if (tempsEcoule() || tempsRestant() < 5 * 60000){ reportes = aChercher.length - vus; break; }
+    if (++vus % 50 === 0) console.log(`    … ${vus}/${aChercher.length}  (${minutesFaites()} min)`);
     for (const lang of ['fr', 'en']){
       const trouve = await chercherTitre(lang, t);
       if (!trouve || trouve.toLowerCase() === String(t).toLowerCase()) continue;
@@ -944,6 +993,7 @@ async function passePhares(ctx){
   const manquants = restants();
   for (const t of manquants) console.log(`  ! « ${t} » : introuvable, même par recherche. Corrigez la ligne.`);
   console.log(`  · ${exacts} titre(s) exact(s), ${repeches} rattrapé(s) par la recherche, ${refuses} refusé(s) comme hors sujet, ${manquants.length} introuvable(s).`);
+  if (reportes) console.log(`  ⏱ ${reportes} titre(s) reportés à la prochaine passe, faute de temps.`);
   if (!trouves.length) return 0;
 
   const rows = await fromWikidata([...new Set(trouves.map(t => t.qid))]);
@@ -1620,6 +1670,7 @@ async function passeReddit(deja){
 
   let ajoutes = 0, vus = 0, ecartes = 0;
   for (const sub of reg.subs){
+    if (tempsEcoule()){ console.log(`  ⏱ subreddits suivants reportés.`); break; }
     const billets = await billetsDe(sub.nom, reg, jeton);
     let n = 0;
     for (const b of billets){
@@ -1725,21 +1776,32 @@ async function construireMaitre(){
   let ajoutes = 0, refusDef = 0, refusFaible = 0, refusArticle = 0, refusExclu = 0;
   if (nouveaux.length){
     console.log('\n▸ vérification des articles');
-    const qids = nouveaux.map(s => s.qid);
+    /* Vérifier coûte un appel par vingt articles, dans chaque langue. Sur
+       vingt mille nouveaux sujets, c'est deux mille appels — dix minutes au
+       mieux, une heure si Wikipédia nous freine. On en prend autant que le
+       temps restant permet, et le reste attend la prochaine passe : ils sont
+       déjà identifiés, ils ne se perdront pas. */
+    const parPasse = Math.max(200, Math.round(tempsRestant() / 1000 * 4));
+    const aVerifier = nouveaux.slice(0, parPasse);
+    if (aVerifier.length < nouveaux.length)
+      console.log(`  · ${aVerifier.length} sur ${nouveaux.length} cette fois — le temps restant ne permet pas plus.`);
+
+    const qids = aVerifier.map(s => s.qid);
     const lignes = [];
     for (let i = 0; i < qids.length; i += 400){
+      if (tempsEcoule()) break;
       const lot = await fromWikidata(qids.slice(i, i + 400));
       lignes.push(...lot);
-      console.log(`  · ${Math.min(i + 400, qids.length)}/${qids.length}`);
+      console.log(`  · Wikidata ${Math.min(i + 400, qids.length)}/${qids.length}  (${minutesFaites()} min)`);
     }
     const parQid = new Map(lignes.map(r => [r.qid, r]));
 
     const introFr = new Map(), introEn = new Map();
     const frKeep = await verify('fr', lignes.map(r => r.fr).filter(Boolean), true, introFr);
     const enKeep = await verify('en', lignes.map(r => r.en).filter(Boolean), true, introEn);
-    console.log(`  · ${frKeep.size} article(s) FR et ${enKeep.size} EN utilisables.`);
+    console.log(`  · ${frKeep.size} article(s) FR et ${enKeep.size} EN utilisables.  (${minutesFaites()} min)`);
 
-    for (const s of nouveaux){
+    for (const s of aVerifier){
       const r = parQid.get(s.qid);
       if (!r){ refusArticle++; continue; }
       const okFr = r.fr && frKeep.has(r.fr), okEn = r.en && enKeep.has(r.en);
@@ -1795,7 +1857,9 @@ async function construireMaitre(){
       });
       ajoutes++;
     }
+    const reste = nouveaux.length - aVerifier.length;
     console.log(`\n  → ${ajoutes} sujet(s) ajouté(s) au catalogue maître.`);
+    if (reste > 0) console.log(`     ${reste} sujet(s) identifiés mais pas encore vérifiés : la prochaine passe s'en charge.`);
     console.log(`     ${refusArticle} sans article utilisable, ${refusDef} définitions écartées, `
               + `${refusFaible} sans signal d'anecdote, ${refusExclu} exclus par vos soins.`);
   }
@@ -1849,7 +1913,14 @@ async function construireMaitre(){
   console.log(`║  ` + [10,9,8,7,6,5,4,3,2,1].map(n => n + ':' + (parPot[n] || 0)).join('  '));
   console.log(`╚═══════════════════════════════════════════════════════════`);
   console.log(`\nÉcrit : catalogue-maitre.json, catalogue-maitre.csv, catalog.json`);
-  console.log(`Relancez cette action quand vous voulez : elle n'ajoute que le nouveau.`);
+  console.log(`Passe terminée en ${minutesFaites()} minute(s) sur ${MINUTES} allouées.`);
+  if (budgetAnnonce){
+    console.log(`\n⏱ CETTE PASSE N'A PAS TOUT FAIT, ET C'EST NORMAL.`);
+    console.log(`  Le catalogue s'agrandit à chaque nuit. Rien n'est perdu, rien n'est`);
+    console.log(`  à refaire : ce qui est ci-dessus est enregistré, et la passe suivante`);
+    console.log(`  reprend exactement là où celle-ci s'arrête — plus vite, grâce au cache.`);
+    console.log(`  Relancez à la main si vous ne voulez pas attendre minuit.`);
+  }
 }
 
 /* Le catalogue maître est la vérité ; catalog.json n'en est que la vue dont

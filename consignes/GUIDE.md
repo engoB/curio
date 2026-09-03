@@ -80,6 +80,34 @@ tous sont orthographiés comme Wikipédia les écrit, aucun n'y figure deux fois
 
 ---
 
+### Elle ne fait pas tout d'un coup, et c'est voulu
+
+Wikipédia impose une cadence : 260 ms entre deux appels, davantage quand elle
+nous freine. Une moisson complète représente des dizaines de milliers
+d'appels — plusieurs heures. Une exécution qui tente tout se fait tuer par la
+limite de GitHub, et **on perd tout**, parce que l'enregistrement se fait à la
+fin.
+
+Chaque passe se donne donc **40 minutes**, enregistre ce qu'elle a fait, et
+s'arrête. Le journal le dit :
+
+```
+⏱  Les 40 minutes de cette passe sont écoulées.
+   On enregistre ce qui est fait ; la prochaine reprendra la suite.
+  ⏱ 87 page(s) non lues cette fois — la prochaine passe les prendra.
+```
+
+Ce n'est pas une erreur. Le catalogue est additif, le cache des réponses est
+conservé, et la passe suivante repart d'où celle-ci s'est arrêtée — plus vite,
+puisque ce qui est déjà lu ne coûte plus rien. Le catalogue s'agrandit nuit
+après nuit.
+
+Si vous ne voulez pas attendre : relancez-la plusieurs fois de suite, chaque
+passe avance. Ou donnez-lui plus de temps en lançant l'action à la main avec
+`minutes = 60`.
+
+---
+
 ### Reddit, quand vous voudrez
 
 `consignes/reddit.txt` — vide par défaut, rien ne se passe tant que vous ne

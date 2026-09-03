@@ -1,4 +1,64 @@
-# Curio 8.3.0 — ce qui a changé depuis v6
+# Curio 8.3.2 — ce qui a changé depuis v6
+
+## 8.3.2 — la moisson ne peut plus s'éterniser
+
+**Le symptôme.** Deux exécutions de `1 · Moissonner` annulées après
+5 h 50 min 31 s — c'est-à-dire exactement le `timeout-minutes: 350` du job.
+Rien n'était bloqué : la passe n'a simplement jamais eu le droit de finir, et
+comme l'enregistrement se fait à la fin, six heures ont été perdues deux fois.
+
+**La cause.** Wikipédia impose une cadence : 260 ms entre deux appels, et
+jusqu'à trois secondes dès qu'elle nous freine. Une moisson complète — les
+archives de « Le saviez-vous ? » côté FR et EN, la résolution de
+2 506 sujets phares dont beaucoup passent par la recherche, puis
+l'identification et la vérification de milliers de sujets — représente des
+dizaines de milliers d'appels. Plusieurs heures, structurellement. À quoi
+s'ajoutait un amplificateur : `api()` réessayait huit fois avec des pauses
+croissantes, soit **quarante secondes pour un seul appel en échec**.
+
+**Le remède : un budget de temps, et on s'y tient.** `--minutes` (40 par
+défaut) pose une échéance. `tempsEcoule()` est consulté dans toutes les
+boucles — file des pages à lire, recherche des titres approximatifs,
+`qidsParTitre`, `fromWikidata`, `verify`, Reddit — et dans `api()` avant
+chaque nouvelle tentative. Quand l'échéance tombe, la passe **s'arrête
+proprement et enregistre**.
+
+Ce n'est pas une dégradation, c'est le bon modèle : le catalogue maître est
+additif, le cache des réponses est conservé d'une exécution à l'autre, et la
+passe suivante reprend exactement où celle-ci s'est arrêtée. Le journal le dit
+en clair plutôt que de laisser croire à une panne.
+
+Éprouvé sur une Wikipédia simulée de 800 pages avec 120 ms de latence :
+- budget 0,5 min → passe terminée en 0,5 min, 114 pages lues, « 87 pages non
+  lues cette fois », fichiers écrits ;
+- passes 2 et 3 : 201 pages FR puis 143 EN, chacune dans son budget. Les pages
+  déjà lues ne coûtent rien, le cache faisant son office.
+
+Sans les gardes dans `qidsParTitre` / `verify` / `fromWikidata`, la même passe
+débordait à 1,3 min pour 0,5 alloué : les phases d'après-moisson finissaient
+leurs lots. Elles sont bornées elles aussi.
+
+**Côté action** : `timeout-minutes` passe de 350 à **75**, une entrée
+`minutes` permet de choisir la durée d'une passe lancée à la main, et un
+`concurrency: curio-moisson` empêche deux moissons de se marcher dessus et de
+se voler le catalogue en s'enregistrant l'une après l'autre.
+
+## 8.3.1 — le jeton n'est plus obligatoire
+
+Sans jeton, la console ne bloque plus : le bouton **Télécharger
+decisions.json** (ou **validations.json**) donne le fichier, qu'on dépose sur
+GitHub par *Add file → Upload files* dans `consignes/`. Le résultat est
+identique — ce sont ces fichiers que les outils lisent, pas la console. Deux
+clics de plus, et aucune raison d'être empêché.
+
+Le panneau de réglages porte maintenant le mode d'emploi complet, en sept
+étapes dépliables : où aller, quel nom, quelle expiration, quel dépôt, et les
+**deux seules permissions** à passer sur *Read and write* — `Contents` et
+`Actions`, tout le reste sur *No access*. Avec ce qu'un tel jeton peut et ne
+peut pas faire, et comment le révoquer.
+
+Et la consigne qui manquait, en gras : **ne jamais coller un jeton dans une
+conversation.**
 
 ## 8.3.0 — Reddit comme source, et la moisson à la demande
 

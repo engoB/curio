@@ -18,20 +18,23 @@
 #  ecrit, publie, retire — et seuls les nouveaux sont ajoutes. Le journal dit
 #  combien, et pourquoi les autres ont ete refuses.
 #
-#  Gratuit. Aucun appel paye. Comptez une demi-heure la premiere fois,
-#  quelques minutes ensuite.
+#  Gratuit. Aucun appel paye.
 #
-#  ELLE TOURNE TOUTE SEULE chaque nuit. Vous n avez a la lancer a la
-#  main que si vous venez de modifier consignes/sujets-phares.txt et que vous
-#  ne voulez pas attendre dimanche.
+#  ELLE NE FAIT PAS TOUT EN UNE FOIS, ET C EST VOULU. Wikipedia impose une
+#  cadence : une moisson complete represente des dizaines de milliers
+#  d appels, soit plusieurs heures. On se donne 40 minutes par passe, on
+#  enregistre ce qui est fait, et la nuit suivante reprend la suite — plus
+#  vite, grace au cache. Le catalogue s agrandit nuit apres nuit et rien
+#  n est jamais perdu.
+#
+#  ELLE TOURNE TOUTE SEULE chaque nuit a minuit. Lancez-la a la main si vous
+#  venez de modifier consignes/sujets-phares.txt ou consignes/reddit.txt et
+#  que vous ne voulez pas attendre.
 # ═══════════════════════════════════════════════════════════════════════════
 name: 1 · Moissonner
 
-# CHAQUE NUIT A MINUIT UTC, toute seule. Vous n avez rien a declencher : la
-# liste se tient a jour, et le journal dit ce qui est arrive de neuf. La
-# premiere execution dure une demi-heure ; les suivantes quelques minutes,
-# le cache faisant le reste.
-# Pour changer la cadence, modifiez la ligne « cron » ci-dessous :
+# Chaque passe dure au plus 40 minutes et enregistre ce qu elle a fait ; la
+# suivante reprend la suite. Pour changer la cadence, la ligne « cron » :
 #     0 0 * * *     chaque nuit a minuit        <- par defaut
 #     0 0 * * 0     tous les dimanches
 #     0 0 1 * *     le 1er de chaque mois
@@ -39,6 +42,16 @@ on:
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
+    inputs:
+      minutes:
+        description: "Duree max de la passe, en minutes (le reste attendra la suivante)"
+        default: "40"
+
+# Une seule moisson a la fois. Sans cela, deux executions peuvent se marcher
+# dessus et se voler le catalogue en s enregistrant l une apres l autre.
+concurrency:
+  group: curio-moisson
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -46,7 +59,7 @@ permissions:
 jobs:
   curio:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 75
     env:
       REDDIT_ID: ${{ secrets.REDDIT_ID }}
       REDDIT_SECRET: ${{ secrets.REDDIT_SECRET }}
@@ -75,7 +88,8 @@ jobs:
       - name: Moissonner
         run: |
           set -o pipefail
-          node tools/build-catalog.mjs --maitre 2>&1 | tee curio.log
+          M="${{ github.event.inputs.minutes }}"; [ -z "$M" ] && M=40
+          node tools/build-catalog.mjs --maitre --minutes "$M" 2>&1 | tee curio.log
 
       - name: Compte rendu
         if: always()

@@ -57,8 +57,15 @@ Elle parle à GitHub avec un jeton que vous créez et qui **ne quitte jamais
 votre navigateur**. Réglages → un jeton à portée fine, limité à ce dépôt,
 permissions `Contents: Read and write` et `Actions: Read and write`.
 
-Sans jeton, elle marche quand même : elle montre tout, garde vos décisions
-dans le navigateur, et vous demande de vous connecter au moment d'enregistrer.
+**Vous pouvez vous en passer.** Sans jeton, la console montre tout et garde
+vos décisions dans le navigateur ; le bouton *Télécharger decisions.json* vous
+donne le fichier, que vous déposez sur GitHub par *Add file → Upload files*
+dans `consignes/`. Le résultat est identique — ce sont ces fichiers que les
+outils lisent. Vous lancez alors les actions depuis l'onglet Actions.
+
+**Ne collez jamais un jeton dans une conversation**, avec moi ou avec qui que
+ce soit. S'il vous échappe, révoquez-le : rien n'est cassé, vous en refaites
+un en une minute.
 
 ---
 
