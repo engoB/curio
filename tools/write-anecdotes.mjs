@@ -89,6 +89,10 @@ let PLAFOND = parseFloat(opt('plafond', '0')) || 0;
    titre et sa phrase à raconter tiennent dans 1 800 jetons ; on monte
    automatiquement si le modèle se fait couper. */
 let MAX_SORTIE = parseInt(opt('max-sortie', '1800'), 10) || 1800;
+/* Le raisonnement interne du modèle est facturé en sortie. Pour de la
+   rédaction sous consigne stricte, il ne sert à rien : on le coupe.
+   --avec-pensee le rétablit. */
+let SANS_PENSEE = !opt('avec-pensee', false);
 /* Les langues de CETTE tranche. « fr » seul écrit le français maintenant et
    laisse l'anglais pour plus tard, sans rien perdre : le sujet reste
    « à écrire » tant que toutes ses langues ne sont pas faites, et une
@@ -310,6 +314,7 @@ let tokEcrit = 0, tokRelu = 0;
 /* Combien de fois on a redemandé un texte — chaque reprise est un appel
    facturé. C'est la première explication d'une facture plus lourde que prévu. */
 let reprises = 0;
+let tokPensee = 0;                  // jetons de raisonnement, facturés en sortie
 /* La mise en cache est active par défaut ; --sans-cache la coupe, et l'API
    peut la refuser d'elle-même — on continue alors sans. */
 let CACHE = !opt('sans-cache', false);
@@ -555,9 +560,23 @@ async function ask(lang, title, text, pourquoi, langueFiche){
         /* 1 800 jetons : un texte de 3 500 signes en fait environ 1 100.
            L'ancien plafond de 2 400 laissait une réponse bavarde coûter le
            double sans rien apporter. */
+        /* ── PAS DE RAISONNEMENT ─────────────────────────────────────────
+           Opus 5 réfléchit avant de répondre, et ce raisonnement est FACTURÉ
+           en jetons de sortie — à 25 $ le million. Sur une tranche réelle il
+           représentait les deux tiers de la facture (2 750 jetons de sortie
+           par appel au lieu de 1 100), et il débordait du plafond, coupant
+           la réponse en plein milieu : « arrêt max_tokens, blocs
+           thinking+text ».
+
+           Écrire une anecdote de 3 000 signes à partir d'une fiche de faits
+           ne demande pas de raisonnement caché : la consigne dit exactement
+           quoi faire. On le désactive donc explicitement. Si l'API refuse ce
+           réglage, on s'en passe et on élargit le plafond pour ne pas être
+           coupé — mieux vaut payer un peu plus que jeter la réponse. */
         const corps = { model: MODEL, max_tokens: MAX_SORTIE,
           system: CACHE ? [{ type:'text', text: system, cache_control:{ type:'ephemeral' } }] : system,
           messages:[{ role:'user', content: user }] };
+        if (SANS_PENSEE) corps.thinking = { type: 'disabled' };
         res = await fetch('https://api.anthropic.com/v1/messages', {
           method:'POST',
           headers:{ 'Content-Type':'application/json', 'x-api-key': KEY, 'anthropic-version':'2023-06-01' },
@@ -568,6 +587,13 @@ async function ask(lang, title, text, pourquoi, langueFiche){
         /* Si l'API refuse la mise en cache — compte trop ancien, modèle qui
            ne la gère pas — on renonce au cache et on continue : c'est une
            économie, pas une dépendance. */
+        if (j.error && SANS_PENSEE && /thinking/i.test(String(j.error.message || ''))){
+          SANS_PENSEE = false;
+          MAX_SORTIE = Math.max(MAX_SORTIE, 4000);
+          console.log(`  · ce modèle n'accepte pas « thinking: disabled » : on le laisse `
+                    + `réfléchir,\n    et on porte le plafond à ${MAX_SORTIE} jetons pour ne pas être coupé.`);
+          continue;
+        }
         if (j.error && CACHE && /cache/i.test(String(j.error.message || ''))){
           CACHE = false;
           console.log('  · mise en cache refusée par l’API : on continue sans elle.');
@@ -578,6 +604,7 @@ async function ask(lang, title, text, pourquoi, langueFiche){
         arret = j.stop_reason || '';
         blocs = (j.content || []).map(c => c.type).join('+');
         const u = j.usage || {};
+        tokPensee += (u.output_tokens_details && u.output_tokens_details.thinking_tokens) || 0;
         tokIn  += (u.input_tokens || 0);
         tokOut += (u.output_tokens || 0);
         tokEcrit += (u.cache_creation_input_tokens || 0);
@@ -606,14 +633,17 @@ async function ask(lang, title, text, pourquoi, langueFiche){
 
       // Contrôle de reprise : si le texte partage de longues suites de mots
       // avec l'article, ce n'est pas une écriture, c'est une copie. On refuse.
+      /* La fiche de faits conserve l'ordre des mots de l'article : quelques
+         suites communes sont donc inévitables, et n'ont rien d'une copie. Le
+         seuil était à trois, il passe à cinq, et on ne réécrit qu'UNE fois —
+         chaque réécriture est un appel payé, et deux coûtaient plus cher
+         qu'elles ne rapportaient. */
       const rec = recouvrement(produit, text, 8);
-      if (rec.communs > 2){
-        /* Deux réécritures au plus : chacune est un appel PAYÉ. Au-delà, on
-           écarte le sujet plutôt que de payer une quatrième fois. */
-        if (i < 2){
+      if (rec.communs > 5){
+        if (i < 1){
           reprises++;
-          console.log(`  · reprise trop proche (${rec.communs} passages, ${rec.max} mots) — on réécrit `
-                    + `(tentative ${i + 2}/3, appel payé)`);
+          console.log(`  · reprise trop proche (${rec.communs} passages, ${rec.max} mots) — `
+                    + `on réécrit une fois (appel payé)`);
           await sleep(600);
           continue;
         }
@@ -876,6 +906,9 @@ async function ecrireTranche(retenus, maitre){
     console.log(`║  ${(tokIn/1e6).toFixed(3)} M jetons en entrée · ${(tokOut/1e6).toFixed(3)} M en sortie`);
     if (tokRelu || tokEcrit)
       console.log(`║  cache : ${(tokEcrit/1e6).toFixed(3)} M mémorisés, ${(tokRelu/1e6).toFixed(3)} M relus à 1/10 du prix`);
+    if (tokPensee)
+      console.log(`║  dont ${(tokPensee/1e6).toFixed(3)} M de raisonnement interne `
+                + `(${Math.round(tokPensee / Math.max(1, tokOut) * 100)} % de la sortie, facturé plein tarif)`);
     else if (CACHE)
       console.log(`║  cache : aucun jeton relu — la consigne est peut-être trop courte`
                 + `\n║  pour être mise en cache, ou les appels trop espacés.`);

@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Curio — console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,450;9..144,600&display=swap">
 <!--
   ═══════════════════════════════════════════════════════════════════════════
   LA CONSOLE
@@ -154,12 +157,70 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 /* ---------- relecture : la fiche entière ---------- */
 .fiche{background:var(--ink-2);border:1px solid var(--line);border-radius:15px;padding:18px 22px;margin-bottom:10px}
 .fiche.valide{border-color:var(--vert)}
-.fiche h2{font-size:21px;margin:0 0 3px;letter-spacing:-.01em;line-height:1.25}
+.fiche h2{font-family:Fraunces,Georgia,serif;font-weight:450;font-variation-settings:"SOFT" 26,"WONK" 1;
+  font-size:25px;margin:0 0 3px;letter-spacing:-.02em;line-height:1.18;text-wrap:balance}
 .fiche .art{font-size:12.5px;color:var(--texte-3);margin:0 0 12px}
 .fiche .art a{color:var(--texte-3)}
-.corps{font-size:15px;line-height:1.68;color:var(--texte)}
-.corps p{margin:0 0 13px}
-.corps strong{color:var(--accent);font-weight:600}
+.corps{font-size:15.5px;line-height:1.72;color:var(--texte);max-width:64ch}
+.corps p{margin:0 0 15px;text-wrap:pretty}
+/* LA MISE EN FORME EXACTE DE L'APPLICATION : l'accroche en gros, dans la
+   serif du produit, avec son filet ; le gras surligné. La relecture doit
+   montrer ce que le lecteur verra, pas un texte brut. */
+.corps p:first-child{font-family:Fraunces,Georgia,serif;font-weight:450;
+  font-variation-settings:"SOFT" 26,"WONK" 1;
+  font-size:21px;line-height:1.36;letter-spacing:-.012em;color:#fff;
+  margin:0 0 17px;padding:0 0 0 14px;border-left:2px solid var(--accent);text-wrap:balance}
+.corps p:first-child strong{color:inherit;box-shadow:none;font-weight:600}
+.corps strong{color:var(--texte);font-weight:600;box-shadow:inset 0 -.42em 0 var(--accent-doux)}
+.corps em{font-style:italic;color:var(--texte-2)}
+/* ══════════════ L'APERÇU LECTEUR ══════════════
+   La relecture sert à juger le texte ; l'aperçu montre la CARTE, telle que
+   le lecteur la verra dans l'application — même typographie, même image,
+   même bloc « à raconter ». Sans rien publier. */
+.apercu{position:fixed;inset:0;z-index:60;background:rgba(2,6,18,.86);
+  display:flex;align-items:center;justify-content:center;padding:22px;overflow:auto}
+.apercu .cadre{width:min(560px,100%);max-height:calc(100vh - 44px);display:flex;flex-direction:column;
+  background:#050E24;border:1px solid var(--line-fort);
+  border-radius:22px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.6);position:relative}
+.apercu .barreApp{display:flex;align-items:center;gap:10px;padding:12px 16px;
+  border-bottom:1px solid rgba(150,190,255,.15);background:rgba(5,14,36,.75)}
+.apercu .marque{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:17px;color:#EAF1FF}
+.apercu .fermer{margin-left:auto;font:inherit;font-size:12px;font-weight:600;cursor:pointer;
+  background:none;border:1px solid rgba(150,190,255,.30);color:#9FB4DA;border-radius:9px;padding:5px 11px}
+.apercu .fermer:hover{color:#EAF1FF;border-color:#3FA9FF}
+.apercu .carte{position:relative;min-height:420px;flex:1 1 auto;min-height:0;display:flex;overflow:hidden}
+.apercu .fond{position:absolute;inset:0;background-size:cover;background-position:center}
+.apercu .voile{position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(5,14,36,.30) 0%,rgba(5,14,36,.72) 44%,rgba(5,14,36,.95) 100%)}
+.apercu .dedans{position:relative;z-index:2;width:100%;padding:24px 26px;min-height:0;
+  display:flex;flex-direction:column;justify-content:flex-end;color:#EAF1FF}
+.apercu .sourcil{display:flex;align-items:center;gap:9px;margin:0 0 13px;font-size:10px;
+  font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#9FB4DA}
+.apercu .sourcil i{width:5px;height:5px;border-radius:50%;background:#3FA9FF}
+.apercu h2{font-family:Fraunces,Georgia,serif;font-weight:450;font-variation-settings:"SOFT" 26,"WONK" 1;
+  font-size:32px;line-height:1.08;letter-spacing:-.025em;margin:0 0 20px;text-wrap:balance;color:#EAF1FF}
+.apercu .texte{max-width:60ch;flex:0 1 auto;min-height:0;max-height:min(48vh,460px);
+  overflow-y:auto;padding-right:6px;
+  scrollbar-width:thin;scrollbar-color:rgba(150,190,255,.3) transparent}
+.apercu .texte p{margin:0 0 1.5em;font-size:16.5px;line-height:1.78;color:#EAF1FF}
+.apercu .texte p:first-child{font-family:Fraunces,Georgia,serif;font-weight:450;
+  font-variation-settings:"SOFT" 26,"WONK" 1;font-size:25px;line-height:1.36;
+  letter-spacing:-.012em;color:#fff;margin:0 0 1.15em;padding:0 0 0 15px;
+  border-left:2px solid #3FA9FF;text-wrap:balance}
+.apercu .texte p:first-child strong{color:inherit;box-shadow:none}
+.apercu .texte strong{font-weight:600;color:#fff;box-shadow:inset 0 -.42em 0 rgba(63,169,255,.13)}
+.apercu .texte em{font-style:italic;color:#9FB4DA}
+.apercu .dire{position:relative;margin:18px 0 0;padding:15px 17px 15px 18px;border-radius:0 14px 14px 0;
+  border-left:2px solid #3FA9FF;background:rgba(63,169,255,.13)}
+.apercu .dire b{display:block;margin-bottom:7px;font-size:9.5px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:#3FA9FF}
+.apercu .dire p{margin:0;font-family:Fraunces,Georgia,serif;font-size:17px;line-height:1.45;color:#EAF1FF}
+/* « notule » et non « pied » : la console a déjà une classe .pied — sa barre
+   du bas, en position fixe — et l'aperçu en héritait, ce qui projetait cette
+   ligne tout en bas de la fenêtre, hors de la carte. */
+.apercu .notule{margin:16px 0 0;padding-top:14px;border-top:1px solid rgba(150,190,255,.15);
+  font-size:11.5px;color:#6C82AD}
+
 .raconter{margin:14px 0 0;padding:12px 15px;background:var(--ink-3);border-radius:11px;
   font-size:14px;font-style:italic;color:var(--texte);border-left:3px solid var(--or)}
 .raconter span{display:block;font-style:normal;font-size:10px;text-transform:uppercase;
@@ -826,6 +887,10 @@ function ficheHtml(f){
   meta.innerHTML=h;
 
   var g=el('span','gestes');
+  var oeil=el('button','g','aperçu lecteur'); oeil.type='button';
+  oeil.title='Voir la carte telle que le lecteur la verra — sans rien publier';
+  oeil.addEventListener('click', function(){ apercuLecteur(f); });
+  g.appendChild(oeil);
   [['valide','valider','on-v'],['refaire','à refaire','on-r'],['retire','retirer','on-r']].forEach(function(x){
     var b=el('button','g'+(v===x[0]?' '+x[2]:''),x[1]); b.type='button';
     b.addEventListener('click', function(){
@@ -844,26 +909,74 @@ function ficheHtml(f){
 
   var corps=el('div','corps');
   var paras=String(f.rec.x||'').split(/\n{2,}/).filter(function(p){ return p.trim(); });
-  var court = paras.length>2;
+  /* L'accroche est un bloc à part : on montre l'accroche PUIS deux
+     paragraphes, sinon on ne voit presque rien du texte. */
+  var court = paras.length>3;
   paras.forEach(function(p,i){
     var pn=el('p',null,esc(p.trim()).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>'));
-    if(court && i>=2) pn.hidden=true;
+    if(court && i>=3) pn.hidden=true;
     corps.appendChild(pn);
   });
   n.appendChild(corps);
   if(court){
-    var b=el('button','replier','Lire la suite ('+(paras.length-2)+' paragraphes)');
+    var b=el('button','replier','Lire la suite ('+(paras.length-3)+' paragraphes)');
     b.type='button';
     b.addEventListener('click', function(){
       var caches=corps.querySelectorAll('p[hidden]');
       if(caches.length){ [].forEach.call(caches,function(p){p.hidden=false;}); b.textContent='Replier'; }
-      else { [].forEach.call(corps.querySelectorAll('p'),function(p,i){ if(i>=2) p.hidden=true; });
-             b.textContent='Lire la suite ('+(paras.length-2)+' paragraphes)'; }
+      else { [].forEach.call(corps.querySelectorAll('p'),function(p,i){ if(i>=3) p.hidden=true; });
+             b.textContent='Lire la suite ('+(paras.length-3)+' paragraphes)'; }
     });
     n.appendChild(b);
   }
   if(f.rec.r) n.appendChild(el('div','raconter','<span>la phrase à raconter</span>'+esc(f.rec.r)));
   return n;
+}
+
+/* La carte du lecteur, reconstruite à l'identique depuis la fiche : image de
+   l'article, univers, titre, accroche, texte, phrase à raconter. C'est
+   exactement ce que l'application affichera le jour de la publication. */
+function apercuLecteur(f){
+  var uni = NOMS[f.uni] || [f.uni, 200];
+  var mots = String(f.rec.x||'').split(/\s+/).filter(Boolean).length;
+  var mn = Math.max(1, Math.round(mots / 200));
+  var fond = f.rec.i
+    ? 'background-image:url(\''+esc(f.rec.i)+'\')'
+    : 'background:radial-gradient(120% 90% at 78% 24%,hsl('+uni[1]+' 62% 45% / .45),transparent 62%),'
+      + 'linear-gradient(160deg,#0A1636,#050E24 55%,#04091C)';
+
+  var paras = String(f.rec.x||'').split(/\n{2,}/).filter(function(p){ return p.trim(); })
+    .map(function(p){ return '<p>' + esc(p.trim())
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g,'<em>$1</em>') + '</p>'; }).join('');
+
+  var vue = el('div','apercu');
+  vue.innerHTML =
+    '<div class="cadre">'
+  + '  <div class="barreApp"><span class="marque">Curio</span>'
+  + '    <button class="fermer" type="button">Fermer (Échap)</button></div>'
+  + '  <div class="carte">'
+  + '    <div class="fond" style="'+fond+'"></div><div class="voile"></div>'
+  + '    <div class="dedans">'
+  + '      <p class="sourcil"><i></i>'+esc(uni[0])+' · '+esc(f.titre)+' · '+mn+' min</p>'
+  + '      <h2>'+esc(f.rec.t||f.titre)+'</h2>'
+  + '      <div class="texte">'+paras+'</div>'
+  + (f.rec.r ? '      <div class="dire"><b>'
+      + (f.lang==='en' ? 'the line to tell' : 'à raconter ce soir')
+      + '</b><p>'+esc(f.rec.r)+'</p></div>' : '')
+  + '      <p class="notule">note '+(f.rec.s==null?'—':f.rec.s+'/10')
+  + ' · ' + (f.rec.p ? 'en ligne depuis le '+esc(f.rec.p) : 'pas encore publiée')
+  + ' · aperçu, rien n’est mis en ligne</p>'
+  + '    </div>'
+  + '  </div>'
+  + '</div>';
+
+  var fermer = function(){ vue.remove(); document.removeEventListener('keydown', auClavier); };
+  var auClavier = function(e){ if(e.key === 'Escape') fermer(); };
+  vue.addEventListener('click', function(e){ if(e.target === vue) fermer(); });
+  vue.querySelector('.fermer').addEventListener('click', fermer);
+  document.addEventListener('keydown', auClavier);
+  document.body.appendChild(vue);
 }
 
 function peindreRel(){

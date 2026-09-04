@@ -1,4 +1,86 @@
-# Curio 8.5.5 — ce qui a changé depuis v6
+# Curio 8.5.7 — ce qui a changé depuis v6
+
+## 8.5.7 — l'aperçu lecteur, sans rien publier
+
+« Sur le contenu ça me semble bien, mais je n'ai pas vraiment la mise en
+forme, il faut que je publie ? »
+
+**Non.** La relecture montrait le texte, pas la carte : titre en sans-serif,
+accroche noyée dans le corps, gras en bleu plat. Rien de faux, mais rien qui
+ressemble à ce que le lecteur verra. Deux réponses.
+
+### 1. Un bouton « aperçu lecteur » sur chaque fiche
+
+Il ouvre **la carte, telle qu'elle sera** : la vignette de l'article en fond,
+le voile, l'univers et le temps de lecture en surtitre, le titre en Fraunces,
+l'accroche détachée avec son filet bleu, le gras surligné, le bloc « à
+raconter » — et une mention qui rappelle que rien n'est mis en ligne. Échap ou
+un clic à côté referme.
+
+Aucune publication, aucun appel réseau, aucune dépense : tout est déjà dans la
+fiche.
+
+### 2. La relecture elle-même se met au format
+
+Même quand l'aperçu est fermé : titre en Fraunces, **accroche en grand avec
+son filet**, gras surligné plutôt que bleu plat, italiques, et trois
+paragraphes visibles au lieu de deux — puisque le premier est désormais
+l'accroche et ne compte pas comme du texte.
+
+**Un défaut trouvé en mesurant plutôt qu'en regardant.** L'aperçu utilisait
+une classe `.pied`, déjà employée par la barre du bas de la console — en
+position fixe. La ligne de bas de carte se retrouvait donc projetée en bas de
+la fenêtre, hors du cadre. Renommée `.notule`. Vérifié par les coordonnées :
+la ligne est maintenant à 912-944 px, dans un cadre qui va de 131 à 969.
+
+## 8.5.6 — les deux tiers de la facture partaient en raisonnement
+
+## 8.5.6 — les deux tiers de la facture partaient en raisonnement
+
+**Ce que le journal a fini par dire**, une fois qu'il disait quelque chose :
+
+```
+· réponse illisible — arrêt « max_tokens », blocs « thinking+text »
+```
+
+**`thinking`.** Opus 5 réfléchit avant de répondre, et ce raisonnement interne
+est facturé **en jetons de sortie**, à 25 $ le million. Mesuré sur votre
+tranche de deux sujets : **2 750 jetons de sortie par appel** au lieu des
+1 100 que fait le texte. Les deux tiers de la facture, invisibles — et, comme
+ils comptent dans le plafond de longueur, ils coupaient la réponse en plein
+milieu, ce qui provoquait un appel de plus.
+
+D'où votre `0,1720 $ par fiche` au lieu de `0,0335 $`.
+
+**Le remède.** `thinking: { type: "disabled" }` est envoyé avec chaque appel.
+Écrire une anecdote de 3 000 signes à partir d'une fiche de faits ne demande
+aucun raisonnement caché : la consigne dit exactement quoi faire, et c'est
+elle qui porte la qualité. Si un modèle refuse ce réglage, le code s'en passe
+et élargit le plafond pour ne pas être coupé — et le journal le dit.
+`--avec-pensee` le rétablit.
+
+Mesuré sur une API de substitution reproduisant les deux comportements :
+
+| | sortie par appel | coût par fiche |
+|---|---|---|
+| avec raisonnement | 2 750 jetons | 0,0735 $ |
+| **sans** | **1 100 jetons** | **0,0335 $** |
+
+C'est très exactement l'estimation annoncée. Et le compte rendu affiche
+désormais la part de raisonnement quand il y en a :
+*« dont 0.006 M de raisonnement interne (59 % de la sortie, facturé plein
+tarif) »*.
+
+**Deuxième économie, plus petite.** La détection de « texte trop proche de la
+source » se déclenchait à trois suites de huit mots communes. Or la fiche de
+faits conserve l'ordre des mots de l'article : quelques suites communes sont
+inévitables et ne sont pas des copies. Seuil porté à cinq, et **une seule**
+réécriture au lieu de deux — chacune est un appel payé.
+
+**Votre budget redevient celui annoncé** : 1 200 sujets en français,
+1 200 textes, **40 $ ≈ 37 €** avec Opus 5.
+
+## 8.5.5 — « réponse illisible » : c'étaient des retours à la ligne
 
 ## 8.5.5 — « réponse illisible » : c'étaient des retours à la ligne
 
