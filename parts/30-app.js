@@ -546,8 +546,29 @@ async function loadStats(){
     const r = await fetch(CONFIG.anecdotesDir + '/index.json', { cache:'no-cache' });
     if(!r.ok) return;
     const j = await r.json();
-    if(j && j.total){ STATS = j; renderTocCount(); }
+    if(j && j.total){ STATS = j; renderTocCount(); langueUnique(); }
   }catch(e){}
+}
+
+/* ── UNE SEULE LANGUE EN LIGNE ──────────────────────────────────────────
+   Tant qu'aucune fiche anglaise n'est publiée, le bouton FR/EN ne mène
+   qu'à un écran vide : « il n'y a rien à lire ». On le retire, et on
+   ramène le lecteur au français s'il était resté en anglais. Rien à
+   régler : le jour où des fiches anglaises sont publiées, le bouton
+   revient de lui-même. */
+function langueUnique(){
+  const b = $('#langBtn');
+  if(!b || !STATS || !STATS.total) return;
+  const nFr = Number(STATS.total.fr || 0), nEn = Number(STATS.total.en || 0);
+  const seule = (nFr > 0 && nEn === 0) ? 'fr' : (nEn > 0 && nFr === 0) ? 'en' : '';
+  b.hidden = !!seule;
+  if(seule && S.lang !== seule){
+    S.lang = seule;
+    LS.set('curio.lang', S.lang);
+    applyLang();
+    if(typeof curLangueChangee === 'function') curLangueChangee();
+    resetFeed();
+  }
 }
 /* Le chiffre public est un nombre de SUJETS écrits, pas de textes : une
    anecdote rédigée en français et en anglais, c'est un sujet. `sujets` est

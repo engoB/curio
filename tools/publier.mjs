@@ -53,7 +53,8 @@ const jour = (d = new Date()) => d.toISOString().slice(0, 10);
 
 /* ------------------------------------------------------- le réglage à vous */
 async function reglage(){
-  const par = { parPassage: 3, ordre: 'potentiel', quarantaine: false };
+  const par = { parPassage: 3, ordre: 'potentiel', quarantaine: false,
+                rythme: 'quotidien', jours: [], jusquAu: '', langues: ['fr', 'en'] };
   let brut = '';
   try{ brut = await fs.readFile(REGLAGE, 'utf8'); }catch{ return par; }
   for (const l of brut.split(/\r?\n/)){
@@ -65,8 +66,49 @@ async function reglage(){
     if (cle === 'parpassage' || cle === 'par-passage' || cle === 'nombre') par.parPassage = Math.max(0, parseInt(val, 10) || 0);
     if (cle === 'ordre') par.ordre = val.toLowerCase();
     if (cle === 'quarantaine') par.quarantaine = /^(oui|yes|true|1)$/i.test(val);
+    /* Le rythme. L'action tourne tous les jours ; c'est ce réglage qui dit
+       si aujourd'hui est un jour de publication. Le régler ici plutôt que
+       dans le « cron » du workflow permet de le changer depuis la console,
+       sans toucher à un fichier de code. */
+    if (cle === 'rythme') par.rythme = val.toLowerCase();
+    if (cle === 'jours')
+      par.jours = val.split(/[,\s]+/).map(x => parseInt(x, 10)).filter(n => n >= 1 && n <= 7);
+    if (cle === 'jusqu-au' || cle === 'jusquau' || cle === 'jusqu_au')
+      par.jusquAu = /^\d{4}-\d{2}-\d{2}$/.test(val) ? val : '';
+    if (cle === 'langues')
+      par.langues = val.split(/[,\s+]+/).map(x => x.trim().toLowerCase())
+                       .filter(x => x === 'fr' || x === 'en');
   }
+  if (!par.langues.length) par.langues = ['fr', 'en'];
   return par;
+}
+
+/* Lundi = 1 … dimanche = 7, comme dans le fichier de réglage. */
+function jourSemaine(d){ return d.getUTCDay() === 0 ? 7 : d.getUTCDay(); }
+
+function estJourDePublication(par, d = new Date()){
+  const r = par.rythme;
+  if (r === 'pause' || r === 'jamais' || r === 'non') return false;
+  if (r === 'hebdomadaire' || r === 'hebdo')
+    return jourSemaine(d) === (par.jours[0] || 1);
+  if (r === 'jours' || r === 'choisis')
+    return par.jours.length ? par.jours.includes(jourSemaine(d)) : true;
+  return true;                                  // quotidien
+}
+
+/* Combien de passages de publication entre aujourd'hui et la date visée,
+   celui d'aujourd'hui compris. Sert à étaler une réserve jusqu'à une date
+   sans avoir à calculer soi-même le nombre par passage. */
+function passagesJusqua(par, fin, d = new Date()){
+  const stop = new Date(fin + 'T00:00:00Z');
+  if (isNaN(stop) || stop < d) return 0;
+  let n = 0;
+  const cur = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  while (cur <= stop && n < 4000){
+    if (estJourDePublication(par, cur)) n++;
+    cur.setUTCDate(cur.getUTCDate() + 1);
+  }
+  return n;
 }
 
 /* ------------------------------------------------- lecture de toutes les fiches */
@@ -356,7 +398,16 @@ async function main(){
     console.log('Aucune fiche dans anecdotes/. Lancez « 2 · Écrire » puis « 3 · Contrôler ».');
     return;
   }
-  const groupes = grouper(fiches, maitre);
+  let groupes = grouper(fiches, maitre);
+
+  /* Les langues que l'on publie. Écrire l'anglais et ne pas le publier est un
+     état parfaitement valable : les fiches restent au dépôt, elles sortiront
+     le jour où vous ajouterez « en » à cette ligne. */
+  if (par.langues.length < 2){
+    for (const g of groupes) g.fiches = g.fiches.filter(f => par.langues.includes(f.lang));
+    groupes = groupes.filter(g => g.fiches.length);
+  }
+
   const b = bilan(groupes);
 
   console.log(`\n╔══ LE STOCK ═══════════════════════════════════════════════`);
@@ -365,6 +416,11 @@ async function main(){
   console.log(`║  ${b.nonControles} écrit(s) mais pas encore contrôlé(s)`);
   console.log(`║  ${b.quarantaine} en quarantaine`);
   console.log(`║  ${b.retires} retiré(s)`);
+  console.log(`╠══ réglages ───────────────────────────────────────────────`);
+  console.log(`║  rythme : ${par.rythme}${par.jours.length ? ' (' + par.jours.join(',') + ')' : ''}`
+            + `  ·  ${par.parPassage} par passage  ·  ordre : ${par.ordre}`);
+  console.log(`║  langue(s) publiée(s) : ${par.langues.join(' + ')}`
+            + (par.jusquAu ? `  ·  étalement jusqu'au ${par.jusquAu}` : ''));
   console.log(`╚═══════════════════════════════════════════════════════════`);
 
   if (b.prets){
@@ -377,7 +433,33 @@ async function main(){
 
   if (ETAT) return;
 
-  const combien = FORCE ? (parseInt(FORCE, 10) || 0) : par.parPassage;
+  /* ── LE RYTHME ────────────────────────────────────────────────────────
+     L'action tourne tous les jours ; c'est ici qu'on décide si aujourd'hui
+     compte. Une publication lancée à la main (« publier » + un nombre) passe
+     outre : c'est vous qui décidez, pas le calendrier. */
+  if (!FORCE && !estJourDePublication(par)){
+    console.log(`\nRythme « ${par.rythme}${par.jours.length ? ' ' + par.jours.join(',') : ''} » : `
+              + `aujourd'hui n'est pas un jour de publication. Rien n'est publié.`);
+    return;
+  }
+
+  let combien = FORCE ? (parseInt(FORCE, 10) || 0) : par.parPassage;
+
+  /* « Tout sortir d'ici le 31 décembre » : on compte les passages restants
+     et on répartit. Le nombre par passage se recalcule à chaque exécution,
+     donc il s'ajuste tout seul si vous écrivez de nouvelles fiches. */
+  if (!FORCE && par.jusquAu){
+    const passages = passagesJusqua(par, par.jusquAu);
+    if (passages > 0){
+      combien = Math.max(1, Math.ceil(b.prets / passages));
+      console.log(`\nÉtalement demandé jusqu'au ${par.jusquAu} : ${passages} passage(s) restant(s), `
+                + `${b.prets} sujet(s) prêts → ${combien} par passage.`);
+    } else {
+      console.log(`\nLa date « jusqu-au: ${par.jusquAu} » est passée : on publie tout ce qui est prêt.`);
+      combien = b.prets;
+    }
+  }
+
   if (combien <= 0){
     console.log('\nRythme réglé à zéro dans consignes/publication.txt : rien n’est publié.');
     return;
@@ -405,11 +487,14 @@ async function main(){
   const aujourdhui = jour();
   console.log(`\n▸ publication du ${aujourdhui} — ${choisis.length} sujet(s)\n`);
   for (const g of choisis){
-    for (const f of g.fiches){
+    /* Une fiche déjà en ligne garde sa date : on ne réécrit pas l'histoire
+       parce qu'on vient d'ajouter l'autre langue. */
+    const neuves = g.fiches.filter(f => !f.rec.p);
+    for (const f of neuves){
       f.rec.p = aujourdhui;
       paquets.get(f.chemin).modifie = true;
     }
-    const titres = g.fiches.map(f => f.lang.toUpperCase()).join('+');
+    const titres = neuves.map(f => f.lang.toUpperCase()).sort().join('+');
     console.log(`  ● [${titres}] ${g.fiches[0].rec.t || g.fiches[0].titre}`);
     if (g.sujet){ g.sujet.statut = 'publie'; g.sujet.publie = aujourdhui; }
   }

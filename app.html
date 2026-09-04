@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#050E24" />
-<meta name="curio-version" content="8.4.3+cca52e69a0" />
+<meta name="curio-version" content="8.5.1+8feeb9c45e" />
 <title>Curio</title>
 <meta name="description" content="Des anecdotes vraies, écrites pour être lues : deux minutes par récit, une par écran. Cosmos, histoire, vivant, mystères." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -331,13 +331,26 @@ a{color:var(--accent);text-decoration:none}
   letter-spacing:.002em;
   text-wrap:pretty;
 }
-/* La première phrase porte le texte : on lui donne un peu plus de présence. */
+/* ── L'ACCROCHE ────────────────────────────────────────────────────────
+   Le premier paragraphe n'est pas le début du texte : c'est la phrase qui
+   décide si on lit la suite. « Un peu plus gros » ne suffisait pas — à
+   l'œil elle se confondait avec le corps, et on entrait dans l'article
+   sans voir qu'on avait commencé. Elle a maintenant sa typographie, son
+   filet et de l'air autour d'elle.                                      */
 .card .lede p:first-child{
-  font-size:calc(clamp(18px,2.2vw,21px) * var(--lecture));
-  line-height:1.62;color:var(--text);
+  font-family:Fraunces,Georgia,serif;font-weight:450;font-variation-settings:"SOFT" 26,"WONK" 1;
+  font-size:calc(clamp(21px,2.7vw,26px) * var(--lecture));
+  line-height:1.36;letter-spacing:-.012em;color:#fff;
+  margin:0 0 1.15em;padding:0 0 0 15px;
+  border-left:2px solid var(--accent);
+  text-wrap:balance;
 }
+/* Dans l'accroche, le gras n'ajoute rien : elle est déjà au premier plan. */
+.card .lede p:first-child strong{color:inherit;box-shadow:none;font-weight:600}
 .card .lede p:last-child{margin-bottom:.4em}
-.card .lede strong{font-weight:600;color:var(--text);box-shadow:inset 0 -.42em 0 var(--accent-soft)}
+/* Le gras porte les chiffres qui frappent : lisibles d'un coup d'œil, sans
+   transformer le texte en surligneur. */
+.card .lede strong{font-weight:600;color:#fff;box-shadow:inset 0 -.42em 0 var(--accent-soft)}
 .card .lede em{font-style:italic;color:var(--text-2)}
 .card .lede p:last-child{margin-bottom:0}
 .card .lede .sec{
@@ -2330,8 +2343,29 @@ async function loadStats(){
     const r = await fetch(CONFIG.anecdotesDir + '/index.json', { cache:'no-cache' });
     if(!r.ok) return;
     const j = await r.json();
-    if(j && j.total){ STATS = j; renderTocCount(); }
+    if(j && j.total){ STATS = j; renderTocCount(); langueUnique(); }
   }catch(e){}
+}
+
+/* ── UNE SEULE LANGUE EN LIGNE ──────────────────────────────────────────
+   Tant qu'aucune fiche anglaise n'est publiée, le bouton FR/EN ne mène
+   qu'à un écran vide : « il n'y a rien à lire ». On le retire, et on
+   ramène le lecteur au français s'il était resté en anglais. Rien à
+   régler : le jour où des fiches anglaises sont publiées, le bouton
+   revient de lui-même. */
+function langueUnique(){
+  const b = $('#langBtn');
+  if(!b || !STATS || !STATS.total) return;
+  const nFr = Number(STATS.total.fr || 0), nEn = Number(STATS.total.en || 0);
+  const seule = (nFr > 0 && nEn === 0) ? 'fr' : (nEn > 0 && nFr === 0) ? 'en' : '';
+  b.hidden = !!seule;
+  if(seule && S.lang !== seule){
+    S.lang = seule;
+    LS.set('curio.lang', S.lang);
+    applyLang();
+    if(typeof curLangueChangee === 'function') curLangueChangee();
+    resetFeed();
+  }
 }
 /* Le chiffre public est un nombre de SUJETS écrits, pas de textes : une
    anecdote rédigée en français et en anglais, c'est un sujet. `sujets` est

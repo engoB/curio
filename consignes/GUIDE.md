@@ -244,7 +244,38 @@ vos notes, une histoire que vous voulez ajouter seul.
 
 ## 2 · Écrire — une tranche de N euros
 
-Un seul réglage : **le budget**. On prend les meilleurs sujets non encore
+**Ce que ça coûte.** Un sujet = deux textes, français et anglais. Avec la
+consigne mise en cache (automatique depuis la 8.4.5, −21 %) :
+
+| modèle | par texte | 1 200 sujets = 2 400 textes |
+|---|---|---|
+| `claude-opus-5` | 0,0335 $ | 80 $ ≈ 74 € |
+| `claude-sonnet-5` | 0,0134 $ | 32 $ ≈ 30 € |
+| `claude-haiku-4-5-20251001` | 0,0067 $ | 16 $ ≈ 15 € |
+
+Le champ **Modele** de l'action change de modèle à chaque tranche. Et le vrai
+levier n'est pas là : c'est de **ne pas tout écrire d'un coup**. Deux cents
+sujets, vingt fiches relues, la consigne corrigée si besoin — puis la suite.
+Un sujet déjà écrit n'est jamais repayé.
+
+**Deux façons de dimensionner une tranche.** Le champ **`sujets`** — 5 pour un
+essai, 300 pour un lot — ou le **budget** en euros. Le premier prime.
+
+**Et le champ `langues`** : `fr,en`, `fr` ou `en`. Le français seul divise la
+facture par deux et **ne perd rien**.
+
+Ces sujets-là prennent un état à eux : **« à finir »**, badge doré, avec le
+badge `FR` plein et le badge `EN` creux. Un filtre les isole dans la console et
+dans le tableau de bord, un compteur les affiche, et la colonne
+`langues_ecrites` du CSV les nomme. Ce ne sont ni des sujets vierges, ni des
+sujets terminés.
+
+**Rien n'est jamais réécrit.** Avant tout appel payant, la rédaction lit le
+fichier de sortie et écarte les titres qui s'y trouvent déjà — pas d'article
+téléchargé, pas de jeton dépensé. Une tranche anglaise ne repaiera jamais le
+français.
+
+Un seul réglage historique : **le budget**. On prend les meilleurs sujets non encore
 écrits, autant que la tranche permet, et on écrit le français **et** l'anglais.
 
 Plus de sélection à coller — GitHub refusait les grandes (« Provided inputs
@@ -283,7 +314,24 @@ repasse en vert. La liste complète part dans `controle.csv`.
 
 ---
 
-## 5 · Publier — le goutte-à-goutte
+## 5 · Publier — le goutte-à-goutte, réglé depuis la console
+
+**Onglet Publication de `console.html`.** Fréquence (tous les jours, une fois
+par semaine, certains jours cochés, ou en pause), combien de sujets par
+passage, l'ordre, les langues publiées — et, si vous préférez raisonner en
+échéance, une date : *« tout sortir d'ici le 31 décembre »*. Le nombre par
+passage est alors calculé, et recalculé à chaque exécution : il s'ajuste si
+vous écrivez de nouvelles fiches entre-temps.
+
+Tout cela s'écrit dans `consignes/publication.txt`, que vous pouvez aussi
+modifier à la main. **L'action tourne tous les jours à 6 h UTC** ; c'est ce
+fichier qui décide si aujourd'hui est un jour de publication.
+
+**`langues: fr`** publie le français seul. Les fiches anglaises restent au
+dépôt, non publiées. Côté lecteur, le bouton FR/EN disparaît du site et de
+l'application tant qu'une seule langue est en ligne — et revient tout seul le
+jour où l'autre est publiée.
+
 
 Le stock est écrit d'avance ; il sort au compte-gouttes. C'est ce qui donne au
 lecteur la sensation d'une application qui vit, alors que tout est déjà dans

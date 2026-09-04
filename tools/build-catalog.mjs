@@ -2178,10 +2178,11 @@ async function construireMaitre(){
    le catalogue. */
 async function ecrireCsvMaitre(liste){
   const esc = (x) => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"';
-  const csv = ['﻿qid;univers;titre_fr;titre_en;sources;potentiel;accord;statut;ajoute;ecrit;publie;phrase;apercu']
+  const csv = ['﻿qid;univers;titre_fr;titre_en;sources;potentiel;accord;statut;langues_ecrites;ajoute;ecrit;publie;phrase;apercu']
     .concat(liste.map(s => [s.qid, s.uni, esc(s.fr), esc(s.en), esc((s.sources || []).join('+')),
                             s.potentiel, (s.accord == null ? '' : s.accord),
-                            s.statut, s.ajoute || '', s.ecrit || '', s.publie || '',
+                            s.statut, esc((s.langues || []).join('+')),
+                            s.ajoute || '', s.ecrit || '', s.publie || '',
                             esc(s.phrase), esc(s.apercu)].join(';')));
   await fs.writeFile(path.join(process.cwd(), 'catalogue-maitre.csv'), csv.join('\n') + '\n', 'utf8');
 }

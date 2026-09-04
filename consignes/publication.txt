@@ -3,20 +3,56 @@
 # ═══════════════════════════════════════════════════════════════════════════
 #
 # Les anecdotes sont écrites d'avance et gardées en réserve. Ce fichier dit
-# combien en sortent à chaque passage de l'action programmée. Changez le
-# chiffre ici, sur GitHub, et c'est réglé : aucune modification de code.
+# quand elles sortent, et combien. Vous pouvez le modifier ici sur GitHub, ou
+# depuis console.html — onglet Publication — qui l'écrit pour vous.
 #
-# UN SUJET, PAS UNE FICHE. Publier « Lac Nyos » met en ligne le français ET
-# l'anglais le même jour.
+# L'action « 5 · Publier » tourne TOUS LES JOURS à 6 h UTC. C'est ce fichier,
+# et lui seul, qui décide si aujourd'hui est un jour de publication.
 #
 # ─────────────────────────────────────────────────────────────────────────
+# À QUELLE FRÉQUENCE
+#   quotidien      tous les jours                                (défaut)
+#   hebdomadaire   une fois par semaine, le jour indiqué par « jours »
+#   jours          seulement les jours listés dans « jours »
+#   pause          rien ne sort, la réserve dort
+# ─────────────────────────────────────────────────────────────────────────
+rythme: quotidien
+
+# Les jours, pour « hebdomadaire » et « jours ».
+# 1 = lundi, 2 = mardi, 3 = mercredi, 4 = jeudi, 5 = vendredi,
+# 6 = samedi, 7 = dimanche.   Exemple :  jours: 2,5
+jours: 1
+
+# ─────────────────────────────────────────────────────────────────────────
 # COMBIEN de sujets à chaque passage
+# UN SUJET, PAS UNE FICHE : publier « Lac Nyos » met en ligne le français ET
+# l'anglais le même jour — si les deux sont publiés, voir « langues ».
 # ─────────────────────────────────────────────────────────────────────────
 parPassage: 3
 
 # ─────────────────────────────────────────────────────────────────────────
+# OU BIEN : TOUT SORTIR D'ICI UNE DATE
+# Si cette ligne porte une date, « parPassage » est ignoré : la réserve est
+# répartie sur les passages qui restent d'ici là, et le nombre se recalcule
+# à chaque exécution. Laissez vide pour ne pas l'utiliser.
+#     jusqu-au: 2026-12-31
+# ─────────────────────────────────────────────────────────────────────────
+jusqu-au:
+
+# ─────────────────────────────────────────────────────────────────────────
+# QUELLES LANGUES SONT PUBLIÉES
+#   fr        le français seul — l'anglais reste au dépôt, non publié,
+#             et le bouton FR/EN disparaît du site et de l'application
+#   fr,en     les deux                                            (défaut)
+#
+# Écrire l'anglais sans le publier est un état parfaitement valable : le jour
+# où vous ajoutez « en » ici, tout ce qui est écrit et contrôlé sort.
+# ─────────────────────────────────────────────────────────────────────────
+langues: fr,en
+
+# ─────────────────────────────────────────────────────────────────────────
 # DANS QUEL ORDRE
-#   potentiel   les sujets les plus prometteurs d'abord (défaut)
+#   potentiel   les sujets les plus prometteurs d'abord           (défaut)
 #   note        les mieux notés par le rédacteur d'abord — garde le meilleur
 #               pour tout de suite, quitte à s'appauvrir avec le temps
 #   hasard      au hasard — la réserve se vide uniformément
@@ -30,14 +66,7 @@ ordre: potentiel
 quarantaine: non
 
 # ═══════════════════════════════════════════════════════════════════════════
-# LA FRÉQUENCE, elle, est dans .github/workflows/5-publier.yml, ligne
-# « cron ». Par défaut : tous les jours à 6 h UTC (7 h ou 8 h en France).
-#
-#     0 6 * * *      tous les jours à 6 h        ← par défaut
-#     0 6 * * 1      tous les lundis à 6 h
-#     0 6 */2 * *    un jour sur deux
-#     0 6,18 * * *   deux fois par jour
-#
-# Vous pouvez aussi publier à la main quand vous voulez :
-# Actions → « 5 · Publier » → Run workflow, en indiquant un nombre.
+# À la main, quand vous voulez, sans toucher à ce fichier :
+# Actions → « 5 · Publier » → Run workflow, en indiquant un nombre. Une
+# publication lancée à la main passe outre le rythme : c'est vous qui décidez.
 # ═══════════════════════════════════════════════════════════════════════════

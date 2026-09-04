@@ -1,95 +1,115 @@
-CURIO 8.4.3 — LA PASSE QUALITÉ SUR LES SEULS SUJETS RETENUS
-============================================================
-
-Rien de ce que vous avez moissonné ou décidé n'est perdu. Cette version
-ajoute une vérification, un filtre et un rangement.
+CURIO 8.5.0 — ÉCRIRE PAR LOTS, PUBLIER À VOTRE RYTHME, FRANÇAIS SEUL
+=====================================================================
 
 
-LA RÉPONSE À VOTRE QUESTION : OUI
-=================================
+VOTRE PLAN, ÉTAPE PAR ÉTAPE
+===========================
 
-La moisson vérifie des dizaines de milliers de sujets, vite et grossièrement.
-Ce que vous vous apprêtez à PAYER, c'est quelques centaines. Ceux-là méritent
-un examen sérieux — et comme ils sont peu nombreux, il tient en quelques
-minutes.
+Vous avez 1 200 sujets. Voici exactement ce que je ferais.
 
-    Console -> bouton « Vérifier les N retenus »
-    ou   Actions -> Entretien -> operation = auditer
+  ÉTAPE 0 — le réglage qui divise la facture par deux
+  ---------------------------------------------------
+  Console → onglet PUBLICATION → « Langues publiées » = Français seul.
+  → Enregistrer le rythme.
 
-Il reprend chaque sujet retenu à zéro et pose huit questions :
+  Le bouton FR/EN disparaît du site et de l'application. Vous écrirez le
+  français d'abord, l'anglais quand vous voudrez.
 
-    GRAVE   l'article existe-t-il encore ?
-    GRAVE   son introduction est-elle assez fournie ?
-    GRAVE   est-ce une page d'homonymie (« peut désigner… ») ?
-    GRAVE   la phrase est-elle une définition d'encyclopédie ?
-    GRAVE   y a-t-il une phrase, et fait-elle huit mots ?
-    GRAVE   le titre est-il en double, ou déjà exclu ?
-    DOUTE   la phrase partage-t-elle un mot avec l'article ?
-    DOUTE   l'article a-t-il été renommé depuis la moisson ?
+  ÉTAPE 1 — cinq sujets, pour voir            environ 7 centimes
+  ---------------------------------------------------
+  Console → Catalogue → filtre « Potentiel 9 et plus » → « Retenir ces 451 »
+  → « Enregistrer mes décisions » → bouton « Écrire ».
+  Il vous demande : combien ? → 5.  Deux langues ? → ANNULER (français seul).
+  Écrire pour de bon ? → OK.
 
-GRAVE = ce sujet n'a rien à faire dans une tranche payante.
-DOUTE = c'est peut-être très bien, mais regardez-le.
+  Relisez les cinq fiches dans l'onglet Relecture. Si le ton ne va pas,
+  corrigez consignes/fr.md — c'est gratuit — et refaites cinq autres.
 
-RIEN N'EST SUPPRIMÉ. Par défaut l'audit ne fait que dire : il écrit
-audit-retenus.csv, les ennuis en tête, une ligne par sujet avec son motif.
-Si vous cochez « appliquer » (ou répondez OK à la fenêtre du bouton), il fait
-une seule chose de plus : passer les GRAVES en « écarté » dans decisions.json.
-Les sujets restent au catalogue, un clic les reprend.
+  ÉTAPE 2 — le premier lot                    environ 4 €
+  ---------------------------------------------------
+  Même bouton, 300 sujets, français seul, Sonnet 5.
+  (Champ « Modele » de l'action : claude-sonnet-5)
 
-Au passage, il rafraîchit ce qu'il vient de télécharger : l'accord recalculé
-sur l'introduction entière, l'aperçu, et les titres renommés.
+  ÉTAPE 3 et 4 — les lots suivants            environ 4 € chacun
+  ---------------------------------------------------
+  300, puis 300, puis les derniers. Vous lancez quand vous voulez ; un sujet
+  déjà écrit n'est jamais repayé.
 
-Éprouvé sur une Wikipédia miniature reproduisant les huit défauts : 8 sur 8
-détectés, et le sujet non retenu jamais touché.
-
-
-CE QUE VOUS FAITES, DANS L'ORDRE
-================================
-
-1. Importez ce zip : Add file -> Upload files, tout déposer, Commit.
-
-   VÉRIFIEZ QUE .github/ EST BIEN PASSÉ — le dossier commence par un point et
-   certains navigateurs le sautent. Ouvrez :
-   github.com/VOTRE-COMPTE/curio/blob/main/.github/workflows/entretien.yml
-   et cherchez « auditer » dans la liste des options. S'il n'y est pas, copiez
-   le contenu de github-workflows/entretien.yml par-dessus (crayon, tout
-   sélectionner, coller, Commit).
-
-2. Entretien -> ranger      vos 12 810 « Mystères » se répartissent
-3. Entretien -> purger      sort « Pac-Man » du catalogue
-
-4. Console : filtre « Potentiel 9 et plus » -> « Retenir ces 451 »
-   -> « Enregistrer mes décisions »
-
-5. Console : « Vérifier les 451 retenus ».
-   Répondez ANNULER la première fois : vous lirez le rapport avant de laisser
-   quoi que ce soit être écarté.
-
-6. Ouvrez audit-retenus.csv à la racine du dépôt. Les GRAVES sont en tête.
-   Si les motifs vous paraissent justes, relancez avec « appliquer ».
-
-7. Alors seulement : « Écrire les N retenus ».
-
-C'est la première tranche écrite qui vous dira si le catalogue tient ses
-promesses — pas les 16 185 lignes, qu'aucun être humain ne peut relire.
+  TOTAL FRANÇAIS : 1 200 textes ≈ 16 $ ≈ 15 €
+  L'anglais plus tard, au même prix, quand le français aura fait ses preuves.
 
 
-CE QUE 8.4.2 AVAIT APPORTÉ, SI VOUS NE L'AVEZ PAS ENCORE IMPORTÉ
-=================================================================
+CE QUI EST NOUVEAU
+==================
 
-  · LE FILTRE PAR POTENTIEL, dans console.html et catalogue.html :
-    10 seulement (119) · 9 et plus (451) · 8 et plus (1 015) ·
-    7 et plus (2 449) · 6 et moins (13 736).
+1. ON ÉCRIT UN NOMBRE DE SUJETS, PLUS UN BUDGET
 
-  · L'UNIVERS VIENT DE L'ARTICLE, plus du titre de la section de la page.
-    Les archives « Le saviez-vous ? » ont des sections datées : « Janvier
-    2015 » ne dit rien du sujet, et tout tombait dans « Mystères ».
-    Entretien -> ranger répare le catalogue existant, sans réseau.
+   L'action « 2 · Écrire » a un champ « sujets ». 5 pour un essai, 300 pour un
+   lot. Il prime sur le budget en euros, qui reste là si vous préférez.
 
-  · LA MOISSON UTILISE SES 40 MINUTES. Elle estimait d'avance combien de
-    sujets elle aurait le temps de vérifier ; elle avance maintenant par
-    tranches de deux mille tant qu'il reste du temps.
+2. UN CHAMP « LANGUES » : fr,en · fr · en
 
-  · LES BOUTONS DE LOT DISENT COMBIEN : « Retenir ces 451 », la portée du
-    filtre écrite sous les boutons, une confirmation quand aucun filtre n'est
-    actif, et « Tout oublier » pour repartir de zéro.
+   Le français seul divise la facture par deux et NE PERD RIEN. Un sujet n'est
+   marqué « écrit » que lorsque ses deux fiches existent vraiment. Un sujet
+   écrit en français reste donc « à écrire », la tranche anglaise le
+   retrouvera, et le français ne sera jamais repayé.
+
+   Le journal vous le dira :
+     « 300 sujet(s) écrits dans une seule langue : ils restent à écrire et
+       attendent leur tranche dans l'autre langue. Rien ne sera repayé. »
+
+3. UN ONGLET PUBLICATION DANS LA CONSOLE
+
+   Fréquence : tous les jours · une fois par semaine · certains jours
+   seulement (à cocher) · en pause.
+   Combien par passage. Dans quel ordre.
+   OU BIEN une date : « tout sortir d'ici le 31 décembre » — le nombre par
+   passage est alors calculé, et recalculé à chaque exécution.
+   Quelles langues sont publiées.
+
+   Un aperçu sous les réglages dit ce que ça donne :
+     « 2 sujets à chaque passage (34 prêts répartis sur 17 passages d'ici le
+       2026-12-31), 1 passage par semaine. Réserve : de quoi tenir
+       17 semaines. »
+
+   Plus deux boutons : « Publier maintenant… », qui passe outre le rythme, et
+   « Voir l'état du stock ».
+
+   Tout cela s'écrit dans consignes/publication.txt, que vous pouvez aussi
+   modifier à la main sur GitHub. L'action tourne toujours tous les jours ;
+   c'est ce fichier qui décide si aujourd'hui compte.
+
+4. L'ANGLAIS DISPARAÎT TOUT SEUL DU SITE ET DE L'APPLICATION
+
+   Tant qu'une seule langue est publiée, le bouton FR/EN est retiré et la
+   langue affichée s'aligne. Rien à régler, et il revient de lui-même le jour
+   où des fiches anglaises sont en ligne.
+
+
+VÉRIFIÉ
+=======
+
+  · rythme hebdomadaire réglé sur lundi, exécuté un jeudi : rien ne sort ;
+    réglé sur jeudi : 3 sujets sortent ;
+  · jours 2,5 puis 2,4,5 : le calendrier est respecté ;
+  · étalement jusqu'au 31 octobre : 26 passages, 2 sujets par passage ;
+  · langues = fr : seules les fiches françaises sortent ;
+  · anglais rallumé : seules les fiches anglaises sortent, et les dates de
+    publication françaises ne sont pas réécrites ;
+  · console : les cinq réglages, l'aperçu, l'écriture de publication.txt et le
+    lancement d'une tranche de 5 sujets en français — aucune erreur.
+
+
+UN MOT SUR « SANS PERTE D'INSTRUCTION »
+=======================================
+
+Vous aviez raison de le préciser. Aucune des économies de cette version ne
+touche à ce que le modèle reçoit :
+
+  · la consigne est mise en cache, donc envoyée ENTIÈRE à chaque appel, mais
+    facturée une fois (version 8.4.5) ;
+  · la fiche de faits n'est pas raccourcie ;
+  · écrire le français seul ne change pas un mot de la consigne française.
+
+La seule chose qui change vraiment le résultat, c'est le modèle. Testez
+Sonnet 5 sur vos cinq premiers sujets : c'est cinq centimes et une lecture.

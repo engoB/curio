@@ -26,7 +26,7 @@
   --texte:#EAF1FF; --texte-2:#9FB4DA; --texte-3:#6C82AD;
   --accent:#3FA9FF; --accent-encre:#04122B; --accent-doux:rgba(63,169,255,.13);
   --or:#F0C46A; --or-doux:rgba(240,196,106,.13);
-  --vert:#4ECBB9; --rouge:#FF7A85;
+  --vert:#4ECBB9; --vert-doux:rgba(78,203,185,.14); --rouge:#FF7A85;
 }
 @media (prefers-color-scheme: light){
   :root{
@@ -35,7 +35,7 @@
     --texte:#0A1B3D; --texte-2:#4A5F84; --texte-3:#7C8DAB;
     --accent:#0B63C4; --accent-encre:#FFFFFF; --accent-doux:rgba(11,99,196,.10);
     --or:#8A6512; --or-doux:rgba(138,101,18,.12);
-    --vert:#0E7C71; --rouge:#B32233;
+    --vert:#0E7C71; --vert-doux:rgba(14,124,113,.12); --rouge:#B32233;
   }
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -84,7 +84,9 @@ input[type=search]:focus,select:focus{outline:2px solid var(--accent);outline-of
 .meta .pastille{width:7px;height:7px;border-radius:2px;flex:none}
 .meta b{padding:2px 7px;border-radius:6px;font-weight:700;font-size:10px;letter-spacing:.07em}
 .uni{color:var(--texte-2)}
-.lg{padding:2px 6px;border-radius:5px;background:var(--ink-3);color:var(--texte-2);font-size:9.5px;letter-spacing:.1em}
+.lg{padding:2px 6px;border-radius:5px;background:var(--ink-3);color:var(--texte-3);font-size:9.5px;letter-spacing:.1em;
+  border:1px solid transparent}
+.lg.faite{background:var(--vert-doux);color:var(--vert);border-color:var(--vert)}
 .src-phare{background:var(--or);color:#17120A}
 .src-insolite{background:var(--accent);color:var(--accent-encre)}
 .src-saviez{background:var(--vert);color:var(--accent-encre)}
@@ -99,6 +101,7 @@ input[type=search]:focus,select:focus{outline:2px solid var(--accent);outline-of
 .et-quarantaine{background:var(--rouge);color:#2A0509}
 .et-retire{border:1px solid var(--line);color:var(--texte-3);text-decoration:line-through}
 .et-aecrire{border:1px solid var(--line);color:var(--texte-3)}
+.et-partiel{background:var(--or-doux);color:var(--or);border:1px solid var(--or)}
 .doute{background:var(--rouge);color:#2A0509}
 
 .item h2{font-size:15.5px;margin:0 0 2px;font-weight:650;letter-spacing:-.005em}
@@ -214,7 +217,8 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;colo
     </select>
     <select id="etat" aria-label="État">
       <option value="">Tous les états</option>
-      <option value="aecrire">À écrire</option>
+      <option value="aecrire">À écrire — rien de fait</option>
+      <option value="partiel">À finir — une langue sur deux</option>
       <option value="ecrit">Écrit</option>
       <option value="publie">En ligne</option>
       <option value="retire">Retiré</option>
@@ -268,13 +272,20 @@ function plier(t){
     .replace(/[’']/g,"'").toLowerCase();
 }
 
+/* La langue est-elle déjà rédigée ? Le badge plein le dit d'un coup d'œil. */
+function faite(s, lang){ return (s.langues || []).indexOf(lang) >= 0; }
+
 function etatDe(s){
   if(s.statut === 'retire') return 'retire';
   if(s.publie) return 'publie';
   if(s.statut === 'ecrit' || s.ecrit) return 'ecrit';
+  /* Une langue écrite, l'autre pas : ni vierge, ni terminé. Le catalogue
+     maître porte « langues » depuis la 8.5.1. */
+  var l = s.langues || [];
+  if(l.length === 1) return 'partiel';
   return 'aecrire';
 }
-var ETIQ = { aecrire:'à écrire', ecrit:'écrit', publie:'en ligne', retire:'retiré' };
+var ETIQ = { aecrire:'à écrire', partiel:'à finir', ecrit:'écrit', publie:'en ligne', retire:'retiré' };
 
 function charger(){
   return fetch('catalogue-maitre.json', {cache:'no-cache'}).then(function(r){
@@ -381,8 +392,8 @@ function ligne(s){
 
   var meta = '<i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i>'
            + '<span class="uni">'+esc(uni[0])+'</span>'
-           + (s.fr ? '<span class="lg">FR</span>' : '')
-           + (s.en ? '<span class="lg">EN</span>' : '')
+           + (s.fr ? '<span class="lg'+(faite(s,'fr')?' faite':'')+'">FR</span>' : '')
+           + (s.en ? '<span class="lg'+(faite(s,'en')?' faite':'')+'">EN</span>' : '')
            + '<b class="note">'+(s.potentiel||1)+'/10</b>';
   src.forEach(function(x){ meta += '<b class="src-'+x+'">'+esc(x === 'saviez' ? 'le saviez-vous' : x)+'</b>'; });
   if(src.length >= 2) meta += '<b class="croise">'+src.length+' sources</b>';

@@ -97,6 +97,14 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
   border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-bottom:12px}
 .portee b{color:var(--texte);font-variant-numeric:tabular-nums}
 .portee .tout{color:var(--or)}
+/* les sept jours de la semaine, à cocher */
+.jours{display:flex;gap:5px;flex-wrap:wrap}
+.jours button{font:inherit;font-size:12px;font-weight:700;width:38px;height:34px;border-radius:9px;
+  border:1px solid var(--line-fort);background:var(--ink-3);color:var(--texte-3);cursor:pointer}
+.jours button.on{background:var(--accent);color:var(--accent-encre);border-color:var(--accent)}
+.apercuPub{margin:14px 0 0;padding:11px 13px;border-radius:10px;background:var(--accent-doux);
+  border-left:2px solid var(--accent);font-size:13.5px;line-height:1.6;color:var(--texte)}
+.apercuPub b{font-variant-numeric:tabular-nums}
 .btn{font:inherit;font-size:13px;font-weight:600;border-radius:9px;padding:8px 14px;cursor:pointer;
   border:1px solid var(--line-fort);background:var(--ink-2);color:var(--texte-2)}
 .btn:hover{color:var(--texte);border-color:var(--accent)}
@@ -114,7 +122,11 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
   font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--texte-3)}
 .meta .pastille{width:7px;height:7px;border-radius:2px;flex:none}
 .meta b{padding:2px 7px;border-radius:6px;font-size:10px;letter-spacing:.07em}
-.lg{padding:2px 6px;border-radius:5px;background:var(--ink-3);color:var(--texte-2);font-size:9.5px;letter-spacing:.1em}
+.lg{padding:2px 6px;border-radius:5px;background:var(--ink-3);color:var(--texte-3);font-size:9.5px;letter-spacing:.1em;
+  border:1px solid transparent}
+/* la langue déjà rédigée : pleine. Celle qui reste à écrire : creuse. */
+.lg.faite{background:var(--vert-doux);color:var(--vert);border-color:var(--vert)}
+.e-partiel{background:var(--or-doux);color:var(--or)}
 .s-phare{background:var(--or);color:#17120A}
 .s-insolite{background:var(--accent);color:var(--accent-encre)}
 .s-saviez{background:var(--vert);color:var(--accent-encre)}
@@ -179,6 +191,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
     <div class="onglets">
       <button id="ongCat" class="on">Catalogue</button>
       <button id="ongRel">Relecture</button>
+      <button id="ongPub">Publication</button>
     </div>
     <div class="etatCx">
       <span class="point" id="pt"></span><span id="cx">non connectée</span>
@@ -258,7 +271,8 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       </select>
       <select id="fEtat">
         <option value="">Tous les états</option>
-        <option value="aecrire">À écrire</option>
+        <option value="aecrire">À écrire — rien de fait</option>
+        <option value="partiel">À finir — une langue sur deux</option>
         <option value="ecrit">Écrit</option>
         <option value="publie">En ligne</option>
         <option value="suspect">⚠ À vérifier — phrase sans rapport</option>
@@ -314,6 +328,66 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
     </div>
     <div class="liste" id="lRel"></div>
     <button class="btn plus" id="plusRel" hidden>Afficher la suite</button>
+  </section>
+
+  <!-- ═══════════════ PUBLICATION ═══════════════ -->
+  <section id="vuePub" hidden>
+    <div class="chiffres" id="chPub"></div>
+
+    <div class="reglages" style="margin-bottom:16px">
+      <h3>Le rythme de sortie</h3>
+      <p>Les fiches sont écrites d’avance et gardées en réserve. Ces réglages disent
+         <b>quand</b> elles sortent et <b>combien</b>. L’action tourne tous les jours à 6 h UTC ;
+         c’est ce que vous réglez ici qui décide si aujourd’hui compte.</p>
+
+      <div class="champs">
+        <div>
+          <label for="pRythme">À quelle fréquence</label>
+          <select id="pRythme">
+            <option value="quotidien">Tous les jours</option>
+            <option value="hebdomadaire">Une fois par semaine</option>
+            <option value="jours">Certains jours seulement</option>
+            <option value="pause">En pause — rien ne sort</option>
+          </select>
+        </div>
+        <div id="boxJours">
+          <label>Quel(s) jour(s)</label>
+          <div class="jours" id="pJours"></div>
+        </div>
+        <div>
+          <label for="pCombien">Combien de sujets par passage</label>
+          <input type="number" id="pCombien" min="0" max="200" step="1">
+        </div>
+        <div>
+          <label for="pOrdre">Dans quel ordre</label>
+          <select id="pOrdre">
+            <option value="potentiel">Les plus prometteurs d’abord</option>
+            <option value="note">Les mieux notés d’abord</option>
+            <option value="hasard">Au hasard</option>
+          </select>
+        </div>
+        <div>
+          <label for="pDate">Ou : tout sortir d’ici le…</label>
+          <input type="date" id="pDate">
+        </div>
+        <div>
+          <label for="pLangues">Langues publiées</label>
+          <select id="pLangues">
+            <option value="fr,en">Français et anglais</option>
+            <option value="fr">Français seul</option>
+            <option value="en">Anglais seul</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="apercuPub" id="apercuPub"></p>
+
+      <div class="cmd" style="margin:14px 0 0">
+        <button class="btn p" id="pEnregistrer">Enregistrer le rythme</button>
+        <button class="btn" id="pPublierNow">Publier maintenant…</button>
+        <button class="btn" id="pEtat">Voir l’état du stock</button>
+      </div>
+    </div>
   </section>
 </div>
 
@@ -463,6 +537,9 @@ function chargerTout(){
   }).then(function(){
     return S.cfg.token ? chargerDecisions() : null;
   }).then(function(){
+    return S.cfg.token ? lirePublication() : null;
+  }).then(function(){
+    calculerEcrites();
     peindreCat(); peindreRel(); peindrePied();
   });
 }
@@ -519,13 +596,37 @@ function remplirUnivers(){
 }
 
 /* ══════════════════════════ CATALOGUE ══════════════════════════ */
+/* ── QUELLES LANGUES SONT ÉCRITES ────────────────────────────────────────
+   Un sujet écrit en français seul reste « à écrire » — c'est exact, il lui
+   manque l'anglais — mais rien ne le distinguait d'un sujet auquel personne
+   n'a touché. On le sait pourtant : le catalogue maître porte « langues »
+   depuis la 8.5.1, et à défaut les fiches déjà chargées le disent.        */
+var ECRITES = {};                     // qid -> {fr:true, en:true}
+function calculerEcrites(){
+  ECRITES = {};
+  S.fiches.forEach(function(f){
+    var q = f.rec && f.rec.q; if(!q) return;
+    if(!ECRITES[q]) ECRITES[q] = {};
+    ECRITES[q][f.lang] = true;
+  });
+}
+function languesDe(s){
+  var e = ECRITES[s.qid];
+  if(e) return { fr:!!e.fr, en:!!e.en };
+  var l = s.langues || [];
+  return { fr: l.indexOf('fr')>=0, en: l.indexOf('en')>=0 };
+}
+
 function etatDe(s){
   if(s.statut==='retire') return 'retire';
   if(s.publie) return 'publie';
   if(s.statut==='ecrit'||s.ecrit) return 'ecrit';
+  /* Ni tout à fait vierge, ni tout à fait écrit : une langue est faite. */
+  var l = languesDe(s);
+  if(l.fr !== l.en) return 'partiel';
   return 'aecrire';
 }
-var ETIQ={aecrire:'à écrire',ecrit:'écrit',publie:'en ligne',retire:'retiré'};
+var ETIQ={aecrire:'à écrire',partiel:'à finir',ecrit:'écrit',publie:'en ligne',retire:'retiré'};
 
 function decDe(s){ return S.decisions[s.qid] || 'neutre'; }
 
@@ -575,8 +676,10 @@ function ligneCat(s){
   var n = el('article','item'+(d==='retenu'?' retenu':d==='ecarte'?' ecarte':''));
 
   var meta = el('div','meta');
+  var lg = languesDe(s);
   var h = '<i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i><span>'+esc(uni[0])+'</span>'
-        + (s.fr?'<span class="lg">FR</span>':'') + (s.en?'<span class="lg">EN</span>':'')
+        + (s.fr?'<span class="lg'+(lg.fr?' faite':'')+'" title="'+(lg.fr?'fiche française écrite':'français pas encore écrit')+'">FR</span>':'')
+        + (s.en?'<span class="lg'+(lg.en?' faite':'')+'" title="'+(lg.en?'fiche anglaise écrite':'anglais pas encore écrit')+'">EN</span>':'')
         + '<b class="note">'+(s.potentiel||1)+'/10</b>';
   src.forEach(function(x){ h += '<b class="s-'+x+'">'+esc(x==='saviez'?'le saviez-vous':x)+'</b>'; });
   if(src.length>=2) h += '<b class="croise">'+src.length+' sources</b>';
@@ -610,7 +713,7 @@ function peindreCat(){
   S.sujets.forEach(function(s){ c[decDe(s)]++; c[etatDe(s)] = (c[etatDe(s)]||0)+1; });
   var box=$('#chCat'); box.innerHTML='';
   [['k',c.total,'au catalogue'],['v',c.retenu,'retenus'],['r',c.ecarte,'écartés'],
-   ['',c.neutre,'pas décidés'],['o',c.ecrit,'écrits'],['k',c.publie,'en ligne']]
+   ['',c.neutre,'pas décidés'],['o',c.partiel||0,'à finir'],['o',c.ecrit,'écrits'],['k',c.publie,'en ligne']]
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
 
   $('#cCat').textContent = nb(S.vueCat.length)+' affiché'+(S.vueCat.length>1?'s':'');
@@ -814,7 +917,9 @@ function peindrePied(){
   if(S.onglet==='cat'){
     var ret=0, eca=0;
     S.sujets.forEach(function(s){ var d=decDe(s); if(d==='retenu')ret++; else if(d==='ecarte')eca++; });
-    var aEcrire = S.sujets.filter(function(s){ return decDe(s)==='retenu' && etatDe(s)==='aecrire'; }).length;
+    /* « à finir » compte aussi : il reste une langue à écrire. */
+    var aEcrire = S.sujets.filter(function(s){
+      var e = etatDe(s); return decDe(s)==='retenu' && (e==='aecrire' || e==='partiel'); }).length;
     r.innerHTML = '<b>'+nb(ret)+'</b> retenus · <b>'+nb(eca)+'</b> écartés'
                 + (S.sale ? ' · <span style="color:var(--or)">non enregistré</span>' : '');
     var b1=el('button','btn'+(S.sale?' p':''),'Enregistrer mes décisions');
@@ -827,10 +932,17 @@ function peindrePied(){
     bA.title = 'Reprend chaque sujet retenu : l’article existe-t-il toujours, '
              + 'est-il assez fourni, votre phrase parle-t-elle bien de lui ?';
     bA.addEventListener('click', envoyerAudit);
-    var b2=el('button','btn o','Écrire les '+nb(aEcrire)+' retenus');
+    var b2=el('button','btn o','Écrire — '+nb(aEcrire)+' retenus');
     b2.disabled = !aEcrire;
     b2.addEventListener('click', envoyerEcriture);
     a.appendChild(b1); a.appendChild(bA); a.appendChild(b2);
+  }else if(S.onglet==='pub'){
+    var prets = stockPret();
+    r.innerHTML = '<b>'+nb(prets)+'</b> sujet(s) prêts à sortir · rythme <b>'+esc(PUB.rythme)+'</b>'
+                + ' · <b>'+esc(PUB.langues)+'</b>';
+    var p1=el('button','btn p','Enregistrer le rythme');
+    p1.addEventListener('click', enregistrerPublication);
+    a.appendChild(p1);
   }else{
     var val=0, ref=0, ret2=0;
     S.fiches.forEach(function(f){ var v=valDe(f); if(v==='valide')val++; else if(v==='refaire')ref++; else if(v==='retire')ret2++; });
@@ -910,18 +1022,41 @@ function envoyerAudit(){
   }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
 }
 function envoyerEcriture(){
-  var n = S.sujets.filter(function(s){ return decDe(s)==='retenu' && etatDe(s)==='aecrire'; }).length;
-  var budget = window.prompt(
-    n + ' sujet(s) retenus restent à écrire, soit ' + (n*2) + ' fiches.\n\n'
-    + 'Budget de cette tranche, en euros ?\n'
-    + '(≈ ' + Math.ceil(n*2*0.036/1.08) + ' € pour tout écrire)', '30');
-  if(budget===null) return;
+  var n = S.sujets.filter(function(s){
+    var e = etatDe(s); return decDe(s)==='retenu' && (e==='aecrire' || e==='partiel'); }).length;
+  if(!n) return;
+  /* On raisonne en SUJETS, pas en euros : « cinq pour voir », puis « trois
+     cents ». C'est le nombre qu'on a en tête, et l'action sait le prendre. */
+  var combien = window.prompt(
+    n + ' sujet(s) retenus restent à écrire.\n\n'
+    + 'Combien voulez-vous en écrire MAINTENANT ?\n'
+    + '(5 pour un essai · 300 pour un lot · ' + n + ' pour tout)', String(Math.min(5, n)));
+  if(combien===null) return;
+  combien = Math.max(1, Math.min(n, parseInt(combien,10) || 0));
+
+  var deux = window.confirm(
+    'Écrire ' + combien + ' sujet(s).\n\n'
+    + 'OK       = français ET anglais — ' + (combien*2) + ' textes.\n'
+    + 'Annuler  = français seul — ' + combien + ' textes, moitié prix.\n\n'
+    + 'Le français seul ne perd rien : ces sujets resteront « à écrire »,\n'
+    + 'et une tranche anglaise plus tard ne repaiera jamais le français.');
+  var langues = deux ? 'fr,en' : 'fr';
+
+  var estimer = !window.confirm(
+    combien + ' sujet(s) × ' + (deux?2:1) + ' texte(s).\n\n'
+    + 'OK       = écrire pour de bon.\n'
+    + 'Annuler  = estimer seulement, sans dépenser un centime.');
+
   dit('Enregistrement des décisions, puis lancement…','info');
   enregistrerDecisions().then(function(){
-    return lancerAction('2-ecrire.yml', { budget:String(budget), estimer:'false', modele:'' });
+    return lancerAction('2-ecrire.yml', { sujets:String(combien), budget:'0',
+      langues:langues, estimer: estimer?'true':'false', modele:'' });
   }).then(function(){
-    dit('L’écriture est lancée. Suivez-la dans l’onglet <b>Actions</b> de votre dépôt ; '
-      + 'revenez ici dans un moment, les fiches apparaîtront dans <b>Relecture</b>.','ok');
+    dit(estimer
+      ? 'Estimation lancée — aucun appel payant. Le plan et le montant s’affichent '
+        + 'dans <b>Actions → 2 · Écrire</b>.'
+      : 'Écriture lancée : <b>' + nb(combien) + '</b> sujet(s) en <b>' + esc(langues) + '</b>. '
+        + 'Suivez-la dans <b>Actions</b> ; les fiches apparaîtront dans <b>Relecture</b>.', 'ok');
   }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
 }
 function envoyerPublication(){
@@ -938,17 +1073,198 @@ function envoyerPublication(){
   }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
 }
 
+/* ══════════════════════════ PUBLICATION ══════════════════════════
+   consignes/publication.txt est le seul maître du rythme : l'action tourne
+   tous les jours et lit ce fichier. On l'édite ici, on le réécrit là-bas,
+   commentaires compris — pour que le fichier reste lisible sur GitHub. */
+var PUB = { rythme:'quotidien', jours:[1], parPassage:3, ordre:'potentiel',
+            jusquAu:'', langues:'fr,en', sha:null };
+var NOMS_JOURS = ['lun','mar','mer','jeu','ven','sam','dim'];
+
+function lirePublication(){
+  return lireFichier('consignes/publication.txt').then(function(r){
+    PUB.sha = r.sha;
+    if(!r.texte) return;
+    String(r.texte).split(/\r?\n/).forEach(function(l){
+      var t=l.trim(); if(!t || t[0]==='#') return;
+      var m=t.match(/^([\w-]+)\s*[:=]\s*(.*)$/); if(!m) return;
+      var k=m[1].toLowerCase(), v=m[2].trim();
+      if(k==='rythme') PUB.rythme=v.toLowerCase();
+      else if(k==='jours') PUB.jours=v.split(/[,\s]+/).map(Number).filter(function(n){return n>=1&&n<=7;});
+      else if(k==='parpassage'||k==='par-passage'||k==='nombre') PUB.parPassage=Math.max(0,parseInt(v,10)||0);
+      else if(k==='ordre') PUB.ordre=v.toLowerCase();
+      else if(k==='jusqu-au'||k==='jusquau') PUB.jusquAu=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:'';
+      else if(k==='langues') PUB.langues=v.replace(/\s+/g,'').toLowerCase()||'fr,en';
+    });
+  }).catch(function(){});
+}
+
+function peindreJours(){
+  var box=$('#pJours'); box.innerHTML='';
+  NOMS_JOURS.forEach(function(nom,i){
+    var n=i+1, b=el('button',PUB.jours.indexOf(n)>=0?'on':'',nom); b.type='button';
+    b.addEventListener('click',function(){
+      if(PUB.rythme==='hebdomadaire'){ PUB.jours=[n]; }
+      else { var k=PUB.jours.indexOf(n); if(k>=0) PUB.jours.splice(k,1); else PUB.jours.push(n); }
+      PUB.jours.sort(); peindreJours(); apercuPublication();
+    });
+    box.appendChild(b);
+  });
+  $('#boxJours').style.display = (PUB.rythme==='hebdomadaire'||PUB.rythme==='jours') ? '' : 'none';
+}
+
+/* Combien de passages entre aujourd'hui et une date : le même calcul que
+   l'outil, pour que l'aperçu dise la vérité. */
+function passagesJusqua(fin){
+  var stop=new Date(fin+'T00:00:00Z'); if(isNaN(stop)) return 0;
+  var cur=new Date(); cur=new Date(Date.UTC(cur.getUTCFullYear(),cur.getUTCMonth(),cur.getUTCDate()));
+  var n=0, garde=0;
+  while(cur<=stop && garde++<4000){ if(estJourPub(cur)) n++; cur.setUTCDate(cur.getUTCDate()+1); }
+  return n;
+}
+function estJourPub(d){
+  var j = d.getUTCDay()===0 ? 7 : d.getUTCDay();
+  if(PUB.rythme==='pause') return false;
+  if(PUB.rythme==='hebdomadaire') return j===(PUB.jours[0]||1);
+  if(PUB.rythme==='jours') return PUB.jours.length ? PUB.jours.indexOf(j)>=0 : true;
+  return true;
+}
+
+/* Le stock : les sujets écrits, contrôlés, pas encore publiés. On le compte
+   sur les fiches déjà chargées — aucun appel de plus. */
+function stockPret(){
+  var par={}, langues=PUB.langues.split(',');
+  S.fiches.forEach(function(f){
+    if(langues.indexOf(f.lang)<0) return;
+    if(f.rec.v==='quarantaine'||f.rec.v==='retire') return;
+    var k=f.rec.q||f.titre;
+    if(!par[k]) par[k]={enligne:true,ok:false};
+    if(!f.rec.p) par[k].enligne=false;
+    if(f.rec.v==='ok') par[k].ok=true;
+  });
+  var n=0; Object.keys(par).forEach(function(k){ if(!par[k].enligne && par[k].ok) n++; });
+  return n;
+}
+
+function apercuPublication(){
+  var prets=stockPret(), a=$('#apercuPub');
+  if(PUB.rythme==='pause'){
+    a.innerHTML='La publication est <b>en pause</b>. Les '+nb(prets)+' sujet(s) prêts restent en réserve.';
+    return;
+  }
+  var combien=PUB.parPassage, source='';
+  if(PUB.jusquAu){
+    var pas=passagesJusqua(PUB.jusquAu);
+    combien = pas>0 ? Math.max(1,Math.ceil(prets/pas)) : prets;
+    source = ' (calculé : '+nb(prets)+' prêts répartis sur '+nb(pas)+' passage(s) d’ici le '+PUB.jusquAu+')';
+  }
+  var parSemaine = PUB.rythme==='quotidien' ? 7
+                 : PUB.rythme==='hebdomadaire' ? 1
+                 : (PUB.jours.length||7);
+  var semaines = combien*parSemaine ? prets/(combien*parSemaine) : 0;
+  a.innerHTML = '<b>'+nb(combien)+'</b> sujet(s) à chaque passage'+esc(source)
+    + ', <b>'+parSemaine+'</b> passage(s) par semaine.<br>'
+    + 'Réserve actuelle : <b>'+nb(prets)+'</b> sujet(s) prêts — de quoi tenir <b>'
+    + (semaines>=1 ? Math.round(semaines)+' semaine(s)' : 'moins d’une semaine') + '</b>.'
+    + (PUB.langues==='fr,en' ? '' : '<br>Seul le <b>'+(PUB.langues==='fr'?'français':'anglais')
+        + '</b> est publié : le bouton FR/EN disparaît du site et de l’application.');
+}
+
+function peindrePub(){
+  $('#pRythme').value = PUB.rythme;
+  $('#pCombien').value = PUB.parPassage;
+  $('#pOrdre').value = PUB.ordre;
+  $('#pDate').value = PUB.jusquAu;
+  $('#pLangues').value = PUB.langues;
+  peindreJours();
+  var c={ecrites:S.fiches.length,enligne:0,prets:stockPret(),quarantaine:0};
+  S.fiches.forEach(function(f){ if(f.rec.p) c.enligne++; if(f.rec.v==='quarantaine') c.quarantaine++; });
+  var box=$('#chPub'); box.innerHTML='';
+  [['k',c.ecrites,'fiches écrites'],['v',c.enligne,'fiches en ligne'],
+   ['o',c.prets,'sujets prêts'],['r',c.quarantaine,'en quarantaine']]
+   .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
+  apercuPublication();
+}
+
+function texteReglagePublication(){
+  return '# ═══════════════════════════════════════════════════════════════════\n'
+   + '# LE RYTHME DE PUBLICATION — écrit par console.html\n'
+   + '# ═══════════════════════════════════════════════════════════════════\n'
+   + '#\n'
+   + '# L’action « 5 · Publier » tourne tous les jours à 6 h UTC. C’est ce\n'
+   + '# fichier qui décide si aujourd’hui est un jour de publication.\n'
+   + '#\n'
+   + '# rythme : quotidien | hebdomadaire | jours | pause\n'
+   + 'rythme: ' + PUB.rythme + '\n\n'
+   + '# 1 = lundi … 7 = dimanche\n'
+   + 'jours: ' + (PUB.jours.length ? PUB.jours.join(',') : '1') + '\n\n'
+   + '# Combien de sujets à chaque passage\n'
+   + 'parPassage: ' + PUB.parPassage + '\n\n'
+   + '# Ou : tout sortir d’ici cette date — « parPassage » est alors ignoré\n'
+   + 'jusqu-au: ' + (PUB.jusquAu || '') + '\n\n'
+   + '# Langues publiées : fr | en | fr,en\n'
+   + 'langues: ' + PUB.langues + '\n\n'
+   + '# Ordre : potentiel | note | hasard\n'
+   + 'ordre: ' + PUB.ordre + '\n\n'
+   + '# Publier ce qui est en quarantaine ? Non.\n'
+   + 'quarantaine: non\n';
+}
+
+function enregistrerPublication(){
+  dit('Enregistrement du rythme…','info');
+  return ecrireFichier('consignes/publication.txt', texteReglagePublication(), PUB.sha,
+      'console : rythme de publication (' + PUB.rythme + ', ' + PUB.parPassage + '/passage, ' + PUB.langues + ')')
+    .then(function(sha){ PUB.sha=sha;
+      dit('Rythme enregistré. Il s’applique dès le prochain passage de <b>5 · Publier</b>.','ok'); })
+    .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+}
+
 /* ══════════════════════════ branchements ══════════════════════════ */
 function onglet(nom){
   S.onglet=nom;
   $('#ongCat').className = nom==='cat'?'on':'';
   $('#ongRel').className = nom==='rel'?'on':'';
+  $('#ongPub').className = nom==='pub'?'on':'';
   $('#vueCat').hidden = nom!=='cat';
   $('#vueRel').hidden = nom!=='rel';
+  $('#vuePub').hidden = nom!=='pub';
+  if(nom==='pub') peindrePub();
   peindrePied();
 }
 $('#ongCat').addEventListener('click',function(){ onglet('cat'); });
 $('#ongRel').addEventListener('click',function(){ onglet('rel'); });
+$('#ongPub').addEventListener('click',function(){ onglet('pub'); });
+
+['pRythme','pCombien','pOrdre','pDate','pLangues'].forEach(function(id){
+  $('#'+id).addEventListener('change',function(){
+    PUB.rythme=$('#pRythme').value;
+    PUB.parPassage=Math.max(0,parseInt($('#pCombien').value,10)||0);
+    PUB.ordre=$('#pOrdre').value;
+    PUB.jusquAu=$('#pDate').value||'';
+    PUB.langues=$('#pLangues').value;
+    if(PUB.rythme==='hebdomadaire' && PUB.jours.length>1) PUB.jours=[PUB.jours[0]];
+    if((PUB.rythme==='hebdomadaire'||PUB.rythme==='jours') && !PUB.jours.length) PUB.jours=[1];
+    peindreJours(); apercuPublication();
+  });
+});
+$('#pEnregistrer').addEventListener('click', enregistrerPublication);
+$('#pEtat').addEventListener('click',function(){
+  enregistrerPublication().then(function(){
+    return lancerAction('5-publier.yml', { operation:'etat', combien:'', titre:'' });
+  }).then(function(){
+    dit('L’état du stock est demandé. Le détail s’affiche dans <b>Actions → 5 · Publier</b>.','ok');
+  }).catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+});
+$('#pPublierNow').addEventListener('click',function(){
+  var n=window.prompt('Combien de sujets publier tout de suite ?\n\n'
+    + 'Cette publication passe outre le rythme : c’est vous qui décidez.', String(PUB.parPassage||3));
+  if(n===null) return;
+  enregistrerPublication().then(function(){
+    return lancerAction('5-publier.yml', { operation:'publier', combien:String(parseInt(n,10)||0), titre:'' });
+  }).then(function(){
+    dit('Publication lancée. Suivez-la dans <b>Actions → 5 · Publier</b>.','ok');
+  }).catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+});
 /* La moisson tourne chaque nuit à minuit. Ce bouton est là pour les fois où
    l'on ne veut pas attendre : on vient d'ajouter des sujets phares, ou de
    brancher un subreddit, et on veut voir le résultat maintenant. */

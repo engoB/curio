@@ -27,7 +27,7 @@ Les cinq actions, directement :
 
 ```
 .../actions/workflows/1-moissonner.yml     construire le catalogue maître
-.../actions/workflows/2-ecrire.yml         écrire une tranche de N euros
+.../actions/workflows/2-ecrire.yml         écrire N sujets, dans la ou les langues voulues
 .../actions/workflows/3-controler.yml      contrôler avant mise en ligne
 .../actions/workflows/5-publier.yml        publier — tourne seule chaque jour
 .../actions/workflows/entretien.yml        auditer, ranger, accorder, purger…
@@ -42,13 +42,12 @@ Sur chacune : bouton **Run workflow**, en haut à droite.
 
 ## La console — l'endroit où tout se passe
 
-`console.html`. Une page, deux vues, et vous n'ouvrez rien d'autre.
+`console.html`. Une page, trois vues, et vous n'ouvrez rien d'autre.
 
 **Catalogue** — tout ce que la moisson a trouvé (elle tourne chaque nuit à
 minuit, toute seule). Vous lisez, vous retenez ou vous écartez, à la main.
 Deux boutons en bas : **Enregistrer mes décisions**, qui les écrit dans le
-dépôt, et **Écrire les retenus**, qui lance l'écriture avec le budget que vous
-indiquez.
+dépôt, et **Écrire**, qui lance une tranche.
 
 **Six filtres, dont le potentiel.** Univers, provenance, décision, état,
 **potentiel** (*10 seulement · 9 et plus · 8 et plus · 7 et plus · 6 et
@@ -77,6 +76,24 @@ phrase à raconter. Vous validez une par une ou d'un bloc, et **Publier les
 validées** les met en ligne. Ce que vous marquez « à refaire » repasse à
 écrire ; « à retirer » sort définitivement.
 
+**Publication** — le rythme de sortie, réglé ici plutôt que dans un fichier de
+code : tous les jours, une fois par semaine, certains jours seulement, ou en
+pause ; combien de sujets à chaque passage ; ou bien une date — *tout sortir
+d'ici le 31 décembre* — et le nombre par passage se calcule tout seul. Et
+**quelles langues sont publiées** : `fr` seul retire l'anglais du site et de
+l'application, sans rien supprimer, jusqu'au jour où vous le rallumez.
+
+**Écrire par lots.** Le bouton *Écrire* demande un **nombre de sujets** — 5
+pour un essai, 300 pour un lot — puis les langues. Le français seul divise la
+facture par deux et ne perd rien.
+
+**Et ces sujets-là se voient.** Un sujet écrit en français mais pas en anglais
+porte l'état **« à finir »**, badge doré, avec le badge `FR` plein et le badge
+`EN` creux ; un filtre et un compteur les isolent. Ce ne sont ni des sujets
+vierges, ni des sujets terminés. La tranche anglaise d'un autre jour les
+reprendra sans jamais repayer le français : avant tout appel, la rédaction lit
+le fichier de sortie et saute les titres qui s'y trouvent déjà.
+
 Elle parle à GitHub avec un jeton que vous créez et qui **ne quitte jamais
 votre navigateur**. Réglages → un jeton à portée fine, limité à ce dépôt,
 permissions `Contents: Read and write` et `Actions: Read and write`.
@@ -102,7 +119,7 @@ un en une minute.
         ↓
    [ on vérifie ]     Vérifier les N retenus     gratuit, quelques minutes
         ↓
-   2 · Écrire       →  une tranche de N euros    FR + EN, toujours les deux
+   2 · Écrire       →  N sujets, FR seul ou FR+EN
         ↓
    3 · Contrôler    →  quarantaine               gratuit, instantané
         ↓

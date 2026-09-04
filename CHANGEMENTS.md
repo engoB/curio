@@ -1,4 +1,222 @@
-# Curio 8.4.3 — ce qui a changé depuis v6
+# Curio 8.5.1 — ce qui a changé depuis v6
+
+## 8.5.1 — « écrit en français seul » se voit enfin
+
+**La question.** « Les fiches écrites mais qui restent dans *à écrire*, comment
+les distinguer ? Et comment fais-tu pour ne pas réécrire dedans ? »
+
+**Comment l'outil, lui, ne s'y trompe pas.** Avant tout appel payant, la
+rédaction lit le fichier de sortie et écarte ce qui s'y trouve déjà :
+
+```js
+const restants = entrees.filter(e => !store.items[e.titre]);
+```
+
+`store`, c'est `anecdotes/fr-cosmos.json` — le fichier réel, pas une mémoire de
+l'exécution. Un titre déjà présent n'est même pas mis dans la file : pas
+d'article téléchargé, pas de jeton dépensé. C'est ce qui rend une tranche
+« français seul » suivie d'une tranche « anglais » strictement additive.
+
+**Ce qui manquait : le voir.** Un sujet écrit en français restait affiché
+« à écrire », exactement comme un sujet auquel personne n'avait touché. Trois
+choses le distinguent maintenant :
+
+| | avant | maintenant |
+|---|---|---|
+| état | « à écrire » | **« à finir »**, badge doré |
+| badges de langue | `FR` `EN` gris, indiquant seulement que le titre existe | **`FR` plein et vert** quand la fiche est écrite, `EN` creux tant qu'elle ne l'est pas |
+| filtre | « À écrire » | « À écrire — rien de fait » **et** « À finir — une langue sur deux » |
+| compteur | — | un bloc **« à finir »** en tête de la console |
+
+Le catalogue maître porte désormais un champ **`langues`** — les langues
+réellement rédigées, constatées sur le disque après chaque tranche — et
+`catalogue-maitre.csv` une colonne **`langues_ecrites`**. La console sait aussi
+le déduire des fiches qu'elle a chargées, donc l'affichage est juste même pour
+un catalogue écrit avant cette version.
+
+Le bouton **Écrire** compte les « à finir » avec les « à écrire » : ce sont
+bien des sujets qui attendent du texte. Il ne repaiera que ce qui manque.
+
+Éprouvé au navigateur sur 50 sujets — 30 vierges, 12 en français seul,
+8 complets : les trois filtres donnent 30, 12 et 8, le badge FR est plein et le
+badge EN creux sur les douze, et le tableau de bord `catalogue.html` les
+retrouve aussi.
+
+## 8.5.0 — écrire par lots, publier à son rythme, et le français seul
+
+### 1. On écrit un NOMBRE DE SUJETS, plus un budget en euros
+
+« Cinq pour mes tests, puis par lots. » C'est le bon raisonnement, et l'action
+ne savait parler qu'en euros. Elle a maintenant un champ **`sujets`** qui
+prime sur le budget, et le bouton **Écrire** de la console demande simplement
+combien.
+
+```
+╔══ TRANCHE DE 5 SUJET(S) ══════════════════════════════════
+║  modèle : claude-sonnet-5
+║  langue(s) : fr  — l'autre langue restera à écrire
+║  0.0134 $ par texte, 1 texte(s) par sujet.
+║  consigne mise en cache : 21 % de moins (0.0170 $ sans elle).
+║  5 sujet(s) → 5 texte(s) → 0.07 $ (~0.06 €)
+```
+
+### 2. Le français maintenant, l'anglais plus tard — sans rien perdre
+
+Nouveau champ **`langues`** : `fr,en`, `fr` ou `en`. Écrire le français seul
+divise la facture par deux, et **ne perd rien** : un sujet n'est marqué
+« écrit » que lorsque ses deux fiches existent **sur le disque**. Un sujet
+écrit en français reste donc « à écrire », la tranche anglaise d'un autre jour
+le retrouve, et le français n'est jamais repayé — une fiche déjà présente est
+sautée avant tout appel.
+
+Le journal le dit : *« 300 sujet(s) écrits dans une seule langue : ils restent
+« à écrire » et attendent leur tranche dans l'autre langue. Rien ne sera
+repayé. »*
+
+### 3. Le rythme de publication se règle depuis la console
+
+Un troisième onglet, **Publication**. L'action tourne toujours tous les jours
+à 6 h UTC ; c'est `consignes/publication.txt` — écrit par la console — qui
+décide si aujourd'hui compte.
+
+| réglage | ce qu'il fait |
+|---|---|
+| **rythme** | `quotidien` · `hebdomadaire` · `jours` (les jours cochés) · `pause` |
+| **jours** | lundi…dimanche, à cocher |
+| **parPassage** | combien de sujets à chaque sortie |
+| **jusqu-au** | *« tout sortir d'ici le 31 décembre »* — le nombre par passage est recalculé à chaque exécution, donc il s'ajuste si vous écrivez de nouvelles fiches |
+| **langues** | quelles langues sont publiées |
+| **ordre** | potentiel · note · hasard |
+
+Un aperçu, sous les réglages, dit ce que cela donne : *« 2 sujets à chaque
+passage (34 prêts répartis sur 17 passages d'ici le 2026-12-31), 1 passage par
+semaine. Réserve : 34 sujets prêts — de quoi tenir 17 semaines. »*
+
+Deux boutons de plus : **Publier maintenant…**, qui passe outre le rythme, et
+**Voir l'état du stock**.
+
+### 4. Retirer l'anglais du site et de l'application
+
+`langues: fr` suffit. Les fiches anglaises restent au dépôt, simplement non
+publiées — et le jour où vous ajoutez `en`, tout ce qui est écrit et contrôlé
+sort, **sans réécrire la date de publication du français**.
+
+Côté lecteur, rien à régler : le bouton **FR/EN disparaît** tant qu'une seule
+langue est publiée, dans l'application comme sur le site, et la langue
+affichée s'aligne d'elle-même. Le bouton revient tout seul le jour où l'autre
+langue est en ligne. C'est déduit de `anecdotes/index.json`, pas d'un réglage
+de plus à tenir à jour.
+
+**Éprouvé** : rythme hebdomadaire un lundi (aujourd'hui jeudi → rien ne sort),
+puis jeudi (3 sujets) ; jours `2,5` puis `2,4,5` ; étalement jusqu'au
+31 octobre → 26 passages, 2 par passage ; français seul → seules les fiches FR
+sortent ; anglais rallumé → seules les fiches EN sortent, les dates françaises
+intactes. Console : les cinq réglages, l'aperçu, l'écriture de
+`publication.txt`, et le lancement d'une tranche de 5 sujets en français —
+aucune erreur JavaScript.
+
+## 8.4.5 — la consigne était payée deux mille quatre cents fois
+
+**Le constat.** Votre consigne de rédaction fait environ deux mille jetons, et
+elle est **identique pour les 2 400 textes** d'une tranche de 1 200 sujets.
+Elle était réexpédiée à chaque appel : cinq millions de jetons payés plein
+tarif pour dire deux mille quatre cents fois la même chose.
+
+**Le remède.** `cache_control` sur le bloc système. Le premier appel la fait
+mémoriser (×1,25), tous les suivants la relisent à **un dixième du prix** tant
+que les appels s'enchaînent — ce qui est le cas, trois requêtes en parallèle
+sans interruption. Si l'API refuse la mise en cache, le code s'en passe et
+continue : c'est une économie, pas une dépendance. `--sans-cache` la coupe.
+
+**Et une correction de vérité au passage.** L'estimation reposait sur
+1 800 jetons d'entrée par texte. La réalité : deux mille pour la consigne plus
+mille pour la fiche de faits, soit **trois mille**. L'action sous-évaluait
+donc la facture d'un tiers. Les constantes sont corrigées, et l'estimation
+tient compte du cache.
+
+Pour 1 200 sujets, soit 2 400 textes :
+
+| modèle | ancienne estimation | sans cache (réel) | **avec cache** |
+|---|---|---|---|
+| Opus 5 | 86 $ | 102 $ | **80 $ ≈ 74 €** |
+| Sonnet 5 | 35 $ | 41 $ | **32 $ ≈ 30 €** |
+| Haiku 4.5 | 17 $ | 20 $ | **16 $ ≈ 15 €** |
+
+L'encadré d'estimation affiche désormais « consigne mise en cache : 21 % de
+moins », et le compte rendu de fin dit ce que la tranche aurait coûté sans
+elle, jetons de cache à l'appui.
+
+Conséquence utile : **vous pouvez écrire des consignes riches sans les payer
+au mot.** Les quatre règles ajoutées en 8.4.4 ont allongé `consignes/fr.md` de
+moitié ; avec le cache, cela ne coûte plus rien.
+
+## 8.4.4 — l'accroche devient un bloc, et le début se comprend du premier coup
+
+Trois remarques sur la fiche d'exemple, toutes justes, et une quatrième
+trouvée en regardant le rendu.
+
+### 1. « J'ai eu du mal avec le début »
+
+C'était le vrai défaut. L'ancienne ouverture :
+
+> Le temps de lire cette phrase, vous vous êtes déplacé de douze cents
+> kilomètres. Pas autour du Soleil, pas avec la rotation de la Galaxie : en
+> plus de tout cela, dans une direction précise du ciel…
+
+Deux négations et une exception avant que le lecteur ait la moindre image en
+tête. **On ne peut pas nier ce qui n'a pas encore été posé.** La nouvelle :
+
+> Vous êtes en train de tomber.
+>
+> Pas vers le sol. Vers un point du ciel, dans la constellation du Centaure,
+> et vous ne le sentez pas.
+
+Une section **« Se faire comprendre du premier coup »** entre dans
+`consignes/fr.md` et `en.md`, et dans les consignes de secours du code : une
+idée par phrase, deux propositions au maximum ; affirmer avant de corriger ;
+toute notion technique expliquée dans la phrase où elle apparaît, par une
+comparaison familière (« le fond diffus cosmologique » devient « la plus
+vieille lumière de l'univers », avec le sifflement du train qui monte quand il
+vient vers vous) ; et la première phrase de chaque paragraphe doit se
+comprendre hors du texte.
+
+### 2. L'accroche est un paragraphe à elle seule
+
+Elle n'était qu'« un peu plus grosse » que le corps — à l'œil, on entrait dans
+l'article sans voir qu'on avait commencé. Elle a maintenant :
+
+- **une règle d'écriture** : un paragraphe isolé, vingt-cinq mots au plus, une
+  ou deux phrases courtes, qui pose une chose et une seule ;
+- **une typographie** : Fraunces, corps 21 à 26 px, filet bleu à gauche, de
+  l'air en dessous (`parts/00-head.html`) ;
+- **un contrôle** : au-delà de quarante-cinq mots, `3 · Contrôler` la recale —
+  ce n'est plus une accroche, c'est un mur.
+
+### 3. Le gras passe de deux à cinq
+
+« Jamais plus de deux » rendait le texte plat pour qui le parcourt des yeux.
+La consigne demande maintenant **trois à cinq** éléments — les chiffres et les
+noms qui portent l'histoire —, jamais une phrase entière, jamais deux dans la
+même phrase. Le contrôle, qui recalait au-delà de quatre, tolère six.
+
+### 4. Le titre ne répète plus l'accroche
+
+Trouvé en regardant le premier rendu : titre « Nous tombons vers un point
+invisible », accroche « Vous êtes en train de tomber. » — la même phrase deux
+fois, à deux lignes d'intervalle, au moment précis où le lecteur venait d'être
+pris. La règle entre dans les deux consignes, et `3 · Contrôler` la vérifie :
+si l'un commence par l'autre, la fiche part en quarantaine.
+
+Éprouvé sur les deux fiches d'exemple (français et anglais, 2 538 et 2 551
+signes, accroche + 6 paragraphes, 5 gras, 23 et 26 mots à raconter) : **2
+conformes**. Et sur trois fiches fautives fabriquées exprès — titre répété,
+accroche de 67 mots, sept gras — **3 recalées**, chacune avec le bon motif.
+
+### Et le déploiement
+
+Un fichier **`.nojekyll`** vide est ajouté à la racine : il empêche GitHub de
+faire passer le site dans son moteur de blog avant de le publier. Inutile ici,
+et source classique de fichiers qui disparaissent sans explication.
 
 ## 8.4.3 — la passe qualité, sur les seuls sujets retenus
 

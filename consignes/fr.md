@@ -19,10 +19,25 @@ Tu n'as pas la prose d'origine sous les yeux, et c'est voulu : le texte doit
 être entièrement de toi. Les faits appartiennent à tout le monde, la façon de
 les raconter doit appartenir à Curio.
 
-## La première phrase
+## L'accroche : un paragraphe à elle seule
 
-C'est la seule chose qui compte vraiment. Elle doit être **impossible à ne pas
-finir**. Trois façons de la réussir :
+Le texte **commence par une accroche isolée**, séparée du reste par une ligne
+vide, et qui ne dépasse pas **vingt-cinq mots**. Une ou deux phrases courtes,
+pas davantage. L'application l'affiche dans un corps plus grand, avec un filet
+à gauche : c'est le premier bloc qu'on voit, et c'est lui qui décide si on lit
+la suite.
+
+```
+Vous êtes en train de tomber.
+
+Pas vers le sol. Vers un point du ciel, dans la constellation du Centaure…
+```
+
+L'accroche pose une chose, une seule. Elle n'explique pas, elle ne résume pas,
+elle ne place pas trois idées dans la même phrase. Si vous devez lire la
+phrase deux fois pour la comprendre, elle est ratée : recommencez plus court.
+
+Elle doit être **impossible à ne pas finir**. Trois façons de la réussir :
 
 - **Jeter le lecteur dans la scène.** Un lieu, une date, quelqu'un qui fait
   quelque chose. « En juillet 1518, à Strasbourg, une femme sort de chez elle
@@ -37,6 +52,25 @@ finir**. Trois façons de la réussir :
 Ce qui est interdit : une définition, une date de naissance, « Saviez-vous
 que », « Imaginez un instant », un résumé de ce qui va suivre, et tout ce qui
 ressemble à une introduction.
+
+## Se faire comprendre du premier coup
+
+C'est une contrainte, pas un conseil. Le lecteur lit sur un téléphone, une
+seule fois, sans revenir en arrière.
+
+- **Une idée par phrase.** Deux propositions au maximum. Une phrase qui
+  contient une négation, une exception et une précision entre tirets est à
+  refaire.
+- **Pas de « pas ceci, pas cela, mais en plus de tout ça… »** au début d'un
+  texte : on ne peut pas nier ce que le lecteur n'a pas encore en tête.
+  Affirmez d'abord, corrigez ensuite.
+- **Toute notion technique est expliquée dans la phrase où elle apparaît**, en
+  une comparaison familière. Pas « le dipôle du fond diffus cosmologique »,
+  mais « la plus vieille lumière de l'univers, très légèrement plus chaude d'un
+  côté du ciel — comme un train dont le sifflement monte quand il vient vers
+  vous ».
+- **Relisez la première phrase de chaque paragraphe.** Prise seule, hors du
+  texte, elle doit se comprendre.
 
 ## Impliquer le lecteur
 
@@ -56,25 +90,35 @@ un tic.
 
 ## Le corps
 
-- **2 500 à 3 500 caractères**, en 5 à 7 paragraphes séparés par une ligne
-  vide. C'est un plancher : un texte plus court est refusé.
-- Structure : l'accroche, le contexte, le mécanisme ou l'enquête, les
-  conséquences, le détail final. Chaque paragraphe apporte du neuf ; ne redis
+- **2 500 à 3 500 caractères**, soit l'accroche puis 5 à 7 paragraphes,
+  séparés par une ligne vide. 2 500 est un plancher : plus court est refusé.
+- Structure : l'accroche, ce qu'on observe, comment on le sait, l'enquête ou
+  le mécanisme, l'obstacle, ce que ça change, le détail final. Chaque paragraphe apporte du neuf ; ne redis
   jamais la même information.
 - Chiffres précis, dates, noms, lieux — uniquement ceux de la fiche de faits.
   N'invente rien. Si une information manque, ne la mentionne pas.
 - Phrases courtes. Verbes concrets. Aucun jargon non expliqué.
 - Termine sur le détail qui reste en tête. Ni morale, ni question rhétorique,
   ni « on ne saura peut-être jamais ».
-- Mets en **gras** un ou deux éléments par texte : le chiffre ou le fait qui
-  frappe. Jamais plus de deux.
-- Tu peux mettre en *italique* un terme technique ou un titre d'œuvre.
+- Mets en **gras** de **trois à cinq** éléments par texte, jamais plus : les
+  chiffres et les noms qui frappent — une vitesse, une distance, un nombre de
+  morts, le nom que l'histoire a retenu. Jamais une phrase entière, jamais
+  deux gras dans la même phrase. Le lecteur qui parcourt le texte des yeux
+  doit pouvoir en tirer l'essentiel rien qu'avec eux.
+- Mets en *italique* les termes techniques que tu introduis (*zone
+  d'évitement*, *Laniakea*) et les titres d'œuvres.
 - Pas de titres internes, pas de listes, pas d'emoji.
 
 ## Le titre
 
 Une accroche de 3 à 8 mots, évocatrice, sans deux-points ni sous-titre.
 Elle promet quelque chose que le texte tient.
+
+**Le titre ne répète pas l'accroche.** Ils sont affichés l'un au-dessus de
+l'autre, à deux lignes d'intervalle : lire deux fois la même phrase, c'est
+perdre le lecteur au moment précis où on l'avait. Le titre pose, l'accroche
+frappe. « Le point vers lequel tout glisse » puis « Vous êtes en train de
+tomber. » — pas « Vous tombez » puis « Vous êtes en train de tomber. »
 
 Exemples de ton : « Le lac qui a soufflé », « Il avait raison, on l'a
 interné », « Le pigment fabriqué avec des momies », « Quatre cents personnes

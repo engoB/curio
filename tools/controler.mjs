@@ -83,6 +83,28 @@ function controler(rec, lang, titre, vus){
   const debut = paras[0] || texte.slice(0, 200);
   if (OUVERTURES.some(re => re.test(debut.replace(/^\*+/, '').trim()))) pb.push('ouverture interdite (définition ou formule creuse)');
 
+  /* L'accroche est un paragraphe à elle seule, et l'application l'affiche
+     dans un corps beaucoup plus grand. Un premier paragraphe de quatre-vingts
+     mots y devient un mur : ce n'est plus une accroche, et la fiche est mal
+     faite avant même d'être lue. La consigne dit vingt-cinq mots ; on recale
+     au-delà de quarante-cinq, pour laisser de la marge sans laisser passer un
+     paragraphe entier. */
+  const brutAccroche = debut.replace(/^\*+/, '').trim();
+  const motsAccroche = brutAccroche.split(/\s+/).filter(Boolean).length;
+  if (paras.length > 1 && motsAccroche > 45)
+    pb.push(`accroche de ${motsAccroche} mots (25 attendus, 45 tolérés) : ce n'est plus une accroche`);
+
+  /* Le titre et l'accroche s'affichent l'un au-dessus de l'autre. Quand ils
+     disent la même chose, le lecteur lit deux fois la même phrase au moment
+     précis où on venait de le capter. */
+  if (accroche && brutAccroche){
+    const nu = (x) => x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                       .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+    const t = nu(accroche), a = nu(brutAccroche);
+    if (t && a && (a.startsWith(t) || t.startsWith(a)))
+      pb.push('le titre répète l\'accroche du texte');
+  }
+
   if (rec.s == null) pb.push('pas de note');
   else if (rec.s < 0 || rec.s > 10) pb.push(`note hors bornes (${rec.s})`);
 
@@ -98,8 +120,11 @@ function controler(rec, lang, titre, vus){
   const l = langueDe(texte);
   if (l && l !== lang) pb.push(`texte en « ${l} » alors qu’on attend « ${lang} »`);
 
+  /* La consigne demande de trois à cinq gras : ils portent les chiffres et
+     les noms, et c'est ce qu'on lit quand on parcourt. Au-delà de six, le
+     texte devient un surligneur et plus rien ne ressort. */
   const gras = (texte.match(/\*\*/g) || []).length / 2;
-  if (gras > 4) pb.push(`${Math.round(gras)} passages en gras (deux suffisent)`);
+  if (gras > 6) pb.push(`${Math.round(gras)} passages en gras (cinq au plus)`);
 
   return pb;
 }

@@ -58,7 +58,17 @@ const PRIX = {
   'claude-haiku-4-5-20251001':  { in: 1,  out: 5  },
   'gpt-4o-mini':                { in: 0.15, out: 0.6 }
 };
-const JETONS_ENTREE = 1800, JETONS_SORTIE = 1100;  // moyennes pour un texte de 2 min
+/* Moyennes mesurées pour un texte : l'entrée, c'est votre consigne (environ
+   deux mille jetons, identique à chaque appel) plus la fiche de faits (mille
+   environ, différente à chaque fois). L'ancienne estimation de 1 800 jetons
+   d'entrée sous-évaluait la facture d'un bon tiers.
+
+   Avec la mise en cache de la consigne, seule la fiche de faits est payée
+   plein tarif ; la consigne est relue à un dixième du prix. C'est ce que
+   traduit ENTREE_CACHE.                                                  */
+const JETONS_CONSIGNE = 2000, JETONS_FICHE = 1000, JETONS_SORTIE = 1100;
+const JETONS_ENTREE = JETONS_CONSIGNE + JETONS_FICHE;
+const ENTREE_CACHE  = JETONS_FICHE + Math.round(JETONS_CONSIGNE * 0.1);
 const PARALLEL = Math.max(1, Math.min(8, parseInt(opt('parallele', '3'), 10) || 3));
 /* Une tranche de budget, en euros. C'est la seule chose à régler pour
    écrire : plus de sélection à coller — GitHub refusait d'ailleurs les
@@ -66,12 +76,24 @@ const PARALLEL = Math.max(1, Math.min(8, parseInt(opt('parallele', '3'), 10) || 
    à choisir. On prend les meilleurs sujets non écrits du catalogue maître,
    jusqu'à épuisement de la tranche, et on écrit le français ET l'anglais. */
 const BUDGET  = parseFloat(opt('budget', '0')) || 0;
+/* Le nombre de sujets. Plus lisible qu'un budget en euros quand on veut
+   « cinq pour voir », puis « trois cents ». S'il est donné, il commande ; le
+   budget ne sert plus alors qu'à afficher le coût. */
+const SUJETS  = parseInt(opt('sujets', '0'), 10) || 0;
+/* Les langues de CETTE tranche. « fr » seul écrit le français maintenant et
+   laisse l'anglais pour plus tard, sans rien perdre : le sujet reste
+   « à écrire » tant que toutes ses langues ne sont pas faites, et une
+   deuxième tranche en anglais ne repaiera jamais le français. */
+const LANGUES = String(opt('langues', 'fr,en')).split(',')
+                  .map(x => x.trim().toLowerCase()).filter(x => x === 'fr' || x === 'en');
+const LANGUES_TRANCHE = LANGUES.length ? LANGUES : ['fr', 'en'];
 const EUR_USD = 1.08;
 const MAITRE  = path.join(process.cwd(), 'catalogue-maitre.json');
 
 function coutParTexte(){
   const t = PRIX[MODEL] || PRIX['claude-opus-5'];
-  return (JETONS_ENTREE * t.in + JETONS_SORTIE * t.out) / 1e6;   // en dollars
+  const entree = (CACHE && PROVIDER !== 'openai') ? ENTREE_CACHE : JETONS_ENTREE;
+  return (entree * t.in + JETONS_SORTIE * t.out) / 1e6;   // en dollars
 }
 
 async function lireMaitre(){
@@ -83,8 +105,11 @@ async function lireMaitre(){
    deux fois le même, et toujours les deux langues. */
 function planDeTranche(maitre, budgetEuros, decisions){
   const cout = coutParTexte();
+  const parSujet = LANGUES_TRANCHE.length;          // 1 ou 2 textes par sujet
   const textesPossibles = Math.floor((budgetEuros * EUR_USD) / cout);
-  const sujetsPossibles = Math.max(0, Math.floor(textesPossibles / 2));
+  const sujetsPossibles = SUJETS > 0
+    ? SUJETS
+    : Math.max(0, Math.floor(textesPossibles / parSujet));
 
   /* Vos décisions, prises dans la console, commandent. Si vous avez retenu
      des sujets, on n'écrit QUE ceux-là — et jamais ce que vous avez écarté.
@@ -99,7 +124,7 @@ function planDeTranche(maitre, budgetEuros, decisions){
   candidats.sort((a, b) => (b.potentiel - a.potentiel)
                || ((b.sources || []).length - (a.sources || []).length)
                || (b.editions || 0) - (a.editions || 0));
-  return { cout, sujetsPossibles, retenus: candidats.slice(0, sujetsPossibles),
+  return { cout, sujetsPossibles, parSujet, retenus: candidats.slice(0, sujetsPossibles),
            restants: candidats.length, surDecision: retenusExplicites > 0 };
 }
 
@@ -153,26 +178,31 @@ Tu n'as pas la prose d'origine sous les yeux, et c'est voulu : le texte doit
 être entièrement de toi. Les faits appartiennent à tout le monde, la façon de
 les raconter doit appartenir à Curio.
 
-LA PREMIÈRE PHRASE
-C'est la seule chose qui compte vraiment. Elle doit être impossible à ne pas finir. Trois façons : jeter le lecteur dans la scène (un lieu, une date, quelqu'un qui fait quelque chose) ; poser l'anomalie sans l'expliquer (une phrase courte qui ne peut pas être vraie, et qui l'est) ; prendre le lecteur à témoin (une chose qu'il croit savoir, et qui est fausse).
+L'ACCROCHE : UN PARAGRAPHE À ELLE SEULE
+Le texte commence par une accroche ISOLÉE, séparée du reste par une ligne vide, de VINGT-CINQ MOTS AU PLUS. Une ou deux phrases courtes. L'application l'affiche plus grande, avec un filet à gauche : c'est elle qui décide si on lit la suite. Elle pose une chose, une seule ; elle n'explique pas et ne résume pas.
+Elle doit être impossible à ne pas finir. Trois façons : jeter le lecteur dans la scène (un lieu, une date, quelqu'un qui fait quelque chose) ; poser l'anomalie sans l'expliquer (une phrase courte qui ne peut pas être vraie, et qui l'est) ; prendre le lecteur à témoin (une chose qu'il croit savoir, et qui est fausse).
 Interdit : une définition, une date de naissance, « Saviez-vous que », « Imaginez un instant », un résumé de ce qui va suivre.
+
+SE FAIRE COMPRENDRE DU PREMIER COUP
+Le lecteur lit sur un téléphone, une seule fois, sans revenir en arrière. Une idée par phrase, deux propositions au maximum. Jamais « pas ceci, pas cela, mais en plus de tout ça… » au début : on ne peut pas nier ce que le lecteur n'a pas encore en tête — affirme d'abord, corrige ensuite. Toute notion technique est expliquée dans la phrase où elle apparaît, par une comparaison familière. La première phrase de chaque paragraphe doit se comprendre seule.
 
 IMPLIQUER LE LECTEUR
 Le texte s'adresse à quelqu'un. Deux ou trois fois — pas plus — tu peux lui faire faire un geste mental (« fermez les yeux »), lui donner une échelle qu'il connaît (« à peine plus qu'un grain de riz » plutôt que « 5 mm »), ou nommer ce qu'il est en train de penser (« on se dit que quelqu'un aurait fini par le remarquer. C'est ce que tout le monde a pensé. »). Avec parcimonie : le « vous » ne doit jamais devenir un tic.
 
 RÈGLES
-- **2 500 à 3 500 caractères**, en 5 à 7 paragraphes séparés par une ligne vide. C'est un minimum : un texte plus court est refusé.
+- **2 500 à 3 500 caractères** : l'accroche, puis 5 à 7 paragraphes séparés par une ligne vide. 2 500 est un minimum : un texte plus court est refusé.
 - Raconte, et développe. Chiffres précis, dates, noms, lieux — uniquement ceux présents dans la fiche de faits.
 - Structure : l'accroche, puis le contexte, puis le mécanisme ou l'enquête, puis les conséquences, puis le détail final. Chaque paragraphe apporte quelque chose de neuf ; ne redis jamais la même information.
 - N'invente rien. Si une information manque, ne la mentionne pas.
 - Termine sur le détail qui reste en tête, pas sur une morale ni sur une question.
-- Mets en **gras** un ou deux éléments par texte : le chiffre ou le fait qui frappe. Jamais plus de deux.
-- Tu peux mettre en *italique* un terme technique ou un titre d'oeuvre. Avec parcimonie.
+- Mets en **gras** de TROIS À CINQ éléments par texte, jamais plus : les chiffres et les noms qui frappent. Jamais une phrase entière, jamais deux gras dans la même phrase. Celui qui parcourt le texte des yeux doit en tirer l'essentiel rien qu'avec eux.
+- Mets en *italique* les termes techniques que tu introduis et les titres d'oeuvres.
 - Pas de titres internes, pas de listes, pas d'emoji.
 - Français naturel, phrases courtes, aucun jargon non expliqué.
 
 TITRE
 - Une accroche de 3 à 8 mots, évocatrice, sans deux-points ni sous-titre.
+- LE TITRE NE RÉPÈTE PAS L'ACCROCHE DU TEXTE. Ils sont affichés l'un au-dessus de l'autre : lire deux fois la même phrase perd le lecteur. Le titre pose, l'accroche frappe.
 - Exemples de ton : « Le lac qui a soufflé », « La guerre perdue contre des oiseaux », « Le vert qui tuait ».
 
 NOTE INSOLITE (0 à 10)
@@ -196,26 +226,31 @@ You do not have the original prose in front of you, and that is deliberate:
 the writing must be entirely yours. Facts belong to everyone; the telling
 must belong to Curio.
 
-THE FIRST SENTENCE
-It is the only thing that really matters. It must be impossible not to finish. Three ways: drop the reader into the scene (a place, a date, someone doing something); state the anomaly without explaining it (a short sentence that cannot be true, and is); make the reader a witness (something they think they know, which is wrong).
+THE HOOK: A PARAGRAPH OF ITS OWN
+The piece opens with a hook STANDING ALONE, separated from the rest by a blank line, TWENTY-FIVE WORDS AT MOST. One or two short sentences. The app renders it larger, with a rule down its left side: it decides whether the reader goes on. It states one thing, and one only; it does not explain and does not summarise.
+It must be impossible not to finish. Three ways: drop the reader into the scene (a place, a date, someone doing something); state the anomaly without explaining it (a short sentence that cannot be true, and is); make the reader a witness (something they think they know, which is wrong).
 Forbidden: a definition, a birth date, "Did you know", "Imagine for a moment", a summary of what follows.
+
+BEING UNDERSTOOD THE FIRST TIME
+The reader is on a phone, reading once, not going back. One idea per sentence, two clauses at most. Never open with "not this, not that, but on top of all that…": you cannot negate what the reader has not yet pictured — state first, correct after. Every technical notion is explained in the sentence where it appears, with a familiar comparison. The first sentence of each paragraph must make sense on its own.
 
 INVOLVING THE READER
 The text speaks to someone. Two or three times — no more — you may ask for a mental gesture ("close your eyes"), give a scale they know ("barely larger than a grain of rice" rather than "5 mm"), or name the thought they are having ("you would think someone would have noticed. That is exactly what everyone thought."). Sparingly: "you" must never become a tic.
 
 RULES
-- **2,500 to 3,500 characters**, in 5 to 7 paragraphs separated by a blank line. This is a floor: a shorter text is rejected.
+- **2,500 to 3,500 characters**: the hook, then 5 to 7 paragraphs separated by a blank line. 2,500 is a floor: a shorter text is rejected.
 - Tell it as a story, and develop it. Precise figures, dates, names, places — only those present in the fact sheet.
 - Structure: the hook, then the context, then the mechanism or the investigation, then the consequences, then the closing detail. Every paragraph adds something new; never restate the same fact.
 - Invent nothing. If something is missing, leave it out.
 - End on the detail that sticks, not on a moral or a question.
-- Put one or two elements per piece in **bold**: the figure or fact that lands. Never more than two.
-- You may use *italics* for a technical term or a work title. Sparingly.
+- Put THREE TO FIVE elements per piece in **bold**, never more: the figures and names that land. Never a whole sentence, never two in the same sentence. A reader skimming should get the essentials from those alone.
+- Use *italics* for technical terms you introduce and for work titles.
 - No internal headings, no lists, no emoji.
 - Natural English, short sentences, no unexplained jargon.
 
 TITLE
 - A 3 to 8 word hook, evocative, no colon, no subtitle.
+- THE TITLE MUST NOT REPEAT THE OPENING HOOK. They are shown one above the other: reading the same sentence twice loses the reader. The title sets up, the hook lands.
 - Tone examples: "The lake that exhaled", "The war lost to birds", "The green that killed".
 
 WONDER SCORE (0 to 10)
@@ -234,6 +269,12 @@ Reply ONLY with a JSON object: {"titre": "...", "texte": "...", "raconter": "...
 /* ---------------------------------------------------------------- utilitaires */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let tokIn = 0, tokOut = 0, done = 0, skipped = 0, failed = 0;
+/* Les jetons de cache : ceux qu'on a fait mémoriser une fois, et ceux qu'on
+   a relus à un dixième du prix. C'est là que se voit l'économie. */
+let tokEcrit = 0, tokRelu = 0;
+/* La mise en cache est active par défaut ; --sans-cache la coupe, et l'API
+   peut la refuser d'elle-même — on continue alors sans. */
+let CACHE = !opt('sans-cache', false);
 
 async function readJson(p, d){ try{ return JSON.parse(await fs.readFile(p, 'utf8')); }catch{ return d; } }
 async function writeAtomic(p, obj){
@@ -415,17 +456,42 @@ async function ask(lang, title, text, pourquoi, langueFiche){
         out = j.choices?.[0]?.message?.content;
         tokIn += j.usage?.prompt_tokens || 0; tokOut += j.usage?.completion_tokens || 0;
       } else {
+        /* ── LA CONSIGNE EST MISE EN CACHE ────────────────────────────────
+           Votre consigne de rédaction fait deux mille jetons, et elle est
+           identique pour les 2 400 textes d'une grande tranche : la
+           réexpédier à chaque appel, c'est payer cinq millions de jetons
+           pour dire cinq cents fois la même chose.
+
+           `cache_control` la fait mémoriser par l'API : le premier appel la
+           paie un peu plus cher (×1,25), tous les suivants la relisent à un
+           dixième du prix tant que les appels s'enchaînent. Sur une tranche
+           complète, c'est environ 15 % de la facture — et cela vous permet
+           d'écrire des consignes riches sans les payer au mot.          */
+        const corps = { model: MODEL, max_tokens: 2400, temperature: 0.7,
+          system: CACHE ? [{ type:'text', text: system, cache_control:{ type:'ephemeral' } }] : system,
+          messages:[{ role:'user', content: user }] };
         res = await fetch('https://api.anthropic.com/v1/messages', {
           method:'POST',
           headers:{ 'Content-Type':'application/json', 'x-api-key': KEY, 'anthropic-version':'2023-06-01' },
-          body: JSON.stringify({ model: MODEL, max_tokens: 2400, temperature: 0.7,
-            system, messages:[{ role:'user', content: user }] })
+          body: JSON.stringify(corps)
         });
         if (res.status === 429 || res.status >= 500){ await sleep(2500 * (i+1)); continue; }
         const j = await res.json();
+        /* Si l'API refuse la mise en cache — compte trop ancien, modèle qui
+           ne la gère pas — on renonce au cache et on continue : c'est une
+           économie, pas une dépendance. */
+        if (j.error && CACHE && /cache/i.test(String(j.error.message || ''))){
+          CACHE = false;
+          console.log('  · mise en cache refusée par l’API : on continue sans elle.');
+          continue;
+        }
         if (j.error) throw new Error(j.error.message || 'erreur API');
         out = (j.content || []).map(c => c.text || '').join('');
-        tokIn += j.usage?.input_tokens || 0; tokOut += j.usage?.output_tokens || 0;
+        const u = j.usage || {};
+        tokIn  += (u.input_tokens || 0);
+        tokOut += (u.output_tokens || 0);
+        tokEcrit += (u.cache_creation_input_tokens || 0);
+        tokRelu  += (u.cache_read_input_tokens || 0);
       }
       const parsed = parseJson(out);
       if (!parsed || !parsed.texte) throw new Error('réponse illisible');
@@ -551,7 +617,7 @@ async function ecrireTranche(retenus, maitre){
   // on regroupe par fichier de sortie : une langue, un univers
   const paquets = new Map();          // "lang|uni" -> [ {sujet, titre} ]
   for (const s of retenus){
-    for (const lang of ['fr', 'en']){
+    for (const lang of LANGUES_TRANCHE){
       const titre = lang === 'fr' ? (s.fr || s.en) : (s.en || s.fr);
       if (!titre) continue;
       const cle = lang + '|' + s.uni;
@@ -621,11 +687,33 @@ async function ecrireTranche(retenus, maitre){
   /* ---- le catalogue maître enregistre ce qui est fait ------------------- */
   const aujourdhui = new Date().toISOString().slice(0, 10);
   let marques = 0;
+  /* Un sujet n'est « écrit » que lorsque ses DEUX langues existent sur le
+     disque. Une tranche en français seul le laisse donc « à écrire », et la
+     tranche anglaise d'un autre jour le retrouvera — sans jamais repayer le
+     français, puisqu'une fiche déjà présente est sautée. On regarde les
+     fichiers, pas ce que cette exécution a fait : c'est la seule vérité. */
+  const vusFichier = new Map();
+  const aFiche = async (lang, uni, titre) => {
+    const cle = lang + '|' + uni;
+    if (!vusFichier.has(cle)){
+      const j = await readJson(path.join(OUTDIR, lang + '-' + uni + '.json'), { items:{} });
+      vusFichier.set(cle, new Set(Object.keys(j.items || {})));
+    }
+    return vusFichier.get(cle).has(titre);
+  };
+  let incomplets = 0;
   for (const s of maitre.sujets){
     if (!faites.has(s.qid)) continue;
-    if (faites.get(s.qid) >= 2 || (!s.fr || !s.en)){
+    const tfr = s.fr || s.en, ten = s.en || s.fr;
+    const okFr = await aFiche('fr', s.uni, tfr), okEn = await aFiche('en', s.uni, ten);
+    /* On INSCRIT les langues déjà rédigées dans le catalogue maître. Sans
+       cela, un sujet écrit en français seul reste « à écrire » — ce qui est
+       exact — mais rien ne le distingue d'un sujet auquel personne n'a
+       touché, ni dans la console, ni dans le tableur. */
+    s.langues = [okFr ? 'fr' : null, okEn ? 'en' : null].filter(Boolean);
+    if (okFr && okEn){
       s.statut = 'ecrit'; s.ecrit = aujourdhui; marques++;
-    }
+    } else incomplets++;
   }
   maitre.genere = new Date().toISOString();
   await writeAtomic(MAITRE, maitre);
@@ -635,6 +723,9 @@ async function ecrireTranche(retenus, maitre){
   const restantes = maitre.sujets.filter(x => x.statut === 'a-ecrire').length;
   console.log(`\n╔══ TRANCHE TERMINÉE ═══════════════════════════════════════`);
   console.log(`║  ${done} fiche(s) écrite(s), ${marques} sujet(s) complet(s).`);
+  if (incomplets)
+    console.log(`║  ${incomplets} sujet(s) écrits dans une seule langue : ils restent `
+              + `« à écrire »\n║  et attendent leur tranche dans l'autre langue. Rien ne sera repayé.`);
   console.log(`║  ${skipped} écartée(s) (article trop maigre ou note trop basse), ${failed} en échec.`);
   console.log(`║  ${restantes} sujet(s) restent à écrire dans le catalogue maître.`);
   console.log(`╚═══════════════════════════════════════════════════════════`);
@@ -693,7 +784,7 @@ async function main(){
      maître, autant que trente euros permettent d'en écrire, français et
      anglais. `--estimer` avec la même tranche affiche le plan sans dépenser
      un centime. */
-  if (BUDGET > 0){
+  if (BUDGET > 0 || SUJETS > 0){
     const maitre = await lireMaitre();
     if (!maitre || !maitre.sujets || !maitre.sujets.length){
       console.error('✗ catalogue-maitre.json introuvable ou vide. Lancez d\'abord l\'action « 1 · Moissonner ».');
@@ -701,11 +792,20 @@ async function main(){
     }
     const decisions = await lireDecisions();
     const plan = planDeTranche(maitre, BUDGET, decisions);
-    const coutReel = plan.retenus.length * 2 * plan.cout;
-    console.log(`\n╔══ TRANCHE DE ${BUDGET} € ══════════════════════════════════`);
+    const coutReel = plan.retenus.length * plan.parSujet * plan.cout;
+    const entete = SUJETS > 0 ? `TRANCHE DE ${SUJETS} SUJET(S)` : `TRANCHE DE ${BUDGET} €`;
+    console.log(`\n╔══ ${entete} ══════════════════════════════════`);
     console.log(`║  modèle : ${MODEL}`);
-    console.log(`║  ${plan.cout.toFixed(4)} $ par texte, deux textes par sujet.`);
-    console.log(`║  ${plan.retenus.length} sujet(s) → ${plan.retenus.length * 2} textes → `
+    console.log(`║  langue(s) : ${LANGUES_TRANCHE.join(' + ')}`
+              + (plan.parSujet === 1 ? '  — l\'autre langue restera à écrire' : ''));
+    console.log(`║  ${plan.cout.toFixed(4)} $ par texte, ${plan.parSujet} texte(s) par sujet.`);
+    if (CACHE && PROVIDER !== 'openai'){
+      const t = PRIX[MODEL] || PRIX['claude-opus-5'];
+      const sans = (JETONS_ENTREE * t.in + JETONS_SORTIE * t.out) / 1e6;
+      console.log(`║  consigne mise en cache : ${Math.round((1 - plan.cout / sans) * 100)} % de moins `
+                + `(${sans.toFixed(4)} $ sans elle).`);
+    }
+    console.log(`║  ${plan.retenus.length} sujet(s) → ${plan.retenus.length * plan.parSujet} texte(s) → `
               + `${coutReel.toFixed(2)} $ (~${(coutReel / EUR_USD).toFixed(2)} €)`);
     console.log(`║  ${plan.restants} sujet(s) restent à écrire au total.`);
     if (plan.surDecision)
@@ -724,7 +824,8 @@ async function main(){
 
     if (ESTIMATE){
       console.log('\nAucun appel payant n\'a été fait.');
-      console.log('Si le montant vous convient, relancez « 2 · Écrire » avec la même tranche.');
+      console.log('Si le montant vous convient, relancez « 2 · Écrire » avec la même tranche,');
+      console.log('sans cocher « estimer seulement ».');
       return;
     }
     if (!plan.retenus.length){
@@ -862,7 +963,20 @@ async function main(){
   const p = PRIX[MODEL];
   console.log(`\n✓ ${done} anecdotes écrites, ${skipped} sujets écartés, ${failed} échecs.`);
   console.log(`  Jetons : ${(tokIn/1e6).toFixed(3)} M en entrée, ${(tokOut/1e6).toFixed(3)} M en sortie.`);
-  if (p) console.log(`  Coût réel de cette exécution : $${(tokIn/1e6*p.in + tokOut/1e6*p.out).toFixed(2)} (modèle ${MODEL}).`);
+  if (tokRelu || tokEcrit)
+    console.log(`  Cache : ${(tokEcrit/1e6).toFixed(3)} M mémorisés une fois, `
+              + `${(tokRelu/1e6).toFixed(3)} M relus à un dixième du prix.`);
+  if (p){
+    /* Facturation réelle : l'écriture du cache coûte 1,25 fois le tarif
+       d'entrée, sa relecture un dixième. */
+    const cout = (tokIn/1e6)*p.in + (tokEcrit/1e6)*p.in*1.25 + (tokRelu/1e6)*p.in*0.1
+               + (tokOut/1e6)*p.out;
+    console.log(`  Coût réel de cette exécution : $${cout.toFixed(2)} (modèle ${MODEL}).`);
+    if (tokRelu){
+      const sans = cout + (tokRelu/1e6)*p.in*0.9 - (tokEcrit/1e6)*p.in*0.25;
+      console.log(`  Sans la mise en cache, la même tranche aurait coûté $${sans.toFixed(2)}.`);
+    }
+  }
 }
 
 /* anecdotes/index.json : ce que le site a le droit d'annoncer.
