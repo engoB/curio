@@ -1,4 +1,117 @@
-# Curio 8.5.3 — ce qui a changé depuis v6
+# Curio 8.5.5 — ce qui a changé depuis v6
+
+## 8.5.5 — « réponse illisible » : c'étaient des retours à la ligne
+
+**Le symptôme.** Trois sujets, trois échecs, et une facture qui monte :
+
+```
+  ! Axolotl : réponse illisible
+  ! Ignace Philippe Semmelweis : réponse illisible
+  ! Géoglyphes de Nazca : réponse illisible
+```
+
+**La cause.** Le modèle répond par un objet JSON dont le champ `texte`
+contient une anecdote de six paragraphes — donc des **retours à la ligne**. La
+norme JSON exige qu'ils soient écrits `\n` ; un modèle qui rédige les met
+souvent tels quels. `JSON.parse` refuse alors la réponse **entière**, et un
+texte parfaitement bon partait à la poubelle. Trois fois par sujet, chaque
+tentative facturée.
+
+C'est aussi l'explication de votre 0,45 $ puis 1,09 $ : les appels étaient
+servis — donc payés — et jetés à la lecture.
+
+**Le remède : on répare avant de renoncer.**
+
+1. `JSON.parse` tel quel ;
+2. sinon, on échappe les sauts de ligne **à l'intérieur des chaînes**, et rien
+   d'autre — un automate qui suit l'état « dans une chaîne / hors chaîne » ;
+3. sinon, on va chercher les quatre champs un par un, à la main, en tolérant
+   l'ordre des clés et une accolade manquante.
+
+Éprouvé sur six formes de réponse : JSON correct, sauts de ligne bruts,
+préambule et clôture en ```json, accolade finale manquante, guillemets
+français dans le texte — **5 lues sur 5**, et la sixième (« je ne sais pas
+répondre ») correctement refusée.
+
+**Et le journal dit enfin ce qui s'est passé.** À la première réponse
+illisible, il affiche le motif d'arrêt renvoyé par l'API, les types de blocs
+reçus, la longueur, et les deux cents premiers caractères tels quels :
+
+```
+  · réponse illisible — arrêt « max_tokens », blocs « text », 441 caractères reçus
+    début : "{\"titre\": \"Un titre distinct\", \"texte\": \"Une phrase…"
+```
+
+**Réponse coupée = budget relevé, une fois.** Si l'arrêt est `max_tokens`, le
+texte est vraiment tronqué et aucune réparation n'y peut rien : la limite
+passe de 1 800 à 4 000 jetons pour la suite de la tranche, et le journal le
+dit. Éprouvé : trois fiches écrites après relèvement, contre zéro avant.
+
+## 8.5.4 — le coût, enfin visible, et plafonné
+
+## 8.5.4 — le coût, enfin visible, et plafonné
+
+**Le constat.** Trois sujets d'essai, 0,45 $ dépensés, la tranche encore en
+cours. L'estimation annonçait 0,10 $. Trois défauts se cumulaient, et aucun ne
+se voyait.
+
+### 1. Jusqu'à cinq appels facturés pour un seul sujet
+
+`ask()` réessayait **cinq fois**. Deux des trois motifs de reprise sont des
+appels **servis, donc facturés** : une réponse illisible, et un texte jugé trop
+proche de l'article source. Un sujet récalcitrant pouvait donc coûter cinq
+fois son prix, en silence.
+
+Désormais : **trois tentatives au maximum** — la première et deux reprises —
+et chaque reprise s'annonce dans le journal en disant que l'appel est payé.
+Les erreurs réseau (429, 5xx), elles, ne sont pas facturées et gardent leurs
+tentatives.
+
+### 2. `max_tokens` à 2 400 pour un texte qui en fait 1 100
+
+Une réponse bavarde pouvait coûter le double sans rien apporter. Plafond
+ramené à **1 800**, largement au-dessus des 3 500 signes demandés.
+
+### 3. Le coût réel ne s'affichait pas
+
+Le bloc « Jetons / Cache / Coût réel » n'existait que dans l'ancien mode de
+rédaction, pas dans les tranches — c'est-à-dire nulle part où vous le voyiez.
+La tranche termine maintenant par :
+
+```
+╠══ ce que cette tranche a coûté ────────────────────────────
+║  0.012 M jetons en entrée · 0.013 M en sortie
+║  cache : 0.002 M mémorisés, 0.022 M relus à 1/10 du prix
+║  0.41 $ (~0.38 €)  ·  0.0345 $ par fiche
+```
+
+Et toutes les dix fiches, en cours de route :
+`10/12 écrites — 0.35 $ dépensés (0.0347 $ par fiche)`.
+
+Si le cache ne sert pas, la ligne le dit au lieu de laisser croire à
+l'économie annoncée.
+
+### 4. Un plafond de dépense, automatique
+
+**C'est le garde-fou qui manquait.** Sans réglage, la tranche se donne un
+plafond de **deux fois et demie l'estimation** ; au-delà, elle s'arrête
+proprement, enregistre ce qui est écrit, et le dit. Relancer reprend où elle
+en était, sans rien repayer.
+
+```
+║  12 sujet(s) → 12 texte(s) → 0.40 $ (~0.37 €)
+║  plafond de sécurité : 1.01 $ — au-delà, la tranche s'arrête
+║  et enregistre ce qu'elle a fait.
+```
+
+Le champ **`plafond`** de l'action le remplace par le vôtre. Sur un lot de
+300 sujets, c'est la différence entre une surprise à dix euros et une surprise
+à cinquante.
+
+Éprouvé sur une API de substitution : plafond à 0,15 $ → arrêt après 7 fiches
+sur 12, tout enregistré, relance reprenant les 5 restantes sans repayer les 7.
+
+## 8.5.3 — « `temperature` is deprecated for this model »
 
 ## 8.5.3 — « `temperature` is deprecated for this model »
 

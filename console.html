@@ -1050,7 +1050,7 @@ function envoyerEcriture(){
   dit('Enregistrement des décisions, puis lancement…','info');
   enregistrerDecisions().then(function(){
     return lancerAction('2-ecrire.yml', { sujets:String(combien), budget:'0',
-      langues:langues, estimer: estimer?'true':'false', modele:'' });
+      langues:langues, plafond:'0', estimer: estimer?'true':'false', modele:'' });
   }).then(function(){
     dit(estimer
       ? 'Estimation lancée — aucun appel payant. Le plan et le montant s’affichent '

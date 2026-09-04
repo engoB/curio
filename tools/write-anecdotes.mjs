@@ -80,6 +80,15 @@ const BUDGET  = parseFloat(opt('budget', '0')) || 0;
    « cinq pour voir », puis « trois cents ». S'il est donné, il commande ; le
    budget ne sert plus alors qu'à afficher le coût. */
 const SUJETS  = parseInt(opt('sujets', '0'), 10) || 0;
+/* Un plafond de dépense, en dollars. Au-delà, la tranche s'arrête proprement
+   et enregistre ce qu'elle a fait. C'est le garde-fou qui manquait : une
+   consigne mal comprise, un modèle qui bavarde, et un lot de trois cents
+   sujets peut coûter bien plus que prévu sans que personne ne l'arrête. */
+let PLAFOND = parseFloat(opt('plafond', '0')) || 0;
+/* La longueur maximale d'une réponse. Un texte de 3 500 signes plus son
+   titre et sa phrase à raconter tiennent dans 1 800 jetons ; on monte
+   automatiquement si le modèle se fait couper. */
+let MAX_SORTIE = parseInt(opt('max-sortie', '1800'), 10) || 1800;
 /* Les langues de CETTE tranche. « fr » seul écrit le français maintenant et
    laisse l'anglais pour plus tard, sans rien perdre : le sujet reste
    « à écrire » tant que toutes ses langues ne sont pas faites, et une
@@ -117,6 +126,14 @@ async function languesPubliees(){
 async function lireMaitre(){
   try{ return JSON.parse(await fs.readFile(MAITRE, 'utf8')); }
   catch{ return null; }
+}
+
+/* Ce que cette exécution a coûté jusqu'ici, en dollars, d'après les jetons
+   que l'API a elle-même comptés. C'est la vérité, pas une estimation. */
+function coutCourant(){
+  const p = PRIX[MODEL];
+  if (!p) return 0;
+  return (tokIn/1e6)*p.in + (tokEcrit/1e6)*p.in*1.25 + (tokRelu/1e6)*p.in*0.1 + (tokOut/1e6)*p.out;
 }
 
 /* Les sujets que la tranche permet d'écrire : les meilleurs d'abord, jamais
@@ -290,6 +307,9 @@ let tokIn = 0, tokOut = 0, done = 0, skipped = 0, failed = 0;
 /* Les jetons de cache : ceux qu'on a fait mémoriser une fois, et ceux qu'on
    a relus à un dixième du prix. C'est là que se voit l'économie. */
 let tokEcrit = 0, tokRelu = 0;
+/* Combien de fois on a redemandé un texte — chaque reprise est un appel
+   facturé. C'est la première explication d'une facture plus lourde que prévu. */
+let reprises = 0;
 /* La mise en cache est active par défaut ; --sans-cache la coupe, et l'API
    peut la refuser d'elle-même — on continue alors sans. */
 let CACHE = !opt('sans-cache', false);
@@ -427,16 +447,59 @@ async function ficheArticle(lang, titre, jumeau){
 }
 
 /* ------------------------------------------------------------ appel du modèle */
+/* ── LIRE LA RÉPONSE, MÊME MAL FORMÉE ────────────────────────────────────
+   Un texte de six paragraphes tient dans un champ JSON, et il contient des
+   retours à la ligne. La norme JSON exige qu'ils soient écrits « \n » ; un
+   modèle qui rédige une anecdote les met souvent tels quels. `JSON.parse`
+   refuse alors la réponse entière — et chaque refus coûtait un nouvel appel,
+   facturé, pour un résultat identique.
+
+   On répare donc avant de renoncer : on échappe les sauts de ligne qui se
+   trouvent À L'INTÉRIEUR d'une chaîne, et rien d'autre. Si cela ne suffit
+   pas, on va chercher les quatre champs à la main.                       */
+function reparerJson(t){
+  let out = '', dans = false, echap = false;
+  for (const c of t){
+    if (echap){ out += c; echap = false; continue; }
+    if (c === '\\'){ out += c; echap = true; continue; }
+    if (c === '"'){ dans = !dans; out += c; continue; }
+    if (dans && (c === '\n' || c === '\r' || c === '\t')){
+      out += c === '\n' ? '\\n' : c === '\r' ? '\\r' : '\\t';
+      continue;
+    }
+    out += c;
+  }
+  return out;
+}
+
+/* Dernier recours : les quatre champs, extraits un par un. Tolère les
+   retours à la ligne bruts, l'ordre des clés, et une accolade manquante. */
+function champsALaMain(t){
+  const texte = (cle) => {
+    const re = new RegExp('"' + cle + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"', 's');
+    const m = t.match(re);
+    return m ? m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\') : '';
+  };
+  const titre = texte('titre'), corps = texte('texte'), raconter = texte('raconter');
+  const n = t.match(/"insolite"\s*:\s*(\d+)/);
+  if (!corps) return null;
+  return { titre, texte: corps, raconter, insolite: n ? Number(n[1]) : 0 };
+}
+
 function parseJson(txt){
   if (!txt) return null;
   let t = String(txt).trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
   const a = t.indexOf('{'), b = t.lastIndexOf('}');
-  if (a < 0 || b < a) return null;
-  try { return JSON.parse(t.slice(a, b + 1)); } catch { return null; }
+  if (a < 0 || b < a) return champsALaMain(t);
+  const brut = t.slice(a, b + 1);
+  try { return JSON.parse(brut); } catch {}
+  try { return JSON.parse(reparerJson(brut)); } catch {}
+  return champsALaMain(brut);
 }
 
 async function ask(lang, title, text, pourquoi, langueFiche){
   const system = await consigne(lang);
+  let arret = '', blocs = '';        // pourquoi le modèle s'est arrêté, et ce qu'il a renvoyé
   /* La fiche de faits vient parfois de l'autre édition de Wikipédia : le
      sujet n'existe que là. Les faits valent, la langue d'écriture ne change
      pas pour autant. */
@@ -489,7 +552,10 @@ async function ask(lang, title, text, pourquoi, langueFiche){
            deprecated for this model » — et l'omettre est valable pour tous
            les modèles. Le réglage ne nous manque pas : la consigne, elle,
            est très précise. */
-        const corps = { model: MODEL, max_tokens: 2400,
+        /* 1 800 jetons : un texte de 3 500 signes en fait environ 1 100.
+           L'ancien plafond de 2 400 laissait une réponse bavarde coûter le
+           double sans rien apporter. */
+        const corps = { model: MODEL, max_tokens: MAX_SORTIE,
           system: CACHE ? [{ type:'text', text: system, cache_control:{ type:'ephemeral' } }] : system,
           messages:[{ role:'user', content: user }] };
         res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -509,6 +575,8 @@ async function ask(lang, title, text, pourquoi, langueFiche){
         }
         if (j.error) throw new Error(j.error.message || 'erreur API');
         out = (j.content || []).map(c => c.text || '').join('');
+        arret = j.stop_reason || '';
+        blocs = (j.content || []).map(c => c.type).join('+');
         const u = j.usage || {};
         tokIn  += (u.input_tokens || 0);
         tokOut += (u.output_tokens || 0);
@@ -516,15 +584,36 @@ async function ask(lang, title, text, pourquoi, langueFiche){
         tokRelu  += (u.cache_read_input_tokens || 0);
       }
       const parsed = parseJson(out);
-      if (!parsed || !parsed.texte) throw new Error('réponse illisible');
+      if (!parsed || !parsed.texte){
+        /* Une réponse illisible sans explication ne se corrige pas. On dit
+           donc POURQUOI : arrêté sur la limite de longueur, blocs reçus, et
+           les premiers caractères tels quels. Une fois suffit. */
+        if (!ask._dit){
+          ask._dit = true;
+          console.log(`  · réponse illisible — arrêt « ${arret || '?'} », blocs « ${blocs || '?'} », `
+                    + `${(out || '').length} caractères reçus`);
+          console.log(`    début : ${JSON.stringify(String(out || '').slice(0, 220))}`);
+        }
+        if (arret === 'max_tokens' && MAX_SORTIE < 4000){
+          MAX_SORTIE = 4000;
+          console.log(`  · réponse coupée par la limite de longueur : on repasse à ${MAX_SORTIE} jetons.`);
+          reprises++; continue;
+        }
+        if (i < 2){ reprises++; console.log(`  · on redemande (appel payé)`); await sleep(600); continue; }
+        throw new Error(`réponse illisible (arrêt « ${arret || '?'} »)`);
+      }
       const produit = String(parsed.texte).replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim();
 
       // Contrôle de reprise : si le texte partage de longues suites de mots
       // avec l'article, ce n'est pas une écriture, c'est une copie. On refuse.
       const rec = recouvrement(produit, text, 8);
       if (rec.communs > 2){
-        if (i < 4){
-          console.log(`  · reprise trop proche (${rec.communs} passages, ${rec.max} mots) — on réécrit`);
+        /* Deux réécritures au plus : chacune est un appel PAYÉ. Au-delà, on
+           écarte le sujet plutôt que de payer une quatrième fois. */
+        if (i < 2){
+          reprises++;
+          console.log(`  · reprise trop proche (${rec.communs} passages, ${rec.max} mots) — on réécrit `
+                    + `(tentative ${i + 2}/3, appel payé)`);
           await sleep(600);
           continue;
         }
@@ -547,7 +636,10 @@ async function ask(lang, title, text, pourquoi, langueFiche){
         }
         throw new Error('Aucun modèle disponible sur votre compte. Indiquez-en un avec --modele.');
       }
-      if (i === 4) throw e;
+      /* Deux tentatives de plus au maximum : au-delà, on renonce. Un appel
+         qui échoue côté réseau n'est pas facturé, mais un appel servi puis
+         jugé mauvais l'est — inutile d'en payer cinq. */
+      if (i >= 2) throw e;
       await sleep(1500 * (i+1));
     }
   }
@@ -650,6 +742,7 @@ async function ecrireTranche(retenus, maitre){
 
   const faites = new Map();           // qid -> nombre de langues écrites
   const causes = new Map();           // message d'erreur -> combien de fois
+  let plafondAtteint = false;
   let done = 0, skipped = 0, failed = 0;
   const total = [...paquets.values()].reduce((n, v) => n + v.length, 0);
 
@@ -666,6 +759,17 @@ async function ecrireTranche(retenus, maitre){
     let curseur = 0, depuis = 0;
     const ouvrier = async () => {
       while (curseur < restants.length){
+        /* Le plafond : on s'arrête AVANT d'engager un nouvel appel. Ce qui
+           est écrit est déjà enregistré ; la tranche suivante reprendra. */
+        if (PLAFOND > 0 && coutCourant() >= PLAFOND){
+          if (!ouvrier._dit){
+            ouvrier._dit = true;
+            console.log(`\n  ⛔ plafond de ${PLAFOND} $ atteint (${coutCourant().toFixed(2)} $ dépensés).`);
+            console.log(`     On s'arrête ici et on enregistre. Relancez pour continuer.`);
+          }
+          plafondAtteint = true;
+          return;
+        }
         const { s, titre } = restants[curseur++];
         try{
           /* Un sujet venu de VOUS porte son propre texte : il n'y a rien à
@@ -696,7 +800,9 @@ async function ecrireTranche(retenus, maitre){
             depuis = 0;
             await writeAtomic(fichier, { generated:new Date().toISOString(), model:MODEL, items:store.items });
           }
-          if (done % 20 === 0) process.stdout.write(`  ${done}/${total} écrites…\n`);
+          if (done % 10 === 0)
+            console.log(`  ${done}/${total} écrites — ${coutCourant().toFixed(2)} $ dépensés `
+                      + `(${(coutCourant()/done).toFixed(4)} $ par fiche)`);
         }catch(e){
           failed++;
           causes.set(e.message, (causes.get(e.message) || 0) + 1);
@@ -759,6 +865,26 @@ async function ecrireTranche(retenus, maitre){
     console.log(`║  ${incomplets} sujet(s) écrits dans une seule langue : ils restent `
               + `« à écrire »\n║  et attendent leur tranche dans l'autre langue. Rien ne sera repayé.`);
   console.log(`║  ${skipped} écartée(s) (article trop maigre ou note trop basse), ${failed} en échec.`);
+  if (reprises)
+    console.log(`║  ${reprises} réécriture(s) demandée(s) — chacune est un appel facturé.`);
+  /* LE CHIFFRE QUI MANQUAIT : ce que cette tranche a réellement coûté,
+     d'après les jetons comptés par l'API elle-même. Il n'apparaissait que
+     dans l'ancien mode, pas dans les tranches. */
+  const px = PRIX[MODEL];
+  if (px){
+    console.log(`╠══ ce que cette tranche a coûté ────────────────────────────`);
+    console.log(`║  ${(tokIn/1e6).toFixed(3)} M jetons en entrée · ${(tokOut/1e6).toFixed(3)} M en sortie`);
+    if (tokRelu || tokEcrit)
+      console.log(`║  cache : ${(tokEcrit/1e6).toFixed(3)} M mémorisés, ${(tokRelu/1e6).toFixed(3)} M relus à 1/10 du prix`);
+    else if (CACHE)
+      console.log(`║  cache : aucun jeton relu — la consigne est peut-être trop courte`
+                + `\n║  pour être mise en cache, ou les appels trop espacés.`);
+    const c = coutCourant();
+    console.log(`║  ${c.toFixed(2)} $ (~${(c / EUR_USD).toFixed(2)} €)`
+              + (done ? `  ·  ${(c/done).toFixed(4)} $ par fiche` : ''));
+  }
+  if (plafondAtteint)
+    console.log(`║  ⛔ arrêt sur plafond : relancez la même tranche pour continuer.`);
   console.log(`║  Il reste ${aCommencer} sujet(s) à commencer`
             + (aFinir ? ` et ${aFinir} à finir dans l'autre langue` : '')
             + (retenusExplicites ? `,\n║  parmi VOS ${retenusExplicites} sujets retenus.` : `\n║  dans le catalogue maître.`));
@@ -856,6 +982,13 @@ async function main(){
     }
     console.log(`║  ${plan.retenus.length} sujet(s) → ${plan.retenus.length * plan.parSujet} texte(s) → `
               + `${coutReel.toFixed(2)} $ (~${(coutReel / EUR_USD).toFixed(2)} €)`);
+    /* Un plafond automatique, deux fois et demie l'estimation. Il ne sert
+       jamais quand tout se passe bien ; il évite qu'une réécriture en boucle
+       ou un modèle bavard transforme une tranche de dix euros en cinquante.
+       « plafond » dans l'action le remplace par le vôtre. */
+    if (PLAFOND <= 0 && coutReel > 0) PLAFOND = Math.max(0.5, coutReel * 2.5);
+    console.log(`║  plafond de sécurité : ${PLAFOND.toFixed(2)} $ — au-delà, la tranche s'arrête`);
+    console.log(`║  et enregistre ce qu'elle a fait.`);
     console.log(`║  ${plan.restants} sujet(s) restent à écrire au total.`);
     if (plan.surDecision)
       console.log(`║  Ce sont VOS sujets retenus dans la console — les autres attendent.`);
