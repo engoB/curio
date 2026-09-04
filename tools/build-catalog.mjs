@@ -1512,6 +1512,24 @@ async function languesPubliees(){
   return ['fr', 'en'];
 }
 
+/* Le réglage « images » de consignes/publication.txt, recopié dans les
+   fichiers que le site et l'application lisent au démarrage. Il est aussi
+   gravé dans les pages à la construction ; celui-ci permet de le changer
+   sans reconstruire : « Entretien → recompter » suffit.
+     oui (défaut) · franches · non                                        */
+async function imagesPubliees(){
+  try{
+    const brut = await fs.readFile(path.join(process.cwd(), 'consignes', 'publication.txt'), 'utf8');
+    for (const l of brut.split(/\r?\n/)){
+      const t = l.trim();
+      if (!t || t.startsWith('#')) continue;
+      const m = t.match(/^images\s*[:=]\s*(\S+)/i);
+      if (m && /^(oui|non|franches)$/i.test(m[1])) return m[1].toLowerCase();
+    }
+  }catch{}
+  return 'oui';
+}
+
 async function lireMaitre(){
   try{ return JSON.parse(await fs.readFile(MAITRE, 'utf8')); }
   catch{ return { version:1, genere:null, sujets:[] }; }
@@ -2242,6 +2260,7 @@ async function vueApplication(liste){
        et ce réglage vaut AVANT toute publication, là où un simple comptage
        de fiches en ligne ne peut encore rien dire. */
     langues: await languesPubliees(),
+      images:  await imagesPubliees(),
     themes: UNIVERSES.map(u => ({ id:u.id, hue:u.hue, free:u.free, fr:u.fr, en:u.en })),
     sources, index, pairs, scores,
     counts: counts(sources, paires)

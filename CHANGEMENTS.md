@@ -1,4 +1,128 @@
-# Curio 8.5.9 — ce qui a changé depuis v6
+# Curio 8.6.0 — ce qui a changé depuis v6
+
+## 8.6.0 — Sonnet par défaut, rien de perdu dans un lot, et l'anglais s'en va
+
+### L'anglais était masqué, et le CSS le remettait
+
+Le code faisait bien `b.hidden = true` sur le bouton FR/EN. Mais la feuille de
+style du site donne `display:inline-flex` à ce bouton, et **une règle d'auteur
+l'emporte sur le `display:none` que le navigateur applique à `[hidden]`** :
+le bouton restait affiché quoi qu'on règle. Une ligne — `[hidden]{display:none
+!important}` — et il disparaît.
+
+Deuxième cause, indépendante : le réglage `langues` ne vivait que dans
+`anecdotes/index.json`, écrit par une action. Tant qu'aucune action n'avait
+tourné, la page ne savait rien. **Le réglage est désormais gravé dans
+`index.html` et `app.html` à la construction** : il s'applique dès la première
+seconde, hors ligne compris. `publication.txt` passe à `langues: fr`.
+
+### Sonnet devient le défaut
+
+Vous n'avez pas distingué Sonnet d'Opus. Le coût, lui, se distingue très
+bien : **0,0196 $ contre 0,049 $ la fiche**, soit 23 $ contre 57 $ pour vos
+1 158 sujets. Payer deux fois et demie pour une différence invisible est une
+dépense inutile — c'est l'objet de cette version.
+
+Opus reste à un clic, dans le menu du panneau de lancement.
+
+### Un lot ne perd plus rien
+
+Quatre défauts, tous du même genre : du travail payé qui disparaissait.
+
+| | avant | maintenant |
+|---|---|---|
+| Enregistrement | par paquets de 10 | **à chaque fiche** |
+| Crédit épuisé sur 300 sujets | 900 appels refusés | **arrêt au premier** |
+| Catalogue après une interruption | faux, à réparer à la main | **remis d'accord au démarrage** |
+| Action annulée | coupée en plein vol | **enregistre, puis s'arrête** |
+
+Concrètement : si le crédit tombe au sujet 187 d'un lot de 300, les 186
+premières fiches sont sur le disque, le catalogue le sait, **seul le 187e est
+à reprendre**, et relancer la même tranche repart exactement de là.
+
+### Le potentiel et le modèle, dans un vrai panneau
+
+Le lancement d'une tranche passait par quatre fenêtres système enchaînées,
+sans retour possible et sans jamais montrer le total. C'est maintenant **un
+panneau unique** : seuil de potentiel (avec le nombre de sujets disponibles à
+chaque seuil), nombre, langues, modèle — et le montant qui se recalcule à
+chaque changement, sous les yeux jusqu'au clic.
+
+### Ce qui est payé puis jeté se voit enfin
+
+Les articles trop maigres (écartés **avant** tout appel, donc gratuits) et les
+textes trop courts (écartés **après**, donc payés) tombaient dans le même
+compteur. Ils sont séparés, et le second annonce la somme perdue.
+
+### Les photos
+
+Elles n'apparaissaient nulle part : le code les enregistrait pour chaque fiche
+mais ne les affichait jamais. Elles sont maintenant posées sur l'art dessiné —
+qui reste dessous, donc jamais de trou si l'image manque — **sous un voile de
+30 %** pour que le texte prime. Nouveau réglage `images` dans la Publication :
+
+* `oui` — la photo voilée (défaut)
+* `franches` — la photo à nu
+* `non` — aucune photo, l'art dessiné seul
+
+### La réécriture payée (8.5.11)
+
+Sur *Porte de l'Enfer*, un texte trop proche de la source était refusé, puis
+redemandé **avec exactement le même message** — donc à peu près le même texte.
+Trois appels facturés, zéro fiche. La seconde demande dit désormais ce qu'on
+reproche et cite au modèle ses propres passages fautifs. La consigne mise en
+cache ne bouge pas : l'économie de cache est intacte.
+
+## 8.5.11 — une réécriture payée qui a une raison d'être différente
+
+Votre test en Sonnet l'a montré sur *Porte de l'Enfer* : le texte reprenait
+des passages entiers de l'article, l'outil l'a refusé, a redemandé — **avec
+exactement le même message** — et a reçu, sans surprise, à peu près le même
+texte. Trois appels facturés, zéro fiche.
+
+Un rappel muet ne corrige rien. Désormais, quand un texte est refusé, la
+demande suivante **dit ce qu'on reproche**, et le prouve :
+
+```
+· reprise trop proche (6 passages, 11 mots) —
+  on réécrit une fois en citant les passages fautifs (appel payé)
+```
+
+Le modèle reçoit alors, à la suite de la fiche de faits, ses propres phrases
+fautives et l'ordre de n'en réutiliser aucune suite de plus de sept mots. De
+même pour une réponse illisible : on lui rappelle la forme exacte attendue au
+lieu de répéter la question.
+
+**La consigne mise en cache ne bouge pas** — le reproche s'ajoute au message
+du sujet, jamais à la consigne. L'économie de cache est intacte.
+
+## 8.5.10 — l'estimation calibrée sur la facture, pas sur une hypothèse
+
+Le cache s'amorce bien : `3 000 mémorisés, 3 000 relus` sur une tranche de
+deux — un appel qui mémorise, un qui relit. Restaient deux constantes fausses.
+
+**Ce que dit vraiment le journal**, par appel : 2 000 jetons d'entrée plein
+tarif (la fiche de faits et l'invite), 3 000 mis en cache (la consigne),
+1 500 en sortie. J'avais écrit 1 000 et 2 000. D'où un prix annoncé de
+0,0435 $ pour une facture à 0,049 $.
+
+| | par fiche | 1 158 sujets en français |
+|---|---|---|
+| Opus 5 | **0,049 $** | 56,70 $ ≈ **52 €** |
+| Sonnet 5 | **0,0196 $** | 22,70 $ ≈ **21 €** |
+
+**Et la projection ne se fait plus sur le coût moyen.** La mise en cache se
+paie une fois : sur deux fiches elle pèse un cinquième du prix, sur trois
+cents elle ne pèse plus rien. Le journal donne donc le coût **marginal** — ce
+que coûte la fiche suivante, cache chaud — et projette là-dessus :
+
+```
+║  0.12 $ (~0.11 €)  ·  0.0576 $ par fiche
+║  0.0483 $ par fiche une fois le cache chaud (la mise en cache se paie une seule fois).
+║  à ce rythme, les 1158 sujet(s) qui restent coûteraient 55.93 $ (~51.79 €).
+```
+
+## 8.5.9 — le cache coûtait au lieu de rapporter, et l'estimation était basse d'un quart
 
 ## 8.5.9 — le cache coûtait au lieu de rapporter, et l'estimation était basse d'un quart
 

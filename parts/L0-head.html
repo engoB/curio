@@ -132,6 +132,13 @@ img{max-width:100%}
   color:var(--text-2);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
   display:inline-flex;align-items:center;gap:6px;transition:color .18s,border-color .18s;
 }
+/* ── POURQUOI LE BOUTON FR/EN NE DISPARAISSAIT PAS ─────────────────────────
+   Le code le masquait bien — b.hidden = true — mais `display:inline-flex`
+   ci-dessus est une règle d'auteur, et elle l'emporte sur le `display:none`
+   que le navigateur applique à [hidden], qui n'est qu'une règle par défaut.
+   Le bouton restait donc affiché, réglage ou pas. Cette ligne rétablit
+   l'ordre, pour ce bouton comme pour tout élément masqué de la page. */
+[hidden]{display:none !important}
 .mini:hover{color:var(--text);border-color:var(--line-strong)}
 .mini svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 

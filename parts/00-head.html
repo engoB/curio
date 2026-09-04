@@ -251,12 +251,15 @@ a{color:var(--accent);text-decoration:none}
   position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;
   overflow:hidden;display:flex;align-items:flex-end;isolation:isolate;
 }
+[hidden]{display:none !important}
 .card__media{position:absolute;inset:0;z-index:0;background:var(--ink-2)}
 .card__media img,.card__media canvas{
   width:100%;height:100%;object-fit:cover;display:block;filter:var(--img-filter);
   transform:scale(1.06);
 }
-.card__media img{opacity:0;transition:opacity .7s ease}
+/* La photo est empilée SUR l'art procédural et ne se révèle qu'une fois
+   chargée : si elle n'arrive jamais, l'art reste et la carte n'a pas de trou. */
+.card__media img{position:absolute;inset:0;opacity:0;transition:opacity .7s ease}
 .card__media img.ready{opacity:1}
 @media (prefers-reduced-motion:no-preference){
   .card.is-active .card__media img,.card.is-active .card__media canvas{
@@ -264,7 +267,28 @@ a{color:var(--accent);text-decoration:none}
   }
 }
 @keyframes kb{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.19) translate3d(0,-1.5%,0)}}
+
+/* ── LE VOILE ──────────────────────────────────────────────────────────────
+   Le dégradé (--scrim) sert la lisibilité du bas de carte, là où le texte
+   court. Mais une photo contrastée continuait de tirer l'œil dans le haut, où
+   le dégradé s'éclaircit — on regardait l'image au lieu de lire.
+
+   On pose donc par-dessus un voile plat de la couleur du fond. Une seule
+   valeur le commande, --voile, et elle vaut pour les quatre jeux de couleurs :
+   pas de dégradé à retoucher quatre fois. « images: franches » la ramène à
+   zéro et rend la photo telle quelle.
+
+   Le voile ne s'applique QU'AUX CARTES QUI PORTENT UNE PHOTO — la classe est
+   posée quand l'image est effectivement chargée. L'art procédural, lui, a été
+   composé pour être lu par-dessus : il n'a besoin d'aucun voile, et l'assombrir
+   ne ferait que ternir les cartes qui n'en ont pas. */
+:root{ --voile:.30 }
+[data-images="franches"]{ --voile:0 }
 .card__scrim{position:absolute;inset:0;z-index:1;background:var(--scrim)}
+.card.has-photo .card__scrim::after{
+  content:'';position:absolute;inset:0;background:var(--ink);opacity:var(--voile);
+  pointer-events:none;
+}
 
 .card__body{
   position:relative;z-index:2;width:100%;

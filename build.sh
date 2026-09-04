@@ -19,6 +19,22 @@ mkdir -p build
 LISIBLE=$(cat VERSION 2>/dev/null | tr -d '[:space:]')
 [ -n "$LISIBLE" ] || LISIBLE="0.0.0"
 
+# --- les reglages du lecteur, graves dans la page ---------------------------
+# « langues » et « images » vivent dans consignes/publication.txt. Les outils
+# les recopient dans anecdotes/index.json, mais ce fichier n'existe qu'apres
+# une action, et une page servie sans lui gardait l'ancien reglage : c'est
+# ainsi que le bouton FR/EN a survecu a sa mise a l'arret.
+#
+# On les grave donc AUSSI dans la page, a la construction. La page connait le
+# reglage des la premiere seconde, sans reseau ; index.json, quand il arrive,
+# garde le dernier mot — les deux viennent du meme fichier.
+reglage() {
+  sed -n "s/^[[:space:]]*$1:[[:space:]]*//p" consignes/publication.txt 2>/dev/null \
+    | head -1 | tr -d '[:space:]'
+}
+LANGUES=$(reglage langues); [ -n "$LANGUES" ] || LANGUES="fr,en"
+IMAGES=$(reglage images);   [ -n "$IMAGES" ]   || IMAGES="oui"
+
 doc_head() {
 cat <<EOF
 <!doctype html>
@@ -28,6 +44,8 @@ cat <<EOF
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#050E24" />
 <meta name="curio-version" content="$PLEINE" />
+<meta name="curio-langues" content="$LANGUES" />
+<meta name="curio-images" content="$IMAGES" />
 EOF
 }
 

@@ -53,7 +53,22 @@ jusqu-au:
 # lisent au démarrage. Pour l'appliquer sans attendre une moisson :
 # Actions -> Entretien -> recompter (quelques secondes, gratuit).
 # ─────────────────────────────────────────────────────────────────────────
-langues: fr,en
+langues: fr
+
+# ─────────────────────────────────────────────────────────────────────────
+# LES PHOTOS DES FICHES
+#   oui       la photo de l'article, sous un voile appuyé — le texte prime
+#             et l'image reste là, comme une ambiance                (défaut)
+#   franches  la photo à nu, sans voile ajouté : l'image prime
+#   non       aucune photo. Chaque fiche garde son art dessiné, composé pour
+#             être lu par-dessus. Rien n'est perdu : les photos restent
+#             enregistrées, remettre « oui » les fait revenir.
+#
+# Ce réglage est gravé dans les pages à la construction : il s'applique dès
+# la première seconde, hors ligne compris. Il ne coûte rien et ne réécrit
+# aucune fiche.
+# ─────────────────────────────────────────────────────────────────────────
+images: oui
 
 # ─────────────────────────────────────────────────────────────────────────
 # DANS QUEL ORDRE

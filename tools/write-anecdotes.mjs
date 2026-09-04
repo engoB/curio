@@ -43,12 +43,22 @@ const LANGS    = String(opt('langue', 'fr,en')).split(',').map(s => s.trim()).fi
 const DOMAINE  = String(opt('domaine', 'tous'));
 const COMBIEN  = parseInt(opt('combien', '250'), 10) || 250;
 const PROVIDER = String(opt('fournisseur', process.env.CURIO_PROVIDER || 'anthropic'));
+/* ── LE MODÈLE PAR DÉFAUT : SONNET ─────────────────────────────────────────
+   À l'aveugle, sur neuf fiches, l'auteur de Curio n'a pas distingué Sonnet
+   d'Opus. Or Opus coûte deux fois et demie plus cher : 0,049 $ la fiche
+   contre 0,0196 $, soit 57 $ contre 23 $ pour mille cent cinquante sujets.
+   Payer deux fois et demie pour une différence qu'on ne voit pas est
+   exactement le genre de dépense inutile qu'on cherche à supprimer.
+
+   Sonnet devient donc le défaut. Opus reste à une ligne de distance —
+   « modele » dans l'action, ou le menu de la console — et rien n'oblige à
+   choisir le même modèle pour tous les lots. */
 let   MODEL    = String(opt('modele', process.env.CURIO_MODEL ||
-                   (PROVIDER === 'openai' ? 'gpt-4o-mini' : 'claude-opus-5')));
+                   (PROVIDER === 'openai' ? 'gpt-4o-mini' : 'claude-sonnet-5')));
 /* Si le modèle demandé n'existe pas sur le compte, on descend cette liste. */
 const FALLBACKS = PROVIDER === 'openai'
   ? ['gpt-4o-mini']
-  : ['claude-opus-5', 'claude-sonnet-5', 'claude-haiku-4-5-20251001'];
+  : ['claude-sonnet-5', 'claude-opus-5', 'claude-haiku-4-5-20251001'];
 
 /* Tarifs officiels en dollars par million de jetons (vérifiés en août 2026).
    Mettez-les à jour si Anthropic change sa grille. */
@@ -66,10 +76,13 @@ const PRIX = {
    Avec la mise en cache de la consigne, seule la fiche de faits est payée
    plein tarif ; la consigne est relue à un dixième du prix. C'est ce que
    traduit ENTREE_CACHE.                                                  */
-/* Mesuré sur des tranches réelles avec Opus 5 : 1 500 jetons de sortie par
-   texte, pas 1 100. L'estimation annonçait donc 25 % de moins que la
-   facture. */
-const JETONS_CONSIGNE = 2000, JETONS_FICHE = 1000, JETONS_SORTIE = 1500;
+/* CALIBRÉ SUR DES TRANCHES RÉELLES, Opus 5, journal à l'appui :
+     · la consigne mise en cache        ~3 000 jetons  (relus à 1/10)
+     · la fiche de faits + l'invite     ~2 000 jetons  (plein tarif)
+     · le texte produit                 ~1 500 jetons  (sortie)
+   Les deux premières valeurs étaient sous-évaluées d'un tiers et de moitié :
+   l'estimation annonçait 0,0435 $ là où la facture disait 0,049 $. */
+const JETONS_CONSIGNE = 3000, JETONS_FICHE = 2000, JETONS_SORTIE = 1500;
 const JETONS_ENTREE = JETONS_CONSIGNE + JETONS_FICHE;
 const ENTREE_CACHE  = JETONS_FICHE + Math.round(JETONS_CONSIGNE * 0.1);
 const PARALLEL = Math.max(1, Math.min(8, parseInt(opt('parallele', '3'), 10) || 3));
@@ -83,6 +96,11 @@ const BUDGET  = parseFloat(opt('budget', '0')) || 0;
    « cinq pour voir », puis « trois cents ». S'il est donné, il commande ; le
    budget ne sert plus alors qu'à afficher le coût. */
 const SUJETS  = parseInt(opt('sujets', '0'), 10) || 0;
+/* Le potentiel minimum d'un sujet, de 0 à 10. « --potentiel 9 » n'écrit que
+   les 9 et les 10 : c'est la façon d'attaquer un catalogue de vingt mille
+   sujets par le haut, sans avoir à trier vingt mille lignes à la main.
+   0 — le défaut — ne filtre rien, l'ordre par potentiel suffit. */
+const POTENTIEL_MINI = Math.max(0, Math.min(10, parseInt(opt('potentiel', '0'), 10) || 0));
 /* Un plafond de dépense, en dollars. Au-delà, la tranche s'arrête proprement
    et enregistre ce qu'elle a fait. C'est le garde-fou qui manquait : une
    consigne mal comprise, un modèle qui bavarde, et un lot de trois cents
@@ -130,10 +148,90 @@ async function languesPubliees(){
   return ['fr', 'en'];
 }
 
+/* Le réglage « images » de consignes/publication.txt, recopié dans les
+   fichiers que le site et l'application lisent au démarrage. Il est aussi
+   gravé dans les pages à la construction ; celui-ci permet de le changer
+   sans reconstruire : « Entretien → recompter » suffit.
+     oui (défaut) · franches · non                                        */
+async function imagesPubliees(){
+  try{
+    const brut = await fs.readFile(path.join(process.cwd(), 'consignes', 'publication.txt'), 'utf8');
+    for (const l of brut.split(/\r?\n/)){
+      const t = l.trim();
+      if (!t || t.startsWith('#')) continue;
+      const m = t.match(/^images\s*[:=]\s*(\S+)/i);
+      if (m && /^(oui|non|franches)$/i.test(m[1])) return m[1].toLowerCase();
+    }
+  }catch{}
+  return 'oui';
+}
+
 async function lireMaitre(){
   try{ return JSON.parse(await fs.readFile(MAITRE, 'utf8')); }
   catch{ return null; }
 }
+
+/* ═══ REMETTRE LE CATALOGUE MAÎTRE D'ACCORD AVEC LE DISQUE ═════════════════
+   Le catalogue maître dit quelles langues sont écrites pour chaque sujet.
+   Il était mis à jour à la toute fin d'une tranche : si l'exécution
+   s'arrêtait avant — crédit épuisé, temps de l'action dépassé, exécution
+   annulée — les fiches restaient sur le disque, bel et bien payées, mais le
+   catalogue continuait de les annoncer « à écrire ». La console les comptait
+   comme du travail à faire, et la tranche suivante les reprenait pour
+   constater qu'elles étaient là : « rien de neuf », zéro fiche.
+
+   On remet donc les compteurs d'aplomb AVANT chaque tranche, en lisant les
+   fichiers eux-mêmes. Les fichiers sont la vérité ; le catalogue n'en est que
+   le résumé. Aucun appel, aucune dépense — et quoi qu'il arrive à une
+   exécution, la suivante repart juste.                                      */
+async function synchroniserMaitre(maitre){
+  const cache = new Map();
+  const titresDe = async (lang, uni) => {
+    const cle = lang + '|' + uni;
+    if (!cache.has(cle)){
+      const j = await readJson(path.join(OUTDIR, lang + '-' + uni + '.json'), { items:{} });
+      cache.set(cle, new Set(Object.keys(j.items || {})));
+    }
+    return cache.get(cle);
+  };
+  const aujourdhui = new Date().toISOString().slice(0, 10);
+  let corriges = 0, acheves = 0;
+  for (const s of maitre.sujets || []){
+    if (!s || !s.uni) continue;
+    const tfr = s.fr || s.en, ten = s.en || s.fr;
+    const faites = [];
+    if (tfr && (await titresDe('fr', s.uni)).has(tfr)) faites.push('fr');
+    if (ten && (await titresDe('en', s.uni)).has(ten)) faites.push('en');
+    const avant = (s.langues || []).join(',');
+    if (avant === faites.join(',')) continue;
+    s.langues = faites;
+    corriges++;
+    if (faites.length === 2 && s.statut !== 'ecrit'){
+      s.statut = 'ecrit'; s.ecrit = s.ecrit || aujourdhui; acheves++;
+    }
+  }
+  if (corriges){
+    maitre.genere = new Date().toISOString();
+    await writeAtomic(MAITRE, maitre);
+    console.log(`▸ Catalogue remis d'accord avec le disque : ${corriges} sujet(s) corrigé(s)`
+              + (acheves ? `, dont ${acheves} désormais complet(s).` : '.'));
+    console.log(`  (des fiches payées lors d'une exécution interrompue — rien n'est perdu.)`);
+  }
+}
+
+/* ═══ CE QUI DOIT ARRÊTER LA TRANCHE SUR-LE-CHAMP ═════════════════════════
+   Un crédit épuisé, une clé refusée, un compte suspendu : ces erreurs-là ne
+   se réparent pas en réessayant. Avant, chacun des trois cents sujets d'un
+   lot allait quand même frapper à la porte trois fois — neuf cents appels
+   refusés, une action qui tourne dix minutes pour rien, et un journal où
+   l'on ne voit plus la vraie cause au milieu de trois cents lignes d'échec.
+
+   Désormais on s'arrête au premier. Ce qui est écrit est déjà enregistré ;
+   SEUL LE SUJET EN COURS est à reprendre, et la relance le retrouvera de
+   lui-même puisque le catalogue vient d'être remis d'accord avec le disque. */
+const FATALES = /credit balance|insufficient|quota|billing|payment|invalid x-api-key|authentication|unauthorized|permission|suspended|organization has been disabled/i;
+function estFatale(message){ return FATALES.test(String(message || '')); }
+let ARRET = false, raisonArret = '';
 
 /* Ce que cette exécution a coûté jusqu'ici, en dollars, d'après les jetons
    que l'API a elle-même comptés. C'est la vérité, pas une estimation. */
@@ -176,11 +274,22 @@ function planDeTranche(maitre, budgetEuros, decisions){
   const complets = candidats.filter(dejaFait).length;
   candidats = candidats.filter(s => !dejaFait(s));
 
+  /* Le seuil de potentiel. Trier par potentiel met les meilleurs devant, mais
+     ne dit pas où s'arrêter : sur une tranche de trois cents, on finit
+     forcément dans les 6/10. Le seuil, lui, ferme la porte. */
+  let sousLeSeuil = 0;
+  if (POTENTIEL_MINI > 0){
+    const avant = candidats.length;
+    candidats = candidats.filter(s => (s.potentiel || 0) >= POTENTIEL_MINI);
+    sousLeSeuil = avant - candidats.length;
+  }
+
   candidats.sort((a, b) => (b.potentiel - a.potentiel)
                || ((b.sources || []).length - (a.sources || []).length)
                || (b.editions || 0) - (a.editions || 0));
   return { cout, sujetsPossibles, parSujet, retenus: candidats.slice(0, sujetsPossibles),
-           restants: candidats.length, complets, surDecision: retenusExplicites > 0 };
+           restants: candidats.length, complets, sousLeSeuil,
+           surDecision: retenusExplicites > 0 };
 }
 
 async function lireDecisions(){
@@ -413,12 +522,24 @@ function recouvrement(produit, source, n = 8){
   if (out.length < n || src.length < n) return { max: 0, communs: 0 };
   const grammes = new Set();
   for (let i = 0; i + n <= src.length; i++) grammes.add(src.slice(i, i + n).join(' '));
-  let communs = 0, courant = 0, max = 0;
+  let communs = 0, courant = 0, max = 0, debut = 0;
+  /* On garde aussi les passages fautifs eux-mêmes : sans eux, une réécriture
+     est un coup d'épée dans l'eau — le modèle ne sait pas ce qu'on lui
+     reproche et réécrit la même chose. Avec eux, il sait quoi éviter. */
+  const extraits = [];
+  const fermer = (i) => {
+    if (courant) extraits.push({ n: courant + n - 1, mots: out.slice(debut, i + n - 1).join(' ') });
+    courant = 0;
+  };
   for (let i = 0; i + n <= out.length; i++){
-    if (grammes.has(out.slice(i, i + n).join(' '))){ communs++; courant++; max = Math.max(max, courant + n - 1); }
-    else courant = 0;
+    if (grammes.has(out.slice(i, i + n).join(' '))){
+      if (!courant) debut = i;
+      communs++; courant++; max = Math.max(max, courant + n - 1);
+    } else fermer(i);
   }
-  return { max, communs };
+  fermer(out.length - n + 1);
+  extraits.sort((a, b) => b.n - a.n);
+  return { max, communs, extraits: extraits.slice(0, 3).map(e => e.mots) };
 }
 
 async function articleData(lang, title){
@@ -562,17 +683,30 @@ async function ask(lang, title, text, pourquoi, langueFiche){
     : '';
   const user = 'Sujet : ' + title + traduire + '\n\nFiche de faits :\n\n' + factSheet(text) + angle;
 
+  /* ── LE REPROCHE ────────────────────────────────────────────────────────
+     Quand un texte est refusé — illisible, ou trop proche de la source — on
+     rappelait le modèle avec EXACTEMENT le même message. Il produisait donc,
+     sans surprise, à peu près le même texte, et l'appel était payé pour
+     rien : c'est ce qu'a montré le test Sonnet sur « Porte de l'Enfer »,
+     trois appels facturés, zéro fiche.
+
+     On lui dit maintenant ce qu'on lui reproche, en lui citant ses propres
+     passages fautifs. La consigne mise en cache, elle, ne bouge pas : le
+     reproche s'ajoute au message de l'utilisateur, l'économie est intacte. */
+  let reproche = '';
+
   const jAmorce = await attendreAmorce();
   try{
   for (let i = 0; i < 5; i++){
     try{
       let res, out;
+      const message = user + reproche;
       if (PROVIDER === 'openai'){
         res = await fetch('https://api.openai.com/v1/chat/completions', {
           method:'POST',
           headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + KEY },
           body: JSON.stringify({ model: MODEL, temperature: 0.7, max_tokens: 2400,
-            messages:[{ role:'system', content: system }, { role:'user', content: user }] })
+            messages:[{ role:'system', content: system }, { role:'user', content: message }] })
         });
         if (res.status === 429 || res.status >= 500){ await sleep(2500 * (i+1)); continue; }
         const j = await res.json();
@@ -613,7 +747,7 @@ async function ask(lang, title, text, pourquoi, langueFiche){
            coupé — mieux vaut payer un peu plus que jeter la réponse. */
         const corps = { model: MODEL, max_tokens: MAX_SORTIE,
           system: CACHE ? [{ type:'text', text: system, cache_control:{ type:'ephemeral' } }] : system,
-          messages:[{ role:'user', content: user }] };
+          messages:[{ role:'user', content: message }] };
         if (SANS_PENSEE) corps.thinking = { type: 'disabled' };
         res = await fetch('https://api.anthropic.com/v1/messages', {
           method:'POST',
@@ -664,7 +798,19 @@ async function ask(lang, title, text, pourquoi, langueFiche){
           console.log(`  · réponse coupée par la limite de longueur : on repasse à ${MAX_SORTIE} jetons.`);
           reprises++; continue;
         }
-        if (i < 2){ reprises++; console.log(`  · on redemande (appel payé)`); await sleep(600); continue; }
+        if (i < 2){
+          reprises++;
+          reproche = (lang === 'fr')
+            ? "\n\nATTENTION — ta réponse précédente n'a pas pu être lue par la machine."
+              + " Réponds UNIQUEMENT par l'objet JSON demandé : rien avant, rien après,"
+              + " pas de bloc de code, et jamais de retour à la ligne brut à l'intérieur"
+              + " d'une chaîne — écris \\n."
+            : "\n\nWARNING — your previous answer could not be parsed."
+              + " Answer ONLY with the requested JSON object: nothing before, nothing after,"
+              + " no code fence, and never a raw line break inside a string — write \\n.";
+          console.log(`  · on redemande en disant ce qui n'allait pas (appel payé)`);
+          await sleep(600); continue;
+        }
         throw new Error(`réponse illisible (arrêt « ${arret || '?'} »)`);
       }
       const produit = String(parsed.texte).replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim();
@@ -680,8 +826,20 @@ async function ask(lang, title, text, pourquoi, langueFiche){
       if (rec.communs > 5){
         if (i < 1){
           reprises++;
+          const cites = (rec.extraits || []).map(m => '« … ' + m + ' … »').join('\n');
+          reproche = (lang === 'fr')
+            ? "\n\nATTENTION — ta version précédente reprenait mot pour mot des passages"
+              + " entiers de la source. Recommence : raconte les mêmes faits, mais"
+              + " construis TOUTES tes phrases autrement — autre ordre, autre vocabulaire,"
+              + " autres coupes. Ne reprends aucune suite de plus de sept mots.\n"
+              + "Passages à ne pas réutiliser :\n" + cites
+            : "\n\nWARNING — your previous version reused whole passages of the source"
+              + " word for word. Start again: same facts, but build EVERY sentence"
+              + " differently — different order, different words, different breaks."
+              + " Never reuse a run of more than seven words.\n"
+              + "Passages you must not reuse:\n" + cites;
           console.log(`  · reprise trop proche (${rec.communs} passages, ${rec.max} mots) — `
-                    + `on réécrit une fois (appel payé)`);
+                    + `on réécrit une fois en citant les passages fautifs (appel payé)`);
           await sleep(600);
           continue;
         }
@@ -695,6 +853,10 @@ async function ask(lang, title, text, pourquoi, langueFiche){
         s: Math.max(0, Math.min(10, Math.round(Number(parsed.insolite) || 0)))
       };
     }catch(e){
+      /* Crédit épuisé, clé refusée : on ne réessaie pas. Trois tentatives par
+         sujet sur un lot de trois cents, ce sont neuf cents appels refusés et
+         un journal illisible — pour une cause qui ne changera pas. */
+      if (estFatale(e.message)) throw e;
       if (/model/i.test(e.message) && /not|introuvable|invalid|does not exist|unknown|unsupported/i.test(e.message)){
         const next = FALLBACKS[FALLBACKS.indexOf(MODEL) + 1];
         if (next){
@@ -816,10 +978,24 @@ async function ecrireTranche(retenus, maitre){
   const faites = new Map();           // qid -> nombre de langues écrites
   const causes = new Map();           // message d'erreur -> combien de fois
   let plafondAtteint = false;
-  let done = 0, skipped = 0, failed = 0;
+  let done = 0, maigres = 0, jetees = 0, failed = 0, interrompus = 0;
   const total = [...paquets.values()].reduce((n, v) => n + v.length, 0);
 
+  /* ── VOUS AVEZ ARRÊTÉ L'ACTION ────────────────────────────────────────────
+     GitHub prévient d'abord, tue ensuite. Cette poignée de secondes suffit à
+     poser le drapeau : les ouvriers se retirent, et la tranche passe à son
+     enregistrement final au lieu d'être coupée en plein vol. */
+  const surSignal = () => {
+    if (ARRET) return;
+    ARRET = true;
+    raisonArret = 'exécution interrompue';
+    console.log(`\n  ⛔ interruption demandée — on enregistre ce qui est écrit et on s'arrête.`);
+  };
+  process.on('SIGINT',  surSignal);
+  process.on('SIGTERM', surSignal);
+
   for (const [cle, entrees] of paquets){
+    if (ARRET) break;
     const [lang, uni] = cle.split('|');
     const fichier = path.join(OUTDIR, lang + '-' + uni + '.json');
     const store = await readJson(fichier, { items:{} });
@@ -829,9 +1005,26 @@ async function ecrireTranche(retenus, maitre){
     if (!restants.length){ console.log(`▸ ${lang}/${uni} : rien de neuf`); continue; }
     console.log(`▸ ${lang}/${uni} : ${restants.length} fiche(s) à écrire`);
 
-    let curseur = 0, depuis = 0;
+    /* Trois ouvriers travaillent de front sur le même fichier. Sans file
+       d'attente, deux enregistrements simultanés se marcheraient dessus et le
+       second écraserait le premier. On les met à la queue leu leu : chacun
+       attend que le précédent ait fini. C'est une attente de millisecondes. */
+    let file = Promise.resolve();
+    const enregistrer = () => {
+      file = file.then(() => writeAtomic(fichier,
+        { generated:new Date().toISOString(), model:MODEL, items:store.items })).catch(e => {
+          console.log(`  ! enregistrement de ${lang}/${uni} : ${e.message}`);
+        });
+      return file;
+    };
+
+    let curseur = 0;
     const ouvrier = async () => {
       while (curseur < restants.length){
+        /* Une raison d'arrêter net : crédit épuisé, ou vous avez interrompu
+           l'action. Les ouvriers se retirent, chacun finit l'appel qu'il a
+           engagé, et la tranche va droit à l'enregistrement. */
+        if (ARRET) return;
         /* Le plafond : on s'arrête AVANT d'engager un nouvel appel. Ce qui
            est écrit est déjà enregistré ; la tranche suivante reprendra. */
         if (PLAFOND > 0 && coutCourant() >= PLAFOND){
@@ -856,11 +1049,25 @@ async function ecrireTranche(retenus, maitre){
             const jumeau = lang === 'fr' ? (s.en || s.fr) : (s.fr || s.en);
             d = await ficheArticle(lang, titre, jumeau);
           }
-          if (!d || d.text.length < 400){ skipped++; continue; }
+          /* Écarté AVANT tout appel : l'article est trop maigre pour qu'on en
+             tire quoi que ce soit. Ne coûte rien, et c'est très bien ainsi. */
+          if (!d || d.text.length < 400){ maigres++; continue; }
           const angle = s.phrase || '';
           const a = await ask(lang, titre, d.text, angle, d.source);
-          if (!a || a.x.length < 1600){ skipped++; continue; }
-          if (a.s < MIN_SCORE_KEEP){ skipped++; continue; }
+          /* Écarté APRÈS l'appel : le texte est payé et jeté. C'est la seule
+             dépense de la chaîne qui ne rapporte rien, et elle était noyée
+             dans le même compteur que les articles trop maigres, qui eux ne
+             coûtent rien. On les sépare : ce qui se voit se corrige. */
+          if (!a || a.x.length < 1600){
+            jetees++;
+            console.log(`  · ${titre} : texte trop court (${a ? a.x.length : 0} signes) — payé et écarté`);
+            continue;
+          }
+          if (a.s < MIN_SCORE_KEEP){
+            jetees++;
+            console.log(`  · ${titre} : le rédacteur se note ${a.s}/10 — payé et écarté`);
+            continue;
+          }
           a.i = d.img; a.u = d.url;
           a.d = new Date().toISOString().slice(0, 10);
           a.q = s.qid;                     // le lien vers le catalogue maître
@@ -868,24 +1075,50 @@ async function ecrireTranche(retenus, maitre){
           a.v = '';                        // pas encore contrôlée
           store.items[titre] = a;
           faites.set(s.qid, (faites.get(s.qid) || 0) + 1);
-          done++; depuis++;
-          if (depuis >= 10){
-            depuis = 0;
-            await writeAtomic(fichier, { generated:new Date().toISOString(), model:MODEL, items:store.items });
-          }
+          done++;
+          /* ── ENREGISTRÉE DÈS QU'ÉCRITE ────────────────────────────────
+             On enregistrait par paquets de dix. Une action interrompue au
+             mauvais moment — crédit épuisé, temps dépassé, exécution
+             annulée — jetait donc jusqu'à neuf fiches DÉJÀ PAYÉES.
+             Écrire le fichier coûte quelques millisecondes, un appel à
+             l'API coûte deux centimes et vingt secondes : le calcul est
+             vite fait. */
+          await enregistrer();
           if (done % 10 === 0)
             console.log(`  ${done}/${total} écrites — ${coutCourant().toFixed(2)} $ dépensés `
                       + `(${(coutCourant()/done).toFixed(4)} $ par fiche)`);
         }catch(e){
-          failed++;
           causes.set(e.message, (causes.get(e.message) || 0) + 1);
+          if (estFatale(e.message)){
+            /* Ce n'est pas un échec du sujet : c'est le compte qui a dit non.
+               Les deux ou trois appels déjà engagés par les autres ouvriers
+               reçoivent le même refus — ils ne sont pas facturés, et leurs
+               sujets sont simplement à reprendre. On les compte à part pour
+               ne pas les faire passer pour des sujets défectueux. */
+            interrompus++;
+            /* La seule erreur qui arrête tout. Le sujet en cours est le SEUL
+               à reprendre : tout ce qui précède est enregistré, et le
+               catalogue sera remis d'accord avec le disque avant la relance. */
+            if (!ARRET){
+              ARRET = true;
+              raisonArret = e.message;
+              console.log(`\n  ⛔ ${e.message}`);
+              console.log(`     On s'arrête ici. Les ${done} fiche(s) déjà écrites sont enregistrées ;`);
+              console.log(`     seul « ${titre} » est à reprendre. Rechargez du crédit et relancez :`);
+              console.log(`     la tranche repartira exactement là où elle s'est arrêtée.`);
+            }
+            return;
+          }
+          failed++;
           if (failed <= 3) console.log(`  ! ${titre} : ${e.message}`);
         }
       }
     };
     await Promise.all(Array.from({ length: PARALLEL }, ouvrier));
-    await writeAtomic(fichier, { generated:new Date().toISOString(), model:MODEL, items:store.items });
+    await enregistrer();
   }
+  process.off('SIGINT',  surSignal);
+  process.off('SIGTERM', surSignal);
 
   /* ---- le catalogue maître enregistre ce qui est fait ------------------- */
   const aujourdhui = new Date().toISOString().slice(0, 10);
@@ -937,7 +1170,15 @@ async function ecrireTranche(retenus, maitre){
   if (incomplets)
     console.log(`║  ${incomplets} sujet(s) écrits dans une seule langue : ils restent `
               + `« à écrire »\n║  et attendent leur tranche dans l'autre langue. Rien ne sera repayé.`);
-  console.log(`║  ${skipped} écartée(s) (article trop maigre ou note trop basse), ${failed} en échec.`);
+  console.log(`║  ${maigres} sujet(s) écartés sans appel (article trop maigre) — gratuit.`);
+  if (jetees){
+    const px0 = PRIX[MODEL];
+    const perdu = px0 ? jetees * ((2300 * px0.in + 1500 * px0.out) / 1e6) : 0;
+    console.log(`║  ${jetees} texte(s) PAYÉS PUIS ÉCARTÉS (trop courts ou mal notés)`
+              + (perdu ? ` — environ ${perdu.toFixed(2)} $ perdus.` : '.')
+              + `\n║  Si ce nombre grimpe, c'est la consigne qu'il faut revoir, pas le modèle.`);
+  }
+  console.log(`║  ${failed} en échec.`);
   if (reprises)
     console.log(`║  ${reprises} réécriture(s) demandée(s) — chacune est un appel facturé.`);
   /* LE CHIFFRE QUI MANQUAIT : ce que cette tranche a réellement coûté,
@@ -957,10 +1198,17 @@ async function ecrireTranche(retenus, maitre){
     const c = coutCourant();
     console.log(`║  ${c.toFixed(2)} $ (~${(c / EUR_USD).toFixed(2)} €)`
               + (done ? `  ·  ${(c/done).toFixed(4)} $ par fiche` : ''));
-    /* La projection : c'est le seul chiffre qui compte avant de lancer un
-       gros lot. On la donne au rythme CONSTATÉ, pas au rythme espéré. */
+    /* La projection. Elle ne se fait PAS sur le coût moyen de la tranche :
+       la mise en cache de la consigne se paie une fois, et sur deux fiches
+       elle pèse un cinquième du prix alors que sur trois cents elle ne pèse
+       plus rien. On projette donc sur le coût MARGINAL — ce que coûte la
+       fiche suivante, cache déjà chaud. */
     if (done && enJeu.length){
-      const reste = enJeu.length * (c / done);
+      const marginal = ((tokIn/1e6)*px.in + (tokRelu/1e6)*px.in*0.1 + (tokOut/1e6)*px.out) / done;
+      const reste = enJeu.length * marginal;
+      if (tokEcrit && Math.abs(marginal - c/done) > 0.002)
+        console.log(`║  ${marginal.toFixed(4)} $ par fiche une fois le cache chaud `
+                  + `(la mise en cache se paie une seule fois).`);
       console.log(`║  à ce rythme, les ${enJeu.length} sujet(s) qui restent coûteraient `
                 + `${reste.toFixed(2)} $ (~${(reste / EUR_USD).toFixed(2)} €).`);
       if (tokEcrit && !tokRelu)
@@ -970,6 +1218,13 @@ async function ecrireTranche(retenus, maitre){
   }
   if (plafondAtteint)
     console.log(`║  ⛔ arrêt sur plafond : relancez la même tranche pour continuer.`);
+  if (interrompus)
+    console.log(`║  ${interrompus} appel(s) déjà engagés ont reçu le même refus : non facturés,`
+              + `\n║  leurs sujets sont simplement à reprendre.`);
+  if (ARRET)
+    console.log(`║  ⛔ arrêt net — ${raisonArret}.`
+              + `\n║  Tout ce qui est écrit ci-dessus est enregistré et ne sera pas repayé.`
+              + `\n║  Relancez la même tranche quand ce sera réglé : elle reprend d'elle-même.`);
   console.log(`║  Il reste ${aCommencer} sujet(s) à commencer`
             + (aFinir ? ` et ${aFinir} à finir dans l'autre langue` : '')
             + (retenusExplicites ? `,\n║  parmi VOS ${retenusExplicites} sujets retenus.` : `\n║  dans le catalogue maître.`));
@@ -1050,6 +1305,9 @@ async function main(){
       console.error('✗ catalogue-maitre.json introuvable ou vide. Lancez d\'abord l\'action « 1 · Moissonner ».');
       process.exit(1);
     }
+    /* Avant tout : le catalogue et le disque doivent dire la même chose.
+       C'est ce qui rend une relance sûre après n'importe quelle interruption. */
+    await synchroniserMaitre(maitre);
     const decisions = await lireDecisions();
     const plan = planDeTranche(maitre, BUDGET, decisions);
     const coutReel = plan.retenus.length * plan.parSujet * plan.cout;
@@ -1080,6 +1338,9 @@ async function main(){
     if (plan.complets)
       console.log(`║  ${plan.complets} sujet(s) déjà écrits en ${LANGUES_TRANCHE.join('+')} sont passés — `
                 + `ils ne\n║  seront jamais repayés.`);
+    if (POTENTIEL_MINI > 0)
+      console.log(`║  potentiel ${POTENTIEL_MINI}/10 minimum — ${plan.sousLeSeuil} sujet(s) sous le seuil `
+                + `sont\n║  laissés de côté pour un autre jour.`);
     if (plan.retenus.length){
       const parUni = {};
       for (const x of plan.retenus) parUni[x.uni] = (parUni[x.uni] || 0) + 1;
@@ -1306,6 +1567,7 @@ async function buildIndex(){
       /* Les langues publiées : le site s'en sert pour retirer le bouton FR/EN
          avant même qu'une fiche soit en ligne. */
       langues: await languesPubliees(),
+      images:  await imagesPubliees(),
       total, weekly, byUniverse, reserve:enReserve });
   console.log(`  index.json : ${sujets.size} sujet(s) EN LIGNE — ${JSON.stringify({fr:total.fr||0, en:total.en||0})} textes`
             + (enReserve ? `, ${enReserve} en réserve.` : '.'));

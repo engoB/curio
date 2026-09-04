@@ -173,7 +173,22 @@ const TXT = {
   }
 };
 
+/* ── LES LANGUES PUBLIÉES, GRAVÉES DANS LA PAGE ────────────────────────────
+   Votre réglage « langues » de consignes/publication.txt est inscrit dans
+   l'en-tête du document à la construction. La page le connaît donc AVANT
+   d'avoir touché le réseau : si vous ne publiez que le français, le bouton
+   FR/EN n'apparaît pas une seule seconde, même si index.json est absent,
+   même hors ligne. index.json, quand il arrive, peut le corriger — les deux
+   viennent du même fichier, ils ne se contredisent pas. */
+function metaListe(nom){
+  const m = document.querySelector('meta[name="' + nom + '"]');
+  const v = m && m.content ? String(m.content).split(',').map(s=>s.trim()).filter(Boolean) : [];
+  return v.length ? v : null;
+}
+const LANGUES_GRAVEES = metaListe('curio-langues');
+
 let lang = (localStorage.getItem('curio.lang') ? JSON.parse(localStorage.getItem('curio.lang')) : ((navigator.language||'fr').toLowerCase().startsWith('fr')?'fr':'en'));
+if(LANGUES_GRAVEES && LANGUES_GRAVEES.length === 1) lang = LANGUES_GRAVEES[0];
 let theme = (localStorage.getItem('curio.theme') ? JSON.parse(localStorage.getItem('curio.theme')) : 'dark');
 /* Le jeu de couleurs — « bleu » ou « origine » — est le MÊME réglage que dans
    l'application : même clé de stockage, donc le site et l'application ne se
@@ -240,6 +255,8 @@ function render(){
   document.querySelectorAll('[data-th]').forEach(n=>{ const v=t[n.dataset.th]; if(typeof v==='string') n.innerHTML=v; });
   paintCount();
   $('#langBtn').textContent = lang.toUpperCase();
+  /* Une seule langue publiée : le bouton n'a nulle part où mener. */
+  if(LANGUES_GRAVEES && LANGUES_GRAVEES.length === 1) $('#langBtn').hidden = true;
 
   // univers
   const g = $('#unis'); g.innerHTML='';
@@ -366,7 +383,7 @@ async function loadCount(){
        réglage explicite — « langues » dans consignes/publication.txt, recopié
        ici par les outils — prime, car il vaut avant toute publication. */
     const nFr = Number(j?.total?.fr || 0), nEn = Number(j?.total?.en || 0);
-    const reglees = Array.isArray(j?.langues) ? j.langues : null;
+    const reglees = (Array.isArray(j?.langues) && j.langues.length) ? j.langues : LANGUES_GRAVEES;
     const seule = (reglees && reglees.length === 1) ? reglees[0]
                 : (nFr > 0 && nEn === 0) ? 'fr'
                 : (nEn > 0 && nFr === 0) ? 'en' : '';

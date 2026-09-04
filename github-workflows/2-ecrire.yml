@@ -28,14 +28,18 @@ on:
         description: "Budget de la tranche, en euros (ignore si sujets > 0)"
         required: true
         default: "30"
+      potentiel:
+        description: "Potentiel minimum du sujet, de 0 a 10 (0 = pas de seuil)"
+        required: false
+        default: "0"
       langues:
         description: "Langues de cette tranche"
         required: true
-        default: "fr,en"
+        default: "fr"
         type: choice
         options:
-          - "fr,en"
           - "fr"
+          - "fr,en"
           - "en"
       estimer:
         description: "Estimer seulement, sans rien depenser"
@@ -46,8 +50,13 @@ on:
         required: false
         default: "0"
       modele:
-        description: "Modele (vide = claude-opus-5)"
-        default: ""
+        description: "Modele"
+        required: true
+        default: "claude-sonnet-5"
+        type: choice
+        options:
+          - "claude-sonnet-5"
+          - "claude-opus-5"
 
 permissions:
   contents: write
@@ -90,9 +99,11 @@ jobs:
           M=""; if [ -n "${{ github.event.inputs.modele }}" ]; then M="--modele ${{ github.event.inputs.modele }}"; fi
           S=""; if [ "${{ github.event.inputs.sujets }}" != "0" ] && [ -n "${{ github.event.inputs.sujets }}" ]; then S="--sujets ${{ github.event.inputs.sujets }}"; fi
           L="--langues ${{ github.event.inputs.langues }}"
+          # Le seuil de potentiel : « je ne veux que les meilleurs ». 0 = aucun seuil.
+          Q=""; if [ "${{ github.event.inputs.potentiel }}" != "0" ] && [ -n "${{ github.event.inputs.potentiel }}" ]; then Q="--potentiel ${{ github.event.inputs.potentiel }}"; fi
           C=""; if [ "${{ github.event.inputs.plafond }}" != "0" ] && [ -n "${{ github.event.inputs.plafond }}" ]; then C="--plafond ${{ github.event.inputs.plafond }}"; fi
           P=""; if [ -z "$ANTHROPIC_API_KEY" ] && [ -n "$OPENAI_API_KEY" ]; then P="--fournisseur openai"; fi
-          node tools/write-anecdotes.mjs --budget "${{ github.event.inputs.budget }}" $S $L $C $E $M $P 2>&1 | tee curio.log
+          node tools/write-anecdotes.mjs --budget "${{ github.event.inputs.budget }}" $S $L $Q $C $E $M $P 2>&1 | tee curio.log
 
       - name: Compte rendu
         if: always()

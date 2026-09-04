@@ -16,8 +16,50 @@ function prune(){
 }
 const today = () => new Date().toISOString().slice(0,10);
 
+/* ── CE QUE LA PAGE SAIT AVANT TOUT RÉSEAU ─────────────────────────────────
+   Vos réglages « langues » et « images » de consignes/publication.txt sont
+   gravés dans l'en-tête du document à la construction. L'application les
+   connaît donc dès la première seconde, hors ligne comprise : le bouton
+   FR/EN ne clignote pas avant de disparaître, les images ne s'affichent pas
+   une demi-seconde avant d'être retirées. catalog.json et index.json, quand
+   ils arrivent, gardent le dernier mot — ils viennent du même fichier. */
+function metaListe(nom){
+  const m = document.querySelector('meta[name="' + nom + '"]');
+  const v = m && m.content ? String(m.content).split(',').map(s=>s.trim()).filter(Boolean) : [];
+  return v.length ? v : null;
+}
+const LANGUES_GRAVEES = metaListe('curio-langues');
+/* Gravé dans la page, donc appliqué dès la première seconde ; mais aussi
+   recopié dans catalog.json et index.json par les outils, ce qui permet de
+   changer d'avis sans reconstruire le site — « Entretien → recompter ». */
+let IMAGES_GRAVEES = (metaListe('curio-images') || ['oui'])[0];
+document.documentElement.dataset.images = IMAGES_GRAVEES;
+function reglerImages(v){
+  if(!v || v === IMAGES_GRAVEES || !/^(oui|non|franches)$/.test(v)) return;
+  IMAGES_GRAVEES = v;
+  document.documentElement.dataset.images = v;
+  /* Les cartes déjà construites : on retire ou on remet la photo sans
+     recharger, et sans toucher au texte que le lecteur est en train de lire. */
+  document.querySelectorAll('.card').forEach(c => {
+    const im = c.querySelector('.card__media img');
+    if(v === 'non'){ if(im){ im.remove(); c.classList.remove('has-photo'); } }
+    else if(!im && c._item && c._item.img) mediaPhoto(c, c._item.img);
+  });
+}
+function mediaPhoto(node, src){
+  const wrap = node.querySelector('.card__media');
+  if(!wrap) return;
+  const im = document.createElement('img');
+  im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.referrerPolicy = 'no-referrer';
+  im.addEventListener('load', () => { im.classList.add('ready'); node.classList.add('has-photo'); });
+  im.addEventListener('error', () => { im.remove(); node.classList.remove('has-photo'); });
+  im.src = src;
+  wrap.appendChild(im);
+}
+
 const S = {
-  lang:      LS.get('curio.lang', (navigator.language||'fr').toLowerCase().startsWith('fr') ? 'fr' : 'en'),
+  lang:      (LANGUES_GRAVEES && LANGUES_GRAVEES.length === 1) ? LANGUES_GRAVEES[0]
+             : LS.get('curio.lang', (navigator.language||'fr').toLowerCase().startsWith('fr') ? 'fr' : 'en'),
   theme:     LS.get('curio.theme', 'dark'),
   // « bleu » (par défaut) ou « origine » — le jeu de teintes d'avant, encre
   // presque noire et vert-de-gris. Indépendant du clair/sombre.
@@ -551,6 +593,7 @@ async function loadStats(){
       /* index.json porte aussi le réglage : « Entretien → recompter » suffit
          donc à l'appliquer, sans attendre une moisson. */
       if(Array.isArray(j.langues) && j.langues.length) LANGUES_SITE = j.langues;
+      reglerImages(j.images);
       renderTocCount(); langueUnique();
     }
   }catch(e){}
@@ -562,7 +605,7 @@ async function loadStats(){
    ramène le lecteur au français s'il était resté en anglais. Rien à
    régler : le jour où des fiches anglaises sont publiées, le bouton
    revient de lui-même. */
-let LANGUES_SITE = null;      // ce que le réglage dit, quand il dit quelque chose
+let LANGUES_SITE = LANGUES_GRAVEES;   // le réglage gravé, jusqu'à ce qu'un fichier dise mieux
 function langueUnique(){
   const b = $('#langBtn');
   if(!b) return;
@@ -687,6 +730,7 @@ async function loadCatalog(){
      avant même qu'une seule fiche soit en ligne, là où le simple comptage ne
      peut encore rien dire. */
   if(Array.isArray(j.langues) && j.langues.length){ LANGUES_SITE = j.langues; langueUnique(); }
+  reglerImages(j.images);
 
   const themes  = Array.isArray(j.themes) ? j.themes : [];
   const sources = j.sources || j;
@@ -907,12 +951,26 @@ const ICON = {
 
 /* Le fond d'une fiche est toujours dessiné par Curio : rien n'est emprunté
    à un tiers, rien ne peut manquer, et chaque univers a sa propre matière. */
+/* ── LE FOND D'UNE FICHE ───────────────────────────────────────────────────
+   L'art procédural est toujours peint : c'est le fond garanti, il ne dépend
+   d'aucun réseau et aucune fiche n'en est dépourvue. Quand la fiche porte une
+   photo — les outils en enregistrent une pour presque toutes — elle se pose
+   PAR-DESSUS et se révèle une fois chargée. Si elle n'arrive pas, l'art reste :
+   il n'y a jamais de trou.
+
+   Le réglage « images » de consignes/publication.txt commande l'ensemble :
+     oui       la photo, sous un voile appuyé — le texte prime      (défaut)
+     franches  la photo à nu, comme avant : l'image prime
+     non       pas de photo du tout, l'art procédural seul
+   Le jour où les photos vous lassent, une ligne suffit à les retirer partout,
+   sans rien réécrire ni republier.                                        */
 function mediaFor(item, node){
   const wrap = el('div','card__media');
   const cv = el('canvas');
   wrap.appendChild(cv);
   paintCanvas(cv, themeById(item.theme) || THEMES[0], hash(item.article || item.title));
   node.appendChild(wrap);
+  if(IMAGES_GRAVEES !== 'non' && item.img) mediaPhoto(node, item.img);
 }
 function hash(s){ let h=2166136261; for(let i=0;i<(s||'').length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h,16777619);} return h>>>0; }
 
@@ -2599,7 +2657,7 @@ function relock(){
 })();
 
 $('#streakN').textContent = S.streak;
-applyTheme(); applyLang(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount();
+applyTheme(); applyLang(); langueUnique(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount();
 
 const AUDIT = new URLSearchParams(location.search).get('audit') === '1';
 /* déplacé en tête : filtrerPubliees() en a besoin dès le premier chargement */

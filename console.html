@@ -188,10 +188,45 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .apercu .fermer{margin-left:auto;font:inherit;font-size:12px;font-weight:600;cursor:pointer;
   background:none;border:1px solid rgba(150,190,255,.30);color:#9FB4DA;border-radius:9px;padding:5px 11px}
 .apercu .fermer:hover{color:#EAF1FF;border-color:#3FA9FF}
+/* Le panneau de lancement d'une tranche : quatre réglages qui se répondent,
+   et le montant qui suit. Il emprunte le cadre de l'aperçu — même fenêtre,
+   même façon de se fermer — mais pas son fond de carte. */
+.apercu .cadre.lancer{width:min(460px,100%);background:var(--ink-2)}
+.apercu .cadre.lancer .barreApp{background:var(--ink);border-bottom-color:var(--line-fort)}
+.apercu .cadre.lancer .marque{color:var(--texte)}
+/* La liste des réglages défile si la fenêtre est courte : sur un portable,
+   les deux boutons du bas doivent rester atteignables. */
+.apercu .reglages{padding:18px 20px 4px;display:flex;flex-direction:column;gap:14px;
+  overflow-y:auto;min-height:0;flex:1 1 auto}
+.apercu .reglages label{display:flex;flex-direction:column;gap:6px;font-size:12px;
+  font-weight:700;letter-spacing:.04em;color:var(--texte-2);text-transform:none}
+.apercu .reglages select,.apercu .reglages input{font:inherit;font-size:13.5px;font-weight:500;
+  padding:8px 10px;border-radius:9px;border:1px solid var(--line-fort);
+  background:var(--ink);color:var(--texte)}
+/* Ces phrases sont là pour être lues : ni majuscules, ni interlettrage — la
+   feuille de la console les impose aux <label>, il faut les reprendre ici. */
+.apercu .reglages i{display:block;font-style:normal;font-size:11.5px;font-weight:400;
+  line-height:1.55;letter-spacing:0;text-transform:none;color:var(--texte-3,#7F92B5)}
+.apercu .total{flex:0 0 auto;margin:0;padding:12px 14px;border-radius:11px;
+  background:rgba(63,169,255,.08);border:1px solid rgba(63,169,255,.22);
+  font-size:14px;line-height:1.5;color:var(--texte)}
+.apercu .total span{display:block;margin-top:6px;font-size:11.5px;line-height:1.5;color:var(--texte-3,#7F92B5)}
+.apercu .total{margin:14px 20px 0}
+.apercu .actions{flex:0 0 auto;display:flex;gap:10px;padding:14px 20px 18px}
+.apercu .actions .btn{flex:1;font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  padding:10px 12px;border-radius:10px;border:1px solid var(--line-fort);
+  background:none;color:var(--texte-2)}
+.apercu .actions .btn:hover{color:var(--texte);border-color:#3FA9FF}
+.apercu .actions .btn.primaire{background:#3FA9FF;border-color:#3FA9FF;color:#04162C}
+.apercu .actions .btn.primaire:hover{background:#63BAFF}
 .apercu .carte{position:relative;min-height:420px;flex:1 1 auto;min-height:0;display:flex;overflow:hidden}
 .apercu .fond{position:absolute;inset:0;background-size:cover;background-position:center}
+/* Le même voile que dans l'application — dégradé PUIS aplat à 30 % — sinon
+   l'aperçu montrerait une carte plus contrastée que celle du lecteur, et il
+   ne servirait plus à juger. */
 .apercu .voile{position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(5,14,36,.30) 0%,rgba(5,14,36,.72) 44%,rgba(5,14,36,.95) 100%)}
+.apercu .voile::after{content:'';position:absolute;inset:0;background:#050E24;opacity:.30}
 .apercu .dedans{position:relative;z-index:2;width:100%;padding:24px 26px;min-height:0;
   display:flex;flex-direction:column;justify-content:flex-end;color:#EAF1FF}
 .apercu .sourcil{display:flex;align-items:center;gap:9px;margin:0 0 13px;font-size:10px;
@@ -434,9 +469,17 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
         <div>
           <label for="pLangues">Langues publiées</label>
           <select id="pLangues">
-            <option value="fr,en">Français et anglais</option>
             <option value="fr">Français seul</option>
+            <option value="fr,en">Français et anglais</option>
             <option value="en">Anglais seul</option>
+          </select>
+        </div>
+        <div>
+          <label for="pImages">Photos des fiches</label>
+          <select id="pImages">
+            <option value="oui">Oui, sous un voile — le texte prime</option>
+            <option value="franches">Oui, à nu — l’image prime</option>
+            <option value="non">Aucune photo — l’art dessiné seul</option>
           </select>
         </div>
       </div>
@@ -1134,43 +1177,124 @@ function envoyerAudit(){
       + '<code>audit-retenus.csv</code>, les ennuis en tête.','ok');
   }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
 }
+/* ══════════════════════ LANCER UNE TRANCHE ══════════════════════
+   Une tranche se règle par quatre décisions, et elles se répondent : plus le
+   seuil de potentiel est haut, moins il reste de sujets ; le modèle et les
+   langues font le prix. Les poser une par une dans des fenêtres système, sans
+   pouvoir revenir en arrière ni voir le total, était intenable — surtout
+   quand le total se compte en dizaines d'euros.
+
+   Un seul panneau, donc, avec le nombre de sujets disponibles à chaque seuil
+   et le montant qui se recalcule à chaque changement. Rien n'est lancé tant
+   qu'on n'a pas cliqué. */
+/* Coût marginal d'un texte, cache chaud, calibré sur les journaux réels :
+   2 000 jetons d'entrée plein tarif, 3 000 de consigne relus à 1/10,
+   1 500 en sortie. */
+var MODELES = [
+  { id:'claude-sonnet-5', nom:'Sonnet 5', in:2, out:10,
+    note:'Le défaut. À l’aveugle, indiscernable d’Opus sur vos essais.' },
+  { id:'claude-opus-5',   nom:'Opus 5',   in:5, out:25,
+    note:'Deux fois et demie plus cher. Un peu moins enclin à recopier la source.' }
+];
+function coutTexte(m){ return ((2000 + 300) * m.in + 1500 * m.out) / 1e6; }
+
 function envoyerEcriture(){
-  var n = S.sujets.filter(function(s){
-    var e = etatDe(s); return decDe(s)==='retenu' && (e==='aecrire' || e==='partiel'); }).length;
-  if(!n) return;
-  /* On raisonne en SUJETS, pas en euros : « cinq pour voir », puis « trois
-     cents ». C'est le nombre qu'on a en tête, et l'action sait le prendre. */
-  var combien = window.prompt(
-    n + ' sujet(s) retenus restent à écrire.\n\n'
-    + 'Combien voulez-vous en écrire MAINTENANT ?\n'
-    + '(5 pour un essai · 300 pour un lot · ' + n + ' pour tout)', String(Math.min(5, n)));
-  if(combien===null) return;
-  combien = Math.max(1, Math.min(n, parseInt(combien,10) || 0));
+  var dispo = S.sujets.filter(function(s){
+    var e = etatDe(s); return decDe(s)==='retenu' && (e==='aecrire' || e==='partiel'); });
+  if(!dispo.length) return;
+  var combienA = function(seuil){
+    return dispo.filter(function(s){ return (s.potentiel||1) >= seuil; }).length;
+  };
 
-  var deux = window.confirm(
-    'Écrire ' + combien + ' sujet(s).\n\n'
-    + 'OK       = français ET anglais — ' + (combien*2) + ' textes.\n'
-    + 'Annuler  = français seul — ' + combien + ' textes, moitié prix.\n\n'
-    + 'Le français seul ne perd rien : ces sujets resteront « à écrire »,\n'
-    + 'et une tranche anglaise plus tard ne repaiera jamais le français.');
-  var langues = deux ? 'fr,en' : 'fr';
+  var ovl = document.createElement('div');
+  ovl.className = 'apercu';
+  var opts = '';
+  [10,9,8,7,0].forEach(function(p){
+    var n = combienA(p||1);
+    opts += '<option value="'+p+'"'+(p===0?' selected':'')+(n?'':' disabled')+'>'
+          + (p===0 ? 'Tous les retenus' : (p===10 ? 'Uniquement les 10/10' : p+'/10 et au-dessus'))
+          + ' — ' + n + ' sujet(s)</option>';
+  });
+  var mopts = MODELES.map(function(m,i){
+    return '<option value="'+i+'">'+m.nom+' — '+(coutTexte(m)).toFixed(4)+' $ le texte</option>';
+  }).join('');
+  ovl.innerHTML =
+    '<div class="cadre lancer">'
+  +   '<div class="barreApp"><span class="marque">Lancer une tranche d’écriture</span>'
+  +     '<button class="fermer" data-x>Fermer</button></div>'
+  +   '<div class="reglages">'
+  +     '<label>Potentiel minimum'
+  +       '<select id="lPot">'+opts+'</select>'
+  +       '<i>Le catalogue est trié par potentiel : sans seuil, une grande tranche '
+  +          'finit forcément dans les 6/10.</i></label>'
+  +     '<label>Combien de sujets<input id="lN" type="number" min="1" step="1" value="5" />'
+  +       '<i>5 pour un essai · 300 pour un lot · le maximum pour tout.</i></label>'
+  +     '<label>Langues'
+  +       '<select id="lLang"><option value="fr">Français seul</option>'
+  +         '<option value="fr,en">Français et anglais</option></select>'
+  +       '<i>Le français seul ne perd rien : le sujet reste « à écrire » et une '
+  +          'tranche anglaise plus tard ne repaiera jamais le français.</i></label>'
+  +     '<label>Modèle<select id="lMod">'+mopts+'</select><i id="lNote"></i></label>'
+  +   '</div>'
+  /* Le montant reste sous les yeux même quand la liste défile : c'est la
+     seule ligne du panneau qu'on ne doit jamais avoir à chercher. */
+  +   '<p class="total" id="lTotal"></p>'
+  +   '<div class="actions">'
+  +     '<button class="btn" data-estimer>Estimer sans dépenser</button>'
+  +     '<button class="btn primaire" data-ecrire>Écrire pour de bon</button>'
+  +   '</div>'
+  + '</div>';
+  document.body.appendChild(ovl);
 
-  var estimer = !window.confirm(
-    combien + ' sujet(s) × ' + (deux?2:1) + ' texte(s).\n\n'
-    + 'OK       = écrire pour de bon.\n'
-    + 'Annuler  = estimer seulement, sans dépenser un centime.');
+  var pot = ovl.querySelector('#lPot'), nn = ovl.querySelector('#lN'),
+      lg = ovl.querySelector('#lLang'), md = ovl.querySelector('#lMod'),
+      tot = ovl.querySelector('#lTotal'), note = ovl.querySelector('#lNote');
+  function seuil(){ var v = parseInt(pot.value,10)||0; return v||1; }
+  function recalcul(){
+    var max = combienA(seuil());
+    nn.max = String(max);
+    if((parseInt(nn.value,10)||0) > max) nn.value = String(max);
+    var n = Math.max(1, Math.min(max, parseInt(nn.value,10)||1));
+    var m = MODELES[parseInt(md.value,10)||0];
+    var textes = n * (lg.value === 'fr,en' ? 2 : 1);
+    var d = textes * coutTexte(m);
+    note.textContent = m.note;
+    tot.innerHTML = '<b>' + nb(n) + '</b> sujet(s) → <b>' + nb(textes) + '</b> texte(s) → '
+      + '<b>' + d.toFixed(2) + ' $</b> (~' + (d/1.08).toFixed(2) + ' €)'
+      + '<span>Il reste ' + nb(max) + ' sujet(s) retenus à ce seuil. '
+      + 'Une tranche interrompue n’est jamais repayée : la relance reprend où elle s’est arrêtée.</span>';
+  }
+  [pot,nn,lg,md].forEach(function(x){ x.addEventListener('input', recalcul); x.addEventListener('change', recalcul); });
+  recalcul();
 
-  dit('Enregistrement des décisions, puis lancement…','info');
-  enregistrerDecisions().then(function(){
-    return lancerAction('2-ecrire.yml', { sujets:String(combien), budget:'0',
-      langues:langues, plafond:'0', estimer: estimer?'true':'false', modele:'' });
-  }).then(function(){
-    dit(estimer
-      ? 'Estimation lancée — aucun appel payant. Le plan et le montant s’affichent '
-        + 'dans <b>Actions → 2 · Écrire</b>.'
-      : 'Écriture lancée : <b>' + nb(combien) + '</b> sujet(s) en <b>' + esc(langues) + '</b>. '
-        + 'Suivez-la dans <b>Actions</b> ; les fiches apparaîtront dans <b>Relecture</b>.', 'ok');
-  }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
+  function fermer(){ ovl.remove(); document.removeEventListener('keydown', echap); }
+  function echap(e){ if(e.key === 'Escape') fermer(); }
+  document.addEventListener('keydown', echap);
+  ovl.addEventListener('click', function(e){ if(e.target === ovl || e.target.hasAttribute('data-x')) fermer(); });
+
+  function lancer(estimer){
+    var max = combienA(seuil());
+    var n = Math.max(1, Math.min(max, parseInt(nn.value,10)||1));
+    var m = MODELES[parseInt(md.value,10)||0];
+    var p = parseInt(pot.value,10)||0;
+    fermer();
+    dit('Enregistrement des décisions, puis lancement…','info');
+    enregistrerDecisions().then(function(){
+      return lancerAction('2-ecrire.yml', { sujets:String(n), budget:'0', langues:lg.value,
+        potentiel:String(p), plafond:'0', estimer: estimer?'true':'false', modele:m.id });
+    }).then(function(){
+      dit(estimer
+        ? 'Estimation lancée — aucun appel payant. Le plan et le montant s’affichent '
+          + 'dans <b>Actions → 2 · Écrire</b>.'
+        : 'Écriture lancée : <b>' + nb(n) + '</b> sujet(s) en <b>' + esc(lg.value) + '</b>, '
+          + 'modèle <b>' + esc(m.nom) + '</b>'
+          + (p ? ', potentiel <b>' + p + '/10</b> minimum' : '') + '. '
+          + 'Suivez-la dans <b>Actions</b> ; les fiches apparaîtront dans <b>Relecture</b>.', 'ok');
+    }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
+  }
+  ovl.querySelector('[data-estimer]').addEventListener('click', function(){ lancer(true); });
+  ovl.querySelector('[data-ecrire]').addEventListener('click', function(){ lancer(false); });
+  nn.focus();
 }
 function envoyerPublication(){
   var n = S.fiches.filter(function(f){ return valDe(f)==='valide'; }).length;
@@ -1191,7 +1315,7 @@ function envoyerPublication(){
    tous les jours et lit ce fichier. On l'édite ici, on le réécrit là-bas,
    commentaires compris — pour que le fichier reste lisible sur GitHub. */
 var PUB = { rythme:'quotidien', jours:[1], parPassage:3, ordre:'potentiel',
-            jusquAu:'', langues:'fr,en', sha:null };
+            jusquAu:'', langues:'fr', images:'oui', sha:null };
 var NOMS_JOURS = ['lun','mar','mer','jeu','ven','sam','dim'];
 
 function lirePublication(){
@@ -1208,6 +1332,7 @@ function lirePublication(){
       else if(k==='ordre') PUB.ordre=v.toLowerCase();
       else if(k==='jusqu-au'||k==='jusquau') PUB.jusquAu=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:'';
       else if(k==='langues') PUB.langues=v.replace(/\s+/g,'').toLowerCase()||'fr,en';
+      else if(k==='images') PUB.images=(/^(oui|non|franches)$/.test(v.toLowerCase())?v.toLowerCase():'oui');
     });
   }).catch(function(){});
 }
@@ -1289,6 +1414,7 @@ function peindrePub(){
   $('#pOrdre').value = PUB.ordre;
   $('#pDate').value = PUB.jusquAu;
   $('#pLangues').value = PUB.langues;
+  $('#pImages').value = PUB.images;
   peindreJours();
   var c={ecrites:S.fiches.length,enligne:0,prets:stockPret(),quarantaine:0};
   S.fiches.forEach(function(f){ if(f.rec.p) c.enligne++; if(f.rec.v==='quarantaine') c.quarantaine++; });
@@ -1317,6 +1443,8 @@ function texteReglagePublication(){
    + 'jusqu-au: ' + (PUB.jusquAu || '') + '\n\n'
    + '# Langues publiées : fr | en | fr,en\n'
    + 'langues: ' + PUB.langues + '\n\n'
+   + '# Photos des fiches : oui (voilées) | franches (à nu) | non\n'
+   + 'images: ' + PUB.images + '\n\n'
    + '# Ordre : potentiel | note | hasard\n'
    + 'ordre: ' + PUB.ordre + '\n\n'
    + '# Publier ce qui est en quarantaine ? Non.\n'
@@ -1348,13 +1476,14 @@ $('#ongCat').addEventListener('click',function(){ onglet('cat'); });
 $('#ongRel').addEventListener('click',function(){ onglet('rel'); });
 $('#ongPub').addEventListener('click',function(){ onglet('pub'); });
 
-['pRythme','pCombien','pOrdre','pDate','pLangues'].forEach(function(id){
+['pRythme','pCombien','pOrdre','pDate','pLangues','pImages'].forEach(function(id){
   $('#'+id).addEventListener('change',function(){
     PUB.rythme=$('#pRythme').value;
     PUB.parPassage=Math.max(0,parseInt($('#pCombien').value,10)||0);
     PUB.ordre=$('#pOrdre').value;
     PUB.jusquAu=$('#pDate').value||'';
     PUB.langues=$('#pLangues').value;
+    PUB.images=$('#pImages').value;
     if(PUB.rythme==='hebdomadaire' && PUB.jours.length>1) PUB.jours=[PUB.jours[0]];
     if((PUB.rythme==='hebdomadaire'||PUB.rythme==='jours') && !PUB.jours.length) PUB.jours=[1];
     peindreJours(); apercuPublication();
