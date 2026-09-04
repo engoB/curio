@@ -160,11 +160,24 @@ function planDeTranche(maitre, budgetEuros, decisions){
     .filter(s => s.statut === 'a-ecrire' && (s.fr || s.en) && dec[s.qid] !== 'ecarte');
   if (retenusExplicites) candidats = candidats.filter(s => dec[s.qid] === 'retenu');
 
+  /* Un sujet écrit en français reste « à écrire » — il lui manque l'anglais —
+     mais une tranche EN FRANÇAIS n'a plus rien à y faire. Sans ce filtre, une
+     tranche de deux sujets reprenait les deux mieux notés, constatait qu'ils
+     étaient déjà écrits, et ne faisait rien : « rien de neuf », zéro fiche,
+     zéro dépense. Correct, mais inutile. On écarte donc d'emblée les sujets
+     dont TOUTES les langues demandées sont déjà rédigées. */
+  const dejaFait = (s) => {
+    const l = s.langues || [];
+    return l.length && LANGUES_TRANCHE.every(x => l.includes(x));
+  };
+  const complets = candidats.filter(dejaFait).length;
+  candidats = candidats.filter(s => !dejaFait(s));
+
   candidats.sort((a, b) => (b.potentiel - a.potentiel)
                || ((b.sources || []).length - (a.sources || []).length)
                || (b.editions || 0) - (a.editions || 0));
   return { cout, sujetsPossibles, parSujet, retenus: candidats.slice(0, sujetsPossibles),
-           restants: candidats.length, surDecision: retenusExplicites > 0 };
+           restants: candidats.length, complets, surDecision: retenusExplicites > 0 };
 }
 
 async function lireDecisions(){
@@ -1025,6 +1038,9 @@ async function main(){
     console.log(`║  ${plan.restants} sujet(s) restent à écrire au total.`);
     if (plan.surDecision)
       console.log(`║  Ce sont VOS sujets retenus dans la console — les autres attendent.`);
+    if (plan.complets)
+      console.log(`║  ${plan.complets} sujet(s) déjà écrits en ${LANGUES_TRANCHE.join('+')} sont passés — `
+                + `ils ne\n║  seront jamais repayés.`);
     if (plan.retenus.length){
       const parUni = {};
       for (const x of plan.retenus) parUni[x.uni] = (parUni[x.uni] || 0) + 1;

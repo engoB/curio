@@ -1,4 +1,37 @@
-# Curio 8.5.7 — ce qui a changé depuis v6
+# Curio 8.5.8 — ce qui a changé depuis v6
+
+## 8.5.8 — « rien de neuf » : la tranche reprenait les sujets déjà écrits
+
+**Le symptôme.** Une tranche de deux sujets, lancée pour valider le coût :
+
+```
+▸ fr/vivant : rien de neuf
+▸ fr/sciences : rien de neuf
+║  0 fiche(s) écrite(s)  ·  0.00 $
+```
+
+**La cause.** Un sujet écrit en français seul reste « à écrire » — il lui
+manque l'anglais, c'est voulu. Mais le plan de tranche prenait simplement les
+mieux notés parmi les « à écrire », donc **les mêmes qu'à la tranche
+précédente** : Axolotl et Semmelweis, déjà rédigés. Le garde-fou a joué —
+aucun centime dépensé, rien de réécrit — mais la tranche ne servait à rien.
+
+**Le remède.** Le plan écarte d'emblée les sujets dont **toutes les langues
+demandées** sont déjà rédigées, d'après le champ `langues` du catalogue
+maître. Une tranche en français passe donc aux suivants ; une tranche en
+anglais, elle, les reprendra bien puisqu'il leur manque l'anglais.
+
+Le journal le dit : *« 2 sujet(s) déjà écrits en fr sont passés — ils ne seront
+jamais repayés. »*
+
+Éprouvé sur dix sujets dont les deux mieux notés déjà écrits en français : la
+tranche de deux prend les suivants, écrit deux fiches, **0,0335 $ par fiche**.
+
+Corrigé aussi : la ligne « cache : aucun jeton relu » s'affichait même quand
+aucun appel n'avait été fait, ce qui laissait croire à un défaut de cache
+alors qu'il n'y avait simplement rien eu à écrire.
+
+## 8.5.7 — l'aperçu lecteur, sans rien publier
 
 ## 8.5.7 — l'aperçu lecteur, sans rien publier
 
