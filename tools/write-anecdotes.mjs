@@ -485,7 +485,11 @@ async function ask(lang, title, text, pourquoi, langueFiche){
            dixième du prix tant que les appels s'enchaînent. Sur une tranche
            complète, c'est environ 15 % de la facture — et cela vous permet
            d'écrire des consignes riches sans les payer au mot.          */
-        const corps = { model: MODEL, max_tokens: 2400, temperature: 0.7,
+        /* Pas de « temperature » : Opus 5 la refuse — « `temperature` is
+           deprecated for this model » — et l'omettre est valable pour tous
+           les modèles. Le réglage ne nous manque pas : la consigne, elle,
+           est très précise. */
+        const corps = { model: MODEL, max_tokens: 2400,
           system: CACHE ? [{ type:'text', text: system, cache_control:{ type:'ephemeral' } }] : system,
           messages:[{ role:'user', content: user }] };
         res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -645,6 +649,7 @@ async function ecrireTranche(retenus, maitre){
   }
 
   const faites = new Map();           // qid -> nombre de langues écrites
+  const causes = new Map();           // message d'erreur -> combien de fois
   let done = 0, skipped = 0, failed = 0;
   const total = [...paquets.values()].reduce((n, v) => n + v.length, 0);
 
@@ -694,6 +699,7 @@ async function ecrireTranche(retenus, maitre){
           if (done % 20 === 0) process.stdout.write(`  ${done}/${total} écrites…\n`);
         }catch(e){
           failed++;
+          causes.set(e.message, (causes.get(e.message) || 0) + 1);
           if (failed <= 3) console.log(`  ! ${titre} : ${e.message}`);
         }
       }
@@ -738,16 +744,41 @@ async function ecrireTranche(retenus, maitre){
 
   await buildIndex();
 
-  const restantes = maitre.sujets.filter(x => x.statut === 'a-ecrire').length;
+  /* Ce qui reste À VOUS : si vous avez retenu des sujets dans la console,
+     c'est ce compte-là qui vous intéresse, pas les vingt-deux mille du
+     catalogue entier — l'écriture ne pioche que dans vos retenus. */
+  const dec = await lireDecisions();
+  const retenusExplicites = Object.keys(dec).filter(k => dec[k] === 'retenu').length;
+  const enJeu = maitre.sujets.filter(x => x.statut === 'a-ecrire'
+      && (!retenusExplicites || dec[x.qid] === 'retenu'));
+  const aFinir     = enJeu.filter(x => (x.langues || []).length === 1).length;
+  const aCommencer = enJeu.length - aFinir;
   console.log(`\n╔══ TRANCHE TERMINÉE ═══════════════════════════════════════`);
   console.log(`║  ${done} fiche(s) écrite(s), ${marques} sujet(s) complet(s).`);
   if (incomplets)
     console.log(`║  ${incomplets} sujet(s) écrits dans une seule langue : ils restent `
               + `« à écrire »\n║  et attendent leur tranche dans l'autre langue. Rien ne sera repayé.`);
   console.log(`║  ${skipped} écartée(s) (article trop maigre ou note trop basse), ${failed} en échec.`);
-  console.log(`║  ${restantes} sujet(s) restent à écrire dans le catalogue maître.`);
+  console.log(`║  Il reste ${aCommencer} sujet(s) à commencer`
+            + (aFinir ? ` et ${aFinir} à finir dans l'autre langue` : '')
+            + (retenusExplicites ? `,\n║  parmi VOS ${retenusExplicites} sujets retenus.` : `\n║  dans le catalogue maître.`));
   console.log(`╚═══════════════════════════════════════════════════════════`);
-  console.log(`\nAucune fiche n'est encore VISIBLE : lancez « 3 · Contrôler » puis « 4 · Publier ».`);
+
+  /* Quand tout échoue, la cause est une, et il faut la dire en clair plutôt
+     que de laisser chercher dans le journal. */
+  if (!done && failed){
+    console.log(`\n::error::Aucune fiche écrite : les ${failed} appels ont échoué.`);
+    if (causes.size){
+      console.log(`\nLa ou les causes, telles que l'API les a renvoyées :`);
+      for (const [m, n] of [...causes.entries()].sort((a,b) => b[1]-a[1]).slice(0,3))
+        console.log(`  · ${n} fois — ${m}`);
+    }
+    console.log(`\nRien n'a été facturé pour un appel refusé. Corrigez, puis relancez `
+              + `la même tranche : elle reprendra exactement où elle en est.`);
+    return;
+  }
+  if (done)
+    console.log(`\nAucune fiche n'est encore VISIBLE : lancez « 3 · Contrôler » puis « 5 · Publier ».`);
 }
 
 async function main(){

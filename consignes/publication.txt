@@ -1,27 +1,77 @@
-# ═══════════════════════════════════════════════════════════════════
-# LE RYTHME DE PUBLICATION — écrit par console.html
-# ═══════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════════
+# LE RYTHME DE PUBLICATION
+# ═══════════════════════════════════════════════════════════════════════════
 #
-# L’action « 5 · Publier » tourne tous les jours à 6 h UTC. C’est ce
-# fichier qui décide si aujourd’hui est un jour de publication.
+# Les anecdotes sont écrites d'avance et gardées en réserve. Ce fichier dit
+# quand elles sortent, et combien. Vous pouvez le modifier ici sur GitHub, ou
+# depuis console.html — onglet Publication — qui l'écrit pour vous.
 #
-# rythme : quotidien | hebdomadaire | jours | pause
-rythme: pause
+# L'action « 5 · Publier » tourne TOUS LES JOURS à 6 h UTC. C'est ce fichier,
+# et lui seul, qui décide si aujourd'hui est un jour de publication.
+#
+# ─────────────────────────────────────────────────────────────────────────
+# À QUELLE FRÉQUENCE
+#   quotidien      tous les jours                                (défaut)
+#   hebdomadaire   une fois par semaine, le jour indiqué par « jours »
+#   jours          seulement les jours listés dans « jours »
+#   pause          rien ne sort, la réserve dort
+# ─────────────────────────────────────────────────────────────────────────
+rythme: quotidien
 
-# 1 = lundi … 7 = dimanche
+# Les jours, pour « hebdomadaire » et « jours ».
+# 1 = lundi, 2 = mardi, 3 = mercredi, 4 = jeudi, 5 = vendredi,
+# 6 = samedi, 7 = dimanche.   Exemple :  jours: 2,5
 jours: 1
 
-# Combien de sujets à chaque passage
+# ─────────────────────────────────────────────────────────────────────────
+# COMBIEN de sujets à chaque passage
+# UN SUJET, PAS UNE FICHE : publier « Lac Nyos » met en ligne le français ET
+# l'anglais le même jour — si les deux sont publiés, voir « langues ».
+# ─────────────────────────────────────────────────────────────────────────
 parPassage: 3
 
-# Ou : tout sortir d’ici cette date — « parPassage » est alors ignoré
-jusqu-au: 
+# ─────────────────────────────────────────────────────────────────────────
+# OU BIEN : TOUT SORTIR D'ICI UNE DATE
+# Si cette ligne porte une date, « parPassage » est ignoré : la réserve est
+# répartie sur les passages qui restent d'ici là, et le nombre se recalcule
+# à chaque exécution. Laissez vide pour ne pas l'utiliser.
+#     jusqu-au: 2026-12-31
+# ─────────────────────────────────────────────────────────────────────────
+jusqu-au:
 
-# Langues publiées : fr | en | fr,en
-langues: fr
+# ─────────────────────────────────────────────────────────────────────────
+# QUELLES LANGUES SONT PUBLIÉES
+#   fr        le français seul — l'anglais reste au dépôt, non publié,
+#             et le bouton FR/EN disparaît du site et de l'application
+#   fr,en     les deux                                            (défaut)
+#
+# Écrire l'anglais sans le publier est un état parfaitement valable : le jour
+# où vous ajoutez « en » ici, tout ce qui est écrit et contrôlé sort.
+#
+# Ce réglage agit AVANT toute publication : les outils le recopient dans
+# catalog.json et dans anecdotes/index.json, que le site et l'application
+# lisent au démarrage. Pour l'appliquer sans attendre une moisson :
+# Actions -> Entretien -> recompter (quelques secondes, gratuit).
+# ─────────────────────────────────────────────────────────────────────────
+langues: fr,en
 
-# Ordre : potentiel | note | hasard
+# ─────────────────────────────────────────────────────────────────────────
+# DANS QUEL ORDRE
+#   potentiel   les sujets les plus prometteurs d'abord           (défaut)
+#   note        les mieux notés par le rédacteur d'abord — garde le meilleur
+#               pour tout de suite, quitte à s'appauvrir avec le temps
+#   hasard      au hasard — la réserve se vide uniformément
+# ─────────────────────────────────────────────────────────────────────────
 ordre: potentiel
 
-# Publier ce qui est en quarantaine ? Non.
+# ─────────────────────────────────────────────────────────────────────────
+# PUBLIER MÊME CE QUI EST EN QUARANTAINE ? Non, évidemment. Ne mettez « oui »
+# que si vous savez exactement pourquoi.
+# ─────────────────────────────────────────────────────────────────────────
 quarantaine: non
+
+# ═══════════════════════════════════════════════════════════════════════════
+# À la main, quand vous voulez, sans toucher à ce fichier :
+# Actions → « 5 · Publier » → Run workflow, en indiquant un nombre. Une
+# publication lancée à la main passe outre le rythme : c'est vous qui décidez.
+# ═══════════════════════════════════════════════════════════════════════════

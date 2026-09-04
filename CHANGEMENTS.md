@@ -1,4 +1,43 @@
-# Curio 8.5.2 — ce qui a changé depuis v6
+# Curio 8.5.3 — ce qui a changé depuis v6
+
+## 8.5.3 — « `temperature` is deprecated for this model »
+
+**Le blocage.** Cinq sujets lancés, cinq échecs, zéro fiche :
+
+```
+  ! Axolotl : `temperature` is deprecated for this model.
+  ! Ignace Philippe Semmelweis : `temperature` is deprecated for this model.
+  ! Géoglyphes de Nazca : `temperature` is deprecated for this model.
+```
+
+L'appel envoyait `temperature: 0.7`. **Opus 5 refuse ce paramètre**, et rejette
+la requête entière. Rien n'a été facturé — un appel refusé n'est pas un appel
+servi — mais rien n'a été écrit non plus.
+
+**Le remède.** Le paramètre est retiré de l'appel Anthropic. L'omettre est
+valable pour tous les modèles, et il ne nous manque pas : c'est la consigne qui
+tient le style, pas un réglage de hasard. Le chemin OpenAI, lui, le garde.
+
+**Deux corrections de lisibilité que cet échec a révélées :**
+
+- Le journal disait `22268 sujet(s) restent à écrire dans le catalogue maître`
+  alors que l'écriture ne pioche **que** dans vos retenus — ce qu'elle faisait
+  déjà, et que l'encadré du haut annonçait correctement. Il dit maintenant :
+  *« Il reste 6 sujet(s) à commencer et 4 à finir dans l'autre langue, parmi
+  VOS 1 158 sujets retenus. »*
+- Quand **tout** échoue, la cause est une, et elle est désormais affichée en
+  clair sous l'encadré, comptée et telle que l'API l'a renvoyée, avec la seule
+  chose à savoir : rien n'a été facturé, et relancer la même tranche reprend où
+  elle en est.
+- Et l'invitation finale renvoyait à « 4 · Publier », qui n'existe pas. C'est
+  **5 · Publier**.
+
+Éprouvé sur une API de substitution : refus systématique → 0 écrite, la cause
+nommée trois fois, aucun texte perdu ; API acceptante → 3 fiches écrites,
+puis, à la relance, une seule nouvelle et les trois précédentes sautées sans un
+appel.
+
+## 8.5.2 — l'anglais restait sur le site tant que rien n'était publié
 
 ## 8.5.2 — l'anglais restait sur le site tant que rien n'était publié
 
