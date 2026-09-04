@@ -1,4 +1,28 @@
-# Curio 8.6.1 — ce qui a changé depuis v6
+# Curio 8.6.2 — ce qui a changé depuis v6
+
+## 8.6.2 — le menu comptait des sujets déjà écrits
+
+Indispensable avant de travailler par lots, et surtout avant de mélanger deux
+modèles.
+
+Un sujet rédigé en français seul reste « à finir » — il lui manque l'anglais.
+Le menu du panneau de lancement le comptait donc toujours, quelle que soit la
+langue demandée. Après un lot français de quatre cent quarante sujets, il
+aurait encore annoncé « 9/10 et au-dessus — 440 sujets » : de quoi croire que
+rien ne s'était passé, et relancer pour rien.
+
+Le compte suit maintenant les langues choisies dans le panneau, exactement
+comme le fait l'outil d'écriture. Les libellés se réécrivent quand on change
+de langue :
+
+| Menu | après un lot français sur les 9/10 et + | en repassant sur « fr,en » |
+|---|---|---|
+| Uniquement les 10/10 | 0 | 108 |
+| 9/10 et au-dessus | 0 | 440 |
+| Tous les retenus | 708 | 1 148 |
+
+C'est ce qui permet d'écrire les meilleurs sujets avec un modèle, puis le
+reste avec un autre, sans jamais repasser sur les mêmes.
 
 ## 8.6.1 — le détecteur de copie se trompait, et il coûtait cher
 

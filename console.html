@@ -1212,19 +1212,35 @@ function envoyerEcriture(){
   var dispo = S.sujets.filter(function(s){
     var e = etatDe(s); return decDe(s)==='retenu' && (e==='aecrire' || e==='partiel'); });
   if(!dispo.length) return;
-  var combienA = function(seuil){
-    return dispo.filter(function(s){ return (s.potentiel||1) >= seuil; }).length;
+  /* ── COMPTER CE QUI RESTE VRAIMENT À ÉCRIRE ────────────────────────────
+     Un sujet rédigé en français seul reste « à finir » — il lui manque
+     l'anglais — et il figurait donc toujours dans le compte, quelle que soit
+     la langue demandée. Après un lot français de quatre cent quarante, le
+     menu annonçait encore « quatre cent quarante » : de quoi croire que rien
+     ne s'était passé, et relancer pour rien.
+
+     Le compte suit maintenant les langues choisies dans ce panneau, comme le
+     fait l'outil d'écriture lui-même : un sujet dont TOUTES les langues
+     demandées sont déjà écrites n'est plus à écrire.                      */
+  var aFaire = function(s, langues){
+    var l = languesDe(s);
+    return langues.some(function(x){ return !l[x]; });
+  };
+  var combienA = function(seuil, langues){
+    return dispo.filter(function(s){
+      return (s.potentiel||1) >= seuil && aFaire(s, langues); }).length;
   };
 
   var ovl = document.createElement('div');
   ovl.className = 'apercu';
-  var opts = '';
-  [10,9,8,7,0].forEach(function(p){
-    var n = combienA(p||1);
-    opts += '<option value="'+p+'"'+(p===0?' selected':'')+(n?'':' disabled')+'>'
-          + (p===0 ? 'Tous les retenus' : (p===10 ? 'Uniquement les 10/10' : p+'/10 et au-dessus'))
-          + ' — ' + n + ' sujet(s)</option>';
-  });
+  /* Les libellés du menu portent les nombres : ils doivent donc se réécrire
+     quand on change de langue, sinon ils mentent dès le deuxième lot. */
+  var SEUILS = [10,9,8,7,0];
+  function libelle(p){
+    return p===0 ? 'Tous les retenus' : (p===10 ? 'Uniquement les 10/10' : p+'/10 et au-dessus');
+  }
+  var opts = SEUILS.map(function(p){
+    return '<option value="'+p+'"'+(p===0?' selected':'')+'></option>'; }).join('');
   var mopts = MODELES.map(function(m,i){
     return '<option value="'+i+'">'+m.nom+' — '+(coutTexte(m)).toFixed(4)+' $ le texte</option>';
   }).join('');
@@ -1260,8 +1276,17 @@ function envoyerEcriture(){
       lg = ovl.querySelector('#lLang'), md = ovl.querySelector('#lMod'),
       tot = ovl.querySelector('#lTotal'), note = ovl.querySelector('#lNote');
   function seuil(){ var v = parseInt(pot.value,10)||0; return v||1; }
+  function langues(){ return lg.value.split(','); }
   function recalcul(){
-    var max = combienA(seuil());
+    var L = langues();
+    /* On réécrit les libellés à chaque tour : « 9/10 et au-dessus — 440 »
+       devient « — 0 » dès que ces 440 sont écrits dans la langue demandée. */
+    SEUILS.forEach(function(p, i){
+      var n = combienA(p||1, L);
+      pot.options[i].textContent = libelle(p) + ' — ' + n + ' sujet(s)';
+      pot.options[i].disabled = !n;
+    });
+    var max = combienA(seuil(), L);
     nn.max = String(max);
     if((parseInt(nn.value,10)||0) > max) nn.value = String(max);
     var n = Math.max(1, Math.min(max, parseInt(nn.value,10)||1));
@@ -1283,7 +1308,7 @@ function envoyerEcriture(){
   ovl.addEventListener('click', function(e){ if(e.target === ovl || e.target.hasAttribute('data-x')) fermer(); });
 
   function lancer(estimer){
-    var max = combienA(seuil());
+    var max = combienA(seuil(), langues());
     var n = Math.max(1, Math.min(max, parseInt(nn.value,10)||1));
     var m = MODELES[parseInt(md.value,10)||0];
     var p = parseInt(pot.value,10)||0;
