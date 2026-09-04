@@ -439,6 +439,13 @@ let tokEcrit = 0, tokRelu = 0;
 /* Combien de fois on a redemandé un texte — chaque reprise est un appel
    facturé. C'est la première explication d'une facture plus lourde que prévu. */
 let reprises = 0;
+/* Les fiches gardées mais mises en quarantaine : payées, conservées, à juger. */
+let quarantaines = 0;
+/* Ce que les appels rejetés ont coûté : réponses illisibles, reprises
+   refusées. De l'argent dépensé qui n'a produit aucune fiche. Le tenir à part
+   est la seule façon d'annoncer un prix par fiche qui veuille dire quelque
+   chose — et une projection qui ne s'envole pas dès qu'un sujet résiste. */
+let coutPerdu = 0;
 let tokPensee = 0;                  // jetons de raisonnement, facturés en sortie
 /* La mise en cache est active par défaut ; --sans-cache la coupe, et l'API
    peut la refuser d'elle-même — on continue alors sans. */
@@ -510,36 +517,79 @@ function factSheet(text){
                       : clean.slice(0, 1200);   // article très court : rien à réduire
 }
 
-/* Combien de suites de N mots le texte produit partage-t-il avec la source ?
- * Au-delà de quelques-unes, ce n'est plus une réécriture, c'est une reprise :
- * on refuse et on redemande. */
+/* ═══ MESURER UNE REPRISE, PAS LA DEVINER ═════════════════════════════════
+ *
+ * L'ancienne mesure comptait les POSITIONS où une suite de huit mots se
+ * retrouvait à l'identique. Elle est trompeuse : une seule suite de onze mots
+ * compte pour quatre positions. Le seuil « plus de cinq » se déclenchait donc
+ * dès deux petites suites de onze mots — soit une vingtaine de mots sur cinq
+ * cent cinquante, quatre pour cent du texte. Ce n'est pas une copie ; c'est
+ * ce qu'on obtient forcément en racontant « la Porte de l'Enfer, un cratère
+ * de gaz en feu depuis 1971 dans le désert du Karakoum, au Turkménistan ».
+ *
+ * Et surtout : LE MODÈLE NE VOIT JAMAIS LES PHRASES DE L'ARTICLE. On ne lui
+ * transmet qu'une fiche de faits en puces. Il ne peut donc pas recopier une
+ * prose qu'on ne lui a pas montrée — sauf pour les articles si courts que la
+ * fiche de faits ne réduit rien, seul cas où la prudence s'impose vraiment.
+ *
+ * On mesure donc ce qui compte : LA PART DU TEXTE réellement identique, et la
+ * plus longue suite continue. Deux nombres qu'on peut juger. */
 function motsNormalises(s){
   return String(s || '').toLowerCase()
     .replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
 }
 function recouvrement(produit, source, n = 8){
   const src = motsNormalises(source), out = motsNormalises(produit);
-  if (out.length < n || src.length < n) return { max: 0, communs: 0 };
+  const vide = { max: 0, mots: 0, taux: 0, suites: 0, extraits: [] };
+  if (out.length < n || src.length < n) return vide;
   const grammes = new Set();
   for (let i = 0; i + n <= src.length; i++) grammes.add(src.slice(i, i + n).join(' '));
-  let communs = 0, courant = 0, max = 0, debut = 0;
-  /* On garde aussi les passages fautifs eux-mêmes : sans eux, une réécriture
-     est un coup d'épée dans l'eau — le modèle ne sait pas ce qu'on lui
-     reproche et réécrit la même chose. Avec eux, il sait quoi éviter. */
+
+  /* Une case par mot du texte produit : vraie si ce mot appartient à une
+     suite de huit reprise telle quelle. Compter les mots couverts, et non les
+     positions de départ, est la seule façon d'obtenir une PART du texte. */
+  const couvert = new Array(out.length).fill(false);
+  let courant = 0, max = 0, debut = 0, suites = 0;
   const extraits = [];
   const fermer = (i) => {
-    if (courant) extraits.push({ n: courant + n - 1, mots: out.slice(debut, i + n - 1).join(' ') });
+    if (courant){
+      suites++;
+      extraits.push({ n: courant + n - 1, mots: out.slice(debut, i + n - 1).join(' ') });
+    }
     courant = 0;
   };
   for (let i = 0; i + n <= out.length; i++){
     if (grammes.has(out.slice(i, i + n).join(' '))){
       if (!courant) debut = i;
-      communs++; courant++; max = Math.max(max, courant + n - 1);
+      for (let k = i; k < i + n; k++) couvert[k] = true;
+      courant++; max = Math.max(max, courant + n - 1);
     } else fermer(i);
   }
   fermer(out.length - n + 1);
   extraits.sort((a, b) => b.n - a.n);
-  return { max, communs, extraits: extraits.slice(0, 3).map(e => e.mots) };
+  const mots = couvert.reduce((s, v) => s + (v ? 1 : 0), 0);
+  return { max, mots, taux: mots / out.length, suites,
+           extraits: extraits.slice(0, 3).map(e => e.mots) };
+}
+
+/* Ce qu'on tolère, et à partir d'où l'on s'inquiète.
+ *
+ *   `reduite` = la fiche de faits a bien réduit l'article en puces. Le modèle
+ *   n'a donc jamais vu une seule phrase de la source, et les suites communes
+ *   viennent des noms propres, des dates et des termes techniques qu'il faut
+ *   bien employer. On est large.
+ *
+ *   Sinon — article trop court pour être réduit — le modèle a vu la prose.
+ *   Là, une reprise est une vraie reprise, et on serre.
+ *
+ * Trois issues, et une seule fait perdre le texte payé : la dernière, qui ne
+ * se déclenche que sur une copie manifeste (plus d'un tiers du texte). */
+function verdictReprise(rec, reduite){
+  const s = reduite ? { alerte:0.18, alerteSuite:20, refus:0.35, refusSuite:60 }
+                    : { alerte:0.12, alerteSuite:16, refus:0.25, refusSuite:40 };
+  if (rec.taux >= s.refus  || rec.max >= s.refusSuite)  return 'copie';
+  if (rec.taux >= s.alerte || rec.max >= s.alerteSuite) return 'trop-proche';
+  return 'bon';
 }
 
 async function articleData(lang, title){
@@ -681,7 +731,14 @@ async function ask(lang, title, text, pourquoi, langueFiche){
         : "\n\nTHE ANGLE (what makes this subject extraordinary, according to whoever spotted it):\n"
           + pourquoi + "\nWrite around this. If the fact sheet does not support it, follow the fact sheet.")
     : '';
-  const user = 'Sujet : ' + title + traduire + '\n\nFiche de faits :\n\n' + factSheet(text) + angle;
+  /* La fiche de faits est presque toujours une réduction en puces : on garde
+     l'information, jamais la formulation. Quand l'article est trop court pour
+     être réduit, on retombe sur sa prose — et le contrôle de reprise se durcit
+     en conséquence. C'est cette différence-là qui doit commander le seuil, pas
+     une constante unique appliquée aux deux cas. */
+  const fiche = factSheet(text);
+  const ficheReduite = fiche.startsWith('- ');
+  const user = 'Sujet : ' + title + traduire + '\n\nFiche de faits :\n\n' + fiche + angle;
 
   /* ── LE REPROCHE ────────────────────────────────────────────────────────
      Quand un texte est refusé — illisible, ou trop proche de la source — on
@@ -700,6 +757,7 @@ async function ask(lang, title, text, pourquoi, langueFiche){
   for (let i = 0; i < 5; i++){
     try{
       let res, out;
+      let coutAppel = 0;               // ce que CET appel aura coûté
       const message = user + reproche;
       if (PROVIDER === 'openai'){
         res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -781,6 +839,16 @@ async function ask(lang, title, text, pourquoi, langueFiche){
         tokOut += (u.output_tokens || 0);
         tokEcrit += (u.cache_creation_input_tokens || 0);
         tokRelu  += (u.cache_read_input_tokens || 0);
+        /* Ce que cet appel-ci a coûté, mis de côté. Si la réponse finit par
+           être rejetée, ce montant part au compteur des appels perdus — sans
+           quoi il se mélange au reste et fausse le prix par fiche : sur une
+           tranche de deux, un sujet raté faisait passer l'annonce de 0,05 $ à
+           0,21 $ la fiche, et la projection de 57 $ à 216 $. */
+        const px = PRIX[MODEL];
+        if (px) coutAppel = ((u.input_tokens || 0)/1e6)*px.in
+                          + ((u.cache_creation_input_tokens || 0)/1e6)*px.in*1.25
+                          + ((u.cache_read_input_tokens || 0)/1e6)*px.in*0.1
+                          + ((u.output_tokens || 0)/1e6)*px.out;
       }
       const parsed = parseJson(out);
       if (!parsed || !parsed.texte){
@@ -808,23 +876,27 @@ async function ask(lang, title, text, pourquoi, langueFiche){
             : "\n\nWARNING — your previous answer could not be parsed."
               + " Answer ONLY with the requested JSON object: nothing before, nothing after,"
               + " no code fence, and never a raw line break inside a string — write \\n.";
+          coutPerdu += coutAppel;
           console.log(`  · on redemande en disant ce qui n'allait pas (appel payé)`);
           await sleep(600); continue;
         }
+        coutPerdu += coutAppel;
         throw new Error(`réponse illisible (arrêt « ${arret || '?'} »)`);
       }
       const produit = String(parsed.texte).replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim();
 
-      // Contrôle de reprise : si le texte partage de longues suites de mots
-      // avec l'article, ce n'est pas une écriture, c'est une copie. On refuse.
-      /* La fiche de faits conserve l'ordre des mots de l'article : quelques
-         suites communes sont donc inévitables, et n'ont rien d'une copie. Le
-         seuil était à trois, il passe à cinq, et on ne réécrit qu'UNE fois —
-         chaque réécriture est un appel payé, et deux coûtaient plus cher
-         qu'elles ne rapportaient. */
+      /* ── CONTRÔLE DE REPRISE ──────────────────────────────────────────
+         Trois issues, et une seule fait perdre le texte : la copie manifeste.
+           bon          on garde, sans rien dire.
+           trop-proche  une réécriture motivée ; si ça persiste, on GARDE le
+                        texte et on le met en quarantaine — vous jugerez. Un
+                        texte payé ne se jette pas sur un soupçon.
+           copie        plus d'un tiers du texte identique : là, on refuse.  */
       const rec = recouvrement(produit, text, 8);
-      if (rec.communs > 5){
-        if (i < 1){
+      const verdict = verdictReprise(rec, ficheReduite);
+      const part = Math.round(rec.taux * 100);
+      if (verdict !== 'bon'){
+        if (i < 1 && verdict === 'trop-proche'){
           reprises++;
           const cites = (rec.extraits || []).map(m => '« … ' + m + ' … »').join('\n');
           reproche = (lang === 'fr')
@@ -838,12 +910,34 @@ async function ask(lang, title, text, pourquoi, langueFiche){
               + " differently — different order, different words, different breaks."
               + " Never reuse a run of more than seven words.\n"
               + "Passages you must not reuse:\n" + cites;
-          console.log(`  · reprise trop proche (${rec.communs} passages, ${rec.max} mots) — `
-                    + `on réécrit une fois en citant les passages fautifs (appel payé)`);
+          coutPerdu += coutAppel;
+          console.log(`  · ${part} % du texte repris (plus longue suite : ${rec.max} mots) — `
+                    + `on réécrit une fois (appel payé)`);
           await sleep(600);
           continue;
         }
-        throw new Error(`texte trop proche de la source (${rec.communs} passages repris)`);
+        if (verdict === 'copie'){
+          coutPerdu += coutAppel;
+          /* Marqué DÉFINITIF : sans cela, le gestionnaire d'erreurs plus bas
+             traitait ce refus comme un incident passager et redemandait le
+             texte — un deuxième appel payé pour recevoir la même copie. Une
+             copie manifeste ne se corrige pas en insistant. */
+          const e = new Error(`copie manifeste : ${part} % du texte identique à la source`);
+          e.definitif = true;
+          throw e;
+        }
+        /* Toujours trop proche après la réécriture. On ne rejette pas : le
+           texte est payé, il part en quarantaine et vous tranchez dans
+           Relecture. Rien ne se publie depuis la quarantaine. */
+        quarantaines++;
+        console.log(`  · ${title} : ${part} % repris après réécriture — gardé EN QUARANTAINE, à juger dans Relecture`);
+        return {
+          t: String(parsed.titre || title).trim().replace(/^["'«»\s]+|["'«»\s]+$/g, ''),
+          x: produit,
+          r: String(parsed.raconter || '').trim().replace(/^["'«»\s]+|["'«»\s]+$/g, ''),
+          s: Math.max(0, Math.min(10, Math.round(Number(parsed.insolite) || 0))),
+          quarantaine: `${part} % du texte repris de la source (plus longue suite : ${rec.max} mots)`
+        };
       }
 
       return {
@@ -855,8 +949,9 @@ async function ask(lang, title, text, pourquoi, langueFiche){
     }catch(e){
       /* Crédit épuisé, clé refusée : on ne réessaie pas. Trois tentatives par
          sujet sur un lot de trois cents, ce sont neuf cents appels refusés et
-         un journal illisible — pour une cause qui ne changera pas. */
-      if (estFatale(e.message)) throw e;
+         un journal illisible — pour une cause qui ne changera pas.
+         Même règle pour les refus définitifs — une copie manifeste. */
+      if (e.definitif || estFatale(e.message)) throw e;
       if (/model/i.test(e.message) && /not|introuvable|invalid|does not exist|unknown|unsupported/i.test(e.message)){
         const next = FALLBACKS[FALLBACKS.indexOf(MODEL) + 1];
         if (next){
@@ -1072,7 +1167,11 @@ async function ecrireTranche(retenus, maitre){
           a.d = new Date().toISOString().slice(0, 10);
           a.q = s.qid;                     // le lien vers le catalogue maître
           a.p = null;                      // pas encore publiée
-          a.v = '';                        // pas encore contrôlée
+          /* Une fiche mise en quarantaine à l'écriture le reste : elle apparaît
+             dans Relecture avec sa raison en clair, et rien ne la publiera tant
+             que vous ne l'aurez pas validée vous-même. */
+          if (a.quarantaine){ a.v = 'quarantaine'; a.motif = a.quarantaine; delete a.quarantaine; }
+          else a.v = '';                   // pas encore contrôlée
           store.items[titre] = a;
           faites.set(s.qid, (faites.get(s.qid) || 0) + 1);
           done++;
@@ -1181,6 +1280,10 @@ async function ecrireTranche(retenus, maitre){
   console.log(`║  ${failed} en échec.`);
   if (reprises)
     console.log(`║  ${reprises} réécriture(s) demandée(s) — chacune est un appel facturé.`);
+  if (quarantaines)
+    console.log(`║  ${quarantaines} fiche(s) GARDÉE(S) EN QUARANTAINE : encore proches de la source`
+              + `\n║  après réécriture. Elles sont payées, donc conservées — jugez-les dans`
+              + `\n║  Relecture. Rien ne se publie depuis la quarantaine.`);
   /* LE CHIFFRE QUI MANQUAIT : ce que cette tranche a réellement coûté,
      d'après les jetons comptés par l'API elle-même. Il n'apparaissait que
      dans l'ancien mode, pas dans les tranches. */
@@ -1196,19 +1299,28 @@ async function ecrireTranche(retenus, maitre){
       console.log(`║  dont ${(tokPensee/1e6).toFixed(3)} M de raisonnement interne `
                 + `(${Math.round(tokPensee / Math.max(1, tokOut) * 100)} % de la sortie, facturé plein tarif)`);
     const c = coutCourant();
-    console.log(`║  ${c.toFixed(2)} $ (~${(c / EUR_USD).toFixed(2)} €)`
-              + (done ? `  ·  ${(c/done).toFixed(4)} $ par fiche` : ''));
-    /* La projection. Elle ne se fait PAS sur le coût moyen de la tranche :
-       la mise en cache de la consigne se paie une fois, et sur deux fiches
-       elle pèse un cinquième du prix alors que sur trois cents elle ne pèse
-       plus rien. On projette donc sur le coût MARGINAL — ce que coûte la
-       fiche suivante, cache déjà chaud. */
+    console.log(`║  ${c.toFixed(2)} $ (~${(c / EUR_USD).toFixed(2)} €) au total`);
+    /* ── LE PRIX D'UNE FICHE, ET CELUI DES APPELS PERDUS ────────────────
+       Mélanger les deux donne un chiffre qui ne dit rien. Sur une tranche de
+       deux sujets dont un a résisté, le total divisé par une fiche annonçait
+       0,21 $ — quatre fois le vrai prix — et projetait 216 $ sur le
+       catalogue. On sépare : ce que coûte une fiche, et ce qu'a coûté le
+       sujet qui n'en a pas donné. */
+    const cUtile = Math.max(0, c - coutPerdu);
+    if (done)
+      console.log(`║  dont ${cUtile.toFixed(2)} $ pour les ${done} fiche(s) obtenues `
+                + `— ${(cUtile/done).toFixed(4)} $ par fiche`);
+    if (coutPerdu > 0.0001)
+      console.log(`║  et ${coutPerdu.toFixed(2)} $ d'appels rejetés (réponses illisibles, reprises `
+                + `refusées) :\n║  de l'argent dépensé qui n'a produit aucune fiche.`);
+    /* La projection se fait sur le coût MARGINAL des fiches obtenues : la
+       mise en cache se paie une fois, et les appels perdus n'ont pas à être
+       reproduits mille fois dans une prévision. */
     if (done && enJeu.length){
-      const marginal = ((tokIn/1e6)*px.in + (tokRelu/1e6)*px.in*0.1 + (tokOut/1e6)*px.out) / done;
+      const brutMarginal = (tokIn/1e6)*px.in + (tokRelu/1e6)*px.in*0.1 + (tokOut/1e6)*px.out;
+      const marginal = Math.max(0, brutMarginal - coutPerdu) / done;
       const reste = enJeu.length * marginal;
-      if (tokEcrit && Math.abs(marginal - c/done) > 0.002)
-        console.log(`║  ${marginal.toFixed(4)} $ par fiche une fois le cache chaud `
-                  + `(la mise en cache se paie une seule fois).`);
+      console.log(`║  ${marginal.toFixed(4)} $ par fiche une fois le cache chaud.`);
       console.log(`║  à ce rythme, les ${enJeu.length} sujet(s) qui restent coûteraient `
                 + `${reste.toFixed(2)} $ (~${(reste / EUR_USD).toFixed(2)} €).`);
       if (tokEcrit && !tokRelu)

@@ -141,6 +141,10 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .e-ecrit{background:var(--or-doux);color:var(--or)}
 .e-aecrire{border:1px solid var(--line);color:var(--texte-3)}
 .e-retire{border:1px solid var(--line);color:var(--texte-3);text-decoration:line-through}
+/* La raison d'une quarantaine, en clair : « 22 % du texte repris de la
+   source ». C'est elle qui permet de valider ou d'écarter en connaissance. */
+.motif{flex-basis:100%;font-size:11.5px;font-weight:500;letter-spacing:0;
+  text-transform:none;color:var(--or,#B8860B)}
 .doute{background:var(--rouge);color:#2A0509}
 .item h2{font-size:15.5px;margin:0 0 2px;font-weight:650}
 .item h2 a{color:inherit;text-decoration:none} .item h2 a:hover{color:var(--accent)}
@@ -926,8 +930,14 @@ function ficheHtml(f){
       + '<span class="lg">'+f.lang.toUpperCase()+'</span>'
       + '<b class="note">'+(f.rec.s==null?'—':f.rec.s+'/10')+'</b>'
       + (l ? '<b class="e-publie">en ligne</b>' : '<b class="e-ecrit">en réserve</b>')
-      + (f.rec.v==='quarantaine' ? '<b class="e-retire">quarantaine</b>' : '');
+      /* La quarantaine sans sa raison n'apprend rien : on la porte au survol,
+         et en clair sous la fiche. C'est ce qui permet de trancher. */
+      + (f.rec.v==='quarantaine'
+          ? '<b class="e-retire" title="'+esc(f.rec.motif||'à vérifier avant publication')+'">quarantaine</b>'
+          : '');
   meta.innerHTML=h;
+  if(f.rec.v==='quarantaine' && f.rec.motif)
+    meta.appendChild(el('span','motif','⚠ '+esc(f.rec.motif)));
 
   var g=el('span','gestes');
   var oeil=el('button','g','aperçu lecteur'); oeil.type='button';

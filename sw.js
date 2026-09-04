@@ -23,7 +23,7 @@
  * il ne décide plus de ce qui s'affiche.
  * ======================================================================== */
 
-const VERSION = 'curio-8.6.0+679f883ef0';   /* BUILD:VERSION */
+const VERSION = 'curio-8.6.1+8f10e8576a';   /* BUILD:VERSION */
 const COQUILLE = VERSION + '-app';     // l'application
 const CONTENU  = VERSION + '-txt';     // les anecdotes
 

@@ -35,6 +35,20 @@ reglage() {
 LANGUES=$(reglage langues); [ -n "$LANGUES" ] || LANGUES="fr,en"
 IMAGES=$(reglage images);   [ -n "$IMAGES" ]   || IMAGES="oui"
 
+# Le bouton FR/EN, quand une seule langue est publiee.
+#
+# Il a resiste a deux corrections successives : masque par le code, il etait
+# remis par une regle d'auteur (display:inline-flex l'emporte sur le
+# display:none par defaut de [hidden]) ; puis corrige dans la feuille, il
+# restait affiche chez qui avait deja ouvert le site. On ne discute plus : si
+# une seule langue est publiee, la page part avec le bouton eteint, dans son
+# en-tete, avant toute feuille de style et sans une ligne de JavaScript. Il n y
+# a plus rien qui puisse le rallumer.
+case "$LANGUES" in
+  *,*) CACHE_LANGUE="" ;;
+  *)   CACHE_LANGUE='<style>#langBtn{display:none !important}</style>' ;;
+esac
+
 doc_head() {
 cat <<EOF
 <!doctype html>
@@ -46,6 +60,7 @@ cat <<EOF
 <meta name="curio-version" content="$PLEINE" />
 <meta name="curio-langues" content="$LANGUES" />
 <meta name="curio-images" content="$IMAGES" />
+$CACHE_LANGUE
 EOF
 }
 

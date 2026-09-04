@@ -1,4 +1,73 @@
-# Curio 8.6.0 — ce qui a changé depuis v6
+# Curio 8.6.1 — ce qui a changé depuis v6
+
+## 8.6.1 — le détecteur de copie se trompait, et il coûtait cher
+
+### Ce qui s'est passé sur *Porte de l'Enfer*
+
+Deux sujets demandés, trois appels facturés, une seule fiche. Le journal
+annonçait **0,2062 $ la fiche** et projetait **216 $** sur le catalogue. Trois
+défauts distincts, tous corrigés.
+
+**1. La mesure était fausse.** Elle comptait les *positions* où huit mots
+consécutifs se retrouvaient à l'identique. Une seule suite de onze mots compte
+pour quatre positions : le seuil « plus de cinq » se déclenchait donc dès deux
+petites suites — une vingtaine de mots sur cinq cent cinquante, **quatre pour
+cent du texte**. Ce n'est pas une copie, c'est ce qu'on obtient forcément en
+racontant « un cratère de gaz en feu depuis 1971 dans le désert du Karakoum ».
+
+Et surtout : **le modèle ne voit jamais les phrases de l'article.** On ne lui
+transmet qu'une fiche de faits en puces. Il ne peut pas recopier une prose
+qu'on ne lui a pas montrée.
+
+La mesure porte désormais sur **la part du texte** réellement identique et sur
+**la plus longue suite continue** — deux nombres qu'on peut juger :
+
+| Cas | Part reprise | Plus longue suite | Verdict |
+|---|---|---|---|
+| Texte neuf | 0 % | — | accepté |
+| Faits denses, formulation propre *(le cas Porte de l'Enfer)* | 13 % | 13 mots | **accepté** |
+| Deux phrases entières recopiées | 66 % | 40 mots | refusé |
+| Article recopié | 100 % | 104 mots | refusé |
+
+Le seuil se resserre automatiquement pour les articles trop courts pour être
+réduits en puces : là, le modèle a vu la prose, et la prudence se justifie.
+
+**2. Un texte payé n'est plus jamais jeté sur un soupçon.** Entre « propre » et
+« copié » il y a une zone grise. Une fiche qui y reste après sa réécriture est
+désormais **conservée en quarantaine**, avec sa raison en clair dans Relecture
+(« 16 % du texte repris, plus longue suite 29 mots »). Vous tranchez. Rien ne
+se publie depuis la quarantaine. Seule la copie manifeste est refusée — et
+elle l'est du premier coup, sans second appel payé : elle était jusqu'ici
+traitée comme un incident passager et redemandée une fois de plus.
+
+**3. Le prix par fiche mélangeait tout.** Les appels rejetés sont maintenant
+comptés à part, et la projection ne les reproduit plus mille fois :
+
+```
+║  0.08 $ (~0.07 €) au total
+║  dont 0.04 $ pour les 2 fiche(s) obtenues — 0.0196 $ par fiche
+║  et 0.02 $ d'appels rejetés : de l'argent qui n'a produit aucune fiche.
+║  à ce rythme, les 20 sujet(s) qui restent coûteraient 0.39 $
+```
+
+### Le thème clair rendait les fiches illisibles
+
+L'accroche et les mots en gras prenaient leur couleur **en dur — blanc**. Sur
+le thème clair, où le fond de carte est presque blanc lui aussi, ils
+disparaissaient : le lecteur voyait des trous dans le texte, exactement là où
+se trouvent les chiffres qui portent l'anecdote. La couleur vient maintenant du
+jeu de couleurs, comme tout le reste.
+
+### Le bouton FR/EN, troisième et dernière fois
+
+Masqué par le code, il était remis par une règle d'auteur. Corrigé dans la
+feuille, il persistait chez qui avait déjà ouvert le site. On ne discute plus :
+quand une seule langue est publiée, `build.sh` écrit
+`<style>#langBtn{display:none !important}</style>` **dans l'en-tête de la
+page**, avant toute feuille de style et sans une ligne de JavaScript.
+
+Si le bouton est encore là après cela, c'est que le fichier servi n'est pas
+celui du paquet : le badge de version dans la barre de l'application le dira.
 
 ## 8.6.0 — Sonnet par défaut, rien de perdu dans un lot, et l'anglais s'en va
 
