@@ -6,13 +6,13 @@
 # fichier qui décide si aujourd’hui est un jour de publication.
 #
 # rythme : quotidien | hebdomadaire | jours | pause
-rythme: pause
+rythme: quotidien
 
 # 1 = lundi … 7 = dimanche
 jours: 1
 
 # Combien de sujets à chaque passage
-parPassage: 3
+parPassage: 1
 
 # Ou : tout sortir d’ici cette date — « parPassage » est alors ignoré
 jusqu-au: 
