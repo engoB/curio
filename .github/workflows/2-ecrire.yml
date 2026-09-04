@@ -1,12 +1,15 @@
 # ═══════════════════════════════════════════════════════════════════════════
 #  CURIO — 2 · ECRIRE UNE TRANCHE
 #
-#  Un seul reglage : le budget, en euros. On prend les meilleurs sujets non
-#  encore ecrits du catalogue maitre, autant que la tranche permet, et on
-#  ecrit le francais ET l anglais.
+#  Deux facons de dimensionner une tranche :
+#    · « sujets » — un nombre de sujets. 5 pour un essai, 300 pour un lot.
+#      C est le reglage le plus lisible, et il prime sur le budget.
+#    · « budget » — en euros, si vous preferez raisonner en argent.
 #
-#  Plus de selection a coller — GitHub refusait les grandes (« Provided
-#  inputs are too large ») — plus de langue ni d univers a choisir.
+#  « langues » choisit ce qu on ecrit MAINTENANT. « fr » seul ecrit le
+#  francais et laisse l anglais pour plus tard : le sujet reste « a ecrire »,
+#  et la tranche anglaise d un autre jour le reprendra sans jamais repayer
+#  le francais.
 #
 #  Cochez « estimer seulement » pour voir le plan sans depenser un centime.
 #  Rien n est visible sur le site tant que « 3 · Controler » et « 5 · Publier »
@@ -17,10 +20,23 @@ name: 2 · Ecrire une tranche
 on:
   workflow_dispatch:
     inputs:
+      sujets:
+        description: "Combien de SUJETS ecrire (0 = utiliser le budget)"
+        required: false
+        default: "0"
       budget:
-        description: "Budget de la tranche, en euros"
+        description: "Budget de la tranche, en euros (ignore si sujets > 0)"
         required: true
         default: "30"
+      langues:
+        description: "Langues de cette tranche"
+        required: true
+        default: "fr,en"
+        type: choice
+        options:
+          - "fr,en"
+          - "fr"
+          - "en"
       estimer:
         description: "Estimer seulement, sans rien depenser"
         type: boolean
@@ -68,8 +84,10 @@ jobs:
             exit 1
           fi
           M=""; if [ -n "${{ github.event.inputs.modele }}" ]; then M="--modele ${{ github.event.inputs.modele }}"; fi
+          S=""; if [ "${{ github.event.inputs.sujets }}" != "0" ] && [ -n "${{ github.event.inputs.sujets }}" ]; then S="--sujets ${{ github.event.inputs.sujets }}"; fi
+          L="--langues ${{ github.event.inputs.langues }}"
           P=""; if [ -z "$ANTHROPIC_API_KEY" ] && [ -n "$OPENAI_API_KEY" ]; then P="--fournisseur openai"; fi
-          node tools/write-anecdotes.mjs --budget "${{ github.event.inputs.budget }}" $E $M $P 2>&1 | tee curio.log
+          node tools/write-anecdotes.mjs --budget "${{ github.event.inputs.budget }}" $S $L $E $M $P 2>&1 | tee curio.log
 
       - name: Compte rendu
         if: always()
