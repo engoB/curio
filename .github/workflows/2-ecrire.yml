@@ -41,6 +41,10 @@ on:
         description: "Estimer seulement, sans rien depenser"
         type: boolean
         default: false
+      plafond:
+        description: "Plafond de depense en dollars (0 = automatique, 2,5x l estimation)"
+        required: false
+        default: "0"
       modele:
         description: "Modele (vide = claude-opus-5)"
         default: ""
@@ -86,8 +90,9 @@ jobs:
           M=""; if [ -n "${{ github.event.inputs.modele }}" ]; then M="--modele ${{ github.event.inputs.modele }}"; fi
           S=""; if [ "${{ github.event.inputs.sujets }}" != "0" ] && [ -n "${{ github.event.inputs.sujets }}" ]; then S="--sujets ${{ github.event.inputs.sujets }}"; fi
           L="--langues ${{ github.event.inputs.langues }}"
+          C=""; if [ "${{ github.event.inputs.plafond }}" != "0" ] && [ -n "${{ github.event.inputs.plafond }}" ]; then C="--plafond ${{ github.event.inputs.plafond }}"; fi
           P=""; if [ -z "$ANTHROPIC_API_KEY" ] && [ -n "$OPENAI_API_KEY" ]; then P="--fournisseur openai"; fi
-          node tools/write-anecdotes.mjs --budget "${{ github.event.inputs.budget }}" $S $L $E $M $P 2>&1 | tee curio.log
+          node tools/write-anecdotes.mjs --budget "${{ github.event.inputs.budget }}" $S $L $C $E $M $P 2>&1 | tee curio.log
 
       - name: Compte rendu
         if: always()
