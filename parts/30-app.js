@@ -546,7 +546,13 @@ async function loadStats(){
     const r = await fetch(CONFIG.anecdotesDir + '/index.json', { cache:'no-cache' });
     if(!r.ok) return;
     const j = await r.json();
-    if(j && j.total){ STATS = j; renderTocCount(); langueUnique(); }
+    if(j && j.total){
+      STATS = j;
+      /* index.json porte aussi le réglage : « Entretien → recompter » suffit
+         donc à l'appliquer, sans attendre une moisson. */
+      if(Array.isArray(j.langues) && j.langues.length) LANGUES_SITE = j.langues;
+      renderTocCount(); langueUnique();
+    }
   }catch(e){}
 }
 
@@ -556,11 +562,19 @@ async function loadStats(){
    ramène le lecteur au français s'il était resté en anglais. Rien à
    régler : le jour où des fiches anglaises sont publiées, le bouton
    revient de lui-même. */
+let LANGUES_SITE = null;      // ce que le réglage dit, quand il dit quelque chose
 function langueUnique(){
   const b = $('#langBtn');
-  if(!b || !STATS || !STATS.total) return;
-  const nFr = Number(STATS.total.fr || 0), nEn = Number(STATS.total.en || 0);
-  const seule = (nFr > 0 && nEn === 0) ? 'fr' : (nEn > 0 && nFr === 0) ? 'en' : '';
+  if(!b) return;
+  let seule = '';
+  if(LANGUES_SITE && LANGUES_SITE.length === 1){
+    /* Le réglage prime, et il vaut avant toute publication. */
+    seule = LANGUES_SITE[0];
+  } else {
+    if(!STATS || !STATS.total) return;
+    const nFr = Number(STATS.total.fr || 0), nEn = Number(STATS.total.en || 0);
+    seule = (nFr > 0 && nEn === 0) ? 'fr' : (nEn > 0 && nFr === 0) ? 'en' : '';
+  }
   b.hidden = !!seule;
   if(seule && S.lang !== seule){
     S.lang = seule;
@@ -667,6 +681,12 @@ async function loadCatalog(){
     if(!r.ok) return;
     j = await r.json();
   }catch(e){ return; }
+
+  /* Les langues que VOUS publiez, inscrites dans catalog.json par la moisson
+     d'après consignes/publication.txt. C'est un réglage explicite : il vaut
+     avant même qu'une seule fiche soit en ligne, là où le simple comptage ne
+     peut encore rien dire. */
+  if(Array.isArray(j.langues) && j.langues.length){ LANGUES_SITE = j.langues; langueUnique(); }
 
   const themes  = Array.isArray(j.themes) ? j.themes : [];
   const sources = j.sources || j;

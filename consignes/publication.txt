@@ -47,6 +47,11 @@ jusqu-au:
 #
 # Écrire l'anglais sans le publier est un état parfaitement valable : le jour
 # où vous ajoutez « en » ici, tout ce qui est écrit et contrôlé sort.
+#
+# Ce réglage agit AVANT toute publication : les outils le recopient dans
+# catalog.json et dans anecdotes/index.json, que le site et l'application
+# lisent au démarrage. Pour l'appliquer sans attendre une moisson :
+# Actions -> Entretien -> recompter (quelques secondes, gratuit).
 # ─────────────────────────────────────────────────────────────────────────
 langues: fr,en
 

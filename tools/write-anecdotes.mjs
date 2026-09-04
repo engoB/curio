@@ -96,6 +96,24 @@ function coutParTexte(){
   return (entree * t.in + JETONS_SORTIE * t.out) / 1e6;   // en dollars
 }
 
+/* Les langues publiées, lues dans consignes/publication.txt. Par défaut les
+   deux : ne rien régler ne doit rien retirer. */
+async function languesPubliees(){
+  try{
+    const brut = await fs.readFile(path.join(process.cwd(), 'consignes', 'publication.txt'), 'utf8');
+    for (const l of brut.split(/\r?\n/)){
+      const t = l.trim();
+      if (!t || t.startsWith('#')) continue;
+      const m = t.match(/^langues\s*[:=]\s*(.+)$/i);
+      if (!m) continue;
+      const v = m[1].split(/[,\s+]+/).map(x => x.trim().toLowerCase())
+                    .filter(x => x === 'fr' || x === 'en');
+      if (v.length) return [...new Set(v)];
+    }
+  }catch{}
+  return ['fr', 'en'];
+}
+
 async function lireMaitre(){
   try{ return JSON.parse(await fs.readFile(MAITRE, 'utf8')); }
   catch{ return null; }
@@ -1032,7 +1050,11 @@ async function buildIndex(){
   for (const uni of Object.keys(byUniverse)) byUniverse[uni].sujets = (sujetsUni[uni] || new Set()).size;
 
   await writeAtomic(path.join(OUTDIR, 'index.json'),
-    { generated:new Date().toISOString().slice(0,10), total, weekly, byUniverse, reserve:enReserve });
+    { generated:new Date().toISOString().slice(0,10),
+      /* Les langues publiées : le site s'en sert pour retirer le bouton FR/EN
+         avant même qu'une fiche soit en ligne. */
+      langues: await languesPubliees(),
+      total, weekly, byUniverse, reserve:enReserve });
   console.log(`  index.json : ${sujets.size} sujet(s) EN LIGNE — ${JSON.stringify({fr:total.fr||0, en:total.en||0})} textes`
             + (enReserve ? `, ${enReserve} en réserve.` : '.'));
 }

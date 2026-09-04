@@ -329,8 +329,12 @@ fichier qui décide si aujourd'hui est un jour de publication.
 
 **`langues: fr`** publie le français seul. Les fiches anglaises restent au
 dépôt, non publiées. Côté lecteur, le bouton FR/EN disparaît du site et de
-l'application tant qu'une seule langue est en ligne — et revient tout seul le
-jour où l'autre est publiée.
+l'application — et revient tout seul le jour où vous rallumez l'anglais.
+
+Ce réglage agit **avant même la première publication** : les outils le
+recopient dans `catalog.json` et dans `anecdotes/index.json`, que le site lit
+au démarrage. Pour l'appliquer sans attendre une moisson :
+*Entretien → **recompter***, quelques secondes, gratuit.
 
 
 Le stock est écrit d'avance ; il sort au compte-gouttes. C'est ce qui donne au

@@ -1494,6 +1494,24 @@ async function lireExclusions(){
   return hors;
 }
 
+/* Les langues publiées, lues dans consignes/publication.txt. Par défaut les
+   deux : ne rien régler ne doit rien retirer. */
+async function languesPubliees(){
+  try{
+    const brut = await fs.readFile(path.join(process.cwd(), 'consignes', 'publication.txt'), 'utf8');
+    for (const l of brut.split(/\r?\n/)){
+      const t = l.trim();
+      if (!t || t.startsWith('#')) continue;
+      const m = t.match(/^langues\s*[:=]\s*(.+)$/i);
+      if (!m) continue;
+      const v = m[1].split(/[,\s+]+/).map(x => x.trim().toLowerCase())
+                    .filter(x => x === 'fr' || x === 'en');
+      if (v.length) return [...new Set(v)];
+    }
+  }catch{}
+  return ['fr', 'en'];
+}
+
 async function lireMaitre(){
   try{ return JSON.parse(await fs.readFile(MAITRE, 'utf8')); }
   catch{ return { version:1, genere:null, sujets:[] }; }
@@ -2219,6 +2237,11 @@ async function vueApplication(liste){
   const cat = {
     generated: new Date().toISOString(),
     maitre: true,
+    /* Les langues que vous publiez, recopiées depuis consignes/publication.txt.
+       L'application et le site s'en servent pour retirer le bouton FR/EN —
+       et ce réglage vaut AVANT toute publication, là où un simple comptage
+       de fiches en ligne ne peut encore rien dire. */
+    langues: await languesPubliees(),
     themes: UNIVERSES.map(u => ({ id:u.id, hue:u.hue, free:u.free, fr:u.fr, en:u.en })),
     sources, index, pairs, scores,
     counts: counts(sources, paires)

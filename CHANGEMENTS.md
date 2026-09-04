@@ -1,4 +1,36 @@
-# Curio 8.5.1 — ce qui a changé depuis v6
+# Curio 8.5.2 — ce qui a changé depuis v6
+
+## 8.5.2 — l'anglais restait sur le site tant que rien n'était publié
+
+**Le constat.** « L'anglais est toujours présent sur le site web ? » Oui — et
+c'était un défaut de la 8.5.0.
+
+La règle écrite alors était : *cacher le bouton FR/EN quand une langue compte
+des fiches en ligne et l'autre zéro*. Elle se déduisait de
+`anecdotes/index.json`, donc du **nombre de fiches publiées**. Avec un
+catalogue moissonné mais rien d'écrit, les deux comptes valent zéro : aucune
+langue ne « gagne », et le bouton reste. Le réglage *Langues publiées =
+Français seul* n'avait donc aucun effet visible tant que la première fiche
+n'était pas en ligne — c'est-à-dire précisément pendant la période où vous
+préparez tout.
+
+**Le remède : le réglage est écrit là où le site le lit.** `langues`, tel que
+vous le posez dans la console, est désormais recopié par les outils dans
+**`catalog.json`** (à la moisson) et dans **`anecdotes/index.json`** (à chaque
+recomptage). L'application et le site le lisent, et il **prime sur le
+comptage** : une seule langue réglée, le bouton disparaît immédiatement, même
+avec zéro fiche publiée. Le comptage reste en second recours pour les dépôts
+qui n'ont pas encore de réglage.
+
+**Pour l'appliquer tout de suite**, sans attendre une moisson :
+*Entretien → **recompter*** réécrit `index.json` en quelques secondes,
+gratuitement.
+
+Éprouvé au navigateur, sur le site et dans l'application, avec zéro fiche
+publiée : `langues: fr` → bouton caché des deux côtés ; `langues: fr,en` →
+bouton présent des deux côtés.
+
+## 8.5.1 — « écrit en français seul » se voit enfin
 
 ## 8.5.1 — « écrit en français seul » se voit enfin
 

@@ -362,10 +362,14 @@ async function loadCount(){
       if(j.byUniverse) COUNTS = j.byUniverse;
     }
     /* Tant qu'une seule langue est publiée, le bouton FR/EN ne mène nulle
-       part : le site l'efface et s'aligne sur la langue qui existe. Il
-       revient tout seul le jour où l'autre langue est publiée. */
+       part : le site l'efface et s'aligne sur la langue qui existe. Le
+       réglage explicite — « langues » dans consignes/publication.txt, recopié
+       ici par les outils — prime, car il vaut avant toute publication. */
     const nFr = Number(j?.total?.fr || 0), nEn = Number(j?.total?.en || 0);
-    const seule = (nFr > 0 && nEn === 0) ? 'fr' : (nEn > 0 && nFr === 0) ? 'en' : '';
+    const reglees = Array.isArray(j?.langues) ? j.langues : null;
+    const seule = (reglees && reglees.length === 1) ? reglees[0]
+                : (nFr > 0 && nEn === 0) ? 'fr'
+                : (nEn > 0 && nFr === 0) ? 'en' : '';
     const b = $('#langBtn');
     if(b) b.hidden = !!seule;
     if(seule && lang !== seule){
