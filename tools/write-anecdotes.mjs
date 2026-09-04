@@ -66,7 +66,10 @@ const PRIX = {
    Avec la mise en cache de la consigne, seule la fiche de faits est payée
    plein tarif ; la consigne est relue à un dixième du prix. C'est ce que
    traduit ENTREE_CACHE.                                                  */
-const JETONS_CONSIGNE = 2000, JETONS_FICHE = 1000, JETONS_SORTIE = 1100;
+/* Mesuré sur des tranches réelles avec Opus 5 : 1 500 jetons de sortie par
+   texte, pas 1 100. L'estimation annonçait donc 25 % de moins que la
+   facture. */
+const JETONS_CONSIGNE = 2000, JETONS_FICHE = 1000, JETONS_SORTIE = 1500;
 const JETONS_ENTREE = JETONS_CONSIGNE + JETONS_FICHE;
 const ENTREE_CACHE  = JETONS_FICHE + Math.round(JETONS_CONSIGNE * 0.1);
 const PARALLEL = Math.max(1, Math.min(8, parseInt(opt('parallele', '3'), 10) || 3));
@@ -515,6 +518,26 @@ function parseJson(txt){
   return champsALaMain(brut);
 }
 
+/* ── AMORCER LE CACHE AVANT DE PARALLÉLISER ──────────────────────────────
+   Trois requêtes lancées en même temps arrivent toutes avant que la consigne
+   soit mémorisée : chacune paie la mise en cache (×1,25) et aucune n'en
+   profite. Mesuré sur une tranche de deux : 6 000 jetons mémorisés, ZÉRO relu
+   — le cache coûtait au lieu de rapporter.
+
+   Le premier appel part donc seul ; les autres attendent qu'il ait fini, et
+   relisent la consigne à un dixième du prix. Une seconde d'attente au début,
+   quinze pour cent sur toute la tranche.                                  */
+let amorce = null, libererAmorce = null;
+async function attendreAmorce(){
+  if (!CACHE || PROVIDER === 'openai') return false;
+  if (!amorce){
+    amorce = new Promise(r => { libererAmorce = r; });
+    return true;                     // c'est moi qui amorce
+  }
+  await amorce;
+  return false;
+}
+
 async function ask(lang, title, text, pourquoi, langueFiche){
   const system = await consigne(lang);
   let arret = '', blocs = '';        // pourquoi le modèle s'est arrêté, et ce qu'il a renvoyé
@@ -539,6 +562,8 @@ async function ask(lang, title, text, pourquoi, langueFiche){
     : '';
   const user = 'Sujet : ' + title + traduire + '\n\nFiche de faits :\n\n' + factSheet(text) + angle;
 
+  const jAmorce = await attendreAmorce();
+  try{
   for (let i = 0; i < 5; i++){
     try{
       let res, out;
@@ -685,6 +710,11 @@ async function ask(lang, title, text, pourquoi, langueFiche){
       if (i >= 2) throw e;
       await sleep(1500 * (i+1));
     }
+  }
+  }finally{
+    /* Qu'il ait réussi ou échoué, le premier appel libère les autres : sans
+       cela une erreur au démarrage bloquerait toute la tranche. */
+    if (jAmorce && libererAmorce){ libererAmorce(); libererAmorce = null; }
   }
 }
 
@@ -919,15 +949,24 @@ async function ecrireTranche(retenus, maitre){
     console.log(`║  ${(tokIn/1e6).toFixed(3)} M jetons en entrée · ${(tokOut/1e6).toFixed(3)} M en sortie`);
     if (tokRelu || tokEcrit)
       console.log(`║  cache : ${(tokEcrit/1e6).toFixed(3)} M mémorisés, ${(tokRelu/1e6).toFixed(3)} M relus à 1/10 du prix`);
+    else if (CACHE && done)
+      console.log(`║  cache : aucun jeton mémorisé ni relu.`);
     if (tokPensee)
       console.log(`║  dont ${(tokPensee/1e6).toFixed(3)} M de raisonnement interne `
                 + `(${Math.round(tokPensee / Math.max(1, tokOut) * 100)} % de la sortie, facturé plein tarif)`);
-    else if (CACHE)
-      console.log(`║  cache : aucun jeton relu — la consigne est peut-être trop courte`
-                + `\n║  pour être mise en cache, ou les appels trop espacés.`);
     const c = coutCourant();
     console.log(`║  ${c.toFixed(2)} $ (~${(c / EUR_USD).toFixed(2)} €)`
               + (done ? `  ·  ${(c/done).toFixed(4)} $ par fiche` : ''));
+    /* La projection : c'est le seul chiffre qui compte avant de lancer un
+       gros lot. On la donne au rythme CONSTATÉ, pas au rythme espéré. */
+    if (done && enJeu.length){
+      const reste = enJeu.length * (c / done);
+      console.log(`║  à ce rythme, les ${enJeu.length} sujet(s) qui restent coûteraient `
+                + `${reste.toFixed(2)} $ (~${(reste / EUR_USD).toFixed(2)} €).`);
+      if (tokEcrit && !tokRelu)
+        console.log(`║  ⚠ le cache n'a pas servi sur une tranche aussi courte : sur un gros`
+                  + `\n║    lot, la consigne est mémorisée une fois et le prix baisse.`);
+    }
   }
   if (plafondAtteint)
     console.log(`║  ⛔ arrêt sur plafond : relancez la même tranche pour continuer.`);

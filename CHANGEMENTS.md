@@ -1,4 +1,57 @@
-# Curio 8.5.8 — ce qui a changé depuis v6
+# Curio 8.5.9 — ce qui a changé depuis v6
+
+## 8.5.9 — le cache coûtait au lieu de rapporter, et l'estimation était basse d'un quart
+
+Deux fiches écrites, `0,0608 $ par fiche` au lieu des `0,0335` annoncés. Les
+jetons du journal disent exactement pourquoi.
+
+### 1. `6 000 mémorisés, 0 relu`
+
+Trois requêtes partent **en parallèle**. Toutes arrivent avant que la consigne
+soit mémorisée : chacune paie la mise en cache — au tarif majoré de 25 % — et
+**aucune n'en profite**. Sur une tranche de deux, le cache coûtait 0,037 $ et
+ne rapportait rien.
+
+**Le premier appel part maintenant seul.** Les suivants attendent qu'il ait
+fini, puis relisent la consigne à un dixième du prix. Une seconde d'attente au
+démarrage, quinze pour cent sur toute la tranche. Le premier appel libère les
+autres même s'il échoue, pour qu'une erreur au démarrage ne bloque jamais rien.
+
+Éprouvé sur six fiches, trois ouvriers en parallèle : **2 000 jetons mémorisés
+une fois, 10 000 relus**. Avant : 6 000 mémorisés, 0 relu.
+
+### 2. L'estimation supposait 1 100 jetons de sortie. Il en faut 1 500.
+
+C'est le deuxième quart manquant, et c'est ma faute : le chiffre venait d'un
+calcul, pas d'une mesure. Corrigé d'après vos tranches réelles.
+
+**Le budget honnête, pour Opus 5 :**
+
+| | par fiche | 1 158 sujets en français |
+|---|---|---|
+| annoncé jusqu'ici | 0,0335 $ | 38,80 $ ≈ 36 € |
+| **réel, cache amorcé** | **0,0435 $** | **50,40 $ ≈ 47 €** |
+| sans cache | 0,0525 $ | 60,80 $ ≈ 56 € |
+
+Mesuré après correction : **0,0454 $ par fiche** sur six fiches, l'écart
+restant étant l'amorce du cache, qui se dilue sur un gros lot.
+
+### 3. Le journal projette le reste, au rythme constaté
+
+```
+║  0.27 $ (~0.25 €)  ·  0.0454 $ par fiche
+║  à ce rythme, les 20 sujet(s) qui restent coûteraient 0.91 $ (~0.84 €).
+```
+
+C'est le seul chiffre à regarder avant de lancer un gros lot — et il est
+calculé sur ce que l'API a réellement facturé, pas sur une hypothèse. Si le
+cache n'a pas servi parce que la tranche était trop courte, une ligne le dit
+plutôt que de laisser croire à un surcoût durable.
+
+Corrigé aussi : la ligne « aucun jeton relu » s'affichait en même temps que
+le décompte du cache — un `else if` accroché à la mauvaise condition.
+
+## 8.5.8 — « rien de neuf » : la tranche reprenait les sujets déjà écrits
 
 ## 8.5.8 — « rien de neuf » : la tranche reprenait les sujets déjà écrits
 
