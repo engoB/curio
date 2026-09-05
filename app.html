@@ -4,10 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#050E24" />
-<meta name="curio-version" content="8.7.0+e812251127" />
+<meta name="curio-version" content="8.8.0+c3504daadf" />
 <meta name="curio-langues" content="fr" />
 <meta name="curio-images" content="oui" />
-<style>#langBtn{display:none !important}</style>
+<style>#langBtn,#ligneLangue{display:none !important}</style>
 <title>Curio</title>
 <meta name="description" content="Des anecdotes vraies, écrites pour être lues : deux minutes par récit, une par écran. Cosmos, histoire, vivant, mystères." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -187,18 +187,91 @@ a{color:var(--accent);text-decoration:none}
 .topbar > *{pointer-events:auto;flex:0 0 auto}
 .tbgap{flex:1 1 auto !important;min-width:0}
 
-/* le tiroir « … » : ce qui ne tient pas sur un telephone */
+/* ── LE PANNEAU D'OPTIONS ─────────────────────────────────────────────────
+   Une colonne, des sections intitulées, une ligne par réglage : l'intitulé à
+   gauche, la commande à droite, toutes alignées sur la même verticale. Les
+   actions, elles, prennent toute la largeur. C'est ce qui distingue un
+   panneau d'un tiroir où l'on aurait jeté des boutons. */
 .tbmore{
-  position:absolute;top:100%;right:clamp(10px,3vw,24px);
-  display:none;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;
-  max-width:min(320px,86vw);
-  padding:10px 11px;border-radius:14px;
+  position:absolute;top:calc(100% + 6px);right:clamp(10px,3vw,24px);
+  display:none;flex-direction:column;
+  width:min(300px,88vw);max-height:min(78vh,560px);overflow-y:auto;
+  padding:6px;border-radius:16px;
   border:1px solid var(--line-strong);background:var(--ink-2);
-  box-shadow:0 22px 60px -26px rgba(0,0,0,.75);
+  box-shadow:0 26px 70px -28px rgba(0,0,0,.8);
+  scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
 }
 .tbmore.open{display:flex}
+.opt__tete{
+  display:flex;align-items:center;gap:9px;padding:9px 10px 10px;
+  border-bottom:1px solid var(--line);margin-bottom:4px;
+}
+.opt__titre{
+  font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text-3);
+}
+.opt__tete .planbadge{margin-left:auto}
+.opt__sect{
+  margin:10px 0 2px;padding:0 10px;
+  font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);
+}
+.opt__l{
+  display:flex;align-items:center;gap:10px;min-height:40px;padding:0 10px;
+  font-size:13.5px;color:var(--text);
+}
+.opt__l > span:first-child{flex:1 1 auto;min-width:0}
+.opt__v{
+  flex:none;display:inline-flex;align-items:center;gap:7px;
+  height:30px;padding:0 11px;border-radius:9px;
+  border:1px solid var(--line);background:var(--ink);color:var(--text-2);
+  font:inherit;font-size:11.5px;font-weight:700;letter-spacing:.06em;
+  cursor:pointer;transition:color .16s,border-color .16s;
+}
+.opt__v:hover{color:var(--text);border-color:var(--line-strong)}
+.opt__v svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
+/* L'interrupteur : la forme que tout le monde reconnaît. */
+.bascule{
+  flex:none;width:42px;height:24px;border-radius:999px;padding:0;cursor:pointer;
+  border:1px solid var(--line-strong);background:var(--ink);
+  position:relative;transition:background .18s,border-color .18s;
+}
+.bascule i{
+  position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:var(--text-3);transition:transform .18s ease,background .18s;
+}
+.bascule.on{background:var(--accent-soft);border-color:var(--accent)}
+.bascule.on i{transform:translateX(18px);background:var(--accent)}
+/* Une action occupe la ligne entière : on la lit comme un verbe. */
+.opt__a{
+  display:flex;align-items:center;gap:10px;width:100%;
+  min-height:40px;padding:0 10px;border-radius:10px;
+  border:0;background:none;color:var(--text);
+  font:inherit;font-size:13.5px;text-align:left;cursor:pointer;
+  transition:background .14s;
+}
+.opt__a:hover{background:var(--panel-hi)}
+.opt__a svg{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;color:var(--text-3)}
+.opt__a--or{color:var(--brass)}
+.opt__a--or svg{color:var(--brass)}
+.opt__pied{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-top:8px;padding:9px 10px 5px;border-top:1px solid var(--line);
+}
+.sizer--opt{flex:none}
+.sizer--opt button{width:30px;height:28px}
+/* Une seule langue publiée : la ligne « Langue » n'a rien à proposer, et
+   build.sh l'éteint avec le bouton — sinon il resterait un intitulé en face
+   du vide. */
 .iconbtn--more{position:relative}
 @media (min-width:900px){
+  /* Sur grand écran le panneau reste un panneau : il s'ouvre par le bouton
+     « … » comme sur un téléphone. L'ancienne version le dépliait dans la
+     barre, ce qui l'étalait sur toute la largeur et rendait le bouton
+     inutile — c'est précisément ce qui le faisait passer pour cassé. */
+  .tbmore{max-height:min(70vh,620px)}
   /* Sur grand écran tout tient : le tiroir se déplie dans la barre, et le
      bouton « … » n'a plus lieu d'être.
 
@@ -207,11 +280,6 @@ a{color:var(--accent);text-decoration:none}
      donc sur ce `display:none`. Résultat, le bouton restait affiché à côté
      d'un tiroir déjà déplié — on cliquait, il basculait une classe qui ne
      changeait plus rien, et le bouton passait pour cassé. */
-  .iconbtn--more{display:none !important}
-  .tbmore{
-    position:static;display:flex;background:none;border:0;box-shadow:none;
-    padding:0;max-width:none;
-  }
 }
 
 .brand{display:flex;align-items:baseline;gap:9px;letter-spacing:-.02em;min-width:0}
@@ -258,27 +326,20 @@ a{color:var(--accent);text-decoration:none}
 .streak svg{width:14px;height:14px;fill:currentColor}
 
 /* ---------- feed ----------
-   ── ON CHANGE DE FICHE EN BALAYANT SUR LE CÔTÉ ──────────────────────────
-   Le flux défilait verticalement, et le texte de chaque fiche défilait
-   verticalement lui aussi : deux gestes identiques pour deux actions
-   opposées. Sur un téléphone, un pouce qui voulait lire la suite du texte
-   emportait la fiche entière, et on compensait en rétrécissant la zone de
-   lecture — d'où le manque de place.
-
-   Le haut et le bas appartiennent désormais au TEXTE, sans partage. La
-   gauche et la droite changent de fiche. Chaque geste a une seule
-   signification, et l'article peut occuper tout l'écran. */
+   Le flux défile VERTICALEMENT, une fiche par écran. La place gagnée pour le
+   texte ne vient pas de l'axe : elle vient de `flex:1 1 auto` sur la zone de
+   lecture et du fait que la phrase à raconter défile AVEC le texte au lieu
+   de lui prendre une bande fixe. Les deux gestes cohabitent grâce à
+   `overscroll-behavior:contain` sur la zone de lecture : tant qu'il reste du
+   texte, le doigt le fait défiler ; arrivé au bout, il emmène la fiche. */
 .feed{
-  height:100dvh;display:flex;flex-direction:row;
-  overflow-x:scroll;overflow-y:hidden;scroll-snap-type:x mandatory;
+  height:100dvh;overflow-y:scroll;scroll-snap-type:y mandatory;
   scrollbar-width:none;-ms-overflow-style:none;
-  overscroll-behavior-x:contain;
 }
 .feed::-webkit-scrollbar{display:none}
 
 .card{
-  position:relative;flex:0 0 100%;width:100%;height:100dvh;
-  scroll-snap-align:start;scroll-snap-stop:always;
+  position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;
   overflow:hidden;display:flex;align-items:flex-end;isolation:isolate;
 }
 [hidden]{display:none !important}
@@ -700,37 +761,36 @@ a{color:var(--accent);text-decoration:none}
 }
 
 /* ── LA PIOCHE ────────────────────────────────────────────────────────────
-   Huit bandes aux couleurs des univers filent derrière une fenêtre étroite,
-   puis ralentissent : on voit le tirage avoir lieu. L'écran s'assombrit à
-   peine — c'est un geste, pas une interruption. */
+   Un fond qui se retire, une phrase, un trait qui se remplit. Aucune roue :
+   une machine à sous n'a rien à faire dans une application de lecture. */
 .pioche{
-  position:fixed;inset:0;z-index:90;display:grid;place-items:center;gap:18px;
-  align-content:center;
-  background:color-mix(in srgb, var(--ink) 93%, transparent);
-  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
-  opacity:0;transition:opacity .28s ease;
+  position:fixed;inset:0;z-index:90;display:grid;place-items:center;align-content:center;
+  gap:26px;padding:32px;
+  background:color-mix(in srgb, var(--ink) 94%, transparent);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  opacity:0;transition:opacity .3s ease;
 }
 .pioche.on{opacity:1}
 .pioche.fini{opacity:0}
-.pioche__roue{
-  width:min(280px,72vw);height:78px;border-radius:16px;overflow:hidden;
-  border:1px solid var(--line-strong);
-  box-shadow:0 24px 60px -20px rgba(0,0,0,.6);
+.pioche__mot{
+  margin:0;max-width:22ch;text-align:center;text-wrap:balance;
+  font-family:Fraunces,Georgia,serif;font-weight:450;
+  font-variation-settings:"SOFT" 26,"WONK" 1;
+  font-size:clamp(21px,4.4vw,30px);line-height:1.24;letter-spacing:-.02em;
+  color:var(--text);
 }
-.pioche__piste{display:flex;flex-direction:column;will-change:transform}
-.pioche__piste i{flex:0 0 78px;display:block}
+.pioche__trait{
+  display:block;width:min(180px,50vw);height:2px;border-radius:2px;
+  background:var(--line-strong);overflow:hidden;
+}
+.pioche__trait i{display:block;height:100%;width:0;background:var(--accent)}
 @media (prefers-reduced-motion:no-preference){
-  .pioche__piste{ animation:defile 1.35s cubic-bezier(.2,.8,.2,1) forwards }
+  .pioche.on .pioche__mot{ animation:souffle .7s cubic-bezier(.16,1,.3,1) both }
+  .pioche.on .pioche__trait i{ animation:remplit 1.25s cubic-bezier(.4,0,.2,1) forwards }
 }
-@keyframes defile{
-  0%   { transform:translateY(0) }
-  70%  { transform:translateY(-1014px) }
-  100% { transform:translateY(-1092px) }
-}
-.pioche__tx{
-  font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--text-2);
-}
+@media (prefers-reduced-motion:reduce){ .pioche__trait i{width:100%} }
+@keyframes souffle{ from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+@keyframes remplit{ from{width:0} to{width:100%} }
 .card.piochee .card__body{animation:rise .5s cubic-bezier(.16,1,.3,1) both}
 
 /* ── LE REPÈRE DE FIN DE LECTURE ──────────────────────────────────────────
@@ -739,20 +799,21 @@ a{color:var(--accent);text-decoration:none}
    Discret par construction — pas de fond, pas d'étiquette, et il s'efface dès
    qu'on remonte dans l'article. */
 .suivante{
-  position:absolute;z-index:4;right:6px;top:50%;transform:translateY(-50%);
+  position:absolute;z-index:4;left:50%;transform:translateX(-50%);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 6px);
   width:38px;height:38px;display:grid;place-items:center;
   color:var(--text-2);opacity:0;pointer-events:none;
   transition:opacity .45s ease;
 }
-.suivante svg{width:22px;height:22px}
+.suivante svg{width:22px;height:22px;transform:rotate(90deg)}
 .suivante.vu{opacity:.62;pointer-events:auto;cursor:pointer}
 .suivante.vu:hover{opacity:1;color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){
   .suivante.vu svg{animation:appelle 2.4s ease-in-out 3}
 }
 @keyframes appelle{
-  0%,100%{transform:translateX(0)}
-  50%{transform:translateX(5px)}
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(5px)}
 }
 
 /* ---------- fin d'article : garder, partager, et la suite ---------- */
@@ -1385,38 +1446,75 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
     <svg viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
   </button>
 
-  <div class="tbmore" id="tbMore">
-    <button class="iconbtn" id="searchBtn" title="Rechercher" aria-label="Rechercher">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
-    </button>
-    <button class="langbtn" id="langBtn" title="Langue / Language">FR</button>
-    <button class="iconbtn" id="themeBtn" title="Thème clair / sombre" aria-label="Basculer le thème">
-      <svg viewBox="0 0 24 24" id="themeIcon"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
-    </button>
-    <button class="langbtn" id="paletteBtn" title="Jeu de couleurs : bleu nuit ou encre d'origine">BLEU</button>
-    <!-- Ne montrer que les accroches : pour trouver vite le sujet qui intrigue. -->
-    <button class="chip" id="accBtn" aria-pressed="false">
-      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h6"/></svg>
+  <!-- ── LE PANNEAU D'OPTIONS ────────────────────────────────────────────
+       C'était un tiroir : sept boutons de formes différentes alignés au
+       hasard de leur arrivée, sans titre ni ordre. On ne savait pas ce qu'on
+       regardait. C'est maintenant un panneau à sections, chaque réglage sur
+       sa ligne, avec son intitulé à gauche et sa commande à droite — la
+       forme que prend un réglage dans une application qu'on paie.
+
+       Tous les identifiants sont conservés : le code qui les branche n'a pas
+       bougé d'une ligne. -->
+  <div class="tbmore" id="tbMore" role="dialog" aria-label="Options">
+    <div class="opt__tete">
+      <span class="opt__titre" data-i18n="opt.titre">Options</span>
+      <span class="planbadge" id="planTag2">Gratuit</span>
+    </div>
+
+    <p class="opt__sect" data-i18n="opt.lecture">Lecture</p>
+    <div class="opt__l">
+      <span data-i18n="opt.taille">Taille du texte</span>
+      <div class="sizer sizer--opt" id="sizer2">
+        <button data-size="0.9"  aria-label="Petit">A</button>
+        <button data-size="1"    class="on" aria-label="Normal">A</button>
+        <button data-size="1.15" aria-label="Grand">A</button>
+        <button data-size="1.32" aria-label="Très grand">A</button>
+      </div>
+    </div>
+    <div class="opt__l">
       <span data-i18n="acc.mode">Accroches seules</span>
+      <button class="bascule" id="accBtn" role="switch" aria-checked="false" aria-pressed="false"><i></i></button>
+    </div>
+
+    <p class="opt__sect" data-i18n="opt.apparence">Apparence</p>
+    <div class="opt__l">
+      <span data-i18n="opt.theme">Thème</span>
+      <button class="opt__v" id="themeBtn" aria-label="Basculer le thème">
+        <svg viewBox="0 0 24 24" id="themeIcon"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
+        <span id="themeNom">Sombre</span>
+      </button>
+    </div>
+    <div class="opt__l">
+      <span data-i18n="opt.palette">Jeu de couleurs</span>
+      <button class="opt__v" id="paletteBtn">BLEU</button>
+    </div>
+    <div class="opt__l" id="ligneLangue">
+      <span data-i18n="opt.langue">Langue</span>
+      <button class="opt__v" id="langBtn">FR</button>
+    </div>
+
+    <p class="opt__sect" data-i18n="opt.explorer">Explorer</p>
+    <button class="opt__a" id="searchBtn">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <span data-i18n="opt.chercher">Rechercher un sujet</span>
     </button>
-    <!-- La pioche : réservée à l'abonnement et à l'achat à vie. -->
-    <button class="chip chip--or" id="pioBtn" hidden>
-      <svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.6 5 .6-3.7 3.4 1 4.9L12 14.1 7.6 16.5l1-4.9L4.9 8.2l5-.6L12 3z"/></svg>
-      <span data-i18n="pio.cta">Piocher</span>
-    </button>
-    <button class="chip" id="shuffleBtn">
+    <button class="opt__a" id="shuffleBtn">
       <svg viewBox="0 0 24 24"><path d="M3 6h4l10 12h4M3 18h4l3-3.6M14.5 8.6L17 6h4M18 3l3 3-3 3M18 15l3 3-3 3"/></svg>
       <span data-i18n="shuffle">Tout mélanger</span>
     </button>
-    <!-- La version qui tourne réellement, lue dans la balise <meta> gravée par
-         build.sh. Sans elle, impossible de savoir si le navigateur exécute le
-         dernier déploiement ou une copie en cache. -->
-    <span class="tbver" id="tbVer" title="Version de Curio"></span>
-    <div class="streak" id="streakBox" title="Série de jours consécutifs">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.6 3.4.6 5.4-.8 7C9.4 11 8 12.6 8 15a4 4 0 008 0c0-1.4-.5-2.4-1-3.2 2.4 1 4 3.2 4 5.9A7 7 0 015 17.7C5 11.7 12 10 12 2z"/></svg>
-      <span id="streakN">1</span>
+    <button class="opt__a opt__a--or" id="pioBtn" hidden>
+      <svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.6 5 .6-3.7 3.4 1 4.9L12 14.1 7.6 16.5l1-4.9L4.9 8.2l5-.6L12 3z"/></svg>
+      <span data-i18n="pio.cta">Piocher au hasard</span>
+    </button>
+
+    <div class="opt__pied">
+      <div class="streak" id="streakBox" title="Série de jours consécutifs">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.6 3.4.6 5.4-.8 7C9.4 11 8 12.6 8 15a4 4 0 008 0c0-1.4-.5-2.4-1-3.2 2.4 1 4 3.2 4 5.9A7 7 0 015 17.7C5 11.7 12 10 12 2z"/></svg>
+        <span id="streakN">1</span>
+      </div>
+      <span class="tbver" id="tbVer" title="Version"></span>
+      <span class="offline" id="offlineTag" data-i18n="offline">Collection embarquée</span>
     </div>
-    <span class="offline" id="offlineTag" data-i18n="offline">Collection embarquée</span>
   </div>
 </header>
 
@@ -1786,7 +1884,11 @@ const I18N = {
     'tease.alt':'Revenir demain',
     'size.label':'Taille du texte',
     'act.keep':'Garder', 'act.share':'Partager',
-    'act.next':'Balayez vers la gauche pour la suivante',
+    'act.next':'Continuez pour la suivante',
+    'opt.titre':'Options','opt.lecture':'Lecture','opt.apparence':'Apparence',
+    'opt.explorer':'Explorer','opt.taille':'Taille du texte','opt.theme':'Th\u00e8me',
+    'opt.palette':'Jeu de couleurs','opt.langue':'Langue','opt.chercher':'Rechercher un sujet',
+    'opt.clair':'Clair','opt.sombre':'Sombre',
     'acc.mode':'Accroches seules',
     'acc.on':'Accroches seules : une phrase par fiche, d\u00e9pliez celles qui intriguent.',
     'acc.off':'Fiches enti\u00e8res.',
@@ -1837,9 +1939,9 @@ const I18N = {
     plansTitle:{monthly:'Mensuel',yearly:'Annuel',lifetime:'À vie'},
     planTag:'Le meilleur rapport',
     planFeat:{
-      monthly:['Lecture illimitée','Le sommaire et la recherche','Sans engagement'],
-      yearly:['Lecture illimitée','Le sommaire et la recherche','Deux mois offerts'],
-      lifetime:['Lecture illimitée, pour toujours','Toutes les anecdotes à venir','Aucun renouvellement','Un seul paiement']
+      monthly:['Lecture illimitée','La pioche : une anecdote au hasard','Le sommaire et la recherche','Sans engagement'],
+      yearly:['Lecture illimitée','La pioche : une anecdote au hasard','Le sommaire et la recherche','Deux mois offerts'],
+      lifetime:['Lecture illimitée, pour toujours','La pioche : une anecdote au hasard','Toutes les anecdotes à venir','Un seul paiement']
     },
     planCta:{monthly:"S'abonner",yearly:"S'abonner",lifetime:'Acheter à vie'},
     demo:'Lien de paiement non configuré — voir README.md'
@@ -1918,7 +2020,11 @@ const I18N = {
     'tease.alt':'Come back tomorrow',
     'size.label':'Text size',
     'act.keep':'Keep', 'act.share':'Share',
-    'act.next':'Swipe left for the next one',
+    'act.next':'Keep going for the next one',
+    'opt.titre':'Options','opt.lecture':'Reading','opt.apparence':'Appearance',
+    'opt.explorer':'Explore','opt.taille':'Text size','opt.theme':'Theme',
+    'opt.palette':'Colour set','opt.langue':'Language','opt.chercher':'Search a subject',
+    'opt.clair':'Light','opt.sombre':'Dark',
     'acc.mode':'Hooks only',
     'acc.on':'Hooks only: one line per piece, unfold the ones that catch you.',
     'acc.off':'Full pieces.',
@@ -1969,9 +2075,9 @@ const I18N = {
     plansTitle:{monthly:'Monthly',yearly:'Yearly',lifetime:'Lifetime'},
     planTag:'Best value',
     planFeat:{
-      monthly:['Unlimited reading','Contents list and search','No commitment'],
-      yearly:['Unlimited reading','Contents list and search','Two months free'],
-      lifetime:['Unlimited reading, forever','Every piece still to come','No renewal','One single payment']
+      monthly:['Unlimited reading','The draw: one piece at random','Contents list and search','No commitment'],
+      yearly:['Unlimited reading','The draw: one piece at random','Contents list and search','Two months free'],
+      lifetime:['Unlimited reading, forever','The draw: one piece at random','Every piece still to come','One single payment']
     },
     planCta:{monthly:'Subscribe',yearly:'Subscribe',lifetime:'Buy lifetime'},
     demo:'Checkout link not configured — see README.md'
@@ -2121,8 +2227,15 @@ function applyTheme(){
   });
 })();
 
+/* Le panneau nomme le thème en toutes lettres : une icône de soleil ne dit
+   pas si elle décrit l'état actuel ou ce vers quoi elle bascule. */
+function majNomTheme(){
+  const n = $('#themeNom'); if(!n) return;
+  n.textContent = T()[S.theme === 'light' ? 'opt.clair' : 'opt.sombre'];
+}
 $('#themeBtn').addEventListener('click', ()=>{
   S.theme = S.theme === 'dark' ? 'light' : 'dark';
+  majNomTheme();
   const keep = current();
   LS.set('curio.theme', S.theme); applyTheme(); repaintCanvases();
   // on réaffirme la position : un changement de thème ne doit rien faire défiler
@@ -2883,6 +2996,24 @@ async function tirageDuJour(){
   return c;
 }
 
+/* La sixième : celle qu'on montre sans la donner. Elle n'entre PAS dans la
+   mémoire des deux mois — on ne l'a pas offerte, elle pourra donc être tirée
+   un autre jour, et lue en entier cette fois-là. */
+async function ficheAperçu(){
+  const cles = await tirageDuJour();
+  const pris = new Set(cles.map(k => k.slice(k.indexOf('|') + 1)));
+  Array.from(feed.children).forEach(c => {
+    if(c._item) pris.add(c._item.article || c._item.title);
+  });
+  const tout = await catalogueOffrable();
+  const libre = tout.filter(k => !pris.has(k.slice(k.indexOf('|') + 1)));
+  if(!libre.length) return null;
+  /* Choisie d'après la date, pas au hasard : elle ne doit pas changer si on
+     remonte puis redescend dans le flux. */
+  const g = [...today()].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7);
+  return itemDeCle(libre[g % libre.length]);
+}
+
 /* Le flux du gratuit : les cinq du jour, dans leur ordre, et rien d'autre. */
 async function remplirTirage(){
   const cles = await tirageDuJour();
@@ -3111,25 +3242,46 @@ async function itemDeCle(cle){
   return itemFromWritten(tid, titre, rec);
 }
 
-/* L'animation : huit bandes aux couleurs des univers, qui filent puis
-   ralentissent jusqu'à n'en laisser qu'une. Elle dure le temps qu'il faut
-   pour que le tirage se sente — un peu plus d'une seconde — et pas une
-   milliseconde de plus. */
+/* ── LE MOMENT DE LA PIOCHE ───────────────────────────────────────────────
+   La première version faisait défiler une bande de couleurs, comme une
+   machine à sous. C'était une animation de jeu d'argent posée sur un produit
+   de lecture : le geste disait « vous allez gagner » là où il devait dire
+   « le monde est plus étrange que vous ne le pensez ».
+
+   Ce qui reste : le fond se retire, une phrase paraît en Fraunces, un trait
+   se remplit sous elle le temps du tirage, et la fiche arrive. Rien ne
+   tourne, rien ne clignote. C'est un souffle, pas un tourniquet. */
+const PHRASES_PIOCHE = {
+  fr:[
+    "Le monde est plus étrange que vous ne le pensez.",
+    "Quelque part, un fait vrai attend d'être raconté.",
+    "Il y a toujours une histoire qu'on n'a pas encore entendue.",
+    "Ce que vous allez lire est arrivé pour de bon.",
+    "On ouvre au hasard, comme un livre trouvé chez quelqu'un.",
+    "Il reste des choses à découvrir, même un mardi.",
+    "Quelqu'un a vécu ça, et personne ne vous l'avait dit.",
+    "Le réel n'a jamais eu besoin d'être inventé."
+  ],
+  en:[
+    "The world is stranger than you think.",
+    "Somewhere, a true fact is waiting to be told.",
+    "There is always a story you have not heard yet.",
+    "What you are about to read actually happened.",
+    "Opened at random, like a book found at someone's house.",
+    "There are still things to find out, even on a Tuesday.",
+    "Someone lived through this, and nobody told you.",
+    "The real world never needed to be made up."
+  ]
+};
+
 function animerPioche(){
+  const liste = PHRASES_PIOCHE[S.lang] || PHRASES_PIOCHE.fr;
   const ovl = el('div','pioche');
-  /* Une fenêtre fixe, et une bande qui défile derrière : c'est la bande qu'on
-     anime, pas la fenêtre — sinon c'est toute la roue qui quitte l'écran. */
-  const roue = el('div','pioche__roue');
-  const piste = el('div','pioche__piste');
-  for(let i = 0; i < 18; i++){
-    const t = THEMES[i % THEMES.length];
-    const b = el('i');
-    b.style.background = 'hsl(' + (t && t.hue != null ? t.hue : (i * 40)) + ' 62% 55%)';
-    piste.appendChild(b);
-  }
-  roue.appendChild(piste);
-  ovl.appendChild(roue);
-  ovl.appendChild(el('span','pioche__tx', T()['pio.wait']));
+  const mot = el('p','pioche__mot', esc(liste[Math.floor(Math.random() * liste.length)]));
+  const jauge = el('span','pioche__trait');
+  jauge.appendChild(el('i'));
+  ovl.appendChild(mot);
+  ovl.appendChild(jauge);
   document.body.appendChild(ovl);
   requestAnimationFrame(()=> ovl.classList.add('on'));
   return ()=>{
@@ -3158,7 +3310,7 @@ async function piocher(){
     const apres = current();
     if(apres && apres.nextSibling) feed.insertBefore(carte, apres.nextSibling);
     else feed.appendChild(carte);
-    carte.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' });
+    carte.scrollIntoView({ behavior:'smooth', block:'start' });
     setActive(carte);
   } finally {
     fermer();
@@ -3491,12 +3643,27 @@ async function ensureAhead(){
       const item = await fetchNext();
       if(!item){
         /* ── LA FIN DE LA JOURNÉE OFFERTE ──────────────────────────────
-           Les cinq du jour sont posées : il n'y a plus rien, et le dire
-           franchement vaut mieux que d'empiler des fiches estompées qu'on
-           ne peut pas lire. On invite, on ne frustre pas — et demain, cinq
-           autres arrivent sans rien demander à personne. */
+           Les cinq du jour restent là, entières, relisibles autant qu'on
+           veut : on ne reprend pas ce qui a été donné.
+
+           En dessous, une SIXIÈME fiche, bien réelle, dont on ne lit que le
+           début : le reste s'estompe derrière le mur. Montrer ce qu'on rate
+           est plus honnête — et plus convaincant — qu'un écran fermé qui
+           dit « revenez demain ». */
         if(S.plan === 'free' && feed.children.length && !locked){
-          feed.appendChild(buildLock('quota')); locked = true;
+          locked = true;
+          const suite = await ficheAperçu();
+          if(suite){
+            const carte = buildCard(suite);
+            carte.dataset.apercu = '1';
+            carte.classList.add('apercu');
+            carte._counted = true;
+            fillText(carte, suite);
+            poserCadenas(carte);
+            feed.appendChild(carte);
+          } else {
+            feed.appendChild(buildLock('quota'));
+          }
         } else if(!feed.children.length) feed.appendChild(buildVide());
         break;
       }
@@ -3560,7 +3727,7 @@ function activeIndex(){
 
 function resetFeed(){
   feed.innerHTML = ''; locked = false; bag = {}; offlinePool = []; ready = []; jourServi = false;
-  feed.scrollLeft = 0;
+  feed.scrollTop = 0;
   if(catalogueVide()){ feed.appendChild(buildVide()); setActive(feed.firstElementChild); return; }
   ensureAhead().then(()=>{ const f = feed.firstElementChild; if(f) setActive(f); });
 }
@@ -3616,18 +3783,22 @@ function updateActive(){
 function renderPlanTag(){
   const n = $('#planTag'); if(!n) return;
   const p = S.plan;
+  /* La même pastille en tête du panneau d'options : on doit savoir où l'on
+     en est sans refermer le panneau. */
+  const n2 = $('#planTag2');
   const nom = p === 'lifetime' ? T()['plan.life']
             : p === 'free'     ? T()['plan.free']
-            :                    T()['plan.paid'];
+            :                    T()['plan.paid'];   // sub, monthly, yearly
   // En gratuit, la pastille porte aussi le reste du jour : sur un téléphone
   // c'est le seul endroit où l'information tient, et elle répond aux deux
   // questions à la fois — quelle formule, et combien il me reste.
   const reste = Math.max(0, CONFIG.freeDaily - S.used);
   n.innerHTML = esc(nom) + (p === 'free' ? '<i>' + reste + '</i>' : '');
-  n.classList.toggle('paye', p === 'monthly' || p === 'yearly');
+  n.classList.toggle('paye', p === 'monthly' || p === 'yearly' || p === 'sub');
   n.classList.toggle('vie',  p === 'lifetime');
   n.classList.toggle('bas',  p === 'free' && reste <= 3);
   n.title = p === 'free' ? T()['plan.freeTip'] : T()['plan.paidTip'];
+  if(n2){ n2.innerHTML = n.innerHTML; n2.className = n.className; n2.title = n.title; }
   // la jauge n'a plus de sens quand la lecture est illimitée
   const q = $('#quota'); if(q) q.hidden = (p !== 'free');
 }
@@ -3825,11 +3996,15 @@ $('#searchBtn').addEventListener('click', ()=>{
    plus gros ne doit pas le redemander à chaque visite. */
 (function tailleTexte(){
   const box = $('#sizer'), pop = $('#sizePop'), btn = $('#sizeBtn');
-  if(!box) return;
+  /* Le réglage existe à deux endroits — la barre du haut et le panneau
+     d'options — et les deux doivent toujours dire la même chose. */
+  const boites = [box, $('#sizer2')].filter(Boolean);
+  if(!boites.length) return;
 
   const appliquer = (v)=>{
     document.documentElement.style.setProperty('--lecture', String(v));
-    box.querySelectorAll('button').forEach(b=> b.classList.toggle('on', b.dataset.size === String(v)));
+    boites.forEach(bx => bx.querySelectorAll('button').forEach(
+      b => b.classList.toggle('on', b.dataset.size === String(v))));
     // le texte a changé de taille : l'invite « lire la suite » doit suivre
     requestAnimationFrame(()=> Array.from(feed.children).forEach(c=>{
       if(c._item) fillText(c, c._item);
@@ -3837,13 +4012,13 @@ $('#searchBtn').addEventListener('click', ()=>{
   };
   appliquer(LS.get('curio.taille', '1'));
 
-  box.addEventListener('click', e=>{
+  boites.forEach(bx => bx.addEventListener('click', e=>{
     const b = e.target.closest('button'); if(!b) return;
     LS.set('curio.taille', b.dataset.size);
     appliquer(b.dataset.size);
-  });
+  }));
 
-  if(!pop || !btn) return;
+  if(!box || !pop || !btn) return;
   const fermer = ()=>{ pop.classList.remove('open'); btn.setAttribute('aria-expanded','false'); };
   btn.addEventListener('click', e=>{
     e.stopPropagation();
@@ -3878,7 +4053,13 @@ $('#searchBtn').addEventListener('click', ()=>{
   });
   // le clic peut atterrir sur l'icône : on teste l'ancêtre, pas la cible exacte
   document.addEventListener('click', e=>{ if(!m.contains(e.target) && !b.contains(e.target)) fermer(); });
-  m.addEventListener('click', e=>{ if(e.target.closest('button')) fermer(); });
+  /* On ne referme pas le panneau quand on change un réglage : on veut voir
+     l'effet et parfois en changer un deuxième. Seules les ACTIONS le
+     referment, parce qu'elles emmènent ailleurs. */
+  m.addEventListener('click', e=>{
+    const b = e.target.closest('button');
+    if(b && b.classList.contains('opt__a')) fermer();
+  });
   document.addEventListener('keydown', e=>{ if(e.key === 'Escape') fermer(); });
 })();
 /* Le mode accroche et la pioche, dans le tiroir « … ». */
@@ -3887,6 +4068,7 @@ $('#searchBtn').addEventListener('click', ()=>{
   if(a){
     const peindre = ()=>{
       a.setAttribute('aria-pressed', S.accroches ? 'true' : 'false');
+      a.setAttribute('aria-checked', S.accroches ? 'true' : 'false');
       a.classList.toggle('on', !!S.accroches);
       /* La feuille de style a besoin de savoir : une carte qui n'affiche
          qu'une accroche se cale en bas, pas en haut. */
@@ -3962,7 +4144,7 @@ function resultRow(item){
     close();
     const card = buildCard(item);
     feed.insertBefore(card, feed.firstElementChild);
-    feed.scrollLeft = 0; setActive(card);
+    feed.scrollTop = 0; setActive(card);
   });
   return b;
 }
@@ -4092,8 +4274,14 @@ async function openSubject(themeId, title, lockedU){
   }
   markSeen(item.title);
   const card = buildCard(item);
+  /* ── RELIRE NE COÛTE PAS UNE ANECDOTE ──────────────────────────────────
+     Une fiche rouverte depuis la collection ou le sommaire ne consomme pas
+     la journée offerte : sinon garder une anecdote se retournerait contre
+     celui qui la garde, et la collection ne servirait à rien en gratuit —
+     ce qui était exactement le cas. Ce qu'on a gardé est à soi. */
+  card._counted = true;
   feed.insertBefore(card, feed.firstElementChild);
-  feed.scrollLeft = 0; setActive(card);
+  feed.scrollTop = 0; setActive(card);
   enrich(item);
 }
 
@@ -4866,24 +5054,24 @@ function go(dir){
   const cards = Array.from(feed.children);
   const i = cards.indexOf(current());
   const n = cards[i + dir];
-  if(n) n.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' });
+  if(n) n.scrollIntoView({ behavior:'smooth', block:'start' });
 }
 document.addEventListener('keydown', e=>{
   if($$('.sheet.open').length) return;
   if(e.target.tagName === 'INPUT') return;
-  /* Droite et gauche changent de fiche, comme le doigt. Haut et bas restent
-     au texte : la barre d'espace fait défiler l'article, elle ne saute plus
-     par-dessus la moitié de ce qu'on était en train de lire. */
-  if(e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
-  if(e.key === 'ArrowLeft'){ e.preventDefault(); go(-1); }
-  if(e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown'
-     || e.key === 'PageUp' || e.key === 'ArrowUp'){
+  /* Les flèches changent de fiche. La barre d'espace et Page haut/bas font
+     défiler l'ARTICLE tant qu'il en reste, puis passent à la fiche suivante :
+     au clavier comme au doigt, on ne saute pas par-dessus ce qu'on lit. */
+  if(e.key === 'ArrowDown'){ e.preventDefault(); go(1); }
+  if(e.key === 'ArrowUp'){ e.preventDefault(); go(-1); }
+  if(e.key === ' ' || e.key === 'PageDown' || e.key === 'PageUp'){
     const c = current(), lu = c && c.querySelector('.lede');
-    if(!lu) return;
-    const bas = (e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown');
-    const pas = (e.key === 'ArrowDown' || e.key === 'ArrowUp') ? 80 : Math.round(lu.clientHeight * 0.82);
+    if(!lu){ e.preventDefault(); go(e.key === 'PageUp' ? -1 : 1); return; }
+    const bas = (e.key !== 'PageUp');
+    const bout = bas ? (lu.scrollTop + lu.clientHeight >= lu.scrollHeight - 6) : (lu.scrollTop <= 2);
     e.preventDefault();
-    lu.scrollBy({ top: bas ? pas : -pas, behavior:'smooth' });
+    if(bout) go(bas ? 1 : -1);
+    else lu.scrollBy({ top: (bas ? 1 : -1) * Math.round(lu.clientHeight * 0.82), behavior:'smooth' });
   }
   const c0 = current();
   if((e.key === 'f' || e.key === 'F') && c0) basculerFavori(c0._item, c0);
@@ -4992,10 +5180,18 @@ function relock(){
   if(demarre) resetFeed();
   toast(T()['plan.back']);
 }
-// ?pro=1 débloque tout (test) — ?pro=0 revient à la version gratuite
+/* ── ESSAYER LES TROIS FORMULES ────────────────────────────────────────────
+   Trois adresses, et rien à installer :
+     ?pro=1    comme un achat à vie
+     ?pro=sub  comme un abonné
+     ?pro=0    retour à la version gratuite
+   Le réglage s'écrit dans CE navigateur — celui qui ouvre le lien — et nulle
+   part ailleurs. La console les propose en toutes lettres dans son onglet
+   Publication, pour n'avoir pas à s'en souvenir. */
 (function testUnlock(){
   const q = new URLSearchParams(location.search).get('pro');
   if(q === '1' || q === 'true'){ unlock('lifetime'); }
+  else if(q === 'sub' || q === 'abo'){ unlock('sub'); }
   else if(q === '0'){ relock(); }
 })();
 
@@ -5012,7 +5208,7 @@ function relock(){
 })();
 
 $('#streakN').textContent = S.streak;
-applyTheme(); applyLang(); langueUnique(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount(); majPioche();
+applyTheme(); applyLang(); langueUnique(); majNomTheme(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount(); majPioche();
 
 const AUDIT = new URLSearchParams(location.search).get('audit') === '1';
 /* déplacé en tête : filtrerPubliees() en a besoin dès le premier chargement */

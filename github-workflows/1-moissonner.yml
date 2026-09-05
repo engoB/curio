@@ -27,9 +27,13 @@
 #  vite, grace au cache. Le catalogue s agrandit nuit apres nuit et rien
 #  n est jamais perdu.
 #
-#  ELLE TOURNE TOUTE SEULE chaque nuit a minuit. Lancez-la a la main si vous
-#  venez de modifier consignes/sujets-phares.txt ou consignes/reddit.txt et
-#  que vous ne voulez pas attendre.
+#  ELLE TOURNE TOUTE SEULE chaque nuit a minuit — SI consignes/moisson.txt
+#  dit « auto: oui ». Mettez « non » et la nuit ne fait plus rien : l action
+#  se lance, constate, et s arrete en quelques secondes. Un lancement A LA
+#  MAIN passe toujours outre ce reglage.
+#
+#  Le reglage se change ici sur GitHub, ou depuis l onglet Publication de
+#  console.html.
 # ═══════════════════════════════════════════════════════════════════════════
 name: 1 · Moissonner
 
@@ -68,6 +72,32 @@ jobs:
       CURIO_CONTACT: "https://github.com/${{ github.repository }}"
     steps:
       - uses: actions/checkout@v4
+
+      # ── LA MOISSON DE LA NUIT EST-ELLE DEMANDEE ? ───────────────────────
+      # Le declenchement programme obeit a consignes/moisson.txt. Un lancement
+      # A LA MAIN passe toujours : quand vous cliquez, vous savez ce que vous
+      # faites. Le cron, lui, ne doit pas tourner dans votre dos.
+      - name: Reglage de la moisson
+        id: reglage
+        run: |
+          AUTO=oui
+          if [ -f consignes/moisson.txt ]; then
+            V=$(sed -n 's/^[[:space:]]*auto:[[:space:]]*//p' consignes/moisson.txt | head -1 | tr -d '[:space:]')
+            [ -n "$V" ] && AUTO="$V"
+          fi
+          M=""
+          if [ -f consignes/moisson.txt ]; then
+            M=$(sed -n 's/^[[:space:]]*minutes:[[:space:]]*//p' consignes/moisson.txt | head -1 | tr -d '[:space:]')
+          fi
+          echo "auto=$AUTO" >> $GITHUB_OUTPUT
+          echo "minutes=$M" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$AUTO" != "oui" ]; then
+            echo "passer=oui" >> $GITHUB_OUTPUT
+            echo "La moisson automatique est sur « non » dans consignes/moisson.txt : rien a faire cette nuit." \
+              >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passer=non" >> $GITHUB_OUTPUT
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -86,13 +116,18 @@ jobs:
           done
 
       - name: Moissonner
+        if: steps.reglage.outputs.passer != 'oui'
         run: |
           set -o pipefail
-          M="${{ github.event.inputs.minutes }}"; [ -z "$M" ] && M=40
+          # Le nombre de minutes : celui que vous saisissez, sinon celui de
+          # consignes/moisson.txt, sinon 40.
+          M="${{ github.event.inputs.minutes }}"
+          [ -z "$M" ] && M="${{ steps.reglage.outputs.minutes }}"
+          [ -z "$M" ] && M=40
           node tools/build-catalog.mjs --maitre --minutes "$M" 2>&1 | tee curio.log
 
       - name: Compte rendu
-        if: always()
+        if: always() && steps.reglage.outputs.passer != 'oui'
         run: |
           {
             echo "## Curio — catalogue maitre"
@@ -103,7 +138,7 @@ jobs:
           } >> $GITHUB_STEP_SUMMARY
 
       - name: Enregistrer
-        if: always()
+        if: always() && steps.reglage.outputs.passer != 'oui'
         run: |
           git config user.name  "curio-bot"
           git config user.email "curio-bot@users.noreply.github.com"

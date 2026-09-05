@@ -3,7 +3,7 @@
 <header class="topbar" id="topbar">
   <!-- Une seule ligne, toujours. Ce qui ne tient pas sur un téléphone passe
        derrière le bouton « … », qui se déplie en dessous. -->
-  <div class="brand"><b>Curio</b><span class="planbadge" id="planTag">Gratuit</span></div>
+  <div class="brand"><b>__MARQUE__</b><span class="planbadge" id="planTag">Gratuit</span></div>
 
   <button class="counter" id="tocBtn" title="Sommaire">
     <b id="tocCount">0</b>
@@ -44,38 +44,75 @@
     <svg viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
   </button>
 
-  <div class="tbmore" id="tbMore">
-    <button class="iconbtn" id="searchBtn" title="Rechercher" aria-label="Rechercher">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
-    </button>
-    <button class="langbtn" id="langBtn" title="Langue / Language">FR</button>
-    <button class="iconbtn" id="themeBtn" title="Thème clair / sombre" aria-label="Basculer le thème">
-      <svg viewBox="0 0 24 24" id="themeIcon"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
-    </button>
-    <button class="langbtn" id="paletteBtn" title="Jeu de couleurs : bleu nuit ou encre d'origine">BLEU</button>
-    <!-- Ne montrer que les accroches : pour trouver vite le sujet qui intrigue. -->
-    <button class="chip" id="accBtn" aria-pressed="false">
-      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h6"/></svg>
+  <!-- ── LE PANNEAU D'OPTIONS ────────────────────────────────────────────
+       C'était un tiroir : sept boutons de formes différentes alignés au
+       hasard de leur arrivée, sans titre ni ordre. On ne savait pas ce qu'on
+       regardait. C'est maintenant un panneau à sections, chaque réglage sur
+       sa ligne, avec son intitulé à gauche et sa commande à droite — la
+       forme que prend un réglage dans une application qu'on paie.
+
+       Tous les identifiants sont conservés : le code qui les branche n'a pas
+       bougé d'une ligne. -->
+  <div class="tbmore" id="tbMore" role="dialog" aria-label="Options">
+    <div class="opt__tete">
+      <span class="opt__titre" data-i18n="opt.titre">Options</span>
+      <span class="planbadge" id="planTag2">Gratuit</span>
+    </div>
+
+    <p class="opt__sect" data-i18n="opt.lecture">Lecture</p>
+    <div class="opt__l">
+      <span data-i18n="opt.taille">Taille du texte</span>
+      <div class="sizer sizer--opt" id="sizer2">
+        <button data-size="0.9"  aria-label="Petit">A</button>
+        <button data-size="1"    class="on" aria-label="Normal">A</button>
+        <button data-size="1.15" aria-label="Grand">A</button>
+        <button data-size="1.32" aria-label="Très grand">A</button>
+      </div>
+    </div>
+    <div class="opt__l">
       <span data-i18n="acc.mode">Accroches seules</span>
+      <button class="bascule" id="accBtn" role="switch" aria-checked="false" aria-pressed="false"><i></i></button>
+    </div>
+
+    <p class="opt__sect" data-i18n="opt.apparence">Apparence</p>
+    <div class="opt__l">
+      <span data-i18n="opt.theme">Thème</span>
+      <button class="opt__v" id="themeBtn" aria-label="Basculer le thème">
+        <svg viewBox="0 0 24 24" id="themeIcon"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
+        <span id="themeNom">Sombre</span>
+      </button>
+    </div>
+    <div class="opt__l">
+      <span data-i18n="opt.palette">Jeu de couleurs</span>
+      <button class="opt__v" id="paletteBtn">BLEU</button>
+    </div>
+    <div class="opt__l" id="ligneLangue">
+      <span data-i18n="opt.langue">Langue</span>
+      <button class="opt__v" id="langBtn">FR</button>
+    </div>
+
+    <p class="opt__sect" data-i18n="opt.explorer">Explorer</p>
+    <button class="opt__a" id="searchBtn">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <span data-i18n="opt.chercher">Rechercher un sujet</span>
     </button>
-    <!-- La pioche : réservée à l'abonnement et à l'achat à vie. -->
-    <button class="chip chip--or" id="pioBtn" hidden>
-      <svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.6 5 .6-3.7 3.4 1 4.9L12 14.1 7.6 16.5l1-4.9L4.9 8.2l5-.6L12 3z"/></svg>
-      <span data-i18n="pio.cta">Piocher</span>
-    </button>
-    <button class="chip" id="shuffleBtn">
+    <button class="opt__a" id="shuffleBtn">
       <svg viewBox="0 0 24 24"><path d="M3 6h4l10 12h4M3 18h4l3-3.6M14.5 8.6L17 6h4M18 3l3 3-3 3M18 15l3 3-3 3"/></svg>
       <span data-i18n="shuffle">Tout mélanger</span>
     </button>
-    <!-- La version qui tourne réellement, lue dans la balise <meta> gravée par
-         build.sh. Sans elle, impossible de savoir si le navigateur exécute le
-         dernier déploiement ou une copie en cache. -->
-    <span class="tbver" id="tbVer" title="Version de Curio"></span>
-    <div class="streak" id="streakBox" title="Série de jours consécutifs">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.6 3.4.6 5.4-.8 7C9.4 11 8 12.6 8 15a4 4 0 008 0c0-1.4-.5-2.4-1-3.2 2.4 1 4 3.2 4 5.9A7 7 0 015 17.7C5 11.7 12 10 12 2z"/></svg>
-      <span id="streakN">1</span>
+    <button class="opt__a opt__a--or" id="pioBtn" hidden>
+      <svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.6 5 .6-3.7 3.4 1 4.9L12 14.1 7.6 16.5l1-4.9L4.9 8.2l5-.6L12 3z"/></svg>
+      <span data-i18n="pio.cta">Piocher au hasard</span>
+    </button>
+
+    <div class="opt__pied">
+      <div class="streak" id="streakBox" title="Série de jours consécutifs">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.6 3.4.6 5.4-.8 7C9.4 11 8 12.6 8 15a4 4 0 008 0c0-1.4-.5-2.4-1-3.2 2.4 1 4 3.2 4 5.9A7 7 0 015 17.7C5 11.7 12 10 12 2z"/></svg>
+        <span id="streakN">1</span>
+      </div>
+      <span class="tbver" id="tbVer" title="Version"></span>
+      <span class="offline" id="offlineTag" data-i18n="offline">Collection embarquée</span>
     </div>
-    <span class="offline" id="offlineTag" data-i18n="offline">Collection embarquée</span>
   </div>
 </header>
 
@@ -95,7 +132,7 @@
       </div>
       <button class="btn btn--primary" id="obStart" data-i18n="ob.cta">Commencer à explorer</button>
       <p class="fineprint" data-i18n="ob.note">5 anecdotes offertes chaque jour, renouvelées chaque matin. Aucune inscription requise.</p>
-      <p class="fineprint fineprint--src" data-i18n="ob.source">Chaque anecdote est écrite pour Curio à partir de faits vérifiés, puis relue avant publication.</p>
+      <p class="fineprint fineprint--src" data-i18n="ob.source">Chaque anecdote est écrite pour __MARQUE__ à partir de faits vérifiés, puis relue avant publication.</p>
     </div>
   </div>
 </section>
@@ -157,7 +194,7 @@
     <div class="sheet__head">
       <div>
         <h2 data-i18n="find.title">Chercher un sujet</h2>
-        <p data-i18n="find.sub">Un mot, un nom, un lieu — Curio remonte ce qu'il a de plus surprenant sur le sujet.</p>
+        <p data-i18n="find.sub">Un mot, un nom, un lieu — __MARQUE__ remonte ce qu'il a de plus surprenant sur le sujet.</p>
       </div>
       <button class="iconbtn sheet__close" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>

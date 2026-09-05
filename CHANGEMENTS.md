@@ -1,4 +1,92 @@
-# Curio 8.7.0 — ce qui a changé depuis v6
+# Curio 8.8.0 — ce qui a changé depuis v6
+
+## 8.8.0 — valider n'est plus publier, et le nom devient un réglage
+
+**Aucune fiche écrite n'est modifiée.** Les changements portent sur la console,
+les deux pages et deux outils — jamais sur vos 1 152 textes.
+
+### Valider ne publie plus
+
+C'était le défaut le plus lourd. Valider une fiche la mettait EN LIGNE le jour
+même : relire mille fiches revenait à tout publier d'un coup, sans réserve et
+sans rythme. Valider veut désormais dire « je l'ai lue, elle est bonne, elle
+rejoint la réserve ». C'est « 5 · Publier » qui décide ensuite quand elle sort.
+
+Et pour constituer un fonds d'un seul geste, un nouveau bouton **Mettre en
+ligne…** dans Relecture : il publie toute la réserve validée à partir d'une
+note que vous choisissez.
+
+### Choisir par la note
+
+Un filtre de note dans Relecture, avec **l'effectif de chaque seuil** :
+
+```
+Toutes les notes — 1 152
+Uniquement les 10/10 — … fiche(s)
+9/10 et au-dessus — … fiche(s)
+```
+
+C'est ce compte qui répond à « combien puis-je ouvrir d'un coup ».
+
+### Le nom du produit est un réglage
+
+`consignes/marque.txt`, une ligne, et la construction le recopie partout où le
+lecteur peut le lire — titre des pages, en-tête, FAQ, messages, manifeste
+d'installation. Quarante-sept occurrences.
+
+Ce qui ne change PAS, et c'est voulu : les clés de mémoire du navigateur
+(`curio.plan`, `curio.favs`…), les noms de fichiers et le cache du service
+worker. **Changer de nom ne déconnecte personne de sa collection.** Vérifié en
+renommant le produit puis en le remettant.
+
+### Le défilement revient à la verticale
+
+Avec la place gagnée : elle ne venait pas de l'axe mais de `flex:1 1 auto` sur
+la zone de lecture et de la phrase à raconter qui défile avec le texte. Les
+deux gestes cohabitent par `overscroll-behavior:contain` — tant qu'il reste du
+texte, le doigt le fait défiler ; au bout, il emmène la fiche.
+
+### La fin de la journée offerte
+
+Les cinq restent là, entières, relisibles autant qu'on veut. En dessous, une
+**sixième fiche bien réelle dont on ne lit que le début**, le reste estompé
+derrière le mur. Montrer ce qu'on rate vaut mieux qu'un écran fermé.
+
+Et relire une fiche gardée ne consomme plus la journée : c'est ce qui rendait
+la collection inutile en gratuit.
+
+### Le panneau d'options
+
+Sept boutons de formes différentes alignés au hasard de leur arrivée sont
+devenus un panneau à sections — Lecture, Apparence, Explorer — chaque réglage
+sur sa ligne, intitulé à gauche, commande à droite. Un réglage ne referme plus
+le panneau ; seule une action le fait.
+
+### La pioche
+
+La bande de couleurs qui défilait était une animation de machine à sous posée
+sur un produit de lecture. À la place : le fond se retire, une phrase paraît
+en Fraunces — *« Le monde est plus étrange que vous ne le pensez »*, huit
+variantes — un trait se remplit, la fiche arrive. La pioche est annoncée dans
+les trois formules payantes.
+
+### La moisson automatique se règle
+
+`consignes/moisson.txt` : `auto: oui|non`. Sur « non », le passage de la nuit
+se lance, constate et s'arrête en quelques secondes. Un lancement à la main
+passe toujours outre. Réglable depuis l'onglet Publication.
+
+### Essayer les trois formules
+
+Trois liens dans la console : comme un lecteur gratuit, comme un abonné, comme
+un achat à vie. Le réglage ne vaut que pour le navigateur qui ouvre le lien.
+
+### Textes
+
+« Dix anecdotes vous attendent » devient « Cinq anecdotes vous attendent
+aujourd'hui ». La FAQ ne promet plus qu'un contrôle automatique rejette tout
+brouillon reprenant des phrases, ni qu'une anecdote ne reviendra pas avant deux
+mois — deux promesses que le code ne peut pas tenir mot pour mot.
 
 ## 8.7.0 — la journée offerte, et la lecture reprise à l'endroit
 

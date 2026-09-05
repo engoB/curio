@@ -43,6 +43,10 @@ on:
           - retirer
           - refaire
           - rendre
+      note_mini:
+        description: "Ouvrir le fonds : publier TOUTE la reserve notee au moins N (0 = non)"
+        required: false
+        default: "0"
       combien:
         description: "Publier : combien de sujets (vide = ce que dit consignes/publication.txt)"
         default: ""
@@ -108,7 +112,9 @@ jobs:
               node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
             *)
               C=""; if [ -n "${{ github.event.inputs.combien }}" ]; then C="--combien ${{ github.event.inputs.combien }}"; fi
-              node tools/publier.mjs $C 2>&1 | tee curio.log
+              # Ouverture de fonds : tout ce qui atteint la note, d un seul coup.
+              N=""; if [ "${{ github.event.inputs.note_mini }}" != "0" ] && [ -n "${{ github.event.inputs.note_mini }}" ]; then N="--note-mini ${{ github.event.inputs.note_mini }}"; fi
+              node tools/publier.mjs $C $N 2>&1 | tee curio.log
               node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
           esac
 

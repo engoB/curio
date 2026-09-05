@@ -77,11 +77,11 @@ const DEMO = [
 const FAQ = {
   fr:[
     ["Qui écrit les anecdotes ?",
-     "Chaque fiche est écrite pour Curio à partir de faits vérifiés, puis relue avant d'être publiée. Ce ne sont pas des extraits recopiés : ce sont des textes, avec une accroche, une explication et une chute — et un contrôle automatique rejette tout brouillon qui reprendrait des phrases à une source."],
+     "Chaque fiche est écrite pour __MARQUE__ à partir de faits vérifiés, puis relue une par une avant d'être publiée. Ce ne sont pas des extraits recopiés : ce sont des textes, avec une accroche, une explication et une chute."],
     ["Comment sont choisis les sujets ?",
-     "Un sujet n'entre dans Curio que s'il coche deux cases : il est assez connu pour parler à quelqu'un, et assez étrange pour valoir d'être raconté. Chaque candidat reçoit une note d'insolite ; en dessous d'un certain seuil, il n'est pas écrit. C'est pour cela que vous ne tomberez pas sur une fiche de définition ni sur une biographie plate."],
+     "Un sujet n'entre dans __MARQUE__ que s'il coche deux cases : il est assez connu pour parler à quelqu'un, et assez étrange pour valoir d'être raconté. Chaque candidat reçoit une note d'insolite ; en dessous d'un certain seuil, il n'est pas écrit. C'est pour cela que vous ne tomberez pas sur une fiche de définition ni sur une biographie plate."],
     ["Que contient la version gratuite ?",
-     "Cinq anecdotes par jour, tirées au hasard dans les huit univers — aucun n'est fermé. Elles sont à vous pour la journée : le lendemain, cinq autres arrivent et les précédentes s'en vont. Vous ne reverrez pas deux fois la même avant deux mois. Sans compte, sans publicité."],
+     "Cinq anecdotes par jour, tirées au hasard dans les huit univers — aucun n'est fermé. Elles sont à vous pour la journée : le lendemain, cinq autres arrivent et les précédentes s'en vont. Celles que vous gardez dans votre collection, elles, restent lisibles. Sans compte, sans publicité."],
     ["Quelle différence entre l'abonnement et l'achat à vie ?",
      "L'abonnement se règle au mois ou à l'année et se résilie quand vous voulez, en un clic. L'achat à vie est un paiement unique : le catalogue entier vous reste ouvert pour toujours, y compris tout ce qui sera écrit après votre achat."],
     ["Si je m'abonne aujourd'hui, j'ai accès à tout ?",
@@ -89,11 +89,11 @@ const FAQ = {
   ],
   en:[
     ["Who writes the pieces?",
-     "Every piece is written for Curio from verified facts, then read again before it goes live. These are not copied extracts: they are written texts, with an opening, an explanation and a turn — and an automatic check rejects any draft that borrows sentences from a source."],
+     "Every piece is written for __MARQUE__ from verified facts, then read one by one before it goes live. These are not copied extracts: they are written texts, with an opening, an explanation and a turn."],
     ["How are subjects chosen?",
-     "A subject only enters Curio if it clears two bars: well known enough to mean something to someone, strange enough to be worth telling. Each candidate gets a strangeness score, and below a threshold it never gets written. That is why you will not land on a dictionary definition or a flat biography."],
+     "A subject only enters __MARQUE__ if it clears two bars: well known enough to mean something to someone, strange enough to be worth telling. Each candidate gets a strangeness score, and below a threshold it never gets written. That is why you will not land on a dictionary definition or a flat biography."],
     ["What is in the free version?",
-     "Five pieces a day, drawn at random from all eight universes — none is closed off. They are yours for the day: tomorrow five others arrive and these are gone. You will not see the same one twice within two months. No account, no ads."],
+     "Five pieces a day, drawn at random from all eight universes — none is closed off. They are yours for the day: tomorrow five others arrive and these are gone. The ones you keep in your collection stay readable. No account, no ads."],
     ["Subscription or lifetime — what changes?",
      "The subscription is billed monthly or yearly and can be cancelled in one click. Lifetime is a single payment: the whole catalogue stays open to you for good, including everything written after you buy."],
     ["If I subscribe today, do I get everything?",
@@ -111,7 +111,7 @@ const TXT = {
     cta1:'Essayer gratuitement', cta2:'Voir les formules',
     r1:'5 anecdotes offertes chaque jour', r2:'Aucune inscription', r3:'Sans publicité',
     howEye:'Comment ça marche', howTitle:'Trois gestes, et le savoir devient une habitude.',
-    howLead:"Curio n'est pas une encyclopédie de plus. C'est un rythme : quelque chose de vrai, de court et de mémorable, chaque jour.",
+    howLead:"__MARQUE__ n'est pas une encyclopédie de plus. C'est un rythme : quelque chose de vrai, de court et de mémorable, chaque jour.",
     s1t:'Choisissez vos univers', s1p:"Cosmos, vivant, histoire oubliée, mystères… Vous composez le flux qui vous ressemble, et vous le modifiez quand vous voulez.",
     s2t:'Deux minutes, une histoire entière',
     s2p:"Une anecdote par écran : l'accroche, ce qu'on ne savait pas, la chute. On la lit debout dans le métro, et le soir on la raconte à quelqu'un.",
@@ -122,17 +122,17 @@ const TXT = {
     pLead:"Pas de publicité, pas de revente de données, pas de flux « recommandé » qui vous garde captif. Juste un abonnement honnête — ou un achat définitif.",
     pNote:"Paiement sécurisé, résiliable à tout moment, sans justification. L'achat à vie inclut les huit univers et toutes les anecdotes à venir. Aucune publicité, aucune revente de données.",
     fEye:'Questions', fTitle:"Ce qu'on nous demande le plus souvent.",
-    fin1:"Vous avez appris quelque chose aujourd'hui ?", fin2:"Dix anecdotes vous attendent. Elles ne coûtent rien.", fin3:'Ouvrir Curio',
+    fin1:"Vous avez appris quelque chose aujourd'hui ?", fin2:"Cinq anecdotes vous attendent aujourd'hui. Elles ne coûtent rien.", fin3:'Ouvrir __MARQUE__',
     foot1:'Anecdotes écrites et vérifiées une par une.',
     planName:{monthly:'Mensuel',yearly:'Annuel',lifetime:'À vie'},
     planTag:'Le meilleur rapport',
     freeName:'Gratuit', freeUnit:'€ pour toujours', freeCta:'Commencer maintenant',
-    freeFeat:['5 anecdotes par jour, renouvelées chaque matin','Les 8 univers, aucun fermé','Ma collection','Sans compte, sans publicité'],
+    freeFeat:['5 anecdotes par jour, renouvelées chaque matin','Les 8 univers, aucun fermé','Ce que vous gardez reste relisible','Sans compte, sans publicité'],
     planCta:{monthly:"S'abonner",yearly:"S'abonner",lifetime:'Acheter à vie'},
     feat:{
-      monthly:['Lecture illimitée','Le sommaire et la recherche','Nouveautés chaque semaine','Sans engagement'],
-      yearly:['Lecture illimitée','Le sommaire et la recherche','Nouveautés chaque semaine','Deux mois offerts'],
-      lifetime:['Lecture illimitée, pour toujours','Le sommaire et la recherche','Toutes les anecdotes à venir','Un seul paiement']
+      monthly:['Lecture illimitée','La pioche : une anecdote au hasard','Nouveautés chaque semaine','Sans engagement'],
+      yearly:['Lecture illimitée','La pioche : une anecdote au hasard','Nouveautés chaque semaine','Deux mois offerts'],
+      lifetime:['Lecture illimitée, pour toujours','La pioche : une anecdote au hasard','Toutes les anecdotes à venir','Un seul paiement']
     },
     soon:'Lien de paiement à configurer'
   },
@@ -144,7 +144,7 @@ const TXT = {
     cta1:'Try it free', cta2:'See the plans',
     r1:'5 free wonders every day', r2:'No sign-up', r3:'No ads',
     howEye:'How it works', howTitle:'Three gestures, and knowing becomes a habit.',
-    howLead:'Curio is not another encyclopedia. It is a rhythm: something true, short and memorable, every day.',
+    howLead:'__MARQUE__ is not another encyclopedia. It is a rhythm: something true, short and memorable, every day.',
     s1t:'Pick your universes', s1p:'Cosmos, living world, forgotten history, mysteries… You compose the stream that suits you, and change it whenever you like.',
     s2t:'Two minutes, a whole story',
     s2p:"One piece per screen: the hook, the thing you did not know, the turn. You read it standing on the train, and that evening you tell someone.",
@@ -155,17 +155,17 @@ const TXT = {
     pLead:'No ads, no data resale, no “recommended” feed engineered to keep you scrolling. Just an honest subscription — or a one-off purchase.',
     pNote:'Secure payment, cancel anytime, no questions asked. Lifetime covers all eight universes and every piece still to come. No advertising, no data resale.',
     fEye:'Questions', fTitle:'What people ask us most.',
-    fin1:'Learned something today?', fin2:'Ten wonders are waiting. They cost nothing.', fin3:'Open Curio',
+    fin1:'Learned something today?', fin2:'Five wonders are waiting today. They cost nothing.', fin3:'Open __MARQUE__',
     foot1:'Written and checked one by one.',
     planName:{monthly:'Monthly',yearly:'Yearly',lifetime:'Lifetime'},
     planTag:'Best value',
     freeName:'Free', freeUnit:'€ forever', freeCta:'Start now',
-    freeFeat:['5 pieces a day, renewed every morning','All 8 universes, none locked','My collection','No account, no ads'],
+    freeFeat:['5 pieces a day, renewed every morning','All 8 universes, none locked','What you keep stays readable','No account, no ads'],
     planCta:{monthly:'Subscribe',yearly:'Subscribe',lifetime:'Buy lifetime'},
     feat:{
-      monthly:['Unlimited reading','Contents list and search','New pieces every week','No commitment'],
-      yearly:['Unlimited reading','Contents list and search','New pieces every week','Two months free'],
-      lifetime:['Unlimited reading, forever','Contents list and search','Every piece still to come','One single payment']
+      monthly:['Unlimited reading','The draw: one piece at random','New pieces every week','No commitment'],
+      yearly:['Unlimited reading','The draw: one piece at random','New pieces every week','Two months free'],
+      lifetime:['Unlimited reading, forever','The draw: one piece at random','Every piece still to come','One single payment']
     },
     soon:'Checkout link to configure'
   }

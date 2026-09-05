@@ -420,10 +420,22 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
         <option value="retire">À retirer</option>
         <option value="enligne">Déjà en ligne</option>
       </select>
+      <!-- La note que le rédacteur s'est donnée. C'est elle qui décide ce
+           qu'on ouvre en premier : on relit les 10 avant les 7. Les effectifs
+           sont recomptés à chaque changement de langue ou d'univers — c'est
+           avec eux qu'on décide combien de fiches ouvrir d'un coup. -->
+      <select id="fNote">
+        <option value="">Toutes les notes</option>
+        <option value="10"></option>
+        <option value="9"></option>
+        <option value="8"></option>
+        <option value="7"></option>
+      </select>
       <span class="compte" id="cRel"></span>
     </div>
     <div class="cmd">
       <button class="btn v" id="toutValider">Valider tout ce qui est affiché</button>
+      <button class="btn o" id="ouvrirFonds">Mettre en ligne…</button>
       <button class="btn" id="toutReplier">Replier tous les textes</button>
     </div>
     <div class="liste" id="lRel"></div>
@@ -490,11 +502,43 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
 
       <p class="apercuPub" id="apercuPub"></p>
 
+      <div class="champs" style="margin-top:14px">
+        <div>
+          <label for="pMoisson">Moisson automatique, chaque nuit</label>
+          <select id="pMoisson">
+            <option value="oui">Oui — le catalogue s’agrandit tout seul</option>
+            <option value="non">Non — je moissonne quand je veux</option>
+          </select>
+        </div>
+      </div>
+      <p class="apercuPub" style="margin-top:10px">La moisson ne coûte rien : elle ne fait
+         qu’interroger Wikipédia, aucun appel payant. Mettez-la sur « non » quand vous avez
+         plus de sujets d’avance que vous n’en écrirez ce mois-ci.</p>
+
       <div class="cmd" style="margin:14px 0 0">
         <button class="btn p" id="pEnregistrer">Enregistrer le rythme</button>
         <button class="btn" id="pPublierNow">Publier maintenant…</button>
         <button class="btn" id="pEtat">Voir l’état du stock</button>
       </div>
+    </div>
+
+    <!-- ══ ESSAYER L'APPLICATION ══════════════════════════════════════════
+         Trois liens, et rien d'autre. Ils écrivent la formule dans le
+         navigateur qui les ouvre — le vôtre, pas celui de vos lecteurs — ce
+         qui permet de voir l'application exactement comme un abonné la voit,
+         puis de revenir au gratuit d'un clic. -->
+    <div class="reglages">
+      <h3>Essayer l’application</h3>
+      <p>Ouvrez l’application dans l’état que vous voulez vérifier. Le réglage ne vaut que
+         pour ce navigateur : personne d’autre n’est concerné, et vous revenez au gratuit
+         quand vous voulez.</p>
+      <div class="cmd" style="margin-top:12px">
+        <a class="btn" id="essaiFree"  target="_blank" rel="noopener">Comme un lecteur gratuit</a>
+        <a class="btn" id="essaiAbo"   target="_blank" rel="noopener">Comme un abonné</a>
+        <a class="btn" id="essaiVie"   target="_blank" rel="noopener">Comme un achat à vie</a>
+      </div>
+      <p class="apercuPub" style="margin-top:10px">« Abonné » et « à vie » ouvrent tout le
+         catalogue et la pioche. « Gratuit » remet les cinq anecdotes du jour et le mur.</p>
     </div>
   </section>
 </div>
@@ -645,7 +689,7 @@ function chargerTout(){
   }).then(function(){
     return S.cfg.token ? chargerDecisions() : null;
   }).then(function(){
-    return S.cfg.token ? lirePublication() : null;
+    return S.cfg.token ? Promise.all([lirePublication(), lireMoisson()]) : null;
   }).then(function(){
     calculerEcrites();
     peindreCat(); peindreRel(); peindrePied();
@@ -905,11 +949,37 @@ function suiteCat(){
 function valDe(f){ var k=f.lang+'|'+f.titre; return S.validations[k]||'neutre'; }
 function enLigne(f){ return f.rec.p && String(f.rec.p) <= new Date().toISOString().slice(0,10); }
 
+/* Combien de fiches à chaque seuil de note, dans la langue et l'univers
+   affichés. C'est ce compte qui répond à « combien puis-je mettre en ligne
+   d'un coup ». */
+function compterNotes(){
+  var lg=$('#fLang').value, u=$('#fUniR').value;
+  var base = S.fiches.filter(function(f){
+    if(lg && f.lang!==lg) return false;
+    if(u && f.uni!==u) return false;
+    return true;
+  });
+  var sel = $('#fNote');
+  var libelle = { '10':'Uniquement les 10/10', '9':'9/10 et au-dessus',
+                  '8':'8/10 et au-dessus', '7':'7/10 et au-dessus' };
+  Array.prototype.forEach.call(sel.options, function(o){
+    if(!o.value){ o.textContent = 'Toutes les notes — ' + nb(base.length); return; }
+    var n = parseInt(o.value,10);
+    var c = base.filter(function(f){ return f.rec.s != null && f.rec.s >= n; }).length;
+    o.textContent = libelle[o.value] + ' — ' + nb(c) + ' fiche(s)';
+    o.disabled = !c;
+  });
+}
+
 function filtrerRel(){
   var q=plier($('#qR').value.trim()), lg=$('#fLang').value, u=$('#fUniR').value, vf=$('#fVal').value;
+  var nm=parseInt($('#fNote').value,10)||0;
   S.vueRel = S.fiches.filter(function(f){
     if(lg && f.lang!==lg) return false;
     if(u && f.uni!==u) return false;
+    /* Le seuil de note. Une fiche sans note ne peut pas prétendre à un
+       seuil : elle n'a pas été jugée. */
+    if(nm && !(f.rec.s != null && f.rec.s >= nm)) return false;
     if(vf==='enligne'){ if(!enLigne(f)) return false; }
     else if(vf && valDe(f)!==vf) return false;
     if(q){
@@ -919,6 +989,7 @@ function filtrerRel(){
     return true;
   });
   S.vueRel.sort(function(a,b){ return (b.rec.s||0)-(a.rec.s||0); });
+  compterNotes();
 }
 
 function ficheHtml(f){
@@ -1351,7 +1422,40 @@ function envoyerPublication(){
    commentaires compris — pour que le fichier reste lisible sur GitHub. */
 var PUB = { rythme:'quotidien', jours:[1], parPassage:3, ordre:'potentiel',
             jusquAu:'', langues:'fr', images:'oui', sha:null };
+/* La moisson vit dans son propre fichier : elle ne concerne pas la
+   publication, et les mélanger obligerait à réécrire l'un pour l'autre. */
+var MOI = { auto:'oui', minutes:'40', sha:null };
 var NOMS_JOURS = ['lun','mar','mer','jeu','ven','sam','dim'];
+
+function lireMoisson(){
+  return lireFichier('consignes/moisson.txt').then(function(r){
+    MOI.sha = r.sha;
+    if(!r.texte) return;
+    String(r.texte).split(/\r?\n/).forEach(function(l){
+      var t=l.trim(); if(!t || t[0]==='#') return;
+      var m=t.match(/^([\w-]+)\s*[:=]\s*(.*)$/); if(!m) return;
+      var k=m[1].toLowerCase(), v=m[2].trim();
+      if(k==='auto') MOI.auto = (v.toLowerCase()==='non' ? 'non' : 'oui');
+      else if(k==='minutes') MOI.minutes = String(parseInt(v,10)||40);
+    });
+  }).catch(function(){});
+}
+function texteMoisson(){
+  return '# ═══════════════════════════════════════════════════════════════════\n'
+   + '# LA MOISSON AUTOMATIQUE — écrit par console.html\n'
+   + '# ═══════════════════════════════════════════════════════════════════\n'
+   + '#\n'
+   + '# « 1 · Moissonner » est programmée chaque nuit à minuit UTC. Elle\n'
+   + '# agrandit le catalogue de sujets et ne coûte rien : aucun appel payant.\n'
+   + '#\n'
+   + '#   oui  le catalogue s’agrandit chaque nuit\n'
+   + '#   non  la nuit ne fait rien — vous moissonnez à la main quand vous voulez\n'
+   + '#\n'
+   + '# Un lancement à la main passe toujours outre ce réglage.\n'
+   + 'auto: ' + MOI.auto + '\n\n'
+   + '# Minutes accordées à chaque passage automatique.\n'
+   + 'minutes: ' + MOI.minutes + '\n';
+}
 
 function lirePublication(){
   return lireFichier('consignes/publication.txt').then(function(r){
@@ -1450,6 +1554,7 @@ function peindrePub(){
   $('#pDate').value = PUB.jusquAu;
   $('#pLangues').value = PUB.langues;
   $('#pImages').value = PUB.images;
+  $('#pMoisson').value = MOI.auto;
   peindreJours();
   var c={ecrites:S.fiches.length,enligne:0,prets:stockPret(),quarantaine:0};
   S.fiches.forEach(function(f){ if(f.rec.p) c.enligne++; if(f.rec.v==='quarantaine') c.quarantaine++; });
@@ -1487,12 +1592,28 @@ function texteReglagePublication(){
 }
 
 function enregistrerPublication(){
-  dit('Enregistrement du rythme…','info');
+  dit('Enregistrement des réglages…','info');
   return ecrireFichier('consignes/publication.txt', texteReglagePublication(), PUB.sha,
       'console : rythme de publication (' + PUB.rythme + ', ' + PUB.parPassage + '/passage, ' + PUB.langues + ')')
     .then(function(sha){ PUB.sha=sha;
-      dit('Rythme enregistré. Il s’applique dès le prochain passage de <b>5 · Publier</b>.','ok'); })
+      return ecrireFichier('consignes/moisson.txt', texteMoisson(), MOI.sha,
+        'console : moisson automatique ' + MOI.auto); })
+    .then(function(sha){ MOI.sha=sha;
+      dit('Réglages enregistrés. Le rythme s’applique dès le prochain passage de '
+        + '<b>5 · Publier</b> ; la moisson, dès cette nuit.','ok'); })
     .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+}
+
+/* Les trois liens d'essai : ils pointent sur l'application du dépôt, avec le
+   paramètre qui écrit la formule dans CE navigateur. */
+function peindreEssais(){
+  var base = 'https://' + (S.cfg.owner||'').toLowerCase() + '.github.io/'
+           + (S.cfg.repo||'') + '/app.html';
+  if(!S.cfg.owner || !S.cfg.repo) base = 'app.html';
+  var paires = [['essaiFree','?pro=0'],['essaiAbo','?pro=sub'],['essaiVie','?pro=1']];
+  paires.forEach(function(x){
+    var a = $('#'+x[0]); if(a) a.href = base + x[1];
+  });
 }
 
 /* ══════════════════════════ branchements ══════════════════════════ */
@@ -1511,7 +1632,31 @@ $('#ongCat').addEventListener('click',function(){ onglet('cat'); });
 $('#ongRel').addEventListener('click',function(){ onglet('rel'); });
 $('#ongPub').addEventListener('click',function(){ onglet('pub'); });
 
-['pRythme','pCombien','pOrdre','pDate','pLangues','pImages'].forEach(function(id){
+/* Ouvrir le fonds : mettre en ligne d'un coup toute la réserve validée qui
+   atteint une note. C'est le geste qu'on fait une fois, au lancement. */
+function ouvrirLeFonds(){
+  var n = window.prompt(
+    'Mettre en ligne TOUTE la réserve validée à partir de quelle note ?\n\n'
+    + '10 = uniquement les meilleures\n'
+    + ' 9 = les 9 et les 10   (le fonds de lancement conseillé)\n'
+    + ' 8 = les 8, 9 et 10\n\n'
+    + 'Seules les fiches VALIDÉES sortent. Le reste attend son tour au rythme\n'
+    + 'réglé dans l’onglet Publication.', '9');
+  if(n === null) return;
+  n = Math.max(1, Math.min(10, parseInt(n, 10) || 0));
+  if(!window.confirm('Publier maintenant toute la réserve validée notée ' + n + '/10 ou plus ?\n\n'
+    + 'C’est immédiat et visible sur le site. Une fiche publiée peut être retirée,\n'
+    + 'mais elle aura été vue.')) return;
+  dit('Ouverture du fonds…','info');
+  lancerAction('5-publier.yml', { operation:'publier', note_mini:String(n), combien:'', titre:'' })
+    .then(function(){
+      dit('Ouverture lancée : toute la réserve validée à <b>' + n + '/10</b> ou plus part en ligne. '
+        + 'Suivez-la dans <b>Actions → 5 · Publier</b>.','ok');
+    })
+    .catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
+}
+
+['pRythme','pCombien','pOrdre','pDate','pLangues','pImages','pMoisson'].forEach(function(id){
   $('#'+id).addEventListener('change',function(){
     PUB.rythme=$('#pRythme').value;
     PUB.parPassage=Math.max(0,parseInt($('#pCombien').value,10)||0);
@@ -1519,6 +1664,7 @@ $('#ongPub').addEventListener('click',function(){ onglet('pub'); });
     PUB.jusquAu=$('#pDate').value||'';
     PUB.langues=$('#pLangues').value;
     PUB.images=$('#pImages').value;
+    MOI.auto=$('#pMoisson').value;
     if(PUB.rythme==='hebdomadaire' && PUB.jours.length>1) PUB.jours=[PUB.jours[0]];
     if((PUB.rythme==='hebdomadaire'||PUB.rythme==='jours') && !PUB.jours.length) PUB.jours=[1];
     peindreJours(); apercuPublication();
@@ -1577,7 +1723,7 @@ $('#regOubli').addEventListener('click',function(){
   var n=document.getElementById(id);
   n.addEventListener(id==='q'?'input':'change', peindreCat);
 });
-['qR','fLang','fUniR','fVal'].forEach(function(id){
+['qR','fLang','fUniR','fVal','fNote'].forEach(function(id){
   var n=document.getElementById(id);
   n.addEventListener(id==='qR'?'input':'change', peindreRel);
 });
@@ -1594,6 +1740,7 @@ $('#toutOublier').addEventListener('click',function(){
   dit('Les '+nb(n)+' décisions sont effacées. <b>Enregistrer mes décisions</b> videra aussi '
     + '<code>decisions.json</code> dans le dépôt.', 'ok');
 });
+$('#ouvrirFonds').addEventListener('click', ouvrirLeFonds);
 $('#toutValider').addEventListener('click',function(){
   var n=S.vueRel.length, lg=$('#fLang').value==='fr'?'françaises':'anglaises';
   if(!n) return;
@@ -1612,7 +1759,7 @@ window.addEventListener('beforeunload',function(e){
   if(S.sale){ e.preventDefault(); e.returnValue=''; }
 });
 
-lireCfg(); relireBrouillon(); peindreCfg();
+lireCfg(); relireBrouillon(); peindreCfg(); peindreEssais();
 if(S.cfg.token) marquerCx(false,'vérification…');
 chargerTout();
 })();

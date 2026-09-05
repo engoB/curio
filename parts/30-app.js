@@ -141,8 +141,15 @@ function applyTheme(){
   });
 })();
 
+/* Le panneau nomme le thème en toutes lettres : une icône de soleil ne dit
+   pas si elle décrit l'état actuel ou ce vers quoi elle bascule. */
+function majNomTheme(){
+  const n = $('#themeNom'); if(!n) return;
+  n.textContent = T()[S.theme === 'light' ? 'opt.clair' : 'opt.sombre'];
+}
 $('#themeBtn').addEventListener('click', ()=>{
   S.theme = S.theme === 'dark' ? 'light' : 'dark';
+  majNomTheme();
   const keep = current();
   LS.set('curio.theme', S.theme); applyTheme(); repaintCanvases();
   // on réaffirme la position : un changement de thème ne doit rien faire défiler
@@ -903,6 +910,24 @@ async function tirageDuJour(){
   return c;
 }
 
+/* La sixième : celle qu'on montre sans la donner. Elle n'entre PAS dans la
+   mémoire des deux mois — on ne l'a pas offerte, elle pourra donc être tirée
+   un autre jour, et lue en entier cette fois-là. */
+async function ficheAperçu(){
+  const cles = await tirageDuJour();
+  const pris = new Set(cles.map(k => k.slice(k.indexOf('|') + 1)));
+  Array.from(feed.children).forEach(c => {
+    if(c._item) pris.add(c._item.article || c._item.title);
+  });
+  const tout = await catalogueOffrable();
+  const libre = tout.filter(k => !pris.has(k.slice(k.indexOf('|') + 1)));
+  if(!libre.length) return null;
+  /* Choisie d'après la date, pas au hasard : elle ne doit pas changer si on
+     remonte puis redescend dans le flux. */
+  const g = [...today()].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7);
+  return itemDeCle(libre[g % libre.length]);
+}
+
 /* Le flux du gratuit : les cinq du jour, dans leur ordre, et rien d'autre. */
 async function remplirTirage(){
   const cles = await tirageDuJour();
@@ -1007,7 +1032,7 @@ async function topUp(){
       const picks = (bag[tid] || []).splice(-14);
       if(!picks.length) continue;
 
-      // Tout est dans le fichier : aucun appel réseau pour lire Curio.
+      // Tout est dans le fichier : aucun appel réseau pour lire __MARQUE__.
       const w = written.get(S.lang + '|' + tid);
       if(!w) continue;
       const already = new Set(ready.map(i => i.article || i.title));
@@ -1096,7 +1121,7 @@ async function fetchNext(){
 
 /* ═══════════════════ LA PIOCHE, ET LA FICHE DU JOUR ══════════════════════
    Deux choses réservées à l'abonnement et à l'achat à vie, et deux réponses
-   au même besoin : ne jamais rouvrir Curio sur ce qu'on a déjà vu.
+   au même besoin : ne jamais rouvrir __MARQUE__ sur ce qu'on a déjà vu.
 
    LA PIOCHE, c'est le geste : on veut une surprise, maintenant, sans
    parcourir. Une carte se retourne, huit couleurs défilent, une s'arrête —
@@ -1131,25 +1156,46 @@ async function itemDeCle(cle){
   return itemFromWritten(tid, titre, rec);
 }
 
-/* L'animation : huit bandes aux couleurs des univers, qui filent puis
-   ralentissent jusqu'à n'en laisser qu'une. Elle dure le temps qu'il faut
-   pour que le tirage se sente — un peu plus d'une seconde — et pas une
-   milliseconde de plus. */
+/* ── LE MOMENT DE LA PIOCHE ───────────────────────────────────────────────
+   La première version faisait défiler une bande de couleurs, comme une
+   machine à sous. C'était une animation de jeu d'argent posée sur un produit
+   de lecture : le geste disait « vous allez gagner » là où il devait dire
+   « le monde est plus étrange que vous ne le pensez ».
+
+   Ce qui reste : le fond se retire, une phrase paraît en Fraunces, un trait
+   se remplit sous elle le temps du tirage, et la fiche arrive. Rien ne
+   tourne, rien ne clignote. C'est un souffle, pas un tourniquet. */
+const PHRASES_PIOCHE = {
+  fr:[
+    "Le monde est plus étrange que vous ne le pensez.",
+    "Quelque part, un fait vrai attend d'être raconté.",
+    "Il y a toujours une histoire qu'on n'a pas encore entendue.",
+    "Ce que vous allez lire est arrivé pour de bon.",
+    "On ouvre au hasard, comme un livre trouvé chez quelqu'un.",
+    "Il reste des choses à découvrir, même un mardi.",
+    "Quelqu'un a vécu ça, et personne ne vous l'avait dit.",
+    "Le réel n'a jamais eu besoin d'être inventé."
+  ],
+  en:[
+    "The world is stranger than you think.",
+    "Somewhere, a true fact is waiting to be told.",
+    "There is always a story you have not heard yet.",
+    "What you are about to read actually happened.",
+    "Opened at random, like a book found at someone's house.",
+    "There are still things to find out, even on a Tuesday.",
+    "Someone lived through this, and nobody told you.",
+    "The real world never needed to be made up."
+  ]
+};
+
 function animerPioche(){
+  const liste = PHRASES_PIOCHE[S.lang] || PHRASES_PIOCHE.fr;
   const ovl = el('div','pioche');
-  /* Une fenêtre fixe, et une bande qui défile derrière : c'est la bande qu'on
-     anime, pas la fenêtre — sinon c'est toute la roue qui quitte l'écran. */
-  const roue = el('div','pioche__roue');
-  const piste = el('div','pioche__piste');
-  for(let i = 0; i < 18; i++){
-    const t = THEMES[i % THEMES.length];
-    const b = el('i');
-    b.style.background = 'hsl(' + (t && t.hue != null ? t.hue : (i * 40)) + ' 62% 55%)';
-    piste.appendChild(b);
-  }
-  roue.appendChild(piste);
-  ovl.appendChild(roue);
-  ovl.appendChild(el('span','pioche__tx', T()['pio.wait']));
+  const mot = el('p','pioche__mot', esc(liste[Math.floor(Math.random() * liste.length)]));
+  const jauge = el('span','pioche__trait');
+  jauge.appendChild(el('i'));
+  ovl.appendChild(mot);
+  ovl.appendChild(jauge);
   document.body.appendChild(ovl);
   requestAnimationFrame(()=> ovl.classList.add('on'));
   return ()=>{
@@ -1178,7 +1224,7 @@ async function piocher(){
     const apres = current();
     if(apres && apres.nextSibling) feed.insertBefore(carte, apres.nextSibling);
     else feed.appendChild(carte);
-    carte.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' });
+    carte.scrollIntoView({ behavior:'smooth', block:'start' });
     setActive(carte);
   } finally {
     fermer();
@@ -1208,7 +1254,7 @@ const ICON = {
   lock:'<svg viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.8a4 4 0 018 0v2.7"/></svg>'
 };
 
-/* Le fond d'une fiche est toujours dessiné par Curio : rien n'est emprunté
+/* Le fond d'une fiche est toujours dessiné par __MARQUE__ : rien n'est emprunté
    à un tiers, rien ne peut manquer, et chaque univers a sa propre matière. */
 /* ── LE FOND D'UNE FICHE ───────────────────────────────────────────────────
    L'art procédural est toujours peint : c'est le fond garanti, il ne dépend
@@ -1511,12 +1557,27 @@ async function ensureAhead(){
       const item = await fetchNext();
       if(!item){
         /* ── LA FIN DE LA JOURNÉE OFFERTE ──────────────────────────────
-           Les cinq du jour sont posées : il n'y a plus rien, et le dire
-           franchement vaut mieux que d'empiler des fiches estompées qu'on
-           ne peut pas lire. On invite, on ne frustre pas — et demain, cinq
-           autres arrivent sans rien demander à personne. */
+           Les cinq du jour restent là, entières, relisibles autant qu'on
+           veut : on ne reprend pas ce qui a été donné.
+
+           En dessous, une SIXIÈME fiche, bien réelle, dont on ne lit que le
+           début : le reste s'estompe derrière le mur. Montrer ce qu'on rate
+           est plus honnête — et plus convaincant — qu'un écran fermé qui
+           dit « revenez demain ». */
         if(S.plan === 'free' && feed.children.length && !locked){
-          feed.appendChild(buildLock('quota')); locked = true;
+          locked = true;
+          const suite = await ficheAperçu();
+          if(suite){
+            const carte = buildCard(suite);
+            carte.dataset.apercu = '1';
+            carte.classList.add('apercu');
+            carte._counted = true;
+            fillText(carte, suite);
+            poserCadenas(carte);
+            feed.appendChild(carte);
+          } else {
+            feed.appendChild(buildLock('quota'));
+          }
         } else if(!feed.children.length) feed.appendChild(buildVide());
         break;
       }
@@ -1580,7 +1641,7 @@ function activeIndex(){
 
 function resetFeed(){
   feed.innerHTML = ''; locked = false; bag = {}; offlinePool = []; ready = []; jourServi = false;
-  feed.scrollLeft = 0;
+  feed.scrollTop = 0;
   if(catalogueVide()){ feed.appendChild(buildVide()); setActive(feed.firstElementChild); return; }
   ensureAhead().then(()=>{ const f = feed.firstElementChild; if(f) setActive(f); });
 }
@@ -1636,18 +1697,22 @@ function updateActive(){
 function renderPlanTag(){
   const n = $('#planTag'); if(!n) return;
   const p = S.plan;
+  /* La même pastille en tête du panneau d'options : on doit savoir où l'on
+     en est sans refermer le panneau. */
+  const n2 = $('#planTag2');
   const nom = p === 'lifetime' ? T()['plan.life']
             : p === 'free'     ? T()['plan.free']
-            :                    T()['plan.paid'];
+            :                    T()['plan.paid'];   // sub, monthly, yearly
   // En gratuit, la pastille porte aussi le reste du jour : sur un téléphone
   // c'est le seul endroit où l'information tient, et elle répond aux deux
   // questions à la fois — quelle formule, et combien il me reste.
   const reste = Math.max(0, CONFIG.freeDaily - S.used);
   n.innerHTML = esc(nom) + (p === 'free' ? '<i>' + reste + '</i>' : '');
-  n.classList.toggle('paye', p === 'monthly' || p === 'yearly');
+  n.classList.toggle('paye', p === 'monthly' || p === 'yearly' || p === 'sub');
   n.classList.toggle('vie',  p === 'lifetime');
   n.classList.toggle('bas',  p === 'free' && reste <= 3);
   n.title = p === 'free' ? T()['plan.freeTip'] : T()['plan.paidTip'];
+  if(n2){ n2.innerHTML = n.innerHTML; n2.className = n.className; n2.title = n.title; }
   // la jauge n'a plus de sens quand la lecture est illimitée
   const q = $('#quota'); if(q) q.hidden = (p !== 'free');
 }
@@ -1791,7 +1856,7 @@ function basculerFavori(it, node){
   else {
     S.favs.unshift({
       cle, theme: it.theme,
-      article: it.article || it.title,      // le sujet, pour rouvrir la fiche dans Curio
+      article: it.article || it.title,      // le sujet, pour rouvrir la fiche dans __MARQUE__
       title: it.title,
       extract: String(it.extract || '').slice(0, 220)
     });
@@ -1805,7 +1870,7 @@ function basculerFavori(it, node){
 async function partager(it){
   if(!it) return;
   const lien = location.origin + location.pathname;
-  const payload = { title: 'Curio — ' + it.title, text: it.title, url: lien };
+  const payload = { title: '__MARQUE__ — ' + it.title, text: it.title, url: lien };
   try{
     if(navigator.share){ await navigator.share(payload); return; }
     await navigator.clipboard.writeText(it.title + ' — ' + lien);
@@ -1822,7 +1887,7 @@ function renderLib(){
   const l = $('#libList'); l.innerHTML='';
   if(!S.favs.length){ l.appendChild(el('div','empty', T().emptyLib)); return; }
   S.favs.forEach(f=>{
-    // On rouvre la fiche dans Curio. Le lecteur ne quitte jamais l'application.
+    // On rouvre la fiche dans __MARQUE__. Le lecteur ne quitte jamais l'application.
     const b = el('button','item');
     const hue = (themeById(f.theme) || { hue:200 }).hue;
     b.innerHTML = '<span class="thumb" style="background:linear-gradient(135deg,hsl('+hue+' 40% 30%),hsl('+((hue+34)%360)+' 34% 16%))"></span>'
@@ -1845,11 +1910,15 @@ $('#searchBtn').addEventListener('click', ()=>{
    plus gros ne doit pas le redemander à chaque visite. */
 (function tailleTexte(){
   const box = $('#sizer'), pop = $('#sizePop'), btn = $('#sizeBtn');
-  if(!box) return;
+  /* Le réglage existe à deux endroits — la barre du haut et le panneau
+     d'options — et les deux doivent toujours dire la même chose. */
+  const boites = [box, $('#sizer2')].filter(Boolean);
+  if(!boites.length) return;
 
   const appliquer = (v)=>{
     document.documentElement.style.setProperty('--lecture', String(v));
-    box.querySelectorAll('button').forEach(b=> b.classList.toggle('on', b.dataset.size === String(v)));
+    boites.forEach(bx => bx.querySelectorAll('button').forEach(
+      b => b.classList.toggle('on', b.dataset.size === String(v))));
     // le texte a changé de taille : l'invite « lire la suite » doit suivre
     requestAnimationFrame(()=> Array.from(feed.children).forEach(c=>{
       if(c._item) fillText(c, c._item);
@@ -1857,13 +1926,13 @@ $('#searchBtn').addEventListener('click', ()=>{
   };
   appliquer(LS.get('curio.taille', '1'));
 
-  box.addEventListener('click', e=>{
+  boites.forEach(bx => bx.addEventListener('click', e=>{
     const b = e.target.closest('button'); if(!b) return;
     LS.set('curio.taille', b.dataset.size);
     appliquer(b.dataset.size);
-  });
+  }));
 
-  if(!pop || !btn) return;
+  if(!box || !pop || !btn) return;
   const fermer = ()=>{ pop.classList.remove('open'); btn.setAttribute('aria-expanded','false'); };
   btn.addEventListener('click', e=>{
     e.stopPropagation();
@@ -1898,7 +1967,13 @@ $('#searchBtn').addEventListener('click', ()=>{
   });
   // le clic peut atterrir sur l'icône : on teste l'ancêtre, pas la cible exacte
   document.addEventListener('click', e=>{ if(!m.contains(e.target) && !b.contains(e.target)) fermer(); });
-  m.addEventListener('click', e=>{ if(e.target.closest('button')) fermer(); });
+  /* On ne referme pas le panneau quand on change un réglage : on veut voir
+     l'effet et parfois en changer un deuxième. Seules les ACTIONS le
+     referment, parce qu'elles emmènent ailleurs. */
+  m.addEventListener('click', e=>{
+    const b = e.target.closest('button');
+    if(b && b.classList.contains('opt__a')) fermer();
+  });
   document.addEventListener('keydown', e=>{ if(e.key === 'Escape') fermer(); });
 })();
 /* Le mode accroche et la pioche, dans le tiroir « … ». */
@@ -1907,6 +1982,7 @@ $('#searchBtn').addEventListener('click', ()=>{
   if(a){
     const peindre = ()=>{
       a.setAttribute('aria-pressed', S.accroches ? 'true' : 'false');
+      a.setAttribute('aria-checked', S.accroches ? 'true' : 'false');
       a.classList.toggle('on', !!S.accroches);
       /* La feuille de style a besoin de savoir : une carte qui n'affiche
          qu'une accroche se cale en bas, pas en haut. */
@@ -1982,7 +2058,7 @@ function resultRow(item){
     close();
     const card = buildCard(item);
     feed.insertBefore(card, feed.firstElementChild);
-    feed.scrollLeft = 0; setActive(card);
+    feed.scrollTop = 0; setActive(card);
   });
   return b;
 }
@@ -2112,8 +2188,14 @@ async function openSubject(themeId, title, lockedU){
   }
   markSeen(item.title);
   const card = buildCard(item);
+  /* ── RELIRE NE COÛTE PAS UNE ANECDOTE ──────────────────────────────────
+     Une fiche rouverte depuis la collection ou le sommaire ne consomme pas
+     la journée offerte : sinon garder une anecdote se retournerait contre
+     celui qui la garde, et la collection ne servirait à rien en gratuit —
+     ce qui était exactement le cas. Ce qu'on a gardé est à soi. */
+  card._counted = true;
   feed.insertBefore(card, feed.firstElementChild);
-  feed.scrollLeft = 0; setActive(card);
+  feed.scrollTop = 0; setActive(card);
   enrich(item);
 }
 
@@ -2886,24 +2968,24 @@ function go(dir){
   const cards = Array.from(feed.children);
   const i = cards.indexOf(current());
   const n = cards[i + dir];
-  if(n) n.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' });
+  if(n) n.scrollIntoView({ behavior:'smooth', block:'start' });
 }
 document.addEventListener('keydown', e=>{
   if($$('.sheet.open').length) return;
   if(e.target.tagName === 'INPUT') return;
-  /* Droite et gauche changent de fiche, comme le doigt. Haut et bas restent
-     au texte : la barre d'espace fait défiler l'article, elle ne saute plus
-     par-dessus la moitié de ce qu'on était en train de lire. */
-  if(e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
-  if(e.key === 'ArrowLeft'){ e.preventDefault(); go(-1); }
-  if(e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown'
-     || e.key === 'PageUp' || e.key === 'ArrowUp'){
+  /* Les flèches changent de fiche. La barre d'espace et Page haut/bas font
+     défiler l'ARTICLE tant qu'il en reste, puis passent à la fiche suivante :
+     au clavier comme au doigt, on ne saute pas par-dessus ce qu'on lit. */
+  if(e.key === 'ArrowDown'){ e.preventDefault(); go(1); }
+  if(e.key === 'ArrowUp'){ e.preventDefault(); go(-1); }
+  if(e.key === ' ' || e.key === 'PageDown' || e.key === 'PageUp'){
     const c = current(), lu = c && c.querySelector('.lede');
-    if(!lu) return;
-    const bas = (e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown');
-    const pas = (e.key === 'ArrowDown' || e.key === 'ArrowUp') ? 80 : Math.round(lu.clientHeight * 0.82);
+    if(!lu){ e.preventDefault(); go(e.key === 'PageUp' ? -1 : 1); return; }
+    const bas = (e.key !== 'PageUp');
+    const bout = bas ? (lu.scrollTop + lu.clientHeight >= lu.scrollHeight - 6) : (lu.scrollTop <= 2);
     e.preventDefault();
-    lu.scrollBy({ top: bas ? pas : -pas, behavior:'smooth' });
+    if(bout) go(bas ? 1 : -1);
+    else lu.scrollBy({ top: (bas ? 1 : -1) * Math.round(lu.clientHeight * 0.82), behavior:'smooth' });
   }
   const c0 = current();
   if((e.key === 'f' || e.key === 'F') && c0) basculerFavori(c0._item, c0);
@@ -3012,10 +3094,18 @@ function relock(){
   if(demarre) resetFeed();
   toast(T()['plan.back']);
 }
-// ?pro=1 débloque tout (test) — ?pro=0 revient à la version gratuite
+/* ── ESSAYER LES TROIS FORMULES ────────────────────────────────────────────
+   Trois adresses, et rien à installer :
+     ?pro=1    comme un achat à vie
+     ?pro=sub  comme un abonné
+     ?pro=0    retour à la version gratuite
+   Le réglage s'écrit dans CE navigateur — celui qui ouvre le lien — et nulle
+   part ailleurs. La console les propose en toutes lettres dans son onglet
+   Publication, pour n'avoir pas à s'en souvenir. */
 (function testUnlock(){
   const q = new URLSearchParams(location.search).get('pro');
   if(q === '1' || q === 'true'){ unlock('lifetime'); }
+  else if(q === 'sub' || q === 'abo'){ unlock('sub'); }
   else if(q === '0'){ relock(); }
 })();
 
@@ -3028,11 +3118,11 @@ function relock(){
   const n = $('#tbVer');
   if(!n || !v) return;
   n.textContent = 'v' + v.split('+')[0];
-  n.title = 'Curio ' + v;
+  n.title = '__MARQUE__ ' + v;
 })();
 
 $('#streakN').textContent = S.streak;
-applyTheme(); applyLang(); langueUnique(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount(); majPioche();
+applyTheme(); applyLang(); langueUnique(); majNomTheme(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount(); majPioche();
 
 const AUDIT = new URLSearchParams(location.search).get('audit') === '1';
 /* déplacé en tête : filtrerPubliees() en a besoin dès le premier chargement */
@@ -3042,7 +3132,7 @@ if(CURATION){
 }
 
 /* ==================== installation sur l'écran d'accueil ====================
-   Curio n'est pas distribué par un magasin d'applications : il s'installe
+   __MARQUE__ n'est pas distribué par un magasin d'applications : il s'installe
    depuis le navigateur. Le service worker rend l'ouverture instantanée et la
    lecture possible hors ligne ; le bandeau ci-dessous explique le geste, une
    seule fois, et seulement aux gens qui ne l'ont pas déjà fait.           */
@@ -3061,7 +3151,7 @@ window.addEventListener('beforeinstallprompt', e=>{
 });
 
 /* ── PROPOSER L'INSTALLATION ──────────────────────────────────────────────
-   Curio est plus agréable installé : plein écran, pas de barre d'adresse,
+   __MARQUE__ est plus agréable installé : plein écran, pas de barre d'adresse,
    une icône sur l'écran d'accueil, et la lecture hors ligne. Mais la
    proposition ne se déclenchait que là où le navigateur la fournit toute
    faite — Chrome sur Android — ou sur iPhone. Sur un ordinateur, sur un iPad

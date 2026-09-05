@@ -32,6 +32,18 @@ reglage() {
   sed -n "s/^[[:space:]]*$1:[[:space:]]*//p" consignes/publication.txt 2>/dev/null \
     | head -1 | tr -d '[:space:]'
 }
+# --- le nom du produit ------------------------------------------------------
+# Il vit dans consignes/marque.txt, et nulle part ailleurs. Les sources
+# portent le jeton __MARQUE__ ; la construction le remplace partout ou le
+# lecteur peut le lire. Les cles de memoire du navigateur, les noms de
+# fichiers et le cache du service worker gardent « curio » : changer de nom
+# ne doit deconnecter personne de sa collection.
+marque() {
+  sed -n "s/^[[:space:]]*$1:[[:space:]]*//p" consignes/marque.txt 2>/dev/null | head -1 \
+    | sed 's/[[:space:]]*$//'
+}
+NOM=$(marque nom);            [ -n "$NOM" ] || NOM="Curio"
+BASELINE=$(marque baseline)
 LANGUES=$(reglage langues); [ -n "$LANGUES" ] || LANGUES="fr,en"
 IMAGES=$(reglage images);   [ -n "$IMAGES" ]   || IMAGES="oui"
 
@@ -46,7 +58,7 @@ IMAGES=$(reglage images);   [ -n "$IMAGES" ]   || IMAGES="oui"
 # a plus rien qui puisse le rallumer.
 case "$LANGUES" in
   *,*) CACHE_LANGUE="" ;;
-  *)   CACHE_LANGUE='<style>#langBtn{display:none !important}</style>' ;;
+  *)   CACHE_LANGUE='<style>#langBtn,#ligneLangue{display:none !important}</style>' ;;
 esac
 
 doc_head() {
@@ -67,7 +79,7 @@ EOF
 # L'empreinte porte sur les SOURCES seules — jamais sur app.html, index.html
 # ni sw.js, ou elle est elle-meme inscrite : elle changerait alors a chaque
 # construction, et le service worker se croirait perime a chaque fois.
-SRC="parts VERSION manifest.webmanifest"
+SRC="parts VERSION manifest.source.webmanifest consignes/marque.txt"
 if command -v sha1sum >/dev/null 2>&1; then
   EMPREINTE=$(find $SRC -type f | sort | xargs cat | sha1sum | cut -c1-10)
 elif command -v shasum >/dev/null 2>&1; then
@@ -77,17 +89,25 @@ else
 fi
 PLEINE="$LISIBLE+$EMPREINTE"
 
+# --- le manifeste d'installation porte le nom du produit ---
+sed "s/__MARQUE__/$NOM/g" manifest.source.webmanifest > manifest.webmanifest
+
 # --- application ---
 { doc_head; cat parts/00-head.html; echo "</head>"; echo "<body>"; \
-  cat parts/10-body.html parts/20-data.js parts/30-app.js; echo "</body>"; echo "</html>"; } > app.html
+  cat parts/10-body.html parts/20-data.js parts/30-app.js; echo "</body>"; echo "</html>"; } \
+  | sed "s/__MARQUE__/$NOM/g" > app.html
 
 # --- site vitrine ---
 { doc_head; cat parts/L0-head.html; echo "</head>"; echo "<body>"; \
-  cat parts/L1-body.html parts/L2-app.js; echo "</body>"; echo "</html>"; } > index.html
+  cat parts/L1-body.html parts/L2-app.js; echo "</body>"; echo "</html>"; } \
+  | sed "s/__MARQUE__/$NOM/g" > index.html
 
 # --- versions Artifact (sans squelette de document) ---
-cat parts/00-head.html parts/10-body.html parts/20-data.js parts/30-app.js > build/curio-app.artifact.html
-cat parts/L0-head.html parts/L1-body.html parts/L2-app.js > build/curio-site.artifact.html
+cat parts/00-head.html parts/10-body.html parts/20-data.js parts/30-app.js \
+  | sed "s/__MARQUE__/$NOM/g" > build/curio-app.artifact.html
+cat parts/L0-head.html parts/L1-body.html parts/L2-app.js \
+  | sed "s/__MARQUE__/$NOM/g" > build/curio-site.artifact.html
+
 
 # --- version du service worker ----------------------------------------------
 # Le nom du cache doit changer des que le contenu change, sinon activate() ne

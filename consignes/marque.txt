@@ -1,0 +1,25 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# LE NOM DU PRODUIT
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Ce nom est écrit à un seul endroit : ici. La construction le recopie dans
+# tout ce que le lecteur voit — le titre des pages, l'en-tête du site et de
+# l'application, la FAQ, les messages, le manifeste d'installation.
+#
+# Ce qu'il NE change PAS, et c'est voulu :
+#   · le nom du dépôt et l'adresse du site ;
+#   · les clés de mémoire du navigateur (curio.lang, curio.plan…) — les
+#     changer déconnecterait tout le monde de sa collection ;
+#   · les noms de fichiers (icones/curio-192.png) ;
+#   · le nom du cache du service worker.
+# Autrement dit : la marque change, les habitudes des lecteurs ne se cassent
+# pas. C'est exactement ce qu'on veut d'un changement de nom.
+#
+# Après modification : reconstruisez (bash build.sh) et redéployez. Rien
+# d'autre. Aucune fiche n'est réécrite, aucun appel payant n'est fait.
+# ═══════════════════════════════════════════════════════════════════════════
+nom: Curio
+
+# La signature qui accompagne le nom dans l'en-tête du site.
+# Laissez vide pour n'afficher que le nom.
+baseline: Le monde est plus étrange

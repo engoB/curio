@@ -42,6 +42,12 @@ const REFAIRE  = opt('refaire', null);
 const VALIDER  = !!opt('valider', false);   // appliquer consignes/validations.json
 const VALIDS   = path.join(process.cwd(), 'consignes', 'validations.json');
 const FORCE    = opt('combien', null);
+/* ── PUBLIER TOUT CE QUI VAUT UNE CERTAINE NOTE ───────────────────────────
+   « --note-mini 9 » met en ligne, d'un seul coup, toute la réserve notée 9
+   ou plus. C'est la façon de constituer un fonds : on ouvre d'emblée ce
+   qu'on a de meilleur, et on garde le reste pour l'alimenter semaine après
+   semaine. Sans seuil, on reste au rythme du fichier de réglage. */
+const NOTE_MINI = parseInt(opt('note-mini', '0'), 10) || 0;
 
 const lire = async (p, d) => { try{ return JSON.parse(await fs.readFile(p, 'utf8')); }catch{ return d; } };
 async function ecrire(p, obj){
@@ -173,7 +179,7 @@ async function appliquerValidations(){
   const parCle = new Map(fiches.map(f => [f.lang + '|' + f.titre, f]));
   const aujourdhui = jour();
 
-  let publiees = 0, refaites = 0, retirees = 0, inconnues = 0, bloquees = 0;
+  let valides = 0, refaites = 0, retirees = 0, inconnues = 0, bloquees = 0;
   const aRetirer = [];
 
   /* On regroupe par sujet : valider le français d'un sujet publie aussi
@@ -195,24 +201,33 @@ async function appliquerValidations(){
     traites.add(idg + '|' + decision);
 
     if (decision === 'valide'){
+      /* ── VALIDER N'EST PAS PUBLIER ──────────────────────────────────────
+         Valider mettait la fiche EN LIGNE le jour même. Relire mille fiches
+         revenait donc à tout publier d'un coup : plus de réserve, plus de
+         rythme, et aucun moyen de dire « celle-ci est bonne, je la sors plus
+         tard ».
+
+         Valider veut dire : je l'ai lue, elle est bonne, elle rejoint la
+         RÉSERVE. C'est « 5 · Publier » qui décide ensuite quand elle sort, au
+         rythme de consignes/publication.txt — ou d'un coup, par l'opération
+         « publier » si vous le demandez. */
       let n = 0, mur = false;
       for (const x of lot){
-        /* Une fiche recalée par le contrôle ne part pas en ligne, même
-           validée à la lecture : la structure prime sur le goût, et on
-           préfère vous le dire plutôt que de publier en silence. */
+        /* Une fiche recalée par le contrôle ne rejoint pas la réserve, même
+           validée à la lecture : la structure prime sur le goût. */
         if (x.rec.v === 'retire' || x.rec.v === 'quarantaine'){ mur = true; continue; }
-        if (x.rec.p && x.rec.p <= aujourdhui) continue;
-        x.rec.p = aujourdhui; x.rec.v = x.rec.v || 'ok';
+        if (x.rec.p && x.rec.p <= aujourdhui) continue;   // déjà en ligne
+        if (x.rec.v === 'ok') continue;                   // déjà dans la réserve
+        x.rec.v = 'ok';
         paquets.get(x.chemin).modifie = true; n++;
       }
       if (!n && mur){
         bloquees++;
-        console.log(`  ! ${lot[0].rec.t || lot[0].titre} — validée, mais en quarantaine : non publiée.`);
+        console.log(`  ! ${lot[0].rec.t || lot[0].titre} — validée, mais en quarantaine : écartée.`);
       }
       if (n){
-        publiees++;
-        if (g && g.sujet){ g.sujet.statut = 'publie'; g.sujet.publie = aujourdhui; }
-        console.log(`  ● ${lot.map(x => x.lang.toUpperCase()).join('+')}  ${lot[0].rec.t || lot[0].titre}`);
+        valides++;
+        console.log(`  ✓ ${lot.map(x => x.lang.toUpperCase()).join('+')}  ${lot[0].rec.t || lot[0].titre}`);
       }
     } else if (decision === 'refaire'){
       for (const x of lot){ delete paquets.get(x.chemin).j.items[x.titre]; paquets.get(x.chemin).modifie = true; }
@@ -245,7 +260,9 @@ async function appliquerValidations(){
   await fs.writeFile(VALIDS, '{}\n', 'utf8');
 
   console.log(`\n╔══ RELECTURE APPLIQUÉE ════════════════════════════════════`);
-  console.log(`║  ${publiees} sujet(s) publié(s) aujourd'hui`);
+  console.log(`║  ${valides} sujet(s) validé(s) — ils rejoignent la RÉSERVE.`);
+  console.log(`║  Ils sortiront au rythme de consignes/publication.txt, ou tout de suite`);
+  console.log(`║  avec l’opération « publier ».`);
   console.log(`║  ${refaites} remis à écrire`);
   console.log(`║  ${retirees} retiré(s) définitivement`);
   if (bloquees) console.log(`║  ${bloquees} validée(s) mais retenue(s) par le contrôle — voir controle.csv`);
@@ -437,7 +454,7 @@ async function main(){
      L'action tourne tous les jours ; c'est ici qu'on décide si aujourd'hui
      compte. Une publication lancée à la main (« publier » + un nombre) passe
      outre : c'est vous qui décidez, pas le calendrier. */
-  if (!FORCE && !estJourDePublication(par)){
+  if (!FORCE && !NOTE_MINI && !estJourDePublication(par)){
     console.log(`\nRythme « ${par.rythme}${par.jours.length ? ' ' + par.jours.join(',') : ''} » : `
               + `aujourd'hui n'est pas un jour de publication. Rien n'est publié.`);
     return;
@@ -448,7 +465,7 @@ async function main(){
   /* « Tout sortir d'ici le 31 décembre » : on compte les passages restants
      et on répartit. Le nombre par passage se recalcule à chaque exécution,
      donc il s'ajuste tout seul si vous écrivez de nouvelles fiches. */
-  if (!FORCE && par.jusquAu){
+  if (!FORCE && !NOTE_MINI && par.jusquAu){
     const passages = passagesJusqua(par, par.jusquAu);
     if (passages > 0){
       combien = Math.max(1, Math.ceil(b.prets / passages));
@@ -460,7 +477,7 @@ async function main(){
     }
   }
 
-  if (combien <= 0){
+  if (combien <= 0 && !NOTE_MINI){
     console.log('\nRythme réglé à zéro dans consignes/publication.txt : rien n’est publié.');
     return;
   }
@@ -479,6 +496,21 @@ async function main(){
 
   const note = (g) => Math.max(...g.fiches.map(f => (f.rec.s == null ? -1 : f.rec.s)));
   const pot  = (g) => (g.sujet && g.sujet.potentiel) || 0;
+
+  /* Le seuil de note : on ne publie que ce qui l'atteint, et on publie TOUT
+     ce qui l'atteint. Le nombre par passage ne s'applique plus — c'est une
+     ouverture de fonds, pas un passage quotidien. */
+  if (NOTE_MINI){
+    const avant = candidats.length;
+    candidats = candidats.filter(g => note(g) >= NOTE_MINI);
+    combien = candidats.length;
+    console.log(`\n▸ Ouverture du fonds : note ${NOTE_MINI}/10 minimum.`);
+    console.log(`  ${candidats.length} sujet(s) sur ${avant} de la réserve atteignent ce seuil.`);
+    if (!candidats.length){
+      console.log('  Rien à ce niveau : relisez et validez d’abord, ou baissez le seuil.');
+      return;
+    }
+  }
   if (par.ordre === 'note')      candidats.sort((a, b2) => note(b2) - note(a));
   else if (par.ordre === 'hasard') candidats.sort(() => Math.random() - 0.5);
   else                            candidats.sort((a, b2) => pot(b2) - pot(a) || note(b2) - note(a));

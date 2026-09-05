@@ -1,10 +1,10 @@
-<title>Curio</title>
+<title>__MARQUE__</title>
 <meta name="description" content="Des anecdotes vraies, écrites pour être lues : deux minutes par récit, une par écran. Cosmos, histoire, vivant, mystères." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&family=Archivo:wght@400;500;600;700&display=swap" />
 
-<!-- Curio s'installe sur l'écran d'accueil comme une application : plein
+<!-- __MARQUE__ s'installe sur l'écran d'accueil comme une application : plein
      écran, sans barre d'adresse, et lisible hors ligne. -->
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="icones/curio-180.png" />
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Curio" />
+<meta name="apple-mobile-web-app-title" content="__MARQUE__" />
 <style>
 /* ============================================================
    CURIO — design tokens
@@ -177,18 +177,91 @@ a{color:var(--accent);text-decoration:none}
 .topbar > *{pointer-events:auto;flex:0 0 auto}
 .tbgap{flex:1 1 auto !important;min-width:0}
 
-/* le tiroir « … » : ce qui ne tient pas sur un telephone */
+/* ── LE PANNEAU D'OPTIONS ─────────────────────────────────────────────────
+   Une colonne, des sections intitulées, une ligne par réglage : l'intitulé à
+   gauche, la commande à droite, toutes alignées sur la même verticale. Les
+   actions, elles, prennent toute la largeur. C'est ce qui distingue un
+   panneau d'un tiroir où l'on aurait jeté des boutons. */
 .tbmore{
-  position:absolute;top:100%;right:clamp(10px,3vw,24px);
-  display:none;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;
-  max-width:min(320px,86vw);
-  padding:10px 11px;border-radius:14px;
+  position:absolute;top:calc(100% + 6px);right:clamp(10px,3vw,24px);
+  display:none;flex-direction:column;
+  width:min(300px,88vw);max-height:min(78vh,560px);overflow-y:auto;
+  padding:6px;border-radius:16px;
   border:1px solid var(--line-strong);background:var(--ink-2);
-  box-shadow:0 22px 60px -26px rgba(0,0,0,.75);
+  box-shadow:0 26px 70px -28px rgba(0,0,0,.8);
+  scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
 }
 .tbmore.open{display:flex}
+.opt__tete{
+  display:flex;align-items:center;gap:9px;padding:9px 10px 10px;
+  border-bottom:1px solid var(--line);margin-bottom:4px;
+}
+.opt__titre{
+  font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text-3);
+}
+.opt__tete .planbadge{margin-left:auto}
+.opt__sect{
+  margin:10px 0 2px;padding:0 10px;
+  font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);
+}
+.opt__l{
+  display:flex;align-items:center;gap:10px;min-height:40px;padding:0 10px;
+  font-size:13.5px;color:var(--text);
+}
+.opt__l > span:first-child{flex:1 1 auto;min-width:0}
+.opt__v{
+  flex:none;display:inline-flex;align-items:center;gap:7px;
+  height:30px;padding:0 11px;border-radius:9px;
+  border:1px solid var(--line);background:var(--ink);color:var(--text-2);
+  font:inherit;font-size:11.5px;font-weight:700;letter-spacing:.06em;
+  cursor:pointer;transition:color .16s,border-color .16s;
+}
+.opt__v:hover{color:var(--text);border-color:var(--line-strong)}
+.opt__v svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
+/* L'interrupteur : la forme que tout le monde reconnaît. */
+.bascule{
+  flex:none;width:42px;height:24px;border-radius:999px;padding:0;cursor:pointer;
+  border:1px solid var(--line-strong);background:var(--ink);
+  position:relative;transition:background .18s,border-color .18s;
+}
+.bascule i{
+  position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:var(--text-3);transition:transform .18s ease,background .18s;
+}
+.bascule.on{background:var(--accent-soft);border-color:var(--accent)}
+.bascule.on i{transform:translateX(18px);background:var(--accent)}
+/* Une action occupe la ligne entière : on la lit comme un verbe. */
+.opt__a{
+  display:flex;align-items:center;gap:10px;width:100%;
+  min-height:40px;padding:0 10px;border-radius:10px;
+  border:0;background:none;color:var(--text);
+  font:inherit;font-size:13.5px;text-align:left;cursor:pointer;
+  transition:background .14s;
+}
+.opt__a:hover{background:var(--panel-hi)}
+.opt__a svg{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;color:var(--text-3)}
+.opt__a--or{color:var(--brass)}
+.opt__a--or svg{color:var(--brass)}
+.opt__pied{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-top:8px;padding:9px 10px 5px;border-top:1px solid var(--line);
+}
+.sizer--opt{flex:none}
+.sizer--opt button{width:30px;height:28px}
+/* Une seule langue publiée : la ligne « Langue » n'a rien à proposer, et
+   build.sh l'éteint avec le bouton — sinon il resterait un intitulé en face
+   du vide. */
 .iconbtn--more{position:relative}
 @media (min-width:900px){
+  /* Sur grand écran le panneau reste un panneau : il s'ouvre par le bouton
+     « … » comme sur un téléphone. L'ancienne version le dépliait dans la
+     barre, ce qui l'étalait sur toute la largeur et rendait le bouton
+     inutile — c'est précisément ce qui le faisait passer pour cassé. */
+  .tbmore{max-height:min(70vh,620px)}
   /* Sur grand écran tout tient : le tiroir se déplie dans la barre, et le
      bouton « … » n'a plus lieu d'être.
 
@@ -197,11 +270,6 @@ a{color:var(--accent);text-decoration:none}
      donc sur ce `display:none`. Résultat, le bouton restait affiché à côté
      d'un tiroir déjà déplié — on cliquait, il basculait une classe qui ne
      changeait plus rien, et le bouton passait pour cassé. */
-  .iconbtn--more{display:none !important}
-  .tbmore{
-    position:static;display:flex;background:none;border:0;box-shadow:none;
-    padding:0;max-width:none;
-  }
 }
 
 .brand{display:flex;align-items:baseline;gap:9px;letter-spacing:-.02em;min-width:0}
@@ -248,27 +316,20 @@ a{color:var(--accent);text-decoration:none}
 .streak svg{width:14px;height:14px;fill:currentColor}
 
 /* ---------- feed ----------
-   ── ON CHANGE DE FICHE EN BALAYANT SUR LE CÔTÉ ──────────────────────────
-   Le flux défilait verticalement, et le texte de chaque fiche défilait
-   verticalement lui aussi : deux gestes identiques pour deux actions
-   opposées. Sur un téléphone, un pouce qui voulait lire la suite du texte
-   emportait la fiche entière, et on compensait en rétrécissant la zone de
-   lecture — d'où le manque de place.
-
-   Le haut et le bas appartiennent désormais au TEXTE, sans partage. La
-   gauche et la droite changent de fiche. Chaque geste a une seule
-   signification, et l'article peut occuper tout l'écran. */
+   Le flux défile VERTICALEMENT, une fiche par écran. La place gagnée pour le
+   texte ne vient pas de l'axe : elle vient de `flex:1 1 auto` sur la zone de
+   lecture et du fait que la phrase à raconter défile AVEC le texte au lieu
+   de lui prendre une bande fixe. Les deux gestes cohabitent grâce à
+   `overscroll-behavior:contain` sur la zone de lecture : tant qu'il reste du
+   texte, le doigt le fait défiler ; arrivé au bout, il emmène la fiche. */
 .feed{
-  height:100dvh;display:flex;flex-direction:row;
-  overflow-x:scroll;overflow-y:hidden;scroll-snap-type:x mandatory;
+  height:100dvh;overflow-y:scroll;scroll-snap-type:y mandatory;
   scrollbar-width:none;-ms-overflow-style:none;
-  overscroll-behavior-x:contain;
 }
 .feed::-webkit-scrollbar{display:none}
 
 .card{
-  position:relative;flex:0 0 100%;width:100%;height:100dvh;
-  scroll-snap-align:start;scroll-snap-stop:always;
+  position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;
   overflow:hidden;display:flex;align-items:flex-end;isolation:isolate;
 }
 [hidden]{display:none !important}
@@ -690,37 +751,36 @@ a{color:var(--accent);text-decoration:none}
 }
 
 /* ── LA PIOCHE ────────────────────────────────────────────────────────────
-   Huit bandes aux couleurs des univers filent derrière une fenêtre étroite,
-   puis ralentissent : on voit le tirage avoir lieu. L'écran s'assombrit à
-   peine — c'est un geste, pas une interruption. */
+   Un fond qui se retire, une phrase, un trait qui se remplit. Aucune roue :
+   une machine à sous n'a rien à faire dans une application de lecture. */
 .pioche{
-  position:fixed;inset:0;z-index:90;display:grid;place-items:center;gap:18px;
-  align-content:center;
-  background:color-mix(in srgb, var(--ink) 93%, transparent);
-  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
-  opacity:0;transition:opacity .28s ease;
+  position:fixed;inset:0;z-index:90;display:grid;place-items:center;align-content:center;
+  gap:26px;padding:32px;
+  background:color-mix(in srgb, var(--ink) 94%, transparent);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  opacity:0;transition:opacity .3s ease;
 }
 .pioche.on{opacity:1}
 .pioche.fini{opacity:0}
-.pioche__roue{
-  width:min(280px,72vw);height:78px;border-radius:16px;overflow:hidden;
-  border:1px solid var(--line-strong);
-  box-shadow:0 24px 60px -20px rgba(0,0,0,.6);
+.pioche__mot{
+  margin:0;max-width:22ch;text-align:center;text-wrap:balance;
+  font-family:Fraunces,Georgia,serif;font-weight:450;
+  font-variation-settings:"SOFT" 26,"WONK" 1;
+  font-size:clamp(21px,4.4vw,30px);line-height:1.24;letter-spacing:-.02em;
+  color:var(--text);
 }
-.pioche__piste{display:flex;flex-direction:column;will-change:transform}
-.pioche__piste i{flex:0 0 78px;display:block}
+.pioche__trait{
+  display:block;width:min(180px,50vw);height:2px;border-radius:2px;
+  background:var(--line-strong);overflow:hidden;
+}
+.pioche__trait i{display:block;height:100%;width:0;background:var(--accent)}
 @media (prefers-reduced-motion:no-preference){
-  .pioche__piste{ animation:defile 1.35s cubic-bezier(.2,.8,.2,1) forwards }
+  .pioche.on .pioche__mot{ animation:souffle .7s cubic-bezier(.16,1,.3,1) both }
+  .pioche.on .pioche__trait i{ animation:remplit 1.25s cubic-bezier(.4,0,.2,1) forwards }
 }
-@keyframes defile{
-  0%   { transform:translateY(0) }
-  70%  { transform:translateY(-1014px) }
-  100% { transform:translateY(-1092px) }
-}
-.pioche__tx{
-  font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--text-2);
-}
+@media (prefers-reduced-motion:reduce){ .pioche__trait i{width:100%} }
+@keyframes souffle{ from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+@keyframes remplit{ from{width:0} to{width:100%} }
 .card.piochee .card__body{animation:rise .5s cubic-bezier(.16,1,.3,1) both}
 
 /* ── LE REPÈRE DE FIN DE LECTURE ──────────────────────────────────────────
@@ -729,20 +789,21 @@ a{color:var(--accent);text-decoration:none}
    Discret par construction — pas de fond, pas d'étiquette, et il s'efface dès
    qu'on remonte dans l'article. */
 .suivante{
-  position:absolute;z-index:4;right:6px;top:50%;transform:translateY(-50%);
+  position:absolute;z-index:4;left:50%;transform:translateX(-50%);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 6px);
   width:38px;height:38px;display:grid;place-items:center;
   color:var(--text-2);opacity:0;pointer-events:none;
   transition:opacity .45s ease;
 }
-.suivante svg{width:22px;height:22px}
+.suivante svg{width:22px;height:22px;transform:rotate(90deg)}
 .suivante.vu{opacity:.62;pointer-events:auto;cursor:pointer}
 .suivante.vu:hover{opacity:1;color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){
   .suivante.vu svg{animation:appelle 2.4s ease-in-out 3}
 }
 @keyframes appelle{
-  0%,100%{transform:translateX(0)}
-  50%{transform:translateX(5px)}
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(5px)}
 }
 
 /* ---------- fin d'article : garder, partager, et la suite ---------- */
