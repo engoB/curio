@@ -1,4 +1,75 @@
-# Curio 8.6.2 — ce qui a changé depuis v6
+# Curio 8.7.0 — ce qui a changé depuis v6
+
+## 8.7.0 — la journée offerte, et la lecture reprise à l'endroit
+
+**Aucun outil, aucune consigne, aucun catalogue n'est touché par cette
+version.** Elle ne concerne que le site et l'application : vos 276 fiches
+écrites et vos lots en cours ne bougent pas d'un octet.
+
+### Le gratuit devient une journée, pas un compteur
+
+Cinq anecdotes, tirées au hasard le matin, à vous jusqu'à minuit. Demain, cinq
+autres, et celles d'hier s'en vont. **Une même anecdote ne peut pas revenir
+avant deux mois.**
+
+Le tirage est arrêté pour la journée : rouvrir l'application ne rebat pas les
+cartes — sans quoi il suffirait de recharger la page. Vérifié sur trois
+journées simulées : cinq fiches par jour, aucun chevauchement, tirage stable
+d'une ouverture à l'autre, et le mur « C'est tout pour aujourd'hui » exactement
+après la cinquième.
+
+Les fiches estompées ont disparu : une anecdote offerte se lit jusqu'au bout,
+ou elle n'est pas proposée.
+
+### On change de fiche en balayant sur le côté
+
+Le flux défilait vers le bas, et le texte de chaque fiche défilait vers le bas
+lui aussi : deux gestes identiques pour deux actions opposées. Un pouce qui
+voulait lire la suite emportait la fiche entière — et on compensait en
+rétrécissant la zone de lecture.
+
+Le haut et le bas appartiennent maintenant au **texte**, la gauche et la droite
+changent de fiche. Résultat mesuré sur un écran de 390 × 844 : la zone de
+lecture passe à **74 % de la hauteur de l'écran**.
+
+La phrase à raconter descend avec elle, à la fin du texte : on la découvre en
+arrivant au bout de la fiche, à son moment. Son bouton « copier » a été retiré.
+Un chevron discret apparaît sur le bord droit quand on atteint la fin.
+
+### Le mode accroche
+
+Un bouton dans le tiroir « … » : chaque fiche s'arrête à sa phrase d'ouverture,
+et un bouton la déplie. De quoi trouver le sujet qui intrigue sans lire huit
+fiches en entier.
+
+### La pioche, et la fiche du jour
+
+Réservées à l'abonnement et à l'achat à vie. La **pioche** tire une anecdote au
+hasard dans tout le catalogue, avec une roue de couleurs qui ralentit — elle
+évite ce qui vient d'être lu. La **fiche du jour** ouvre le flux d'un abonné
+sur une anecdote qu'il n'a pas vue, une par jour : celui qui paie a lui aussi
+son rendez-vous, mais sans compteur.
+
+### Trois défauts trouvés en vérifiant
+
+| | ce qui n'allait pas |
+|---|---|
+| Le bouton « … » | `.iconbtn{display:grid}` est écrit plus bas dans la feuille que le `display:none` du grand écran, à spécificité égale : le bouton restait affiché à côté d'un tiroir déjà déplié, et paraissait cassé. Même famille que le bouton FR/EN. |
+| La fin d'abonnement | Le flux gardait le catalogue entier jusqu'au prochain rechargement. |
+| La fiche du jour | Empilée avant les autres, elle sortait en dernier — un rendez-vous qu'on manquait. |
+
+### Le site
+
+L'étape « Lisez » devient « Deux minutes, une histoire entière », et cesse de
+se défendre. Quatre entrées de la FAQ ont été retirées ; deux autres ont été
+réécrites parce que les nouvelles règles les rendaient fausses — celle sur la
+version gratuite, et celle qui promettait qu'un accès ne se perd jamais.
+
+### L'installation
+
+Elle n'était proposée que sur Chrome Android et sur iPhone. Elle l'est
+maintenant partout, avec le mode d'emploi de la machine qu'on a sous les yeux —
+ordinateur compris — et après deux fiches lues au lieu de trois.
 
 ## 8.6.2 — le menu comptait des sujets déjà écrits
 

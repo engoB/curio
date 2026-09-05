@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#050E24" />
-<meta name="curio-version" content="8.6.2+8846adda15" />
+<meta name="curio-version" content="8.7.0+e812251127" />
 <meta name="curio-langues" content="fr" />
 <meta name="curio-images" content="oui" />
 <style>#langBtn{display:none !important}</style>
@@ -199,8 +199,15 @@ a{color:var(--accent);text-decoration:none}
 .tbmore.open{display:flex}
 .iconbtn--more{position:relative}
 @media (min-width:900px){
-  /* sur grand ecran tout tient : le tiroir se deplie dans la barre */
-  .iconbtn--more{display:none}
+  /* Sur grand écran tout tient : le tiroir se déplie dans la barre, et le
+     bouton « … » n'a plus lieu d'être.
+
+     Le `!important` n'est pas une facilité : `.iconbtn{display:grid}` est
+     écrit PLUS BAS dans cette feuille, à spécificité égale, et l'emportait
+     donc sur ce `display:none`. Résultat, le bouton restait affiché à côté
+     d'un tiroir déjà déplié — on cliquait, il basculait une classe qui ne
+     changeait plus rien, et le bouton passait pour cassé. */
+  .iconbtn--more{display:none !important}
   .tbmore{
     position:static;display:flex;background:none;border:0;box-shadow:none;
     padding:0;max-width:none;
@@ -250,15 +257,28 @@ a{color:var(--accent);text-decoration:none}
 }
 .streak svg{width:14px;height:14px;fill:currentColor}
 
-/* ---------- feed ---------- */
+/* ---------- feed ----------
+   ── ON CHANGE DE FICHE EN BALAYANT SUR LE CÔTÉ ──────────────────────────
+   Le flux défilait verticalement, et le texte de chaque fiche défilait
+   verticalement lui aussi : deux gestes identiques pour deux actions
+   opposées. Sur un téléphone, un pouce qui voulait lire la suite du texte
+   emportait la fiche entière, et on compensait en rétrécissant la zone de
+   lecture — d'où le manque de place.
+
+   Le haut et le bas appartiennent désormais au TEXTE, sans partage. La
+   gauche et la droite changent de fiche. Chaque geste a une seule
+   signification, et l'article peut occuper tout l'écran. */
 .feed{
-  height:100dvh;overflow-y:scroll;scroll-snap-type:y mandatory;
+  height:100dvh;display:flex;flex-direction:row;
+  overflow-x:scroll;overflow-y:hidden;scroll-snap-type:x mandatory;
   scrollbar-width:none;-ms-overflow-style:none;
+  overscroll-behavior-x:contain;
 }
 .feed::-webkit-scrollbar{display:none}
 
 .card{
-  position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;
+  position:relative;flex:0 0 100%;width:100%;height:100dvh;
+  scroll-snap-align:start;scroll-snap-stop:always;
   overflow:hidden;display:flex;align-items:flex-end;isolation:isolate;
 }
 [hidden]{display:none !important}
@@ -313,6 +333,15 @@ a{color:var(--accent);text-decoration:none}
    déborde VERS LE HAUT et passe sous la barre. Avec margin-top:auto il reste
    toujours sous elle, et c'est le bas qui défile. */
 .card__body > :first-child{margin-top:auto}
+/* Sur un écran étroit, le calage en bas coûte une place qu'on n'a pas : la
+   fiche commence sous la barre et descend, tout simplement. */
+@media (max-width:760px){
+  .card__body > :first-child{margin-top:0}
+  /* En mode accroche il n'y a qu'une phrase : la caler en haut laisserait un
+     grand vide sous elle. On revient alors au calage en bas, celui d'une
+     carte qui n'a que peu à dire. */
+  [data-accroches] .card__body > :first-child{margin-top:auto}
+}
 .card.is-active .card__body > *{animation:rise .62s cubic-bezier(.16,1,.3,1) both}
 .card.is-active .card__body > *:nth-child(2){animation-delay:.06s}
 .card.is-active .card__body > *:nth-child(3){animation-delay:.12s}
@@ -338,9 +367,20 @@ a{color:var(--accent);text-decoration:none}
   line-height:1.08;letter-spacing:-.025em;
   margin:0 0 20px;text-wrap:balance;
 }
+/* ── LA ZONE DE LECTURE PREND LA PLACE ────────────────────────────────────
+   Elle était en `flex:0 1 auto` : elle ne prenait que ce dont le texte avait
+   besoin, et se faisait comprimer par tout le reste. Sur un téléphone, entre
+   le bandeau, le titre, la phrase à raconter et la rangée de boutons, il
+   restait quatre lignes d'article — alors que l'article est ce qu'on vient
+   lire. En `flex:1 1 auto`, c'est l'inverse : le texte prend toute la hauteur
+   disponible, et ce sont les autres qui s'arrangent.
+
+   La phrase à raconter et la rangée de fin sont maintenant DANS cette zone,
+   posées après le dernier paragraphe : on les rencontre au bout de la
+   lecture, à leur place. */
 .card .lede{
   margin:0 0 18px;max-width:60ch;
-  flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;scrollbar-width:thin;
   scrollbar-color:var(--line-strong) transparent;
 }
@@ -617,6 +657,8 @@ a{color:var(--accent);text-decoration:none}
 @media (max-width:400px){ .gate .btn{flex:1 1 100%} }
 
 /* ---------- la version courte, celle qu'on dit à voix haute ---------- */
+.card .lede .dire{margin-top:26px}
+.card .lede .endrow{margin-bottom:4px}
 .dire{
   position:relative;margin:18px 0 0;padding:15px 17px 15px 18px;
   border-radius:0 14px 14px 0;border-left:2px solid var(--accent);
@@ -628,20 +670,90 @@ a{color:var(--accent);text-decoration:none}
   color:var(--accent);
 }
 .dire__tx{
-  margin:0;padding-right:64px;
+  margin:0;
   font-family:Fraunces,Georgia,serif;font-weight:400;font-variation-settings:"SOFT" 26;
   font-size:calc(clamp(16px,1.9vw,18.5px) * var(--lecture));
   line-height:1.45;letter-spacing:-.008em;color:var(--text);
 }
-.dire__cp{
-  position:absolute;top:12px;right:12px;
-  height:28px;padding:0 11px;border-radius:9px;
-  border:1px solid var(--accent);color:var(--accent);
-  font-size:11px;font-weight:700;letter-spacing:.04em;
-  transition:background .15s,color .15s;
+/* Le bouton « copier » a été retiré : on ne copie pas une phrase qu'on va
+   dire à voix haute, et il mangeait la largeur de cette phrase. */
+
+/* ── LE MODE ACCROCHE ─────────────────────────────────────────────────────
+   Le bouton qui déplie une fiche : franc, à la largeur du texte, il fait
+   partie de la lecture et non de l'habillage. */
+.deplier{
+  display:block;width:100%;max-width:60ch;margin:18px 0 0;
+  padding:11px 14px;border-radius:11px;
+  border:1px dashed var(--line-strong);background:none;color:var(--accent);
+  font:inherit;font-size:13px;font-weight:700;letter-spacing:.03em;
+  cursor:pointer;transition:background .16s,border-color .16s;
 }
-.dire__cp:hover{background:var(--accent);color:var(--accent-ink)}
-@media (max-width:420px){ .dire__tx{padding-right:0} .dire__cp{position:static;margin-top:10px} }
+.deplier:hover{background:var(--accent-soft);border-color:var(--accent)}
+.chip.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* ── LA MARQUE DE LA FICHE DU JOUR ────────────────────────────────────── */
+.marquejour{
+  display:inline-block;align-self:flex-start;margin:0 0 10px;
+  padding:4px 10px;border-radius:8px;
+  font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--brass);background:var(--brass-soft);border:1px solid var(--brass-soft);
+}
+
+/* ── LA PIOCHE ────────────────────────────────────────────────────────────
+   Huit bandes aux couleurs des univers filent derrière une fenêtre étroite,
+   puis ralentissent : on voit le tirage avoir lieu. L'écran s'assombrit à
+   peine — c'est un geste, pas une interruption. */
+.pioche{
+  position:fixed;inset:0;z-index:90;display:grid;place-items:center;gap:18px;
+  align-content:center;
+  background:color-mix(in srgb, var(--ink) 93%, transparent);
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  opacity:0;transition:opacity .28s ease;
+}
+.pioche.on{opacity:1}
+.pioche.fini{opacity:0}
+.pioche__roue{
+  width:min(280px,72vw);height:78px;border-radius:16px;overflow:hidden;
+  border:1px solid var(--line-strong);
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.6);
+}
+.pioche__piste{display:flex;flex-direction:column;will-change:transform}
+.pioche__piste i{flex:0 0 78px;display:block}
+@media (prefers-reduced-motion:no-preference){
+  .pioche__piste{ animation:defile 1.35s cubic-bezier(.2,.8,.2,1) forwards }
+}
+@keyframes defile{
+  0%   { transform:translateY(0) }
+  70%  { transform:translateY(-1014px) }
+  100% { transform:translateY(-1092px) }
+}
+.pioche__tx{
+  font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--text-2);
+}
+.card.piochee .card__body{animation:rise .5s cubic-bezier(.16,1,.3,1) both}
+
+/* ── LE REPÈRE DE FIN DE LECTURE ──────────────────────────────────────────
+   Un chevron sur le bord droit, invisible tant qu'il reste du texte. Quand on
+   arrive au bout, il apparaît et respire une fois : la suite est par là.
+   Discret par construction — pas de fond, pas d'étiquette, et il s'efface dès
+   qu'on remonte dans l'article. */
+.suivante{
+  position:absolute;z-index:4;right:6px;top:50%;transform:translateY(-50%);
+  width:38px;height:38px;display:grid;place-items:center;
+  color:var(--text-2);opacity:0;pointer-events:none;
+  transition:opacity .45s ease;
+}
+.suivante svg{width:22px;height:22px}
+.suivante.vu{opacity:.62;pointer-events:auto;cursor:pointer}
+.suivante.vu:hover{opacity:1;color:var(--accent)}
+@media (prefers-reduced-motion:no-preference){
+  .suivante.vu svg{animation:appelle 2.4s ease-in-out 3}
+}
+@keyframes appelle{
+  0%,100%{transform:translateX(0)}
+  50%{transform:translateX(5px)}
+}
 
 /* ---------- fin d'article : garder, partager, et la suite ---------- */
 .endrow{
@@ -1282,6 +1394,16 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
       <svg viewBox="0 0 24 24" id="themeIcon"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
     </button>
     <button class="langbtn" id="paletteBtn" title="Jeu de couleurs : bleu nuit ou encre d'origine">BLEU</button>
+    <!-- Ne montrer que les accroches : pour trouver vite le sujet qui intrigue. -->
+    <button class="chip" id="accBtn" aria-pressed="false">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h6"/></svg>
+      <span data-i18n="acc.mode">Accroches seules</span>
+    </button>
+    <!-- La pioche : réservée à l'abonnement et à l'achat à vie. -->
+    <button class="chip chip--or" id="pioBtn" hidden>
+      <svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.6 5 .6-3.7 3.4 1 4.9L12 14.1 7.6 16.5l1-4.9L4.9 8.2l5-.6L12 3z"/></svg>
+      <span data-i18n="pio.cta">Piocher</span>
+    </button>
     <button class="chip" id="shuffleBtn">
       <svg viewBox="0 0 24 24"><path d="M3 6h4l10 12h4M3 18h4l3-3.6M14.5 8.6L17 6h4M18 3l3 3-3 3M18 15l3 3-3 3"/></svg>
       <span data-i18n="shuffle">Tout mélanger</span>
@@ -1313,7 +1435,7 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
         <div class="universes" id="obUniverses"></div>
       </div>
       <button class="btn btn--primary" id="obStart" data-i18n="ob.cta">Commencer à explorer</button>
-      <p class="fineprint" data-i18n="ob.note">10 anecdotes offertes chaque jour. Aucune inscription requise.</p>
+      <p class="fineprint" data-i18n="ob.note">5 anecdotes offertes chaque jour, renouvelées chaque matin. Aucune inscription requise.</p>
       <p class="fineprint fineprint--src" data-i18n="ob.source">Chaque anecdote est écrite pour Curio à partir de faits vérifiés, puis relue avant publication.</p>
     </div>
   </div>
@@ -1483,9 +1605,16 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
    Gumroad, Paddle…). Voir README.md.
    ========================================================================= */
 const CONFIG = {
-  freeDaily: 10,
-  // Le gratuit n'enferme personne dans deux univers : dix anecdotes par
-  // jour, prises partout. C'est le nombre qui limite, pas le sujet.
+  // ── LA JOURNÉE OFFERTE ──────────────────────────────────────────────
+  // Cinq anecdotes, tirées au hasard chaque matin dans les huit univers, à
+  // lire jusqu'à minuit. Le lendemain, cinq autres, et celles de la veille
+  // ne sont plus accessibles. Une même anecdote ne peut pas revenir avant
+  // deux mois (MEMOIRE_JOURS, dans 30-app.js).
+  //
+  // Ce n'est plus un compteur qu'on épuise, c'est une journée qu'on habite :
+  // le gratuit donne une vraie raison de revenir demain, et l'abonnement une
+  // vraie raison de ne pas attendre.
+  freeDaily: 5,
   freeThemes: ['cosmos','vivant','histoire','esprit','sciences','mysteres','terre','arts'],
   // Catalogue étendu généré par tools/build-catalog.mjs (facultatif).
   // Absent => l'app utilise uniquement les listes SOURCES ci-dessous.
@@ -1590,7 +1719,7 @@ const I18N = {
     'ob.title':'Le monde est <em>plus étrange</em> que vous ne le pensez.',
     'ob.sub':"Des faits vrais, écrits pour être lus : deux minutes par anecdote, une par écran. Choisissez vos univers pour commencer.",
     'ob.cta':'Commencer à explorer',
-    'ob.note':'10 anecdotes offertes chaque jour. Aucune inscription requise.',
+    'ob.note':'5 anecdotes offertes chaque jour, renouvel\u00e9es chaque matin. Aucune inscription requise.',
     'uni.title':'Vos univers','uni.sub':'Sélectionnez les mondes qui alimentent votre flux. Vous pouvez en combiner autant que vous voulez.',
     'uni.apply':'Appliquer','uni.all':'Tout sélectionner',
     'pay.title':'Passez en illimité','pay.sub':"Plus de compteur quotidien. Vous lisez autant que vous voulez, et les nouveautés arrivent chaque semaine.",
@@ -1644,23 +1773,34 @@ const I18N = {
     'vide.title':"Il n'y a encore rien \u00e0 lire",
     'vide.body':"C'est normal : ce d\u00e9p\u00f4t est neuf. Ouvrez GitHub, onglet Actions, lancez \u00ab 1-collecter \u00bb pour rassembler des sujets, puis choisissez-les dans la vue Curation et faites-les \u00e9crire avec \u00ab 4-ecrire \u00bb. Les anecdotes appara\u00eetront ici toutes seules.",
     'plan.free':'Gratuit','plan.paid':'Illimit\u00e9','plan.life':'\u00c0 vie',
-    'plan.freeTip':'10 anecdotes par jour, les 8 univers','plan.paidTip':'Lecture illimit\u00e9e',
-    'plan.back':'Abonnement termin\u00e9 : retour \u00e0 10 anecdotes par jour. Votre collection est conserv\u00e9e.',
+    'plan.freeTip':'5 anecdotes par jour, les 8 univers','plan.paidTip':'Lecture illimit\u00e9e',
+    'plan.back':'Abonnement termin\u00e9 : retour aux 5 anecdotes du jour. Votre collection est conserv\u00e9e.',
     'toc.locked':"Le sommaire fait partie de l'abonnement",
     'search.locked':"La recherche fait partie de l'abonnement",
     'dire.label':'\u00c0 raconter','dire.copy':'Copier','dire.done':'Copi\u00e9 \u2014 pr\u00eat \u00e0 raconter',
     /* l'aper\u00e7u bloqu\u00e9 : on lit le d\u00e9but, puis le texte s'estompe */
     'tease.eyebrow':'Aper\u00e7u',
     'tease.title':'La suite fait partie de l\u2019abonnement',
-    'tease.body':"Vous avez lu vos 10 anecdotes du jour. Revenez demain, ou lisez sans compteur d\u00e8s maintenant.",
+    'tease.body':"Vous avez lu vos 5 anecdotes du jour. Revenez demain, ou lisez sans compteur d\u00e8s maintenant.",
     'tease.cta':'Voir les tarifs',
     'tease.alt':'Revenir demain',
     'size.label':'Taille du texte',
     'act.keep':'Garder', 'act.share':'Partager',
-    'act.next':'Faites d\u00e9filer pour la suivante',
+    'act.next':'Balayez vers la gauche pour la suivante',
+    'acc.mode':'Accroches seules',
+    'acc.on':'Accroches seules : une phrase par fiche, d\u00e9pliez celles qui intriguent.',
+    'acc.off':'Fiches enti\u00e8res.',
+    'acc.open':'D\u00e9plier cette anecdote',
+    'pio.cta':'Piocher',
+    'pio.wait':'On tire\u2026',
+    'pio.none':'Rien de neuf \u00e0 piocher pour l\u2019instant.',
+    'jour.badge':'La fiche du jour',
     'inst.title':'Mettre Curio sur votre \u00e9cran d\u2019accueil',
     'inst.body':'Il s\u2019ouvre en plein \u00e9cran et se lit hors ligne.',
     'inst.ios':'Menu de partage, puis \u00ab Sur l\u2019\u00e9cran d\u2019accueil \u00bb.',
+    'inst.titleBureau':'Installer Curio sur cet ordinateur',
+    'inst.bureau':'Dans la barre d\u2019adresse, l\u2019ic\u00f4ne d\u2019installation \u2014 ou le menu du navigateur, \u00ab Installer Curio \u00bb. Il s\u2019ouvre alors dans sa propre fen\u00eatre.',
+    'inst.autre':'Le menu de votre navigateur propose d\u2019ajouter Curio \u00e0 l\u2019\u00e9cran d\u2019accueil.',
     'inst.cta':'Installer',
     'inst.later':'Plus tard',
     'cur.loading':'chargement de l\u2019introduction\u2026',
@@ -1684,9 +1824,9 @@ const I18N = {
     credit:(t,u)=>`Sujet : ${t}`,
     'ob.source':"Chaque anecdote est écrite pour Curio à partir de faits vérifiés, puis relue avant publication.",
     lockTitle:'Cette anecdote fait partie de Curio Illimité',
-    lockTitleQuota:'Vous avez lu vos 10 anecdotes du jour',
+    lockTitleQuota:'C\u2019est tout pour aujourd\u2019hui',
     lockBody:"Passez en lecture illimitée : plus de compteur, et toutes les nouveautés dès leur sortie.",
-    lockBodyQuota:"Revenez demain pour 10 nouvelles anecdotes — ou continuez maintenant, sans limite.",
+    lockBodyQuota:"Vos 5 anecdotes du jour sont lues. Demain matin, 5 autres vous attendent — tir\u00e9es au hasard, et jamais les m\u00eames qu\u2019il y a deux mois. Ou bien ouvrez tout le catalogue, tout de suite.",
     lockCta:'Voir les formules', lockAlt:'Continuer avec les univers gratuits',
     saved:'Ajouté à votre collection', unsaved:'Retiré de votre collection',
     copied:'Lien copié', emptyLib:"Votre collection est vide. Touchez le cœur sur une anecdote pour la garder ici.",
@@ -1711,7 +1851,7 @@ const I18N = {
     'ob.title':'The world is <em>stranger</em> than you think.',
     'ob.sub':'True things, written to be read: two minutes per piece, one per screen. Pick your universes to begin.',
     'ob.cta':'Start exploring',
-    'ob.note':'10 free wonders every day. No sign-up.',
+    'ob.note':'5 free wonders every day, renewed each morning. No sign-up.',
     'uni.title':'Your universes','uni.sub':'Choose the worlds that feed your stream. Combine as many as you like.',
     'uni.apply':'Apply','uni.all':'Select all',
     'pay.title':'Go unlimited','pay.sub':'No more daily counter. Read as much as you want, and new pieces arrive every week.',
@@ -1765,23 +1905,34 @@ const I18N = {
     'vide.title':'There is nothing to read yet',
     'vide.body':"That is expected: this repository is new. Open GitHub, the Actions tab, run \u00ab 1-collecter \u00bb to gather subjects, pick them in the Curation view, and have them written with \u00ab 4-ecrire \u00bb. The pieces will appear here on their own.",
     'plan.free':'Free','plan.paid':'Unlimited','plan.life':'Lifetime',
-    'plan.freeTip':'10 pieces a day, all 8 universes','plan.paidTip':'Unlimited reading',
-    'plan.back':'Subscription ended: back to 10 pieces a day. Your collection is kept.',
+    'plan.freeTip':'5 pieces a day, all 8 universes','plan.paidTip':'Unlimited reading',
+    'plan.back':'Subscription ended: back to the 5 pieces of the day. Your collection is kept.',
     'toc.locked':'The contents list is part of the subscription',
     'search.locked':'Search is part of the subscription',
     'dire.label':'To tell','dire.copy':'Copy','dire.done':'Copied — ready to tell',
     /* the blocked preview: you read the opening, then the text fades out */
     'tease.eyebrow':'Preview',
     'tease.title':'The rest is part of the subscription',
-    'tease.body':'You have read your 10 pieces for today. Come back tomorrow, or read without a counter right now.',
+    'tease.body':'You have read your 5 pieces for today. Come back tomorrow, or read without a counter right now.',
     'tease.cta':'See the plans',
     'tease.alt':'Come back tomorrow',
     'size.label':'Text size',
     'act.keep':'Keep', 'act.share':'Share',
-    'act.next':'Scroll for the next one',
+    'act.next':'Swipe left for the next one',
+    'acc.mode':'Hooks only',
+    'acc.on':'Hooks only: one line per piece, unfold the ones that catch you.',
+    'acc.off':'Full pieces.',
+    'acc.open':'Unfold this piece',
+    'pio.cta':'Draw one',
+    'pio.wait':'Drawing\u2026',
+    'pio.none':'Nothing new to draw right now.',
+    'jour.badge':'Piece of the day',
     'inst.title':'Put Curio on your home screen',
     'inst.body':'It opens full screen and reads offline.',
     'inst.ios':'Share menu, then \u201cAdd to Home Screen\u201d.',
+    'inst.titleBureau':'Install Curio on this computer',
+    'inst.bureau':'The install icon in the address bar \u2014 or your browser menu, \u201cInstall Curio\u201d. It then opens in its own window.',
+    'inst.autre':'Your browser menu offers to add Curio to your home screen.',
     'inst.cta':'Install',
     'inst.later':'Later',
     'cur.loading':'loading the opening\u2026',
@@ -1805,9 +1956,9 @@ const I18N = {
     credit:(t,u)=>`Subject: ${t}`,
     'ob.source':"Every piece is written for Curio from verified facts, then read again before it goes live.",
     lockTitle:'This piece is part of Curio Unlimited',
-    lockTitleQuota:'You have read your 10 wonders for today',
+    lockTitleQuota:'That is all for today',
     lockBody:'Go unlimited: no more counter, and every new piece the day it lands.',
-    lockBodyQuota:'Come back tomorrow for 10 more — or keep going right now, without limits.',
+    lockBodyQuota:'Your 5 pieces for today are read. Tomorrow morning, 5 more — drawn at random, and never the same as two months ago. Or open the whole catalogue, right now.',
     lockCta:'See the plans', lockAlt:'Continue with free universes',
     saved:'Added to your collection', unsaved:'Removed from your collection',
     copied:'Link copied', emptyLib:'Your collection is empty. Tap the heart on a card to keep it here.',
@@ -1894,16 +2045,30 @@ const S = {
   // presque noire et vert-de-gris. Indépendant du clair/sombre.
   palette:   LS.get('curio.palette', 'bleu'),
   plan:      LS.get('curio.plan', 'free'),
+  /* Le mode accroche : on ne voit que la phrase d'ouverture de chaque fiche,
+     et on déplie celles qui intriguent. Une façon de balayer vite. */
+  accroches: LS.get('curio.accroches', false),
   picked:    LS.get('curio.picked', ['cosmos','vivant']),
   day:       LS.get('curio.day', today()),
   used:      LS.get('curio.used', 0),
+  /* Le tirage du jour et la mémoire de ce qui a déjà été offert. */
+  tirage:    LS.get('curio.tirage', null),
+  servis:    LS.get('curio.servis', {}),
+  duJour:    LS.get('curio.dujour', null),
   streak:    LS.get('curio.streak', 1),
   lastDay:   LS.get('curio.lastDay', null),
   favs:      LS.get('curio.favs', []),
   seen:      LS.get('curio.seen', []),
   onboarded: LS.get('curio.onboarded', false)
 };
-if(S.day !== today()){ S.day = today(); S.used = 0; LS.set('curio.day', S.day); LS.set('curio.used', 0); }
+/* Minuit. Le tirage d'hier meurt — c'est tout le principe : ce qui était
+   offert hier ne l'est plus. La MÉMOIRE, elle, survit : c'est elle qui empêche
+   une anecdote de revenir avant deux mois. */
+if(S.day !== today()){
+  S.day = today(); S.used = 0; S.tirage = null; S.duJour = null;
+  LS.set('curio.day', S.day); LS.set('curio.used', 0);
+  LS.set('curio.tirage', null); LS.set('curio.dujour', null);
+}
 (function streak(){
   const t = today();
   if(S.lastDay !== t){
@@ -2598,6 +2763,16 @@ async function loadCatalog(){
 
 /* ============================ file d'anecdotes ============================ */
 let bag = {};            // themeId -> titres restants (mélangés)
+/* La fiche du jour n'est servie qu'une fois par ouverture de flux. */
+let jourServi = false;
+/* ── POURQUOI CE DRAPEAU ────────────────────────────────────────────────
+   `?pro=0` et `?pro=1` s'exécutent AVANT que le catalogue soit chargé. Le
+   resetFeed que déclenchent unlock() et relock() partait donc sur un
+   catalogue vide, posait son verrou de remplissage, et le resetFeed du
+   démarrage — arrivé une seconde plus tard — se heurtait à ce verrou et ne
+   remplissait rien : écran vide. On ne redessine le flux que lorsqu'il y a
+   un flux à redessiner ; au démarrage, la séquence normale s'en charge. */
+let demarre = false;
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
 /* Le flux ne sert QUE des anecdotes rédigées.
@@ -2628,6 +2803,109 @@ function markSeen(title){
   S.seen.push(k);
   if(S.seen.length > 4000) S.seen = S.seen.slice(-3000);
   LS.set('curio.seen', S.seen);
+}
+
+/* ═══════════════════ LE TIRAGE DU JOUR ═══════════════════════════════════
+   La version gratuite n'est plus un compteur qu'on épuise : c'est UNE
+   JOURNÉE. Cinq anecdotes, tirées au hasard le matin, à vous jusqu'à minuit.
+   Demain, cinq autres — et celles d'hier s'en vont.
+
+   Trois promesses, et chacune est tenue par une ligne de ce bloc :
+     · tirées au hasard        → shuffle sur tout le catalogue publié
+     · jamais deux fois la même en deux mois → la mémoire `servis`
+     · uniquement le jour même → le tirage porte sa date et meurt avec elle
+
+   Le tirage est ARRÊTÉ pour la journée : rouvrir l'application ne rebat pas
+   les cartes. Sans quoi il suffirait de recharger la page pour avoir cinq
+   nouvelles anecdotes, et la journée n'aurait plus de sens.
+
+   Tout se joue dans ce navigateur, sans compte ni serveur. Quelqu'un qui
+   efface ses données repart à zéro : c'est le prix d'une application qui ne
+   demande pas d'inscription, et c'est un prix que nous acceptons. */
+const OFFRE_JOUR   = CONFIG.freeDaily;      // cinq
+const MEMOIRE_JOURS = 60;                   // deux mois avant qu'une fiche revienne
+
+function ilYaDesJours(n){
+  const d = new Date(); d.setDate(d.getDate() - n);
+  return d.toISOString().slice(0,10);
+}
+
+/* On oublie ce qui a plus de deux mois : c'est ce qui autorise une anecdote à
+   revenir un jour, sans jamais revenir vite. */
+function purgerServis(){
+  const limite = ilYaDesJours(MEMOIRE_JOURS);
+  let bouge = false;
+  for(const k of Object.keys(S.servis)){
+    if(String(S.servis[k]) < limite){ delete S.servis[k]; bouge = true; }
+  }
+  if(bouge) LS.set('curio.servis', S.servis);
+}
+
+/* Toutes les anecdotes publiées, tous univers confondus. Huit fichiers
+   locaux, déjà en cache : rien ne part vers l'extérieur. */
+async function catalogueOffrable(){
+  const out = [];
+  for(const tid of CONFIG.freeThemes){
+    const w = await loadWritten(S.lang, tid);
+    if(!w) continue;
+    for(const titre of Object.keys(w)){
+      const rec = w[titre];
+      if(!rec || !rec.x) continue;
+      if(rec.s != null && rec.s < (CONFIG.minInsolite || 0)) continue;
+      out.push(tid + '|' + titre);
+    }
+  }
+  return out;
+}
+
+async function tirageDuJour(){
+  purgerServis();
+  if(S.tirage && S.tirage.j === today() && S.tirage.c && S.tirage.c.length) return S.tirage.c;
+
+  const tout = await catalogueOffrable();
+  if(!tout.length) return [];
+  const frais = tout.filter(k => !S.servis[k]);
+  /* Quand le catalogue est plus petit que la mémoire, la promesse des deux
+     mois devient intenable : on reprend alors les plus anciennement offertes
+     d'abord, ce qui reste la meilleure approximation possible. */
+  let source = frais;
+  if(frais.length < OFFRE_JOUR){
+    const anciennes = tout.filter(k => S.servis[k])
+      .sort((a, b) => String(S.servis[a]).localeCompare(String(S.servis[b])));
+    source = frais.concat(anciennes);
+  }
+  const c = shuffle(source.slice()).slice(0, OFFRE_JOUR);
+  const j = today();
+  c.forEach(k => { S.servis[k] = j; });
+  S.tirage = { j, c };
+  LS.set('curio.tirage', S.tirage);
+  LS.set('curio.servis', S.servis);
+  return c;
+}
+
+/* Le flux du gratuit : les cinq du jour, dans leur ordre, et rien d'autre. */
+async function remplirTirage(){
+  const cles = await tirageDuJour();
+  if(!cles.length) return;
+  const unis = [...new Set(cles.map(k => k.slice(0, k.indexOf('|'))))];
+  for(const tid of unis) await loadWritten(S.lang, tid);
+
+  const deja = new Set(ready.map(i => i.article || i.title));
+  Array.from(feed.children).forEach(c => {
+    if(c._item) deja.add(c._item.article || c._item.title);
+  });
+  /* ready est dépilé par la fin (`ready.pop()`) : on empile donc à l'envers
+     pour que la première du tirage sorte la première. */
+  for(let i = cles.length - 1; i >= 0; i--){
+    const cle = cles[i], sep = cle.indexOf('|');
+    const tid = cle.slice(0, sep), titre = cle.slice(sep + 1);
+    if(deja.has(titre)) continue;
+    const w = written.get(S.lang + '|' + tid);
+    const rec = w && w[titre];
+    if(!rec || !rec.x) continue;      // dépubliée depuis le tirage : on saute
+    deja.add(titre);
+    ready.push(itemFromWritten(tid, titre, rec));
+  }
 }
 
 /* Les fiches de démonstration ne pèsent plus dans le code : elles sont dans
@@ -2695,6 +2973,10 @@ async function topUp(){
   if(filling2 || ready.length >= 5) return;
   filling2 = true;
   try{
+    /* Gratuit : les cinq du jour, un point c'est tout. Le parcours d'univers
+       ci-dessous est réservé à ceux qui ont accès au catalogue entier. */
+    if(S.plan === 'free'){ await remplirTirage(); return; }
+
     // on parcourt les univers qui ont du texte, dans un ordre mélangé, et on
     // s'arrête dès qu'on a de quoi remplir l'avance
     const ids = shuffle(themesAvecTexte().slice());
@@ -2717,6 +2999,25 @@ async function topUp(){
         ready.push(itemFromWritten(tid, title, rec));
       });
       shuffle(ready);
+    }
+
+    /* ── LA FICHE DU JOUR PASSE DEVANT ─────────────────────────────────
+       Elle est empilée EN DERNIER, après le mélange : `ready` se dépile par
+       la fin, donc la dernière empilée est la première servie. Empilée avant
+       la boucle, elle se retrouvait au fond de la pile et n'arrivait qu'après
+       une demi-douzaine d'autres — un rendez-vous qu'on manque. */
+    if(!jourServi){
+      jourServi = true;
+      const c = await ficheDuJour();
+      if(c){
+        const dedans = new Set(ready.map(i => i.article || i.title));
+        const it = await itemDeCle(c);
+        if(it && !dedans.has(it.article || it.title)){
+          it.duJour = true;
+          markSeen(it.article || it.title);
+          ready.push(it);
+        }
+      }
     }
   }catch(e){ /* rien à rattraper : la lecture ne dépend plus du réseau */ }
   finally{ filling2 = false; }
@@ -2772,6 +3073,115 @@ async function fetchNext(){
   return item;
 }
 
+
+/* ═══════════════════ LA PIOCHE, ET LA FICHE DU JOUR ══════════════════════
+   Deux choses réservées à l'abonnement et à l'achat à vie, et deux réponses
+   au même besoin : ne jamais rouvrir Curio sur ce qu'on a déjà vu.
+
+   LA PIOCHE, c'est le geste : on veut une surprise, maintenant, sans
+   parcourir. Une carte se retourne, huit couleurs défilent, une s'arrête —
+   et l'anecdote est là. Elle ne pioche jamais dans ce qui vient d'être lu.
+
+   LA FICHE DU JOUR, c'est le rendez-vous : chaque matin, le flux d'un abonné
+   commence sur une anecdote qu'il n'a pas encore vue, tirée pour la journée.
+   Le gratuit a ses cinq du jour ; celui qui paie ne doit pas avoir moins bien
+   qu'un rendez-vous, il doit l'avoir sans compteur. */
+function estPremium(){ return S.plan === 'lifetime' || S.plan === 'paid' || S.plan === 'sub'; }
+
+/* Une clé au hasard dans tout le catalogue, en évitant ce qui a été lu
+   récemment. `exclure` est un Set de titres déjà présents dans le flux. */
+async function cleAuHasard(exclure){
+  const tout = await catalogueOffrable();
+  if(!tout.length) return null;
+  const vus = new Set(S.seen.map(k => k.slice(k.indexOf(':') + 1)));
+  const titre = k => k.slice(k.indexOf('|') + 1);
+  let pool = tout.filter(k => !vus.has(titre(k)) && !(exclure && exclure.has(titre(k))));
+  if(!pool.length) pool = tout.filter(k => !(exclure && exclure.has(titre(k))));
+  if(!pool.length) pool = tout;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+async function itemDeCle(cle){
+  const sep = cle.indexOf('|');
+  const tid = cle.slice(0, sep), titre = cle.slice(sep + 1);
+  await loadWritten(S.lang, tid);
+  const w = written.get(S.lang + '|' + tid);
+  const rec = w && w[titre];
+  if(!rec || !rec.x) return null;
+  return itemFromWritten(tid, titre, rec);
+}
+
+/* L'animation : huit bandes aux couleurs des univers, qui filent puis
+   ralentissent jusqu'à n'en laisser qu'une. Elle dure le temps qu'il faut
+   pour que le tirage se sente — un peu plus d'une seconde — et pas une
+   milliseconde de plus. */
+function animerPioche(){
+  const ovl = el('div','pioche');
+  /* Une fenêtre fixe, et une bande qui défile derrière : c'est la bande qu'on
+     anime, pas la fenêtre — sinon c'est toute la roue qui quitte l'écran. */
+  const roue = el('div','pioche__roue');
+  const piste = el('div','pioche__piste');
+  for(let i = 0; i < 18; i++){
+    const t = THEMES[i % THEMES.length];
+    const b = el('i');
+    b.style.background = 'hsl(' + (t && t.hue != null ? t.hue : (i * 40)) + ' 62% 55%)';
+    piste.appendChild(b);
+  }
+  roue.appendChild(piste);
+  ovl.appendChild(roue);
+  ovl.appendChild(el('span','pioche__tx', T()['pio.wait']));
+  document.body.appendChild(ovl);
+  requestAnimationFrame(()=> ovl.classList.add('on'));
+  return ()=>{
+    ovl.classList.add('fini');
+    setTimeout(()=> ovl.remove(), 420);
+  };
+}
+
+let pioEnCours = false;
+async function piocher(){
+  if(pioEnCours || !estPremium()) return;
+  pioEnCours = true;
+  const fermer = animerPioche();
+  try{
+    const dansLeFlux = new Set(Array.from(feed.children)
+      .map(c => c._item && (c._item.article || c._item.title)).filter(Boolean));
+    const cle = await cleAuHasard(dansLeFlux);
+    const item = cle ? await itemDeCle(cle) : null;
+    /* L'animation a une durée plancher : sans elle, un catalogue en cache
+       répond en dix millisecondes et le geste n'existe pas. */
+    await sleepMs(1150);
+    if(!item){ toast(T()['pio.none']); return; }
+    markSeen(item.article || item.title);
+    const carte = buildCard(item);
+    carte.classList.add('piochee');
+    const apres = current();
+    if(apres && apres.nextSibling) feed.insertBefore(carte, apres.nextSibling);
+    else feed.appendChild(carte);
+    carte.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' });
+    setActive(carte);
+  } finally {
+    fermer();
+    pioEnCours = false;
+  }
+}
+const sleepMs = ms => new Promise(r => setTimeout(r, ms));
+
+/* La fiche du jour : tirée une fois par jour, et gardée. Elle partage la
+   mémoire des deux mois du gratuit — personne ne doit retomber sur ce qu'il
+   vient de lire, quel que soit son plan. */
+async function ficheDuJour(){
+  purgerServis();
+  if(S.duJour && S.duJour.j === today() && S.duJour.c) return S.duJour.c;
+  const c = await cleAuHasard(null);
+  if(!c) return null;
+  S.duJour = { j: today(), c };
+  S.servis[c] = today();
+  LS.set('curio.dujour', S.duJour);
+  LS.set('curio.servis', S.servis);
+  return c;
+}
+
 /* ============================ rendu des cartes ============================ */
 const ICON = {
   ext:'<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-8.5 8.5M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>',
@@ -2822,6 +3232,32 @@ function fillText(node, item){
     return;
   }
 
+  /* ── LE MODE ACCROCHE ──────────────────────────────────────────────────
+     Une fiche entière demande deux minutes. Quand on cherche LE sujet qui va
+     intriguer, deux minutes par fiche, c'est trop : on veut voir la première
+     phrase et passer.
+
+     Dans ce mode, chaque fiche s'arrête à son accroche, et un bouton la
+     déplie. Le dépliage vaut pour cette fiche-là seulement : on peut lire
+     celle qui accroche sans quitter le balayage. */
+  if(S.accroches && !node._deplie){
+    const paras = (item.blocks && item.blocks.length ? item.blocks[0].p
+                : (item.paras && item.paras.length ? item.paras : [item.extract || '']));
+    read.appendChild(el('p', null, md(paras[0] || '')));
+    const ouvrir = el('button','deplier', T()['acc.open']);
+    ouvrir.addEventListener('click', e=>{
+      e.stopPropagation();
+      node._deplie = true;
+      fillText(node, item);
+    });
+    read.appendChild(ouvrir);
+    if(node._endrow) read.appendChild(node._endrow);
+    read.classList.remove('more');
+    const c1 = node.querySelector('.readmore'); if(c1) c1.hidden = true;
+    read.onscroll = null;
+    return;
+  }
+
   let words = 0;
   if(item.blocks && item.blocks.length){
     item.blocks.forEach(b=>{
@@ -2832,6 +3268,11 @@ function fillText(node, item){
     const paras = (item.paras && item.paras.length) ? item.paras : [item.extract || ''];
     paras.forEach(p=>{ read.appendChild(el('p', null, md(p))); words += p.split(/\s+/).length; });
   }
+  /* On repose la phrase à raconter et la rangée de fin APRÈS les paragraphes :
+     elles font partie du texte qui défile, pas du cadre fixe autour de lui. */
+  if(node._dire)   read.appendChild(node._dire);
+  if(node._endrow) read.appendChild(node._endrow);
+
   read.scrollTop = 0;
 
   // Le texte est long : on le dit. Un texte qui s'estompe sans rien annoncer
@@ -2844,8 +3285,20 @@ function fillText(node, item){
     read.classList.toggle('more', over && !end);
     if(cue) cue.hidden = !(over && !end);
   };
-  read.onscroll = sync;
-  requestAnimationFrame(sync);
+  /* ── LE SIGNE DE FIN DE LECTURE ────────────────────────────────────────
+     Arrivé au bout du texte, un chevron discret apparaît sur le bord droit
+     et respire une fois. Il ne dit rien, il ne bloque rien : il rappelle
+     seulement de quel côté se trouve la suite, à l'instant précis où on se
+     le demande. Il s'efface dès qu'on remonte dans l'article. */
+  const fin = node.querySelector('.suivante');
+  const sync2 = ()=>{
+    sync();
+    if(!fin) return;
+    const bout = read.scrollTop + read.clientHeight >= read.scrollHeight - 8;
+    fin.classList.toggle('vu', bout);
+  };
+  read.onscroll = sync2;
+  requestAnimationFrame(sync2);
   if(cue && !cue._wired){
     cue._wired = true;
     cue.addEventListener('click', e=>{
@@ -2870,6 +3323,9 @@ function buildCard(item){
     (item.article ? ' <span class="sep">·</span> <span class="subj">' + esc(item.article) + '</span>'
                   : (item.desc ? ' <span class="sep">·</span> <span class="subj">' + esc(item.desc.slice(0,46)) + '</span>' : '')) +
 ''));
+  /* Le rendez-vous quotidien se voit : sans marque, une fiche du jour est une
+     fiche comme une autre, et le rendez-vous n'existe pas. */
+  if(item.duJour) body.appendChild(el('span','marquejour', T()['jour.badge']));
   body.appendChild(el('h2', null, esc(item.title)));
 
   body.appendChild(el('div','lede'));
@@ -2880,20 +3336,23 @@ function buildCard(item){
   cue.hidden = true;
   body.appendChild(cue);
 
-  // La version courte : la phrase qu'on dira à voix haute. C'est elle qu'on
-  // retient, et c'est pour elle qu'on lit. Elle ferme l'article.
+  /* ── LA PHRASE À RACONTER, EN BOUT DE LECTURE ──────────────────────────
+     Elle occupait une place fixe sous le texte. Sur un téléphone, avec le
+     bandeau, le titre et la rangée de boutons, il ne restait que quelques
+     lignes pour l'article lui-même — alors que c'est lui qu'on vient lire.
+
+     Elle descend donc DANS la zone de lecture, tout en bas : on la découvre
+     en arrivant au bout de la fiche, ce qui est exactement son moment. Le
+     texte, lui, récupère toute la hauteur.
+
+     Le bouton « copier » a disparu : on ne copie pas une phrase qu'on va
+     dire à voix haute, et il mangeait la largeur de la phrase. Le partage
+     reste, juste en dessous. */
   if(item.raconter){
     const dire = el('div','dire');
     dire.appendChild(el('span','dire__lb', T()['dire.label']));
     dire.appendChild(el('p','dire__tx', esc(item.raconter)));
-    const cp = el('button','dire__cp', T()['dire.copy']);
-    cp.addEventListener('click', async e=>{
-      e.stopPropagation();
-      try{ await navigator.clipboard.writeText(item.raconter); toast(T()['dire.done']); }
-      catch(err){ toast(T()['cur.copyFail']); }
-    });
-    dire.appendChild(cp);
-    body.appendChild(dire);
+    node._dire = dire;
   }
 
   // Garder et partager sont au bout de l'article, la ou on arrive quand on a
@@ -2913,9 +3372,18 @@ function buildCard(item){
   row.appendChild(bFav);
   row.appendChild(bShare);
   row.appendChild(el('span','ehint', T()['act.next']));
-  body.appendChild(row);
+  node._endrow = row;
   node._fav = bFav;
   node.appendChild(body);
+
+  /* Le repère de fin de lecture, hors du corps de texte : il appartient à la
+     carte, pas à l'article. */
+  const suiv = el('div','suivante',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"'
+    + ' stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>');
+  suiv.setAttribute('aria-hidden','true');
+  suiv.addEventListener('click', e=>{ e.stopPropagation(); go(1); });
+  node.appendChild(suiv);
 
   fillText(node, item);   // après l'attache : fillText interroge le DOM de la carte
   return node;
@@ -3021,9 +3489,17 @@ async function ensureAhead(){
         if(paidOnly){ feed.appendChild(buildLock('theme')); locked = true; break; }
       }
       const item = await fetchNext();
-      // rien à servir (réseau coupé, aucune fiche de secours) : on s'arrête
-      // plutôt que d'empiler des cartes vides
-      if(!item){ if(!feed.children.length) feed.appendChild(buildVide()); break; }
+      if(!item){
+        /* ── LA FIN DE LA JOURNÉE OFFERTE ──────────────────────────────
+           Les cinq du jour sont posées : il n'y a plus rien, et le dire
+           franchement vaut mieux que d'empiler des fiches estompées qu'on
+           ne peut pas lire. On invite, on ne frustre pas — et demain, cinq
+           autres arrivent sans rien demander à personne. */
+        if(S.plan === 'free' && feed.children.length && !locked){
+          feed.appendChild(buildLock('quota')); locked = true;
+        } else if(!feed.children.length) feed.appendChild(buildVide());
+        break;
+      }
 
       const cle = item.article || item.title;
       if(cle && deja.has(cle)){
@@ -3033,16 +3509,9 @@ async function ensureAhead(){
       if(cle) deja.add(cle);
       vains = 0;
 
-      const carte = buildCard(item);
-      // quota épuisé : la fiche arrive directement en aperçu, jamais bloquée
-      if(quotaEpuise()){
-        carte.dataset.apercu = '1';
-        carte.classList.add('apercu');
-        carte._counted = true;
-        fillText(carte, item);
-        poserCadenas(carte);
-      }
-      feed.appendChild(carte);
+      /* Les cinq du jour sont entières : plus d'aperçu estompé. Une fiche
+         offerte se lit jusqu'au bout, ou elle n'est pas proposée. */
+      feed.appendChild(buildCard(item));
     }
   } finally { filling = false; }
 }
@@ -3090,8 +3559,8 @@ function activeIndex(){
 }
 
 function resetFeed(){
-  feed.innerHTML = ''; locked = false; bag = {}; offlinePool = []; ready = [];
-  feed.scrollTop = 0;
+  feed.innerHTML = ''; locked = false; bag = {}; offlinePool = []; ready = []; jourServi = false;
+  feed.scrollLeft = 0;
   if(catalogueVide()){ feed.appendChild(buildVide()); setActive(feed.firstElementChild); return; }
   ensureAhead().then(()=>{ const f = feed.firstElementChild; if(f) setActive(f); });
 }
@@ -3113,8 +3582,6 @@ function setActive(node){
     if(S.plan === 'free'){ S.used++; LS.set('curio.used', S.used); renderQuota(); }
     if(typeof peutEtreInstall === 'function') peutEtreInstall();
   }
-  // le compteur est atteint : la suite passe en aperçu, on ne coupe pas le flux
-  if(quotaEpuise()) verrouillerSuite();
   updateActive();
   if(node._item) enrich(node._item);
   const nx = node.nextElementSibling;
@@ -3414,6 +3881,43 @@ $('#searchBtn').addEventListener('click', ()=>{
   m.addEventListener('click', e=>{ if(e.target.closest('button')) fermer(); });
   document.addEventListener('keydown', e=>{ if(e.key === 'Escape') fermer(); });
 })();
+/* Le mode accroche et la pioche, dans le tiroir « … ». */
+(function reglagesLecture(){
+  const a = $('#accBtn');
+  if(a){
+    const peindre = ()=>{
+      a.setAttribute('aria-pressed', S.accroches ? 'true' : 'false');
+      a.classList.toggle('on', !!S.accroches);
+      /* La feuille de style a besoin de savoir : une carte qui n'affiche
+         qu'une accroche se cale en bas, pas en haut. */
+      if(S.accroches) document.documentElement.dataset.accroches = '1';
+      else delete document.documentElement.dataset.accroches;
+    };
+    peindre();
+    a.addEventListener('click', ()=>{
+      S.accroches = !S.accroches;
+      LS.set('curio.accroches', S.accroches);
+      peindre();
+      /* On redessine les fiches en place : le lecteur ne perd pas sa position,
+         il change seulement de façon de lire. */
+      Array.from(feed.children).forEach(c=>{
+        if(c.dataset.kind !== 'fact' || !c._item) return;
+        c._deplie = false;
+        fillText(c, c._item);
+      });
+      toast(T()[S.accroches ? 'acc.on' : 'acc.off']);
+    });
+  }
+  const b = $('#pioBtn');
+  if(b) b.addEventListener('click', piocher);
+})();
+
+/* Le bouton Piocher n'apparaît que pour ceux qui y ont droit. */
+function majPioche(){
+  const b = $('#pioBtn');
+  if(b) b.hidden = !estPremium();
+}
+
 $('#qBtn').addEventListener('click', doSearch);
 $('#qInput').addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
 
@@ -3458,7 +3962,7 @@ function resultRow(item){
     close();
     const card = buildCard(item);
     feed.insertBefore(card, feed.firstElementChild);
-    feed.scrollTop = 0; setActive(card);
+    feed.scrollLeft = 0; setActive(card);
   });
   return b;
 }
@@ -3589,7 +4093,7 @@ async function openSubject(themeId, title, lockedU){
   markSeen(item.title);
   const card = buildCard(item);
   feed.insertBefore(card, feed.firstElementChild);
-  feed.scrollTop = 0; setActive(card);
+  feed.scrollLeft = 0; setActive(card);
   enrich(item);
 }
 
@@ -4362,13 +4866,25 @@ function go(dir){
   const cards = Array.from(feed.children);
   const i = cards.indexOf(current());
   const n = cards[i + dir];
-  if(n) n.scrollIntoView({ behavior:'smooth', block:'start' });
+  if(n) n.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' });
 }
 document.addEventListener('keydown', e=>{
   if($$('.sheet.open').length) return;
   if(e.target.tagName === 'INPUT') return;
-  if(e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown'){ e.preventDefault(); go(1); }
-  if(e.key === 'ArrowUp' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+  /* Droite et gauche changent de fiche, comme le doigt. Haut et bas restent
+     au texte : la barre d'espace fait défiler l'article, elle ne saute plus
+     par-dessus la moitié de ce qu'on était en train de lire. */
+  if(e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
+  if(e.key === 'ArrowLeft'){ e.preventDefault(); go(-1); }
+  if(e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown'
+     || e.key === 'PageUp' || e.key === 'ArrowUp'){
+    const c = current(), lu = c && c.querySelector('.lede');
+    if(!lu) return;
+    const bas = (e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown');
+    const pas = (e.key === 'ArrowDown' || e.key === 'ArrowUp') ? 80 : Math.round(lu.clientHeight * 0.82);
+    e.preventDefault();
+    lu.scrollBy({ top: bas ? pas : -pas, behavior:'smooth' });
+  }
   const c0 = current();
   if((e.key === 'f' || e.key === 'F') && c0) basculerFavori(c0._item, c0);
   if((e.key === 's' || e.key === 'S') && c0) partager(c0._item);
@@ -4454,16 +4970,26 @@ function toast(msg){
 function unlock(plan){
   S.plan = plan || 'lifetime'; LS.set('curio.plan', S.plan);
   S.picked = THEMES.map(t=>t.id); LS.set('curio.picked', S.picked);
-  renderQuota(); renderUniverses(); renderTocCount();
+  /* Le flux servait encore le tirage de cinq : on le vide pour que le
+     catalogue entier prenne sa place immédiatement, sans rechargement. */
+  bag = {}; ready = [];
+  renderQuota(); renderUniverses(); renderTocCount(); majPioche();
+  if(demarre) resetFeed();
 }
 
 /* Fin d'abonnement : on revient au gratuit, et rien d'autre ne bouge.
    La collection est conservée, les fiches déjà ouvertes restent lisibles
    hors ligne, et le compteur quotidien repart de zéro. */
+/* Fin d'abonnement : retour au gratuit, et le flux le montre TOUT DE SUITE.
+   Sans le resetFeed, le catalogue entier restait ouvert jusqu'au prochain
+   rechargement — l'abonnement expirait sur le papier, pas à l'écran. La
+   collection, elle, ne bouge pas : ce qui est gardé reste gardé. */
 function relock(){
   S.plan = 'free'; LS.set('curio.plan', 'free');
   S.used = 0; LS.set('curio.used', 0);
-  renderQuota(); renderUniverses(); renderTocCount(); renderPlans();
+  bag = {}; ready = [];
+  renderQuota(); renderUniverses(); renderTocCount(); renderPlans(); majPioche();
+  if(demarre) resetFeed();
   toast(T()['plan.back']);
 }
 // ?pro=1 débloque tout (test) — ?pro=0 revient à la version gratuite
@@ -4486,7 +5012,7 @@ function relock(){
 })();
 
 $('#streakN').textContent = S.streak;
-applyTheme(); applyLang(); langueUnique(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount();
+applyTheme(); applyLang(); langueUnique(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount(); majPioche();
 
 const AUDIT = new URLSearchParams(location.search).get('audit') === '1';
 /* déplacé en tête : filtrerPubliees() en a besoin dès le premier chargement */
@@ -4514,17 +5040,33 @@ window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault(); promptInstall = e; proposerInstall();
 });
 
+/* ── PROPOSER L'INSTALLATION ──────────────────────────────────────────────
+   Curio est plus agréable installé : plein écran, pas de barre d'adresse,
+   une icône sur l'écran d'accueil, et la lecture hors ligne. Mais la
+   proposition ne se déclenchait que là où le navigateur la fournit toute
+   faite — Chrome sur Android — ou sur iPhone. Sur un ordinateur, sur un iPad
+   en Safari, sur Firefox, personne n'apprenait jamais que c'était possible.
+
+   On propose donc partout, avec le mode d'emploi de la machine qu'on a sous
+   les yeux : le bouton natif quand il existe, sinon le chemin en toutes
+   lettres. Une seule fois — « Plus tard » vaut pour de bon. */
 function proposerInstall(){
   if(installe() || LS.get('curio.install', false)) return;
   if(document.querySelector('.install')) return;
 
-  const iOS = /iP(hone|ad|od)/.test(navigator.userAgent);
-  if(!promptInstall && !iOS) return;             // rien à proposer sur ce navigateur
+  const ua = navigator.userAgent;
+  const iOS = /iP(hone|ad|od)/.test(ua)
+           || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);   // iPad récent
+  const bureau = !/Android|iP(hone|ad|od)|Mobile/.test(ua);
+  const commentFaire = promptInstall ? 'inst.body'
+                     : iOS           ? 'inst.ios'
+                     : bureau        ? 'inst.bureau'
+                     :                 'inst.autre';
 
   const box = el('div','install');
   box.innerHTML =
-      '<div class="install__tx"><b>' + T()['inst.title'] + '</b>'
-    + '<span>' + (promptInstall ? T()['inst.body'] : T()['inst.ios']) + '</span></div>';
+      '<div class="install__tx"><b>' + T()[bureau && !promptInstall ? 'inst.titleBureau' : 'inst.title'] + '</b>'
+    + '<span>' + T()[commentFaire] + '</span></div>';
 
   const ferme = el('button','install__x');
   ferme.setAttribute('aria-label', T()['inst.later']);
@@ -4549,7 +5091,9 @@ function proposerInstall(){
 // on ne dérange personne au premier écran : la proposition arrive après
 // quelques anecdotes lues, quand l'intérêt est établi.
 function peutEtreInstall(){
-  if(S.onboarded && S.used >= 3) proposerInstall();
+  /* Deux fiches lues suffisent à savoir si l'endroit plaît. Au-delà, on
+     dérange quelqu'un qui a déjà pris ses habitudes dans un onglet. */
+  if(S.onboarded && S.used >= 2) proposerInstall();
 }
 
 // Les deux fichiers d'état sont attendus avant le premier remplissage :
@@ -4568,6 +5112,7 @@ Promise.all([loadStats(), loadCatalog()]).finally(()=>{
     renderQuota(); renderPlans();
     resetFeed(); openCuration(); return;
   }
+  demarre = true;
   if(!S.onboarded){ open('#onboard'); ensureAhead(); }
   else { resetFeed(); }
 });

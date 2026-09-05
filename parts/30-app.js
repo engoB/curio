@@ -65,16 +65,30 @@ const S = {
   // presque noire et vert-de-gris. Indépendant du clair/sombre.
   palette:   LS.get('curio.palette', 'bleu'),
   plan:      LS.get('curio.plan', 'free'),
+  /* Le mode accroche : on ne voit que la phrase d'ouverture de chaque fiche,
+     et on déplie celles qui intriguent. Une façon de balayer vite. */
+  accroches: LS.get('curio.accroches', false),
   picked:    LS.get('curio.picked', ['cosmos','vivant']),
   day:       LS.get('curio.day', today()),
   used:      LS.get('curio.used', 0),
+  /* Le tirage du jour et la mémoire de ce qui a déjà été offert. */
+  tirage:    LS.get('curio.tirage', null),
+  servis:    LS.get('curio.servis', {}),
+  duJour:    LS.get('curio.dujour', null),
   streak:    LS.get('curio.streak', 1),
   lastDay:   LS.get('curio.lastDay', null),
   favs:      LS.get('curio.favs', []),
   seen:      LS.get('curio.seen', []),
   onboarded: LS.get('curio.onboarded', false)
 };
-if(S.day !== today()){ S.day = today(); S.used = 0; LS.set('curio.day', S.day); LS.set('curio.used', 0); }
+/* Minuit. Le tirage d'hier meurt — c'est tout le principe : ce qui était
+   offert hier ne l'est plus. La MÉMOIRE, elle, survit : c'est elle qui empêche
+   une anecdote de revenir avant deux mois. */
+if(S.day !== today()){
+  S.day = today(); S.used = 0; S.tirage = null; S.duJour = null;
+  LS.set('curio.day', S.day); LS.set('curio.used', 0);
+  LS.set('curio.tirage', null); LS.set('curio.dujour', null);
+}
 (function streak(){
   const t = today();
   if(S.lastDay !== t){
@@ -769,6 +783,16 @@ async function loadCatalog(){
 
 /* ============================ file d'anecdotes ============================ */
 let bag = {};            // themeId -> titres restants (mélangés)
+/* La fiche du jour n'est servie qu'une fois par ouverture de flux. */
+let jourServi = false;
+/* ── POURQUOI CE DRAPEAU ────────────────────────────────────────────────
+   `?pro=0` et `?pro=1` s'exécutent AVANT que le catalogue soit chargé. Le
+   resetFeed que déclenchent unlock() et relock() partait donc sur un
+   catalogue vide, posait son verrou de remplissage, et le resetFeed du
+   démarrage — arrivé une seconde plus tard — se heurtait à ce verrou et ne
+   remplissait rien : écran vide. On ne redessine le flux que lorsqu'il y a
+   un flux à redessiner ; au démarrage, la séquence normale s'en charge. */
+let demarre = false;
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
 /* Le flux ne sert QUE des anecdotes rédigées.
@@ -799,6 +823,109 @@ function markSeen(title){
   S.seen.push(k);
   if(S.seen.length > 4000) S.seen = S.seen.slice(-3000);
   LS.set('curio.seen', S.seen);
+}
+
+/* ═══════════════════ LE TIRAGE DU JOUR ═══════════════════════════════════
+   La version gratuite n'est plus un compteur qu'on épuise : c'est UNE
+   JOURNÉE. Cinq anecdotes, tirées au hasard le matin, à vous jusqu'à minuit.
+   Demain, cinq autres — et celles d'hier s'en vont.
+
+   Trois promesses, et chacune est tenue par une ligne de ce bloc :
+     · tirées au hasard        → shuffle sur tout le catalogue publié
+     · jamais deux fois la même en deux mois → la mémoire `servis`
+     · uniquement le jour même → le tirage porte sa date et meurt avec elle
+
+   Le tirage est ARRÊTÉ pour la journée : rouvrir l'application ne rebat pas
+   les cartes. Sans quoi il suffirait de recharger la page pour avoir cinq
+   nouvelles anecdotes, et la journée n'aurait plus de sens.
+
+   Tout se joue dans ce navigateur, sans compte ni serveur. Quelqu'un qui
+   efface ses données repart à zéro : c'est le prix d'une application qui ne
+   demande pas d'inscription, et c'est un prix que nous acceptons. */
+const OFFRE_JOUR   = CONFIG.freeDaily;      // cinq
+const MEMOIRE_JOURS = 60;                   // deux mois avant qu'une fiche revienne
+
+function ilYaDesJours(n){
+  const d = new Date(); d.setDate(d.getDate() - n);
+  return d.toISOString().slice(0,10);
+}
+
+/* On oublie ce qui a plus de deux mois : c'est ce qui autorise une anecdote à
+   revenir un jour, sans jamais revenir vite. */
+function purgerServis(){
+  const limite = ilYaDesJours(MEMOIRE_JOURS);
+  let bouge = false;
+  for(const k of Object.keys(S.servis)){
+    if(String(S.servis[k]) < limite){ delete S.servis[k]; bouge = true; }
+  }
+  if(bouge) LS.set('curio.servis', S.servis);
+}
+
+/* Toutes les anecdotes publiées, tous univers confondus. Huit fichiers
+   locaux, déjà en cache : rien ne part vers l'extérieur. */
+async function catalogueOffrable(){
+  const out = [];
+  for(const tid of CONFIG.freeThemes){
+    const w = await loadWritten(S.lang, tid);
+    if(!w) continue;
+    for(const titre of Object.keys(w)){
+      const rec = w[titre];
+      if(!rec || !rec.x) continue;
+      if(rec.s != null && rec.s < (CONFIG.minInsolite || 0)) continue;
+      out.push(tid + '|' + titre);
+    }
+  }
+  return out;
+}
+
+async function tirageDuJour(){
+  purgerServis();
+  if(S.tirage && S.tirage.j === today() && S.tirage.c && S.tirage.c.length) return S.tirage.c;
+
+  const tout = await catalogueOffrable();
+  if(!tout.length) return [];
+  const frais = tout.filter(k => !S.servis[k]);
+  /* Quand le catalogue est plus petit que la mémoire, la promesse des deux
+     mois devient intenable : on reprend alors les plus anciennement offertes
+     d'abord, ce qui reste la meilleure approximation possible. */
+  let source = frais;
+  if(frais.length < OFFRE_JOUR){
+    const anciennes = tout.filter(k => S.servis[k])
+      .sort((a, b) => String(S.servis[a]).localeCompare(String(S.servis[b])));
+    source = frais.concat(anciennes);
+  }
+  const c = shuffle(source.slice()).slice(0, OFFRE_JOUR);
+  const j = today();
+  c.forEach(k => { S.servis[k] = j; });
+  S.tirage = { j, c };
+  LS.set('curio.tirage', S.tirage);
+  LS.set('curio.servis', S.servis);
+  return c;
+}
+
+/* Le flux du gratuit : les cinq du jour, dans leur ordre, et rien d'autre. */
+async function remplirTirage(){
+  const cles = await tirageDuJour();
+  if(!cles.length) return;
+  const unis = [...new Set(cles.map(k => k.slice(0, k.indexOf('|'))))];
+  for(const tid of unis) await loadWritten(S.lang, tid);
+
+  const deja = new Set(ready.map(i => i.article || i.title));
+  Array.from(feed.children).forEach(c => {
+    if(c._item) deja.add(c._item.article || c._item.title);
+  });
+  /* ready est dépilé par la fin (`ready.pop()`) : on empile donc à l'envers
+     pour que la première du tirage sorte la première. */
+  for(let i = cles.length - 1; i >= 0; i--){
+    const cle = cles[i], sep = cle.indexOf('|');
+    const tid = cle.slice(0, sep), titre = cle.slice(sep + 1);
+    if(deja.has(titre)) continue;
+    const w = written.get(S.lang + '|' + tid);
+    const rec = w && w[titre];
+    if(!rec || !rec.x) continue;      // dépubliée depuis le tirage : on saute
+    deja.add(titre);
+    ready.push(itemFromWritten(tid, titre, rec));
+  }
 }
 
 /* Les fiches de démonstration ne pèsent plus dans le code : elles sont dans
@@ -866,6 +993,10 @@ async function topUp(){
   if(filling2 || ready.length >= 5) return;
   filling2 = true;
   try{
+    /* Gratuit : les cinq du jour, un point c'est tout. Le parcours d'univers
+       ci-dessous est réservé à ceux qui ont accès au catalogue entier. */
+    if(S.plan === 'free'){ await remplirTirage(); return; }
+
     // on parcourt les univers qui ont du texte, dans un ordre mélangé, et on
     // s'arrête dès qu'on a de quoi remplir l'avance
     const ids = shuffle(themesAvecTexte().slice());
@@ -888,6 +1019,25 @@ async function topUp(){
         ready.push(itemFromWritten(tid, title, rec));
       });
       shuffle(ready);
+    }
+
+    /* ── LA FICHE DU JOUR PASSE DEVANT ─────────────────────────────────
+       Elle est empilée EN DERNIER, après le mélange : `ready` se dépile par
+       la fin, donc la dernière empilée est la première servie. Empilée avant
+       la boucle, elle se retrouvait au fond de la pile et n'arrivait qu'après
+       une demi-douzaine d'autres — un rendez-vous qu'on manque. */
+    if(!jourServi){
+      jourServi = true;
+      const c = await ficheDuJour();
+      if(c){
+        const dedans = new Set(ready.map(i => i.article || i.title));
+        const it = await itemDeCle(c);
+        if(it && !dedans.has(it.article || it.title)){
+          it.duJour = true;
+          markSeen(it.article || it.title);
+          ready.push(it);
+        }
+      }
     }
   }catch(e){ /* rien à rattraper : la lecture ne dépend plus du réseau */ }
   finally{ filling2 = false; }
@@ -943,6 +1093,115 @@ async function fetchNext(){
   return item;
 }
 
+
+/* ═══════════════════ LA PIOCHE, ET LA FICHE DU JOUR ══════════════════════
+   Deux choses réservées à l'abonnement et à l'achat à vie, et deux réponses
+   au même besoin : ne jamais rouvrir Curio sur ce qu'on a déjà vu.
+
+   LA PIOCHE, c'est le geste : on veut une surprise, maintenant, sans
+   parcourir. Une carte se retourne, huit couleurs défilent, une s'arrête —
+   et l'anecdote est là. Elle ne pioche jamais dans ce qui vient d'être lu.
+
+   LA FICHE DU JOUR, c'est le rendez-vous : chaque matin, le flux d'un abonné
+   commence sur une anecdote qu'il n'a pas encore vue, tirée pour la journée.
+   Le gratuit a ses cinq du jour ; celui qui paie ne doit pas avoir moins bien
+   qu'un rendez-vous, il doit l'avoir sans compteur. */
+function estPremium(){ return S.plan === 'lifetime' || S.plan === 'paid' || S.plan === 'sub'; }
+
+/* Une clé au hasard dans tout le catalogue, en évitant ce qui a été lu
+   récemment. `exclure` est un Set de titres déjà présents dans le flux. */
+async function cleAuHasard(exclure){
+  const tout = await catalogueOffrable();
+  if(!tout.length) return null;
+  const vus = new Set(S.seen.map(k => k.slice(k.indexOf(':') + 1)));
+  const titre = k => k.slice(k.indexOf('|') + 1);
+  let pool = tout.filter(k => !vus.has(titre(k)) && !(exclure && exclure.has(titre(k))));
+  if(!pool.length) pool = tout.filter(k => !(exclure && exclure.has(titre(k))));
+  if(!pool.length) pool = tout;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+async function itemDeCle(cle){
+  const sep = cle.indexOf('|');
+  const tid = cle.slice(0, sep), titre = cle.slice(sep + 1);
+  await loadWritten(S.lang, tid);
+  const w = written.get(S.lang + '|' + tid);
+  const rec = w && w[titre];
+  if(!rec || !rec.x) return null;
+  return itemFromWritten(tid, titre, rec);
+}
+
+/* L'animation : huit bandes aux couleurs des univers, qui filent puis
+   ralentissent jusqu'à n'en laisser qu'une. Elle dure le temps qu'il faut
+   pour que le tirage se sente — un peu plus d'une seconde — et pas une
+   milliseconde de plus. */
+function animerPioche(){
+  const ovl = el('div','pioche');
+  /* Une fenêtre fixe, et une bande qui défile derrière : c'est la bande qu'on
+     anime, pas la fenêtre — sinon c'est toute la roue qui quitte l'écran. */
+  const roue = el('div','pioche__roue');
+  const piste = el('div','pioche__piste');
+  for(let i = 0; i < 18; i++){
+    const t = THEMES[i % THEMES.length];
+    const b = el('i');
+    b.style.background = 'hsl(' + (t && t.hue != null ? t.hue : (i * 40)) + ' 62% 55%)';
+    piste.appendChild(b);
+  }
+  roue.appendChild(piste);
+  ovl.appendChild(roue);
+  ovl.appendChild(el('span','pioche__tx', T()['pio.wait']));
+  document.body.appendChild(ovl);
+  requestAnimationFrame(()=> ovl.classList.add('on'));
+  return ()=>{
+    ovl.classList.add('fini');
+    setTimeout(()=> ovl.remove(), 420);
+  };
+}
+
+let pioEnCours = false;
+async function piocher(){
+  if(pioEnCours || !estPremium()) return;
+  pioEnCours = true;
+  const fermer = animerPioche();
+  try{
+    const dansLeFlux = new Set(Array.from(feed.children)
+      .map(c => c._item && (c._item.article || c._item.title)).filter(Boolean));
+    const cle = await cleAuHasard(dansLeFlux);
+    const item = cle ? await itemDeCle(cle) : null;
+    /* L'animation a une durée plancher : sans elle, un catalogue en cache
+       répond en dix millisecondes et le geste n'existe pas. */
+    await sleepMs(1150);
+    if(!item){ toast(T()['pio.none']); return; }
+    markSeen(item.article || item.title);
+    const carte = buildCard(item);
+    carte.classList.add('piochee');
+    const apres = current();
+    if(apres && apres.nextSibling) feed.insertBefore(carte, apres.nextSibling);
+    else feed.appendChild(carte);
+    carte.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' });
+    setActive(carte);
+  } finally {
+    fermer();
+    pioEnCours = false;
+  }
+}
+const sleepMs = ms => new Promise(r => setTimeout(r, ms));
+
+/* La fiche du jour : tirée une fois par jour, et gardée. Elle partage la
+   mémoire des deux mois du gratuit — personne ne doit retomber sur ce qu'il
+   vient de lire, quel que soit son plan. */
+async function ficheDuJour(){
+  purgerServis();
+  if(S.duJour && S.duJour.j === today() && S.duJour.c) return S.duJour.c;
+  const c = await cleAuHasard(null);
+  if(!c) return null;
+  S.duJour = { j: today(), c };
+  S.servis[c] = today();
+  LS.set('curio.dujour', S.duJour);
+  LS.set('curio.servis', S.servis);
+  return c;
+}
+
 /* ============================ rendu des cartes ============================ */
 const ICON = {
   ext:'<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-8.5 8.5M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>',
@@ -993,6 +1252,32 @@ function fillText(node, item){
     return;
   }
 
+  /* ── LE MODE ACCROCHE ──────────────────────────────────────────────────
+     Une fiche entière demande deux minutes. Quand on cherche LE sujet qui va
+     intriguer, deux minutes par fiche, c'est trop : on veut voir la première
+     phrase et passer.
+
+     Dans ce mode, chaque fiche s'arrête à son accroche, et un bouton la
+     déplie. Le dépliage vaut pour cette fiche-là seulement : on peut lire
+     celle qui accroche sans quitter le balayage. */
+  if(S.accroches && !node._deplie){
+    const paras = (item.blocks && item.blocks.length ? item.blocks[0].p
+                : (item.paras && item.paras.length ? item.paras : [item.extract || '']));
+    read.appendChild(el('p', null, md(paras[0] || '')));
+    const ouvrir = el('button','deplier', T()['acc.open']);
+    ouvrir.addEventListener('click', e=>{
+      e.stopPropagation();
+      node._deplie = true;
+      fillText(node, item);
+    });
+    read.appendChild(ouvrir);
+    if(node._endrow) read.appendChild(node._endrow);
+    read.classList.remove('more');
+    const c1 = node.querySelector('.readmore'); if(c1) c1.hidden = true;
+    read.onscroll = null;
+    return;
+  }
+
   let words = 0;
   if(item.blocks && item.blocks.length){
     item.blocks.forEach(b=>{
@@ -1003,6 +1288,11 @@ function fillText(node, item){
     const paras = (item.paras && item.paras.length) ? item.paras : [item.extract || ''];
     paras.forEach(p=>{ read.appendChild(el('p', null, md(p))); words += p.split(/\s+/).length; });
   }
+  /* On repose la phrase à raconter et la rangée de fin APRÈS les paragraphes :
+     elles font partie du texte qui défile, pas du cadre fixe autour de lui. */
+  if(node._dire)   read.appendChild(node._dire);
+  if(node._endrow) read.appendChild(node._endrow);
+
   read.scrollTop = 0;
 
   // Le texte est long : on le dit. Un texte qui s'estompe sans rien annoncer
@@ -1015,8 +1305,20 @@ function fillText(node, item){
     read.classList.toggle('more', over && !end);
     if(cue) cue.hidden = !(over && !end);
   };
-  read.onscroll = sync;
-  requestAnimationFrame(sync);
+  /* ── LE SIGNE DE FIN DE LECTURE ────────────────────────────────────────
+     Arrivé au bout du texte, un chevron discret apparaît sur le bord droit
+     et respire une fois. Il ne dit rien, il ne bloque rien : il rappelle
+     seulement de quel côté se trouve la suite, à l'instant précis où on se
+     le demande. Il s'efface dès qu'on remonte dans l'article. */
+  const fin = node.querySelector('.suivante');
+  const sync2 = ()=>{
+    sync();
+    if(!fin) return;
+    const bout = read.scrollTop + read.clientHeight >= read.scrollHeight - 8;
+    fin.classList.toggle('vu', bout);
+  };
+  read.onscroll = sync2;
+  requestAnimationFrame(sync2);
   if(cue && !cue._wired){
     cue._wired = true;
     cue.addEventListener('click', e=>{
@@ -1041,6 +1343,9 @@ function buildCard(item){
     (item.article ? ' <span class="sep">·</span> <span class="subj">' + esc(item.article) + '</span>'
                   : (item.desc ? ' <span class="sep">·</span> <span class="subj">' + esc(item.desc.slice(0,46)) + '</span>' : '')) +
 ''));
+  /* Le rendez-vous quotidien se voit : sans marque, une fiche du jour est une
+     fiche comme une autre, et le rendez-vous n'existe pas. */
+  if(item.duJour) body.appendChild(el('span','marquejour', T()['jour.badge']));
   body.appendChild(el('h2', null, esc(item.title)));
 
   body.appendChild(el('div','lede'));
@@ -1051,20 +1356,23 @@ function buildCard(item){
   cue.hidden = true;
   body.appendChild(cue);
 
-  // La version courte : la phrase qu'on dira à voix haute. C'est elle qu'on
-  // retient, et c'est pour elle qu'on lit. Elle ferme l'article.
+  /* ── LA PHRASE À RACONTER, EN BOUT DE LECTURE ──────────────────────────
+     Elle occupait une place fixe sous le texte. Sur un téléphone, avec le
+     bandeau, le titre et la rangée de boutons, il ne restait que quelques
+     lignes pour l'article lui-même — alors que c'est lui qu'on vient lire.
+
+     Elle descend donc DANS la zone de lecture, tout en bas : on la découvre
+     en arrivant au bout de la fiche, ce qui est exactement son moment. Le
+     texte, lui, récupère toute la hauteur.
+
+     Le bouton « copier » a disparu : on ne copie pas une phrase qu'on va
+     dire à voix haute, et il mangeait la largeur de la phrase. Le partage
+     reste, juste en dessous. */
   if(item.raconter){
     const dire = el('div','dire');
     dire.appendChild(el('span','dire__lb', T()['dire.label']));
     dire.appendChild(el('p','dire__tx', esc(item.raconter)));
-    const cp = el('button','dire__cp', T()['dire.copy']);
-    cp.addEventListener('click', async e=>{
-      e.stopPropagation();
-      try{ await navigator.clipboard.writeText(item.raconter); toast(T()['dire.done']); }
-      catch(err){ toast(T()['cur.copyFail']); }
-    });
-    dire.appendChild(cp);
-    body.appendChild(dire);
+    node._dire = dire;
   }
 
   // Garder et partager sont au bout de l'article, la ou on arrive quand on a
@@ -1084,9 +1392,18 @@ function buildCard(item){
   row.appendChild(bFav);
   row.appendChild(bShare);
   row.appendChild(el('span','ehint', T()['act.next']));
-  body.appendChild(row);
+  node._endrow = row;
   node._fav = bFav;
   node.appendChild(body);
+
+  /* Le repère de fin de lecture, hors du corps de texte : il appartient à la
+     carte, pas à l'article. */
+  const suiv = el('div','suivante',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"'
+    + ' stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>');
+  suiv.setAttribute('aria-hidden','true');
+  suiv.addEventListener('click', e=>{ e.stopPropagation(); go(1); });
+  node.appendChild(suiv);
 
   fillText(node, item);   // après l'attache : fillText interroge le DOM de la carte
   return node;
@@ -1192,9 +1509,17 @@ async function ensureAhead(){
         if(paidOnly){ feed.appendChild(buildLock('theme')); locked = true; break; }
       }
       const item = await fetchNext();
-      // rien à servir (réseau coupé, aucune fiche de secours) : on s'arrête
-      // plutôt que d'empiler des cartes vides
-      if(!item){ if(!feed.children.length) feed.appendChild(buildVide()); break; }
+      if(!item){
+        /* ── LA FIN DE LA JOURNÉE OFFERTE ──────────────────────────────
+           Les cinq du jour sont posées : il n'y a plus rien, et le dire
+           franchement vaut mieux que d'empiler des fiches estompées qu'on
+           ne peut pas lire. On invite, on ne frustre pas — et demain, cinq
+           autres arrivent sans rien demander à personne. */
+        if(S.plan === 'free' && feed.children.length && !locked){
+          feed.appendChild(buildLock('quota')); locked = true;
+        } else if(!feed.children.length) feed.appendChild(buildVide());
+        break;
+      }
 
       const cle = item.article || item.title;
       if(cle && deja.has(cle)){
@@ -1204,16 +1529,9 @@ async function ensureAhead(){
       if(cle) deja.add(cle);
       vains = 0;
 
-      const carte = buildCard(item);
-      // quota épuisé : la fiche arrive directement en aperçu, jamais bloquée
-      if(quotaEpuise()){
-        carte.dataset.apercu = '1';
-        carte.classList.add('apercu');
-        carte._counted = true;
-        fillText(carte, item);
-        poserCadenas(carte);
-      }
-      feed.appendChild(carte);
+      /* Les cinq du jour sont entières : plus d'aperçu estompé. Une fiche
+         offerte se lit jusqu'au bout, ou elle n'est pas proposée. */
+      feed.appendChild(buildCard(item));
     }
   } finally { filling = false; }
 }
@@ -1261,8 +1579,8 @@ function activeIndex(){
 }
 
 function resetFeed(){
-  feed.innerHTML = ''; locked = false; bag = {}; offlinePool = []; ready = [];
-  feed.scrollTop = 0;
+  feed.innerHTML = ''; locked = false; bag = {}; offlinePool = []; ready = []; jourServi = false;
+  feed.scrollLeft = 0;
   if(catalogueVide()){ feed.appendChild(buildVide()); setActive(feed.firstElementChild); return; }
   ensureAhead().then(()=>{ const f = feed.firstElementChild; if(f) setActive(f); });
 }
@@ -1284,8 +1602,6 @@ function setActive(node){
     if(S.plan === 'free'){ S.used++; LS.set('curio.used', S.used); renderQuota(); }
     if(typeof peutEtreInstall === 'function') peutEtreInstall();
   }
-  // le compteur est atteint : la suite passe en aperçu, on ne coupe pas le flux
-  if(quotaEpuise()) verrouillerSuite();
   updateActive();
   if(node._item) enrich(node._item);
   const nx = node.nextElementSibling;
@@ -1585,6 +1901,43 @@ $('#searchBtn').addEventListener('click', ()=>{
   m.addEventListener('click', e=>{ if(e.target.closest('button')) fermer(); });
   document.addEventListener('keydown', e=>{ if(e.key === 'Escape') fermer(); });
 })();
+/* Le mode accroche et la pioche, dans le tiroir « … ». */
+(function reglagesLecture(){
+  const a = $('#accBtn');
+  if(a){
+    const peindre = ()=>{
+      a.setAttribute('aria-pressed', S.accroches ? 'true' : 'false');
+      a.classList.toggle('on', !!S.accroches);
+      /* La feuille de style a besoin de savoir : une carte qui n'affiche
+         qu'une accroche se cale en bas, pas en haut. */
+      if(S.accroches) document.documentElement.dataset.accroches = '1';
+      else delete document.documentElement.dataset.accroches;
+    };
+    peindre();
+    a.addEventListener('click', ()=>{
+      S.accroches = !S.accroches;
+      LS.set('curio.accroches', S.accroches);
+      peindre();
+      /* On redessine les fiches en place : le lecteur ne perd pas sa position,
+         il change seulement de façon de lire. */
+      Array.from(feed.children).forEach(c=>{
+        if(c.dataset.kind !== 'fact' || !c._item) return;
+        c._deplie = false;
+        fillText(c, c._item);
+      });
+      toast(T()[S.accroches ? 'acc.on' : 'acc.off']);
+    });
+  }
+  const b = $('#pioBtn');
+  if(b) b.addEventListener('click', piocher);
+})();
+
+/* Le bouton Piocher n'apparaît que pour ceux qui y ont droit. */
+function majPioche(){
+  const b = $('#pioBtn');
+  if(b) b.hidden = !estPremium();
+}
+
 $('#qBtn').addEventListener('click', doSearch);
 $('#qInput').addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
 
@@ -1629,7 +1982,7 @@ function resultRow(item){
     close();
     const card = buildCard(item);
     feed.insertBefore(card, feed.firstElementChild);
-    feed.scrollTop = 0; setActive(card);
+    feed.scrollLeft = 0; setActive(card);
   });
   return b;
 }
@@ -1760,7 +2113,7 @@ async function openSubject(themeId, title, lockedU){
   markSeen(item.title);
   const card = buildCard(item);
   feed.insertBefore(card, feed.firstElementChild);
-  feed.scrollTop = 0; setActive(card);
+  feed.scrollLeft = 0; setActive(card);
   enrich(item);
 }
 
@@ -2533,13 +2886,25 @@ function go(dir){
   const cards = Array.from(feed.children);
   const i = cards.indexOf(current());
   const n = cards[i + dir];
-  if(n) n.scrollIntoView({ behavior:'smooth', block:'start' });
+  if(n) n.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' });
 }
 document.addEventListener('keydown', e=>{
   if($$('.sheet.open').length) return;
   if(e.target.tagName === 'INPUT') return;
-  if(e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown'){ e.preventDefault(); go(1); }
-  if(e.key === 'ArrowUp' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+  /* Droite et gauche changent de fiche, comme le doigt. Haut et bas restent
+     au texte : la barre d'espace fait défiler l'article, elle ne saute plus
+     par-dessus la moitié de ce qu'on était en train de lire. */
+  if(e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
+  if(e.key === 'ArrowLeft'){ e.preventDefault(); go(-1); }
+  if(e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown'
+     || e.key === 'PageUp' || e.key === 'ArrowUp'){
+    const c = current(), lu = c && c.querySelector('.lede');
+    if(!lu) return;
+    const bas = (e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown');
+    const pas = (e.key === 'ArrowDown' || e.key === 'ArrowUp') ? 80 : Math.round(lu.clientHeight * 0.82);
+    e.preventDefault();
+    lu.scrollBy({ top: bas ? pas : -pas, behavior:'smooth' });
+  }
   const c0 = current();
   if((e.key === 'f' || e.key === 'F') && c0) basculerFavori(c0._item, c0);
   if((e.key === 's' || e.key === 'S') && c0) partager(c0._item);
@@ -2625,16 +2990,26 @@ function toast(msg){
 function unlock(plan){
   S.plan = plan || 'lifetime'; LS.set('curio.plan', S.plan);
   S.picked = THEMES.map(t=>t.id); LS.set('curio.picked', S.picked);
-  renderQuota(); renderUniverses(); renderTocCount();
+  /* Le flux servait encore le tirage de cinq : on le vide pour que le
+     catalogue entier prenne sa place immédiatement, sans rechargement. */
+  bag = {}; ready = [];
+  renderQuota(); renderUniverses(); renderTocCount(); majPioche();
+  if(demarre) resetFeed();
 }
 
 /* Fin d'abonnement : on revient au gratuit, et rien d'autre ne bouge.
    La collection est conservée, les fiches déjà ouvertes restent lisibles
    hors ligne, et le compteur quotidien repart de zéro. */
+/* Fin d'abonnement : retour au gratuit, et le flux le montre TOUT DE SUITE.
+   Sans le resetFeed, le catalogue entier restait ouvert jusqu'au prochain
+   rechargement — l'abonnement expirait sur le papier, pas à l'écran. La
+   collection, elle, ne bouge pas : ce qui est gardé reste gardé. */
 function relock(){
   S.plan = 'free'; LS.set('curio.plan', 'free');
   S.used = 0; LS.set('curio.used', 0);
-  renderQuota(); renderUniverses(); renderTocCount(); renderPlans();
+  bag = {}; ready = [];
+  renderQuota(); renderUniverses(); renderTocCount(); renderPlans(); majPioche();
+  if(demarre) resetFeed();
   toast(T()['plan.back']);
 }
 // ?pro=1 débloque tout (test) — ?pro=0 revient à la version gratuite
@@ -2657,7 +3032,7 @@ function relock(){
 })();
 
 $('#streakN').textContent = S.streak;
-applyTheme(); applyLang(); langueUnique(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount();
+applyTheme(); applyLang(); langueUnique(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount(); majPioche();
 
 const AUDIT = new URLSearchParams(location.search).get('audit') === '1';
 /* déplacé en tête : filtrerPubliees() en a besoin dès le premier chargement */
@@ -2685,17 +3060,33 @@ window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault(); promptInstall = e; proposerInstall();
 });
 
+/* ── PROPOSER L'INSTALLATION ──────────────────────────────────────────────
+   Curio est plus agréable installé : plein écran, pas de barre d'adresse,
+   une icône sur l'écran d'accueil, et la lecture hors ligne. Mais la
+   proposition ne se déclenchait que là où le navigateur la fournit toute
+   faite — Chrome sur Android — ou sur iPhone. Sur un ordinateur, sur un iPad
+   en Safari, sur Firefox, personne n'apprenait jamais que c'était possible.
+
+   On propose donc partout, avec le mode d'emploi de la machine qu'on a sous
+   les yeux : le bouton natif quand il existe, sinon le chemin en toutes
+   lettres. Une seule fois — « Plus tard » vaut pour de bon. */
 function proposerInstall(){
   if(installe() || LS.get('curio.install', false)) return;
   if(document.querySelector('.install')) return;
 
-  const iOS = /iP(hone|ad|od)/.test(navigator.userAgent);
-  if(!promptInstall && !iOS) return;             // rien à proposer sur ce navigateur
+  const ua = navigator.userAgent;
+  const iOS = /iP(hone|ad|od)/.test(ua)
+           || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);   // iPad récent
+  const bureau = !/Android|iP(hone|ad|od)|Mobile/.test(ua);
+  const commentFaire = promptInstall ? 'inst.body'
+                     : iOS           ? 'inst.ios'
+                     : bureau        ? 'inst.bureau'
+                     :                 'inst.autre';
 
   const box = el('div','install');
   box.innerHTML =
-      '<div class="install__tx"><b>' + T()['inst.title'] + '</b>'
-    + '<span>' + (promptInstall ? T()['inst.body'] : T()['inst.ios']) + '</span></div>';
+      '<div class="install__tx"><b>' + T()[bureau && !promptInstall ? 'inst.titleBureau' : 'inst.title'] + '</b>'
+    + '<span>' + T()[commentFaire] + '</span></div>';
 
   const ferme = el('button','install__x');
   ferme.setAttribute('aria-label', T()['inst.later']);
@@ -2720,7 +3111,9 @@ function proposerInstall(){
 // on ne dérange personne au premier écran : la proposition arrive après
 // quelques anecdotes lues, quand l'intérêt est établi.
 function peutEtreInstall(){
-  if(S.onboarded && S.used >= 3) proposerInstall();
+  /* Deux fiches lues suffisent à savoir si l'endroit plaît. Au-delà, on
+     dérange quelqu'un qui a déjà pris ses habitudes dans un onglet. */
+  if(S.onboarded && S.used >= 2) proposerInstall();
 }
 
 // Les deux fichiers d'état sont attendus avant le premier remplissage :
@@ -2739,6 +3132,7 @@ Promise.all([loadStats(), loadCatalog()]).finally(()=>{
     renderQuota(); renderPlans();
     resetFeed(); openCuration(); return;
   }
+  demarre = true;
   if(!S.onboarded){ open('#onboard'); ensureAhead(); }
   else { resetFeed(); }
 });

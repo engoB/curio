@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#050E24" />
-<meta name="curio-version" content="8.6.2+8846adda15" />
+<meta name="curio-version" content="8.7.0+e812251127" />
 <meta name="curio-langues" content="fr" />
 <meta name="curio-images" content="oui" />
 <style>#langBtn{display:none !important}</style>
@@ -405,7 +405,7 @@ footer .sp{margin-left:auto}
         <a class="btn btn--ghost" href="#tarifs" data-t="cta2">Voir les formules</a>
       </div>
       <div class="reassure">
-        <span><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span data-t="r1">10 anecdotes offertes chaque jour</span></span>
+        <span><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span data-t="r1">5 anecdotes offertes chaque jour</span></span>
         <span><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span data-t="r2">Aucune inscription</span></span>
         <span><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span data-t="r3">Sans publicité</span></span>
       </div>
@@ -456,7 +456,7 @@ footer .sp{margin-left:auto}
   <div class="wrap">
     <p class="eyebrow" data-t="uEye">Les univers</p>
     <h2 data-t="uTitle">Huit mondes, des sujets choisis pour ce qu’ils racontent.</h2>
-    <p class="lead" data-t="uLead">Les huit sont ouverts, dès la version gratuite. Ce qui change avec l'abonnement, c'est le compteur : dix par jour, ou autant que vous voulez.</p>
+    <p class="lead" data-t="uLead">Les huit sont ouverts, dès la version gratuite. Ce qui change avec l'abonnement, c'est la durée : cinq anecdotes qui repartent le lendemain, ou tout le catalogue, quand vous voulez.</p>
     <div class="unis" id="unis"></div>
   </div>
 </section>
@@ -562,48 +562,44 @@ const DEMO = [
        "A bead of molten glass quenched in cold water shrugs off a hammer, a hydraulic press, <b>even a bullet</b>. Its chilled surface compresses the core with enormous force.<br><br>Snip the tail and the whole thing turns to powder. The fracture races at 1,900 metres per second, five times the speed of sound."]}
 ];
 
+/* ── LES QUESTIONS QU'ON SE POSE VRAIMENT ──────────────────────────────────
+   Cinq entrées, pas neuf. Quatre ont été retirées : celle sur la réalité du
+   compteur, qui soulevait elle-même un doute que personne n'avait ; celle sur
+   la proposition de sujets, qui promettait un échange à assurer ; celle sur
+   l'installation, qui répondait « non, et c'est voulu » alors que
+   l'application se propose désormais d'elle-même ; et celle sur le hors ligne,
+   détail technique qu'on ne se demande pas avant d'avoir essayé.
+
+   Les deux dernières disent maintenant la vérité du modèle : cinq anecdotes
+   par jour qui repartent le lendemain, et un abonnement qui, s'il s'arrête,
+   ramène à cette version gratuite. */
 const FAQ = {
   fr:[
     ["Qui écrit les anecdotes ?",
      "Chaque fiche est écrite pour Curio à partir de faits vérifiés, puis relue avant d'être publiée. Ce ne sont pas des extraits recopiés : ce sont des textes, avec une accroche, une explication et une chute — et un contrôle automatique rejette tout brouillon qui reprendrait des phrases à une source."],
     ["Comment sont choisis les sujets ?",
      "Un sujet n'entre dans Curio que s'il coche deux cases : il est assez connu pour parler à quelqu'un, et assez étrange pour valoir d'être raconté. Chaque candidat reçoit une note d'insolite ; en dessous d'un certain seuil, il n'est pas écrit. C'est pour cela que vous ne tomberez pas sur une fiche de définition ni sur une biographie plate."],
-    ["Le chiffre affiché en haut est-il réel ?",
-     "Oui, et c'est important. Il compte les anecdotes réellement écrites et publiées, pas les sujets en attente. Le badge à côté indique combien sont arrivées cette semaine. Rien n'est saisi à la main."],
     ["Que contient la version gratuite ?",
-     "Dix anecdotes par jour, prises dans les huit univers — aucun n'est fermé. La recherche, votre collection, la lecture hors ligne et le mode clair/sombre sont inclus. Sans compte, sans publicité."],
+     "Cinq anecdotes par jour, tirées au hasard dans les huit univers — aucun n'est fermé. Elles sont à vous pour la journée : le lendemain, cinq autres arrivent et les précédentes s'en vont. Vous ne reverrez pas deux fois la même avant deux mois. Sans compte, sans publicité."],
     ["Quelle différence entre l'abonnement et l'achat à vie ?",
-     "L'abonnement se règle au mois ou à l'année et se résilie quand vous voulez, en un clic, depuis votre espace client. L'achat à vie est un paiement unique : il ouvre les huit univers pour toujours, y compris tout ce qui sera écrit après votre achat."],
+     "L'abonnement se règle au mois ou à l'année et se résilie quand vous voulez, en un clic. L'achat à vie est un paiement unique : le catalogue entier vous reste ouvert pour toujours, y compris tout ce qui sera écrit après votre achat."],
     ["Si je m'abonne aujourd'hui, j'ai accès à tout ?",
-     "Oui. Tout ce qui a déjà été publié, et tout ce qui le sera pendant votre abonnement. Une anecdote écrite ne disparaît jamais et n'est jamais réservée à ceux qui étaient là avant vous."],
-    ["Est-ce que ça marche hors ligne ?",
-     "Oui, et pour tout le monde. Curio garde l'application et les anecdotes que vous avez ouvertes : dans le métro ou en avion, elles restent lisibles. Rien à activer, rien à télécharger."],
-    ["Faut-il installer une application ?",
-     "Non, et c'est voulu. Curio s'ajoute à votre écran d'accueil comme une application — sur iPhone : le menu de partage, puis « Sur l'écran d'accueil » ; sur Android, le navigateur le propose de lui-même. Elle s'ouvre en plein écran, sans barre d'adresse, et fonctionne hors ligne. Rien à télécharger, rien à mettre à jour."],
-    ["Puis-je proposer un sujet ?",
-     "Volontiers, et les propositions des abonnés passent en premier. Écrivez-nous le sujet et pourquoi il vous a marqué — c'est la deuxième partie qui décide."]
+     "Oui : tout le catalogue publié, plus tout ce qui paraîtra pendant votre abonnement, sans compteur ni limite de journée. Si vous arrêtez, vous revenez à la version gratuite et à ses cinq anecdotes du jour — rien n'est effacé, votre collection reste, et vous retrouvez le catalogue entier le jour où vous reprenez. L'achat à vie, lui, ne s'arrête pas."]
   ],
   en:[
-    ['Who writes the pieces?',
+    ["Who writes the pieces?",
      "Every piece is written for Curio from verified facts, then read again before it goes live. These are not copied extracts: they are written texts, with an opening, an explanation and a turn — and an automatic check rejects any draft that borrows sentences from a source."],
-    ['How are subjects chosen?',
+    ["How are subjects chosen?",
      "A subject only enters Curio if it clears two bars: well known enough to mean something to someone, strange enough to be worth telling. Each candidate gets a strangeness score, and below a threshold it never gets written. That is why you will not land on a dictionary definition or a flat biography."],
-    ['Is the number at the top real?',
-     "Yes, and that matters. It counts pieces actually written and published, not subjects queued up. The badge beside it shows how many arrived this week. Nothing is typed in by hand."],
-    ['What is in the free version?',
-     "Ten pieces a day, drawn from all eight universes — none is closed off. Search, your collection, offline reading and light/dark mode are included. No account, no ads."],
-    ['Subscription or lifetime — what changes?',
-     "The subscription is billed monthly or yearly and can be cancelled in one click from your customer area. Lifetime is a single payment: all eight universes, for good, including everything written after you buy."],
-    ['If I subscribe today, do I get everything?',
-     "Yes. Everything already published, and everything published while you subscribe. A piece once written never disappears and is never reserved for people who arrived before you."],
-    ['Does it work offline?',
-     "Yes, for everyone. Curio keeps the app and the pieces you have opened: on the underground or on a plane, they stay readable. Nothing to switch on, nothing to download."],
-    ['Do I need to install an app?',
-     "No, and that is deliberate. Curio adds itself to your home screen like an app — on iPhone: the share menu, then 'Add to Home Screen'; on Android the browser offers it for you. It opens full screen, with no address bar, and works offline. Nothing to download, nothing to update."],
-    ['Can I suggest a subject?',
-     "Please do, and subscriber suggestions go first. Send us the subject and why it stuck with you — the second part is what decides."]
+    ["What is in the free version?",
+     "Five pieces a day, drawn at random from all eight universes — none is closed off. They are yours for the day: tomorrow five others arrive and these are gone. You will not see the same one twice within two months. No account, no ads."],
+    ["Subscription or lifetime — what changes?",
+     "The subscription is billed monthly or yearly and can be cancelled in one click. Lifetime is a single payment: the whole catalogue stays open to you for good, including everything written after you buy."],
+    ["If I subscribe today, do I get everything?",
+     "Yes: the whole published catalogue, plus everything that appears while you subscribe, with no counter and no daily limit. If you stop, you go back to the free version and its five pieces of the day — nothing is deleted, your collection stays, and the whole catalogue is there again the day you resume. Lifetime does not stop."]
   ]
 };
+
 
 const TXT = {
   fr:{
@@ -612,14 +608,15 @@ const TXT = {
     h1:'Le monde est <em>plus étrange</em> que vous ne le pensez.',
     sub:"Des faits vrais, écrits pour être lus : deux minutes par anecdote, une par écran, huit univers. Pas de fil sans fin, pas de publicité, rien à faire défiler pour rien.",
     cta1:'Essayer gratuitement', cta2:'Voir les formules',
-    r1:'10 anecdotes offertes chaque jour', r2:'Aucune inscription', r3:'Sans publicité',
+    r1:'5 anecdotes offertes chaque jour', r2:'Aucune inscription', r3:'Sans publicité',
     howEye:'Comment ça marche', howTitle:'Trois gestes, et le savoir devient une habitude.',
     howLead:"Curio n'est pas une encyclopédie de plus. C'est un rythme : quelque chose de vrai, de court et de mémorable, chaque jour.",
     s1t:'Choisissez vos univers', s1p:"Cosmos, vivant, histoire oubliée, mystères… Vous composez le flux qui vous ressemble, et vous le modifiez quand vous voulez.",
-    s2t:'Lisez', s2p:"Une anecdote par écran, deux minutes de lecture, un fond dessiné pour l'univers. Le texte a un début, un mécanisme et une chute — pas un résumé qui s'arrête au milieu.",
+    s2t:'Deux minutes, une histoire entière',
+    s2p:"Une anecdote par écran : l'accroche, ce qu'on ne savait pas, la chute. On la lit debout dans le métro, et le soir on la raconte à quelqu'un.",
     s3t:'Gardez ce qui vous marque', s3p:"Un geste pour ajouter à votre collection, un autre pour partager. Votre série de jours consécutifs vous ramène chaque matin.",
     uEye:'Les univers', uTitle:'Huit mondes, des sujets choisis pour ce qu’ils racontent.',
-    uLead:"Les huit sont ouverts, dès la version gratuite. Ce qui change avec l'abonnement, c'est le compteur : dix par jour, ou autant que vous voulez.",
+    uLead:"Les huit sont ouverts, dès la version gratuite. Ce qui change avec l'abonnement, c'est la durée : cinq anecdotes qui repartent le lendemain, ou tout le catalogue, quand vous voulez.",
     pEye:'Tarifs', pTitle:'Payez une fois, ou chaque mois. Jamais avec votre attention.',
     pLead:"Pas de publicité, pas de revente de données, pas de flux « recommandé » qui vous garde captif. Juste un abonnement honnête — ou un achat définitif.",
     pNote:"Paiement sécurisé, résiliable à tout moment, sans justification. L'achat à vie inclut les huit univers et toutes les anecdotes à venir. Aucune publicité, aucune revente de données.",
@@ -629,7 +626,7 @@ const TXT = {
     planName:{monthly:'Mensuel',yearly:'Annuel',lifetime:'À vie'},
     planTag:'Le meilleur rapport',
     freeName:'Gratuit', freeUnit:'€ pour toujours', freeCta:'Commencer maintenant',
-    freeFeat:['10 anecdotes par jour','Les 8 univers, aucun fermé','Lecture hors ligne','Ma collection','Sans compte, sans publicité'],
+    freeFeat:['5 anecdotes par jour, renouvelées chaque matin','Les 8 univers, aucun fermé','Ma collection','Sans compte, sans publicité'],
     planCta:{monthly:"S'abonner",yearly:"S'abonner",lifetime:'Acheter à vie'},
     feat:{
       monthly:['Lecture illimitée','Le sommaire et la recherche','Nouveautés chaque semaine','Sans engagement'],
@@ -644,14 +641,15 @@ const TXT = {
     h1:'The world is <em>stranger</em> than you think.',
     sub:'True things, written to be read: two minutes per piece, one per screen, eight universes. No endless feed, no advertising, nothing to scroll past.',
     cta1:'Try it free', cta2:'See the plans',
-    r1:'10 free wonders every day', r2:'No sign-up', r3:'No ads',
+    r1:'5 free wonders every day', r2:'No sign-up', r3:'No ads',
     howEye:'How it works', howTitle:'Three gestures, and knowing becomes a habit.',
     howLead:'Curio is not another encyclopedia. It is a rhythm: something true, short and memorable, every day.',
     s1t:'Pick your universes', s1p:'Cosmos, living world, forgotten history, mysteries… You compose the stream that suits you, and change it whenever you like.',
-    s2t:'Read', s2p:'One piece per screen, two minutes of reading, a backdrop drawn for its universe. Each has an opening, a mechanism and a turn — not a summary that stops halfway.',
+    s2t:'Two minutes, a whole story',
+    s2p:"One piece per screen: the hook, the thing you did not know, the turn. You read it standing on the train, and that evening you tell someone.",
     s3t:'Keep what strikes you', s3p:'One tap to add to your collection, one to share. Your daily streak brings you back each morning.',
     uEye:'The universes', uTitle:'Eight worlds, subjects picked for what they tell.',
-    uLead:'All eight are open, from the free version. What the subscription changes is the counter: ten a day, or as many as you like.',
+    uLead:'All eight are open, from the free version. What the subscription changes is how long they last: five pieces that are gone tomorrow, or the whole catalogue, whenever you like.',
     pEye:'Pricing', pTitle:'Pay once, or every month. Never with your attention.',
     pLead:'No ads, no data resale, no “recommended” feed engineered to keep you scrolling. Just an honest subscription — or a one-off purchase.',
     pNote:'Secure payment, cancel anytime, no questions asked. Lifetime covers all eight universes and every piece still to come. No advertising, no data resale.',
@@ -661,7 +659,7 @@ const TXT = {
     planName:{monthly:'Monthly',yearly:'Yearly',lifetime:'Lifetime'},
     planTag:'Best value',
     freeName:'Free', freeUnit:'€ forever', freeCta:'Start now',
-    freeFeat:['10 pieces a day','All 8 universes, none locked','Offline reading','My collection','No account, no ads'],
+    freeFeat:['5 pieces a day, renewed every morning','All 8 universes, none locked','My collection','No account, no ads'],
     planCta:{monthly:'Subscribe',yearly:'Subscribe',lifetime:'Buy lifetime'},
     feat:{
       monthly:['Unlimited reading','Contents list and search','New pieces every week','No commitment'],
@@ -907,8 +905,8 @@ function paintCount(){
                            : 'Eight worlds, ' + n + ' written wonders.';
   const s2 = document.querySelector('[data-t="uLead"]');
   if(s2) s2.textContent = fr
-    ? "Les huit sont ouverts, dès la version gratuite. Ce qui change avec l'abonnement, c'est le compteur : dix par jour, ou autant que vous voulez — et le sommaire, qui donne accès à tout d'un coup."
-    : 'All eight are open, from the free version. What the subscription changes is the counter — ten a day, or as many as you like — and the contents list, which opens everything at once.';
+    ? "Les huit sont ouverts, dès la version gratuite. Ce qui change avec l'abonnement, c'est la durée : cinq anecdotes qui repartent le lendemain, ou tout le catalogue et son sommaire, quand vous voulez."
+    : 'All eight are open, from the free version. What the subscription changes is how long they last — five pieces that are gone tomorrow, or the whole catalogue and its contents list, whenever you like.';
 }
 
 $('#yr').textContent = new Date().getFullYear();

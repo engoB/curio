@@ -189,8 +189,15 @@ a{color:var(--accent);text-decoration:none}
 .tbmore.open{display:flex}
 .iconbtn--more{position:relative}
 @media (min-width:900px){
-  /* sur grand ecran tout tient : le tiroir se deplie dans la barre */
-  .iconbtn--more{display:none}
+  /* Sur grand écran tout tient : le tiroir se déplie dans la barre, et le
+     bouton « … » n'a plus lieu d'être.
+
+     Le `!important` n'est pas une facilité : `.iconbtn{display:grid}` est
+     écrit PLUS BAS dans cette feuille, à spécificité égale, et l'emportait
+     donc sur ce `display:none`. Résultat, le bouton restait affiché à côté
+     d'un tiroir déjà déplié — on cliquait, il basculait une classe qui ne
+     changeait plus rien, et le bouton passait pour cassé. */
+  .iconbtn--more{display:none !important}
   .tbmore{
     position:static;display:flex;background:none;border:0;box-shadow:none;
     padding:0;max-width:none;
@@ -240,15 +247,28 @@ a{color:var(--accent);text-decoration:none}
 }
 .streak svg{width:14px;height:14px;fill:currentColor}
 
-/* ---------- feed ---------- */
+/* ---------- feed ----------
+   ── ON CHANGE DE FICHE EN BALAYANT SUR LE CÔTÉ ──────────────────────────
+   Le flux défilait verticalement, et le texte de chaque fiche défilait
+   verticalement lui aussi : deux gestes identiques pour deux actions
+   opposées. Sur un téléphone, un pouce qui voulait lire la suite du texte
+   emportait la fiche entière, et on compensait en rétrécissant la zone de
+   lecture — d'où le manque de place.
+
+   Le haut et le bas appartiennent désormais au TEXTE, sans partage. La
+   gauche et la droite changent de fiche. Chaque geste a une seule
+   signification, et l'article peut occuper tout l'écran. */
 .feed{
-  height:100dvh;overflow-y:scroll;scroll-snap-type:y mandatory;
+  height:100dvh;display:flex;flex-direction:row;
+  overflow-x:scroll;overflow-y:hidden;scroll-snap-type:x mandatory;
   scrollbar-width:none;-ms-overflow-style:none;
+  overscroll-behavior-x:contain;
 }
 .feed::-webkit-scrollbar{display:none}
 
 .card{
-  position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;
+  position:relative;flex:0 0 100%;width:100%;height:100dvh;
+  scroll-snap-align:start;scroll-snap-stop:always;
   overflow:hidden;display:flex;align-items:flex-end;isolation:isolate;
 }
 [hidden]{display:none !important}
@@ -303,6 +323,15 @@ a{color:var(--accent);text-decoration:none}
    déborde VERS LE HAUT et passe sous la barre. Avec margin-top:auto il reste
    toujours sous elle, et c'est le bas qui défile. */
 .card__body > :first-child{margin-top:auto}
+/* Sur un écran étroit, le calage en bas coûte une place qu'on n'a pas : la
+   fiche commence sous la barre et descend, tout simplement. */
+@media (max-width:760px){
+  .card__body > :first-child{margin-top:0}
+  /* En mode accroche il n'y a qu'une phrase : la caler en haut laisserait un
+     grand vide sous elle. On revient alors au calage en bas, celui d'une
+     carte qui n'a que peu à dire. */
+  [data-accroches] .card__body > :first-child{margin-top:auto}
+}
 .card.is-active .card__body > *{animation:rise .62s cubic-bezier(.16,1,.3,1) both}
 .card.is-active .card__body > *:nth-child(2){animation-delay:.06s}
 .card.is-active .card__body > *:nth-child(3){animation-delay:.12s}
@@ -328,9 +357,20 @@ a{color:var(--accent);text-decoration:none}
   line-height:1.08;letter-spacing:-.025em;
   margin:0 0 20px;text-wrap:balance;
 }
+/* ── LA ZONE DE LECTURE PREND LA PLACE ────────────────────────────────────
+   Elle était en `flex:0 1 auto` : elle ne prenait que ce dont le texte avait
+   besoin, et se faisait comprimer par tout le reste. Sur un téléphone, entre
+   le bandeau, le titre, la phrase à raconter et la rangée de boutons, il
+   restait quatre lignes d'article — alors que l'article est ce qu'on vient
+   lire. En `flex:1 1 auto`, c'est l'inverse : le texte prend toute la hauteur
+   disponible, et ce sont les autres qui s'arrangent.
+
+   La phrase à raconter et la rangée de fin sont maintenant DANS cette zone,
+   posées après le dernier paragraphe : on les rencontre au bout de la
+   lecture, à leur place. */
 .card .lede{
   margin:0 0 18px;max-width:60ch;
-  flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;scrollbar-width:thin;
   scrollbar-color:var(--line-strong) transparent;
 }
@@ -607,6 +647,8 @@ a{color:var(--accent);text-decoration:none}
 @media (max-width:400px){ .gate .btn{flex:1 1 100%} }
 
 /* ---------- la version courte, celle qu'on dit à voix haute ---------- */
+.card .lede .dire{margin-top:26px}
+.card .lede .endrow{margin-bottom:4px}
 .dire{
   position:relative;margin:18px 0 0;padding:15px 17px 15px 18px;
   border-radius:0 14px 14px 0;border-left:2px solid var(--accent);
@@ -618,20 +660,90 @@ a{color:var(--accent);text-decoration:none}
   color:var(--accent);
 }
 .dire__tx{
-  margin:0;padding-right:64px;
+  margin:0;
   font-family:Fraunces,Georgia,serif;font-weight:400;font-variation-settings:"SOFT" 26;
   font-size:calc(clamp(16px,1.9vw,18.5px) * var(--lecture));
   line-height:1.45;letter-spacing:-.008em;color:var(--text);
 }
-.dire__cp{
-  position:absolute;top:12px;right:12px;
-  height:28px;padding:0 11px;border-radius:9px;
-  border:1px solid var(--accent);color:var(--accent);
-  font-size:11px;font-weight:700;letter-spacing:.04em;
-  transition:background .15s,color .15s;
+/* Le bouton « copier » a été retiré : on ne copie pas une phrase qu'on va
+   dire à voix haute, et il mangeait la largeur de cette phrase. */
+
+/* ── LE MODE ACCROCHE ─────────────────────────────────────────────────────
+   Le bouton qui déplie une fiche : franc, à la largeur du texte, il fait
+   partie de la lecture et non de l'habillage. */
+.deplier{
+  display:block;width:100%;max-width:60ch;margin:18px 0 0;
+  padding:11px 14px;border-radius:11px;
+  border:1px dashed var(--line-strong);background:none;color:var(--accent);
+  font:inherit;font-size:13px;font-weight:700;letter-spacing:.03em;
+  cursor:pointer;transition:background .16s,border-color .16s;
 }
-.dire__cp:hover{background:var(--accent);color:var(--accent-ink)}
-@media (max-width:420px){ .dire__tx{padding-right:0} .dire__cp{position:static;margin-top:10px} }
+.deplier:hover{background:var(--accent-soft);border-color:var(--accent)}
+.chip.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* ── LA MARQUE DE LA FICHE DU JOUR ────────────────────────────────────── */
+.marquejour{
+  display:inline-block;align-self:flex-start;margin:0 0 10px;
+  padding:4px 10px;border-radius:8px;
+  font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--brass);background:var(--brass-soft);border:1px solid var(--brass-soft);
+}
+
+/* ── LA PIOCHE ────────────────────────────────────────────────────────────
+   Huit bandes aux couleurs des univers filent derrière une fenêtre étroite,
+   puis ralentissent : on voit le tirage avoir lieu. L'écran s'assombrit à
+   peine — c'est un geste, pas une interruption. */
+.pioche{
+  position:fixed;inset:0;z-index:90;display:grid;place-items:center;gap:18px;
+  align-content:center;
+  background:color-mix(in srgb, var(--ink) 93%, transparent);
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  opacity:0;transition:opacity .28s ease;
+}
+.pioche.on{opacity:1}
+.pioche.fini{opacity:0}
+.pioche__roue{
+  width:min(280px,72vw);height:78px;border-radius:16px;overflow:hidden;
+  border:1px solid var(--line-strong);
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.6);
+}
+.pioche__piste{display:flex;flex-direction:column;will-change:transform}
+.pioche__piste i{flex:0 0 78px;display:block}
+@media (prefers-reduced-motion:no-preference){
+  .pioche__piste{ animation:defile 1.35s cubic-bezier(.2,.8,.2,1) forwards }
+}
+@keyframes defile{
+  0%   { transform:translateY(0) }
+  70%  { transform:translateY(-1014px) }
+  100% { transform:translateY(-1092px) }
+}
+.pioche__tx{
+  font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--text-2);
+}
+.card.piochee .card__body{animation:rise .5s cubic-bezier(.16,1,.3,1) both}
+
+/* ── LE REPÈRE DE FIN DE LECTURE ──────────────────────────────────────────
+   Un chevron sur le bord droit, invisible tant qu'il reste du texte. Quand on
+   arrive au bout, il apparaît et respire une fois : la suite est par là.
+   Discret par construction — pas de fond, pas d'étiquette, et il s'efface dès
+   qu'on remonte dans l'article. */
+.suivante{
+  position:absolute;z-index:4;right:6px;top:50%;transform:translateY(-50%);
+  width:38px;height:38px;display:grid;place-items:center;
+  color:var(--text-2);opacity:0;pointer-events:none;
+  transition:opacity .45s ease;
+}
+.suivante svg{width:22px;height:22px}
+.suivante.vu{opacity:.62;pointer-events:auto;cursor:pointer}
+.suivante.vu:hover{opacity:1;color:var(--accent)}
+@media (prefers-reduced-motion:no-preference){
+  .suivante.vu svg{animation:appelle 2.4s ease-in-out 3}
+}
+@keyframes appelle{
+  0%,100%{transform:translateX(0)}
+  50%{transform:translateX(5px)}
+}
 
 /* ---------- fin d'article : garder, partager, et la suite ---------- */
 .endrow{

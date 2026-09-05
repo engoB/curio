@@ -53,6 +53,16 @@
       <svg viewBox="0 0 24 24" id="themeIcon"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
     </button>
     <button class="langbtn" id="paletteBtn" title="Jeu de couleurs : bleu nuit ou encre d'origine">BLEU</button>
+    <!-- Ne montrer que les accroches : pour trouver vite le sujet qui intrigue. -->
+    <button class="chip" id="accBtn" aria-pressed="false">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h6"/></svg>
+      <span data-i18n="acc.mode">Accroches seules</span>
+    </button>
+    <!-- La pioche : réservée à l'abonnement et à l'achat à vie. -->
+    <button class="chip chip--or" id="pioBtn" hidden>
+      <svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.6 5 .6-3.7 3.4 1 4.9L12 14.1 7.6 16.5l1-4.9L4.9 8.2l5-.6L12 3z"/></svg>
+      <span data-i18n="pio.cta">Piocher</span>
+    </button>
     <button class="chip" id="shuffleBtn">
       <svg viewBox="0 0 24 24"><path d="M3 6h4l10 12h4M3 18h4l3-3.6M14.5 8.6L17 6h4M18 3l3 3-3 3M18 15l3 3-3 3"/></svg>
       <span data-i18n="shuffle">Tout mélanger</span>
@@ -84,7 +94,7 @@
         <div class="universes" id="obUniverses"></div>
       </div>
       <button class="btn btn--primary" id="obStart" data-i18n="ob.cta">Commencer à explorer</button>
-      <p class="fineprint" data-i18n="ob.note">10 anecdotes offertes chaque jour. Aucune inscription requise.</p>
+      <p class="fineprint" data-i18n="ob.note">5 anecdotes offertes chaque jour, renouvelées chaque matin. Aucune inscription requise.</p>
       <p class="fineprint fineprint--src" data-i18n="ob.source">Chaque anecdote est écrite pour Curio à partir de faits vérifiés, puis relue avant publication.</p>
     </div>
   </div>
