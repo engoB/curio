@@ -1373,9 +1373,14 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
     box-shadow:var(--shadow);
     padding:clamp(30px,3vw,44px) clamp(30px,3vw,46px) clamp(26px,2.6vw,38px);
   }
-  .card h2{font-size:clamp(32px,3vw,46px)}
+  /* ── LA TAILLE DE LECTURE VAUT ICI AUSSI ──────────────────────────────
+     Ces deux règles fixaient la taille en dur et écrasaient l'échelle : sur
+     un ordinateur, changer la taille du texte ne déplaçait plus que
+     l'accroche — seule assez spécifique pour survivre. Un réglage
+     d'accessibilité qui ne s'applique pas au texte n'est pas un réglage. */
+  .card h2{font-size:calc(clamp(32px,3vw,46px) * var(--lecture))}
   .card .lede{max-height:min(58vh,620px);max-width:none}
-  .card .lede p{font-size:16.5px}
+  .card .lede p{font-size:calc(16.5px * var(--lecture))}
   .lockwrap{align-self:center;padding-bottom:0}
   .actions{right:clamp(16px,1.6vw,28px)}
 }
@@ -1439,7 +1444,7 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
             calc(env(safe-area-inset-bottom,0px) + 20px) clamp(18px,5vw,26px);
   }
   .lockwrap{padding-bottom:40px}
-  .card h2{font-size:clamp(25px,7vw,32px);margin-bottom:12px}
+  .card h2{font-size:calc(clamp(25px,7vw,32px) * var(--lecture));margin-bottom:12px}
   .eyebrow{margin-bottom:12px}
   .card .lede{max-width:none}
   .actions{bottom:calc(env(safe-area-inset-bottom,0px) + 18px);gap:8px}

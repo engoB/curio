@@ -901,7 +901,12 @@ async function tirageDuJour(){
      dans les univers retenus — et si ceux-ci n'ont pas de quoi remplir la
      journée, on élargit plutôt que de servir trois fiches : une préférence
      n'est pas un mur. */
-  const choisis = activeThemes();
+  /* ── EN GRATUIT, LES HUIT UNIVERS ──────────────────────────────────────
+     Choisir ses univers est une commande sur ce qu'on lit : elle appartient
+     aux formules payantes. Le gratuit, lui, reçoit cinq anecdotes tirées
+     dans TOUT le catalogue — c'est une découverte, pas une bibliothèque
+     qu'on trie. Un filtre qui n'a pas d'effet vaut mieux retiré qu'affiché. */
+  const choisis = estPremium() ? activeThemes() : CONFIG.freeThemes.slice();
   let tout = await catalogueOffrable(choisis);
   if(tout.length < OFFRE_JOUR) tout = await catalogueOffrable();
   if(!tout.length) return [];
@@ -1832,10 +1837,7 @@ function applyPickedIfChanged(){
        de demain, et le lecteur ne reste pas devant un filtre qu'il croit
        cassé. C'était le cas jusqu'ici : le tirage ignorait les univers, et
        rien n'expliquait pourquoi. */
-    if(S.plan === 'free' && S.tirage && S.tirage.j === today()){
-      const memes = (S.tirage.u || '') === activeThemes().slice().sort().join(',');
-      if(!memes) toast(T()['uni.demain']);
-    } else resetFeed();
+    resetFeed();
   }
   pickedSnapshot = '';
 }
@@ -2064,6 +2066,11 @@ $('#searchBtn').addEventListener('click', ()=>{
   }
   const b = $('#pioBtn');
   if(b) b.addEventListener('click', piocher);
+  const ins = $('#installBtn');
+  if(ins) ins.addEventListener('click', ()=>{
+    const d = document.querySelector('.install'); if(d) d.remove();
+    proposerInstall(true);
+  });
 })();
 
 /* ── CE QUI APPARTIENT AUX FORMULES PAYANTES ──────────────────────────────
@@ -2076,14 +2083,35 @@ $('#searchBtn').addEventListener('click', ()=>{
 function majPremium(){
   const p = estPremium();
   const b = $('#pioBtn'); if(b) b.hidden = !p;
+  /* L'installation ne dépend pas de la formule : elle disparaît seulement
+     quand l'application EST installée. */
+  const ib = $('#installBtn'); if(ib) ib.hidden = installe();
   const l = $('#libBtn'); if(l) l.hidden = !p;
+  /* Le choix des univers est une commande sur ce qu'on lit : en gratuit, les
+     cinq du jour viennent des huit, et le bouton n'aurait rien à commander. */
+  const u = $('#uniBtn'); if(u) u.hidden = !p;
   /* Les fiches déjà à l'écran portent peut-être encore le bouton « Garder ». */
   document.querySelectorAll('.ebtn--fav').forEach(x => { x.hidden = !p; });
 }
 const majPioche = majPremium;   // ancien nom, gardé pour ne rien casser
 
 $('#qBtn').addEventListener('click', doSearch);
-$('#qInput').addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+$('#qInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ clearTimeout(chercheT); doSearch(); } });
+/* ── LA RECHERCHE RÉPOND DÈS LES PREMIÈRES LETTRES ───────────────────────
+   Il fallait valider pour voir quoi que ce soit — donc taper, s'arrêter,
+   appuyer, lire, effacer, recommencer. On cherche rarement le mot exact du
+   premier coup : c'est en voyant la liste se resserrer qu'on trouve.
+
+   Un quart de seconde de silence après la dernière touche suffit à ne pas
+   lancer une recherche par lettre frappée. Deux caractères au minimum : en
+   dessous, tout ressort et la liste n'apprend rien. */
+let chercheT = null;
+$('#qInput').addEventListener('input', ()=>{
+  clearTimeout(chercheT);
+  const q = $('#qInput').value.trim();
+  if(q.length < 2){ $('#qList').innerHTML = ''; return; }
+  chercheT = setTimeout(doSearch, 250);
+});
 
 async function doSearch(){
   const q = $('#qInput').value.trim(); if(!q) return;
@@ -2203,8 +2231,14 @@ function renderToc(){
       + '<span class="n">' + list.length + '</span>';
     g.appendChild(h);
 
-    const cap = q ? 400 : (tocShown[t.id] || (prets ? 400 : 24));
-    const wrap = el('div','toclist' + (prets ? ' toclist--rich' : ''));
+    /* `prets` n'a jamais existé : la ligne levait « prets is not defined » et
+       le sommaire s'arrêtait là, sans une seule entrée cliquable. Ce qu'elle
+       voulait dire, c'est « ces entrées portent-elles une accroche rédigée ? »
+       — auquel cas on en montre plus et on les affiche en pleine largeur.
+       C'est exactement ce que contient tocPrets. */
+    const riche = source.length > 0;
+    const cap = q ? 400 : (tocShown[t.id] || (riche ? 400 : 24));
+    const wrap = el('div','toclist' + (riche ? ' toclist--rich' : ''));
     list.slice(0, cap).forEach(x=>{
       const b = el('button','toc', esc(x.accroche));
       b.addEventListener('click', ()=> openSubject(t.id, x.titre, false));
@@ -2256,6 +2290,13 @@ async function openSubject(themeId, title, lockedU){
   }
   markSeen(item.title);
   const card = buildCard(item);
+  /* ── UN SUJET DEMANDÉ SE LIT EN ENTIER ─────────────────────────────────
+     On arrive ici parce qu'on a CHERCHÉ ce sujet — dans le sommaire ou dans
+     sa collection. En mode accroche, la fiche s'ouvrait alors sur sa seule
+     phrase d'accroche : on ne savait même pas si c'était le bon texte. Le
+     mode accroche sert à balayer, pas à répondre à une demande précise. */
+  card._deplie = true;
+  card.classList.add('deplie');
   /* ── RELIRE NE COÛTE PAS UNE ANECDOTE ──────────────────────────────────
      Une fiche rouverte depuis la collection ou le sommaire ne consomme pas
      la journée offerte : sinon garder une anecdote se retournerait contre
@@ -2263,6 +2304,7 @@ async function openSubject(themeId, title, lockedU){
      ce qui était exactement le cas. Ce qu'on a gardé est à soi. */
   card._counted = true;
   feed.insertBefore(card, feed.firstElementChild);
+  fillText(card, item);              // on redessine : la fiche est dépliée
   feed.scrollTop = 0; setActive(card);
   enrich(item);
 }
@@ -3210,8 +3252,13 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   });
 }
 
-const installe = () =>
-  window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+/* Déclaration de fonction, pas constante fléchée : elle est appelée par
+   majPremium() au tout premier rendu, bien avant cette ligne. Une `const` y
+   serait encore dans sa zone morte — « Cannot access before initialization »,
+   et toute l'application s'arrêtait là. */
+function installe(){
+  return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+}
 
 let promptInstall = null;
 window.addEventListener('beforeinstallprompt', e=>{
@@ -3228,8 +3275,11 @@ window.addEventListener('beforeinstallprompt', e=>{
    On propose donc partout, avec le mode d'emploi de la machine qu'on a sous
    les yeux : le bouton natif quand il existe, sinon le chemin en toutes
    lettres. Une seule fois — « Plus tard » vaut pour de bon. */
-function proposerInstall(){
-  if(installe() || LS.get('curio.install', false)) return;
+function proposerInstall(force){
+  if(installe()) return;
+  /* « Plus tard » vaut pour la bannière automatique, pas pour un appui
+     volontaire sur « Installer l'application ». */
+  if(!force && LS.get('curio.install', false)) return;
   if(document.querySelector('.install')) return;
 
   const ua = navigator.userAgent;

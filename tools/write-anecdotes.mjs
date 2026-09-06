@@ -132,9 +132,20 @@ function coutParTexte(){
 
 /* Les langues publiées, lues dans consignes/publication.txt. Par défaut les
    deux : ne rien régler ne doit rien retirer. */
+/* ── LE RÉGLAGE APPARTIENT À L'UTILISATEUR ────────────────────────────────
+ * Le paquet ne livre plus consignes/publication.txt : chaque import écrasait
+ * un rythme déjà réglé — c'est ainsi qu'un « hebdomadaire, le lundi, sept
+ * sujets » est redevenu « quotidien, trois » du jour au lendemain.
+ * Le paquet livre un EXEMPLE ; on lit le vôtre s'il existe, l'exemple sinon.
+ */
+async function fichierReglage(nom){
+  const mien = path.join(process.cwd(), 'consignes', nom + '.txt');
+  try{ await fs.access(mien); return mien; }catch{}
+  return path.join(process.cwd(), 'consignes', nom + '.exemple.txt');
+}
 async function languesPubliees(){
   try{
-    const brut = await fs.readFile(path.join(process.cwd(), 'consignes', 'publication.txt'), 'utf8');
+    const brut = await fs.readFile(await fichierReglage('publication'), 'utf8');
     for (const l of brut.split(/\r?\n/)){
       const t = l.trim();
       if (!t || t.startsWith('#')) continue;
@@ -155,7 +166,7 @@ async function languesPubliees(){
      oui (défaut) · franches · non                                        */
 async function imagesPubliees(){
   try{
-    const brut = await fs.readFile(path.join(process.cwd(), 'consignes', 'publication.txt'), 'utf8');
+    const brut = await fs.readFile(await fichierReglage('publication'), 'utf8');
     for (const l of brut.split(/\r?\n/)){
       const t = l.trim();
       if (!t || t.startsWith('#')) continue;

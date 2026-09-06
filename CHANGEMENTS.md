@@ -1,4 +1,65 @@
-# Curio 8.8.2 — ce qui a changé depuis v6
+# Curio 8.9.0 — ce qui a changé depuis v6
+
+## 8.9.0 — la console en six étapes, et deux bugs qui expliquaient beaucoup
+
+### Vos réglages étaient écrasés à chaque import
+
+Voilà pourquoi votre rythme « hebdomadaire, le lundi, sept sujets » était
+redevenu « quotidien, trois », et votre moisson repassée sur « oui ». **Le
+paquet livrait `consignes/publication.txt` et `consignes/moisson.txt`** : les
+importer écrasait les vôtres, en silence.
+
+Le paquet ne les livre plus. Il livre des `.exemple.txt`, et tout ce qui les
+lit — les trois outils, la construction, l'action de moisson, la console — lit
+le vôtre s'il existe, l'exemple sinon. **Vous pouvez importer autant de
+versions que vous voulez : vos réglages ne bougeront plus.**
+
+### Le sommaire ne fonctionnait pas du tout
+
+`prets is not defined` : une variable qui n'a jamais existé, dans la boucle qui
+construit la liste. Le sommaire s'arrêtait sur cette ligne, sans une seule
+entrée cliquable. C'est ce qui donnait l'impression que le texte ouvert
+n'était pas le bon — il n'y avait pas d'ouverture du tout.
+
+Et un sujet ouvert depuis le sommaire ou la collection s'affiche désormais
+**en entier**, même en mode accroche : on l'a cherché, on ne veut pas d'une
+phrase.
+
+### La taille du texte ne bougeait que l'accroche
+
+Deux règles de bureau fixaient la taille du titre et des paragraphes en dur et
+écrasaient l'échelle. Seule l'accroche, plus spécifique, y survivait. Un
+réglage d'accessibilité qui ne s'applique pas au texte n'est pas un réglage.
+
+### Le gratuit ne choisit plus ses univers
+
+Choisir ses univers est une commande sur ce qu'on lit : elle rejoint la
+collection et la pioche du côté payant. Le gratuit reçoit cinq anecdotes
+tirées dans **tout** le catalogue — une découverte, pas une bibliothèque qu'on
+trie. Le bouton disparaît plutôt que de rester sans effet.
+
+### La console en six étapes numérotées
+
+| | |
+|---|---|
+| **1 · Moisson** | ce qui est au catalogue, le réglage automatique, le lancement |
+| **2 · Sélection** | retenir, écarter, envoyer à l'écriture |
+| **3 · Relecture** | lire, filtrer par note, valider vers la réserve |
+| **4 · Contrôle** | six outils, chacun avec ce qu'il fait et quand le lancer |
+| **5 · Publication** | le rythme, l'ouverture du fonds |
+| **6 · En ligne** | ce que vos lecteurs voient, et le retrait fiche par fiche |
+
+Rien n'a été retiré : tout ce qui existait est rangé sous l'étape à laquelle il
+appartient. Les outils de contrôle — doublons, structure des fiches, paires
+FR/EN, reclassement, nettoyage — vivaient dans un menu déroulant d'action où
+il fallait déjà savoir ce qu'on cherchait ; ils ont maintenant leur carte,
+leur explication et leur bouton.
+
+### Et aussi
+
+L'installation a une entrée permanente dans le panneau d'options : la bannière
+automatique ne se montrait qu'une fois, et « Plus tard » la faisait disparaître
+pour de bon. La recherche répond dès la deuxième lettre, sans validation.
 
 ## 8.8.2 — le filtre d'univers ne filtrait rien
 

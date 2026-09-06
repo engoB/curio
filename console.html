@@ -143,6 +143,30 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .e-retire{border:1px solid var(--line);color:var(--texte-3);text-decoration:line-through}
 /* La raison d'une quarantaine, en clair : « 22 % du texte repris de la
    source ». C'est elle qui permet de valider ou d'écarter en connaissance. */
+/* ── LES OUTILS DE CONTRÔLE ───────────────────────────────────────────────
+   Chacun dit ce qu'il fait, quand le lancer, et porte son bouton. Ils
+   vivaient jusqu'ici dans un menu déroulant d'action GitHub où il fallait
+   déjà savoir ce qu'on cherchait. */
+.outils{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));margin-top:14px}
+.outil{
+  display:flex;flex-direction:column;gap:8px;
+  padding:15px 16px;border-radius:12px;
+  border:1px solid var(--line);background:var(--ink);
+}
+.outil h4{margin:0;font-size:14.5px;font-weight:700;color:var(--texte)}
+.outil p{margin:0;font-size:12.5px;line-height:1.55;color:var(--texte-2)}
+.outil p.quand{color:var(--texte-3);font-style:italic}
+.outil .btn{align-self:flex-start;margin-top:auto}
+
+/* Les étapes numérotées : le chiffre porte l'ordre du travail. */
+.onglets button i{
+  font-style:normal;display:inline-grid;place-items:center;
+  width:18px;height:18px;margin-right:7px;border-radius:6px;
+  font-size:10.5px;font-weight:800;
+  background:var(--ink);color:var(--texte-3);border:1px solid var(--line);
+}
+.onglets button.on i{background:var(--accent);color:#04162C;border-color:var(--accent)}
+
 .motif{flex-basis:100%;font-size:11.5px;font-weight:500;letter-spacing:0;
   text-transform:none;color:var(--or,#B8860B)}
 .doute{background:var(--rouge);color:#2A0509}
@@ -288,14 +312,22 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
 
   <div class="haut">
     <h1>Curio · console</h1>
-    <div class="onglets">
-      <button id="ongCat" class="on">Catalogue</button>
-      <button id="ongRel">Relecture</button>
-      <button id="ongPub">Publication</button>
+    <!-- ── LES ÉTAPES, DANS L'ORDRE OÙ ON LES FAIT ──────────────────────
+         Trois onglets nommés par leur contenu ne disaient pas par où
+         commencer ni ce qui venait après. Six étapes numérotées le disent :
+         on descend la barre de gauche à droite, et chaque chiffre est un
+         moment du travail. Rien n'a été retiré — tout ce qui existait est
+         rangé sous l'étape à laquelle il appartient. -->
+    <div class="onglets" role="tablist">
+      <button id="ongMoi" data-vue="moi"><i>1</i>Moisson</button>
+      <button id="ongCat" class="on" data-vue="cat"><i>2</i>Sélection</button>
+      <button id="ongRel" data-vue="rel"><i>3</i>Relecture</button>
+      <button id="ongCtl" data-vue="ctl"><i>4</i>Contrôle</button>
+      <button id="ongPub" data-vue="pub"><i>5</i>Publication</button>
+      <button id="ongLig" data-vue="lig"><i>6</i>En ligne</button>
     </div>
     <div class="etatCx">
       <span class="point" id="pt"></span><span id="cx">non connectée</span>
-      <button class="btn" id="moissonner" style="padding:5px 11px;font-size:12px">Moissonner maintenant</button>
       <button class="lienreg" id="ouvrirReg">réglages</button>
     </div>
   </div>
@@ -349,7 +381,38 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
   <div class="msg" id="msg"></div>
 
   <!-- ═══════════════ CATALOGUE ═══════════════ -->
-  <section id="vueCat">
+  <!-- ═══════════ 1 · MOISSON ═══════════ -->
+  <section id="vueMoi" hidden>
+    <div class="chiffres" id="chMoi"></div>
+    <div class="reglages">
+      <h3>Agrandir le catalogue de sujets</h3>
+      <p>La moisson parcourt Wikipédia et ajoute des SUJETS — pas des textes. Elle ne coûte
+         rien : aucun appel payant. Un sujet déjà présent garde son état ; relancer
+         n’écrase jamais rien.</p>
+      <div class="champs">
+        <div>
+          <label for="pMoisson">Chaque nuit, automatiquement</label>
+          <select id="pMoisson">
+            <option value="oui">Oui — le catalogue s’agrandit tout seul</option>
+            <option value="non">Non — je moissonne quand je veux</option>
+          </select>
+        </div>
+        <div>
+          <label for="pMinutes">Minutes par passage</label>
+          <input type="number" id="pMinutes" min="5" max="300" step="5">
+        </div>
+      </div>
+      <p class="apercuPub" style="margin-top:10px">Mettez « non » quand vous avez plus de
+         sujets d’avance que vous n’en écrirez ce mois-ci. Un lancement à la main passe
+         toujours outre ce réglage.</p>
+      <div class="cmd" style="margin:14px 0 0">
+        <button class="btn p" id="mEnregistrer">Enregistrer</button>
+        <button class="btn o" id="mLancer">Moissonner maintenant</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="vueCat" hidden>
     <div class="chiffres" id="chCat"></div>
     <div class="cmd">
       <input type="search" id="q" placeholder="Chercher : méduse, nyos, galaxie…">
@@ -442,7 +505,18 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
     <button class="btn plus" id="plusRel" hidden>Afficher la suite</button>
   </section>
 
-  <!-- ═══════════════ PUBLICATION ═══════════════ -->
+  <!-- ═══════════ 4 · CONTRÔLE ═══════════ -->
+  <section id="vueCtl" hidden>
+    <div class="chiffres" id="chCtl"></div>
+    <div class="reglages">
+      <h3>Vérifier avant de publier</h3>
+      <p>Cinq outils, tous <b>gratuits</b> et tous <b>sans destruction</b> : ils lisent, ils
+         rapportent, et ne modifient que si vous le demandez explicitement.</p>
+      <div class="outils" id="outils"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 5 · PUBLICATION ═══════════════ -->
   <section id="vuePub" hidden>
     <div class="chiffres" id="chPub"></div>
 
@@ -502,19 +576,6 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
 
       <p class="apercuPub" id="apercuPub"></p>
 
-      <div class="champs" style="margin-top:14px">
-        <div>
-          <label for="pMoisson">Moisson automatique, chaque nuit</label>
-          <select id="pMoisson">
-            <option value="oui">Oui — le catalogue s’agrandit tout seul</option>
-            <option value="non">Non — je moissonne quand je veux</option>
-          </select>
-        </div>
-      </div>
-      <p class="apercuPub" style="margin-top:10px">La moisson ne coûte rien : elle ne fait
-         qu’interroger Wikipédia, aucun appel payant. Mettez-la sur « non » quand vous avez
-         plus de sujets d’avance que vous n’en écrirez ce mois-ci.</p>
-
       <div class="cmd" style="margin:14px 0 0">
         <button class="btn p" id="pEnregistrer">Enregistrer le rythme</button>
         <button class="btn" id="pPublierNow">Publier maintenant…</button>
@@ -541,6 +602,20 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          catalogue et la pioche. « Gratuit » remet les cinq anecdotes du jour et le mur.</p>
     </div>
   </section>
+  <!-- ═══════════ 6 · EN LIGNE ═══════════ -->
+  <section id="vueLig" hidden>
+    <div class="chiffres" id="chLig"></div>
+    <div class="cmd">
+      <input type="search" id="qL" placeholder="Chercher parmi les fiches en ligne…">
+      <select id="fUniL"><option value="">Tous les univers</option></select>
+      <span class="compte" id="cLig"></span>
+    </div>
+    <p class="apercuPub">Ce que vos lecteurs voient en ce moment. « Retirer » sort une fiche
+       du site sans l’effacer : elle revient dans la réserve, et vous pouvez la remettre en
+       ligne plus tard.</p>
+    <div class="liste" id="lLig"></div>
+    <button class="btn plus" id="plusLig" hidden>Afficher la suite</button>
+  </section>
 </div>
 
 <div class="pied">
@@ -565,7 +640,7 @@ var S = {
   onglet:'cat',
   sujets:[], decisions:{}, decSha:null,
   fiches:[], validations:{}, valSha:null,
-  vueCat:[], nCat:0, vueRel:[], nRel:0,
+  vueCat:[], nCat:0, vueRel:[], nRel:0, vueLig:[], nLig:0,
   cfg:{ owner:'', repo:'', branch:'main', token:'' },
   connecte:false, sale:false
 };
@@ -736,7 +811,7 @@ function chargerDecisions(){
 function remplirUnivers(){
   var us = {};
   S.sujets.forEach(function(s){ us[s.uni]=(us[s.uni]||0)+1; });
-  [['#fUni',true],['#fUniR',false]].forEach(function(p){
+  [['#fUni',true],['#fUniR',false],['#fUniL',false]].forEach(function(p){
     var sel = $(p[0]); if(!sel) return;
     while(sel.options.length>1) sel.remove(1);
     Object.keys(us).sort(function(a,b){ return us[b]-us[a]; }).forEach(function(k){
@@ -1427,8 +1502,23 @@ var PUB = { rythme:'quotidien', jours:[1], parPassage:3, ordre:'potentiel',
 var MOI = { auto:'oui', minutes:'40', sha:null };
 var NOMS_JOURS = ['lun','mar','mer','jeu','ven','sam','dim'];
 
+/* ── VOS RÉGLAGES NE SONT PLUS LIVRÉS PAR LE PAQUET ───────────────────────
+   Chaque import écrasait consignes/publication.txt et consignes/moisson.txt
+   par les valeurs par défaut : un rythme réglé « hebdomadaire, le lundi, sept
+   sujets » redevenait « quotidien, trois » sans que rien ne le dise. Le
+   paquet livre désormais des EXEMPLES ; on lit le vôtre s'il existe, l'exemple
+   sinon, et le premier enregistrement crée le vôtre. */
+function lireAvecExemple(nom){
+  return lireFichier('consignes/' + nom + '.txt').then(function(r){
+    if(r.texte) return r;
+    return lireFichier('consignes/' + nom + '.exemple.txt')
+      .then(function(e){ return { texte: e.texte, sha: null }; })   // sha nul : on créera le vôtre
+      .catch(function(){ return { texte:'', sha:null }; });
+  });
+}
+
 function lireMoisson(){
-  return lireFichier('consignes/moisson.txt').then(function(r){
+  return lireAvecExemple('moisson').then(function(r){
     MOI.sha = r.sha;
     if(!r.texte) return;
     String(r.texte).split(/\r?\n/).forEach(function(l){
@@ -1458,7 +1548,7 @@ function texteMoisson(){
 }
 
 function lirePublication(){
-  return lireFichier('consignes/publication.txt').then(function(r){
+  return lireAvecExemple('publication').then(function(r){
     PUB.sha = r.sha;
     if(!r.texte) return;
     String(r.texte).split(/\r?\n/).forEach(function(l){
@@ -1554,7 +1644,6 @@ function peindrePub(){
   $('#pDate').value = PUB.jusquAu;
   $('#pLangues').value = PUB.langues;
   $('#pImages').value = PUB.images;
-  $('#pMoisson').value = MOI.auto;
   peindreJours();
   var c={ecrites:S.fiches.length,enligne:0,prets:stockPret(),quarantaine:0};
   S.fiches.forEach(function(f){ if(f.rec.p) c.enligne++; if(f.rec.v==='quarantaine') c.quarantaine++; });
@@ -1616,21 +1705,209 @@ function peindreEssais(){
   });
 }
 
+
+/* ═══════════════════ 1 · MOISSON ═══════════════════════════════════════ */
+function peindreMoisson(){
+  var total = S.sujets.length;
+  var neufs = S.sujets.filter(function(s){ return decDe(s)==='neutre'; }).length;
+  var ret   = S.sujets.filter(function(s){ return decDe(s)==='retenu'; }).length;
+  var eca   = S.sujets.filter(function(s){ return decDe(s)==='ecarte'; }).length;
+  var box = $('#chMoi'); box.innerHTML = '';
+  [['k',total,'sujets au catalogue'],['o',neufs,'pas encore décidés'],
+   ['v',ret,'retenus'],['r',eca,'écartés']]
+   .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],
+     '<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
+  $('#pMoisson').value = MOI.auto;
+  $('#pMinutes').value = MOI.minutes;
+}
+function enregistrerMoisson(){
+  MOI.auto = $('#pMoisson').value;
+  MOI.minutes = String(Math.max(5, Math.min(300, parseInt($('#pMinutes').value,10)||40)));
+  dit('Enregistrement…','info');
+  return ecrireFichier('consignes/moisson.txt', texteMoisson(), MOI.sha,
+      'console : moisson ' + MOI.auto + ', ' + MOI.minutes + ' min')
+    .then(function(sha){ MOI.sha = sha;
+      dit('Enregistré. La moisson automatique est <b>' + esc(MOI.auto) + '</b>.','ok'); })
+    .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+}
+
+/* ═══════════════════ 4 · CONTRÔLE ═══════════════════════════════════════
+   Les outils d'entretien existaient, mais dans un menu déroulant d'action
+   GitHub où il fallait déjà savoir ce qu'on cherchait. Ils sont ici, chacun
+   avec ce qu'il fait et ce qu'il ne fait pas. */
+var OUTILS = [
+  { op:'verifier', nom:'Chercher les doublons',
+    quoi:'Reprend tout le catalogue et signale deux sujets qui désignent la même chose — '
+       + 'même identifiant Wikidata, ou titres qui se recouvrent. Ne supprime rien.',
+    quand:'Après chaque grosse moisson.' },
+  { op:'auditer', nom:'Vérifier les sujets retenus',
+    quoi:'Sur vos seuls retenus : l’article existe-t-il toujours, est-il assez fourni, '
+       + 'n’est-ce pas une page d’homonymie ? C’est la passe à faire AVANT de payer.',
+    quand:'Juste avant de lancer un lot d’écriture.', dur:'écarter ce qui échoue gravement' },
+  { op:'ranger', nom:'Reclasser les univers',
+    quoi:'Un sujet mal rangé se retrouve dans le mauvais flux. Cet outil relit chaque '
+       + 'sujet et propose l’univers que son texte désigne vraiment.',
+    quand:'Si un univers vous paraît anormalement gros.', dur:'appliquer les corrections' },
+  { op:'accorder', nom:'Accorder les paires FR / EN',
+    quoi:'Rapproche les titres français et anglais d’un même sujet. Sans cela, un sujet '
+       + 'peut être écrit deux fois — une par langue — et payé deux fois.',
+    quand:'Après une moisson qui a ajouté beaucoup d’anglais.' },
+  { op:'purger', nom:'Nettoyer le catalogue',
+    quoi:'Retire les entrées vides, les doublons stricts et les sujets dont l’article a '
+       + 'disparu. Vos décisions et vos fiches écrites ne sont jamais touchées.',
+    quand:'De temps en temps, quand le catalogue devient lourd.' }
+];
+function peindreControle(){
+  var c = { fiches:S.fiches.length, quarantaine:0, nonRelues:0 };
+  S.fiches.forEach(function(f){
+    if(f.rec.v==='quarantaine') c.quarantaine++;
+    if(valDe(f)==='neutre' && !enLigne(f)) c.nonRelues++;
+  });
+  var box = $('#chCtl'); box.innerHTML='';
+  [['k',S.sujets.length,'sujets au catalogue'],['v',c.fiches,'fiches écrites'],
+   ['o',c.nonRelues,'pas encore relues'],['r',c.quarantaine,'en quarantaine']]
+   .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],
+     '<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
+
+  var l = $('#outils'); l.innerHTML='';
+  /* Le contrôle de structure des fiches n'est pas un entretien du catalogue :
+     il a son action à lui, et sa place en tête de liste. */
+  var carte = el('div','outil');
+  carte.innerHTML = '<h4>Contrôler la structure des fiches</h4>'
+    + '<p>Accroche trop longue, titre qui répète l’accroche, excès de gras, texte trop '
+    + 'court : les défauts de forme que la relecture laisse passer. Ce qui échoue part '
+    + 'en quarantaine et n’est jamais publié.</p>'
+    + '<p class="quand">À lancer après chaque lot d’écriture.</p>';
+  var b0 = el('button','btn o','Lancer le contrôle');
+  b0.addEventListener('click', function(){
+    if(!window.confirm('Contrôler la structure de toutes les fiches écrites ?\n\n'
+      + 'Gratuit. Ce qui échoue est mis en quarantaine — donc non publié — et reste '
+      + 'visible dans Relecture avec sa raison.')) return;
+    dit('Contrôle lancé…','info');
+    lancerAction('3-controler.yml', { quarantaine:'true' })
+      .then(function(){ dit('Contrôle lancé. Le rapport est dans <b>Actions → 3 · Contrôler</b>.','ok'); })
+      .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+  });
+  carte.appendChild(b0);
+  l.appendChild(carte);
+
+  OUTILS.forEach(function(o){
+    var d = el('div','outil');
+    d.innerHTML = '<h4>'+esc(o.nom)+'</h4><p>'+o.quoi+'</p>'
+                + '<p class="quand">'+esc(o.quand)+'</p>';
+    var b = el('button','btn','Lancer');
+    b.addEventListener('click', function(){
+      var dur = false;
+      if(o.dur){
+        dur = window.confirm(esc(o.nom) + '\n\n'
+          + 'OK      = ' + o.dur + '\n'
+          + 'Annuler = lire le rapport sans rien changer');
+      } else if(!window.confirm(o.nom + ' ?\n\nGratuit, et sans destruction.')) return;
+      dit('Lancement…','info');
+      lancerAction('entretien.yml', { operation:o.op, appliquer: dur ? 'true' : 'false' })
+        .then(function(){ dit('Lancé. Le rapport est dans <b>Actions → Entretien</b>.','ok'); })
+        .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+    });
+    d.appendChild(b);
+    l.appendChild(d);
+  });
+}
+
+/* ═══════════════════ 6 · EN LIGNE ═══════════════════════════════════════ */
+function filtrerLig(){
+  var q = plier($('#qL').value.trim()), u = $('#fUniL').value;
+  S.vueLig = S.fiches.filter(function(f){
+    if(!enLigne(f)) return false;
+    if(u && f.uni!==u) return false;
+    if(q){
+      if(!f._f) f._f = plier([f.titre,f.rec.t,f.rec.x,f.rec.r].filter(Boolean).join(' '));
+      if(f._f.indexOf(q)<0) return false;
+    }
+    return true;
+  });
+  S.vueLig.sort(function(a,b){ return String(b.rec.p||'').localeCompare(String(a.rec.p||'')); });
+  S.nLig = 0;
+}
+function peindreLig(){
+  var c = { total:S.vueLig.length };
+  var toutes = S.fiches.filter(enLigne).length;
+  var semaine = 0, cut = new Date(Date.now()-7*864e5).toISOString().slice(0,10);
+  S.fiches.forEach(function(f){ if(enLigne(f) && String(f.rec.p||'') >= cut) semaine++; });
+  var box = $('#chLig'); box.innerHTML='';
+  [['v',toutes,'fiches en ligne'],['k',semaine,'sorties cette semaine'],
+   ['o',stockPret(),'sujets prêts en réserve']]
+   .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],
+     '<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
+  $('#cLig').textContent = nb(c.total)+' affichée'+(c.total>1?'s':'');
+  var l = $('#lLig'); l.innerHTML='';
+  if(!c.total){
+    l.appendChild(el('div','vide', toutes
+      ? 'Rien ne correspond.'
+      : 'Aucune fiche en ligne pour l’instant.<br>Validez des fiches en <b>3 · Relecture</b>, '
+        + 'puis mettez-les en ligne en <b>5 · Publication</b>.'));
+    $('#plusLig').hidden = true; return;
+  }
+  suiteLig();
+}
+function suiteLig(){
+  var f = document.createDocumentFragment(), fin = Math.min(S.nLig+20, S.vueLig.length);
+  for(var i=S.nLig; i<fin; i++) f.appendChild(ligneEnLigne(S.vueLig[i]));
+  $('#lLig').appendChild(f); S.nLig = fin;
+  $('#plusLig').hidden = S.nLig >= S.vueLig.length;
+  $('#plusLig').textContent = 'Afficher la suite ('+nb(S.vueLig.length-S.nLig)+' restantes)';
+}
+function ligneEnLigne(f){
+  var uni = NOMS[f.uni] || [f.uni,200];
+  var n = el('article','fiche');
+  var meta = el('div','meta');
+  meta.innerHTML = '<i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i>'
+    + '<span>'+esc(uni[0])+'</span><span class="lg">'+f.lang.toUpperCase()+'</span>'
+    + '<b class="note">'+(f.rec.s==null?'—':f.rec.s+'/10')+'</b>'
+    + '<b class="e-publie">en ligne depuis le '+esc(f.rec.p||'?')+'</b>';
+  n.appendChild(meta);
+  n.appendChild(el('h3', null, esc(f.rec.t || f.titre)));
+  if(f.rec.r) n.appendChild(el('p','raconte', esc(f.rec.r)));
+  var g = el('span','gestes');
+  var oeil = el('button','g','aperçu lecteur'); oeil.type='button';
+  oeil.addEventListener('click', function(){ apercuLecteur(f); });
+  var ret = el('button','g','retirer du site'); ret.type='button';
+  ret.addEventListener('click', function(){
+    if(!window.confirm('Retirer « ' + (f.rec.t || f.titre) + ' » du site ?\n\n'
+      + 'Elle disparaît pour vos lecteurs mais n’est pas effacée : elle revient dans la\n'
+      + 'réserve et vous pourrez la remettre en ligne quand vous voudrez.')) return;
+    dit('Retrait…','info');
+    lancerAction('5-publier.yml', { operation:'retirer', titre:f.titre, combien:'', note_mini:'0' })
+      .then(function(){ dit('Retrait lancé. Rechargez cette page quand l’action est verte.','ok'); })
+      .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+  });
+  g.appendChild(oeil); g.appendChild(ret);
+  n.appendChild(g);
+  return n;
+}
+
 /* ══════════════════════════ branchements ══════════════════════════ */
+/* Six étapes, une seule fonction. Ajouter la septième ne demandera qu'un
+   bouton et une section : plus de liste d'identifiants à tenir à jour. */
+var ETAPES = ['moi','cat','rel','ctl','pub','lig'];
 function onglet(nom){
-  S.onglet=nom;
-  $('#ongCat').className = nom==='cat'?'on':'';
-  $('#ongRel').className = nom==='rel'?'on':'';
-  $('#ongPub').className = nom==='pub'?'on':'';
-  $('#vueCat').hidden = nom!=='cat';
-  $('#vueRel').hidden = nom!=='rel';
-  $('#vuePub').hidden = nom!=='pub';
+  if(ETAPES.indexOf(nom) < 0) nom = 'cat';
+  S.onglet = nom;
+  document.querySelectorAll('.onglets button').forEach(function(b){
+    b.className = (b.dataset.vue === nom) ? 'on' : '';
+  });
+  ETAPES.forEach(function(v){
+    var sec = document.getElementById('vue' + v.charAt(0).toUpperCase() + v.slice(1));
+    if(sec) sec.hidden = (v !== nom);
+  });
   if(nom==='pub') peindrePub();
+  if(nom==='moi') peindreMoisson();
+  if(nom==='ctl') peindreControle();
+  if(nom==='lig') { filtrerLig(); peindreLig(); }
   peindrePied();
 }
-$('#ongCat').addEventListener('click',function(){ onglet('cat'); });
-$('#ongRel').addEventListener('click',function(){ onglet('rel'); });
-$('#ongPub').addEventListener('click',function(){ onglet('pub'); });
+document.querySelectorAll('.onglets button').forEach(function(b){
+  b.addEventListener('click', function(){ onglet(b.dataset.vue); });
+});
 
 /* Ouvrir le fonds : mettre en ligne d'un coup toute la réserve validée qui
    atteint une note. C'est le geste qu'on fait une fois, au lancement. */
@@ -1691,7 +1968,7 @@ $('#pPublierNow').addEventListener('click',function(){
 /* La moisson tourne chaque nuit à minuit. Ce bouton est là pour les fois où
    l'on ne veut pas attendre : on vient d'ajouter des sujets phares, ou de
    brancher un subreddit, et on veut voir le résultat maintenant. */
-$('#moissonner').addEventListener('click',function(){
+$('#mLancer').addEventListener('click',function(){
   if(!S.connecte){ dit('Connectez votre dépôt d’abord : la moisson se lance par l’API GitHub.','ko');
     $('#reglages').hidden=false; window.scrollTo(0,0); return; }
   if(!window.confirm('Lancer la moisson maintenant ?\n\n'
@@ -1741,6 +2018,13 @@ $('#toutOublier').addEventListener('click',function(){
     + '<code>decisions.json</code> dans le dépôt.', 'ok');
 });
 $('#ouvrirFonds').addEventListener('click', ouvrirLeFonds);
+$('#mEnregistrer').addEventListener('click', enregistrerMoisson);
+$('#plusLig').addEventListener('click', suiteLig);
+['qL','fUniL'].forEach(function(id){
+  var e = $('#'+id); if(!e) return;
+  e.addEventListener('input', function(){ filtrerLig(); peindreLig(); });
+  e.addEventListener('change', function(){ filtrerLig(); peindreLig(); });
+});
 $('#toutValider').addEventListener('click',function(){
   var n=S.vueRel.length, lg=$('#fLang').value==='fr'?'françaises':'anglaises';
   if(!n) return;

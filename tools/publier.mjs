@@ -32,7 +32,7 @@ const opt = (n, d) => { const i = argv.indexOf('--' + n); if (i < 0) return d; c
 
 const OUTDIR   = path.join(process.cwd(), 'anecdotes');
 const MAITRE   = path.join(process.cwd(), 'catalogue-maitre.json');
-const REGLAGE  = path.join(process.cwd(), 'consignes', 'publication.txt');
+const REGLAGE  = await fichierReglage('publication');
 const EXCLUS   = path.join(process.cwd(), 'consignes', 'exclusions.txt');
 
 const ETAT     = !!opt('etat', false);
@@ -50,6 +50,17 @@ const FORCE    = opt('combien', null);
 const NOTE_MINI = parseInt(opt('note-mini', '0'), 10) || 0;
 
 const lire = async (p, d) => { try{ return JSON.parse(await fs.readFile(p, 'utf8')); }catch{ return d; } };
+/* ── LE RÉGLAGE APPARTIENT À L'UTILISATEUR ────────────────────────────────
+ * Le paquet ne livre plus consignes/publication.txt : chaque import écrasait
+ * un rythme déjà réglé — c'est ainsi qu'un « hebdomadaire, le lundi, sept
+ * sujets » est redevenu « quotidien, trois » du jour au lendemain.
+ * Le paquet livre un EXEMPLE ; on lit le vôtre s'il existe, l'exemple sinon.
+ */
+async function fichierReglage(nom){
+  const mien = path.join(process.cwd(), 'consignes', nom + '.txt');
+  try{ await fs.access(mien); return mien; }catch{}
+  return path.join(process.cwd(), 'consignes', nom + '.exemple.txt');
+}
 async function ecrire(p, obj){
   const t = p + '.tmp';
   await fs.writeFile(t, JSON.stringify(obj, null, 1), 'utf8');

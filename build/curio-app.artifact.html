@@ -1373,9 +1373,14 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
     box-shadow:var(--shadow);
     padding:clamp(30px,3vw,44px) clamp(30px,3vw,46px) clamp(26px,2.6vw,38px);
   }
-  .card h2{font-size:clamp(32px,3vw,46px)}
+  /* ── LA TAILLE DE LECTURE VAUT ICI AUSSI ──────────────────────────────
+     Ces deux règles fixaient la taille en dur et écrasaient l'échelle : sur
+     un ordinateur, changer la taille du texte ne déplaçait plus que
+     l'accroche — seule assez spécifique pour survivre. Un réglage
+     d'accessibilité qui ne s'applique pas au texte n'est pas un réglage. */
+  .card h2{font-size:calc(clamp(32px,3vw,46px) * var(--lecture))}
   .card .lede{max-height:min(58vh,620px);max-width:none}
-  .card .lede p{font-size:16.5px}
+  .card .lede p{font-size:calc(16.5px * var(--lecture))}
   .lockwrap{align-self:center;padding-bottom:0}
   .actions{right:clamp(16px,1.6vw,28px)}
 }
@@ -1439,7 +1444,7 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
             calc(env(safe-area-inset-bottom,0px) + 20px) clamp(18px,5vw,26px);
   }
   .lockwrap{padding-bottom:40px}
-  .card h2{font-size:clamp(25px,7vw,32px);margin-bottom:12px}
+  .card h2{font-size:calc(clamp(25px,7vw,32px) * var(--lecture));margin-bottom:12px}
   .eyebrow{margin-bottom:12px}
   .card .lede{max-width:none}
   .actions{bottom:calc(env(safe-area-inset-bottom,0px) + 18px);gap:8px}
@@ -1576,6 +1581,12 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
     <button class="opt__a" id="shuffleBtn">
       <svg viewBox="0 0 24 24"><path d="M3 6h4l10 12h4M3 18h4l3-3.6M14.5 8.6L17 6h4M18 3l3 3-3 3M18 15l3 3-3 3"/></svg>
       <span data-i18n="shuffle">Tout mélanger</span>
+    </button>
+    <!-- Toujours atteignable : la bannière automatique ne se montre qu'une
+         fois, et « Plus tard » la faisait disparaître pour de bon. -->
+    <button class="opt__a" id="installBtn" hidden>
+      <svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M5 20h14"/></svg>
+      <span data-i18n="inst.menu">Installer l’application</span>
     </button>
     <button class="opt__a opt__a--or" id="pioBtn" hidden>
       <svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.6 5 .6-3.7 3.4 1 4.9L12 14.1 7.6 16.5l1-4.9L4.9 8.2l5-.6L12 3z"/></svg>
@@ -1973,6 +1984,7 @@ const I18N = {
     'pio.wait':'On tire\u2026',
     'pio.none':'Rien de neuf \u00e0 piocher pour l\u2019instant.',
     'jour.badge':'La fiche du jour',
+    'inst.menu':'Installer l\u2019application',
     'inst.title':'Mettre Curio sur votre \u00e9cran d\u2019accueil',
     'inst.body':'Il s\u2019ouvre en plein \u00e9cran et se lit hors ligne.',
     'inst.ios':'Menu de partage, puis \u00ab Sur l\u2019\u00e9cran d\u2019accueil \u00bb.',
@@ -2110,6 +2122,7 @@ const I18N = {
     'pio.wait':'Drawing\u2026',
     'pio.none':'Nothing new to draw right now.',
     'jour.badge':'Piece of the day',
+    'inst.menu':'Install the app',
     'inst.title':'Put Curio on your home screen',
     'inst.body':'It opens full screen and reads offline.',
     'inst.ios':'Share menu, then \u201cAdd to Home Screen\u201d.',
@@ -3064,7 +3077,12 @@ async function tirageDuJour(){
      dans les univers retenus — et si ceux-ci n'ont pas de quoi remplir la
      journée, on élargit plutôt que de servir trois fiches : une préférence
      n'est pas un mur. */
-  const choisis = activeThemes();
+  /* ── EN GRATUIT, LES HUIT UNIVERS ──────────────────────────────────────
+     Choisir ses univers est une commande sur ce qu'on lit : elle appartient
+     aux formules payantes. Le gratuit, lui, reçoit cinq anecdotes tirées
+     dans TOUT le catalogue — c'est une découverte, pas une bibliothèque
+     qu'on trie. Un filtre qui n'a pas d'effet vaut mieux retiré qu'affiché. */
+  const choisis = estPremium() ? activeThemes() : CONFIG.freeThemes.slice();
   let tout = await catalogueOffrable(choisis);
   if(tout.length < OFFRE_JOUR) tout = await catalogueOffrable();
   if(!tout.length) return [];
@@ -3995,10 +4013,7 @@ function applyPickedIfChanged(){
        de demain, et le lecteur ne reste pas devant un filtre qu'il croit
        cassé. C'était le cas jusqu'ici : le tirage ignorait les univers, et
        rien n'expliquait pourquoi. */
-    if(S.plan === 'free' && S.tirage && S.tirage.j === today()){
-      const memes = (S.tirage.u || '') === activeThemes().slice().sort().join(',');
-      if(!memes) toast(T()['uni.demain']);
-    } else resetFeed();
+    resetFeed();
   }
   pickedSnapshot = '';
 }
@@ -4227,6 +4242,11 @@ $('#searchBtn').addEventListener('click', ()=>{
   }
   const b = $('#pioBtn');
   if(b) b.addEventListener('click', piocher);
+  const ins = $('#installBtn');
+  if(ins) ins.addEventListener('click', ()=>{
+    const d = document.querySelector('.install'); if(d) d.remove();
+    proposerInstall(true);
+  });
 })();
 
 /* ── CE QUI APPARTIENT AUX FORMULES PAYANTES ──────────────────────────────
@@ -4239,14 +4259,35 @@ $('#searchBtn').addEventListener('click', ()=>{
 function majPremium(){
   const p = estPremium();
   const b = $('#pioBtn'); if(b) b.hidden = !p;
+  /* L'installation ne dépend pas de la formule : elle disparaît seulement
+     quand l'application EST installée. */
+  const ib = $('#installBtn'); if(ib) ib.hidden = installe();
   const l = $('#libBtn'); if(l) l.hidden = !p;
+  /* Le choix des univers est une commande sur ce qu'on lit : en gratuit, les
+     cinq du jour viennent des huit, et le bouton n'aurait rien à commander. */
+  const u = $('#uniBtn'); if(u) u.hidden = !p;
   /* Les fiches déjà à l'écran portent peut-être encore le bouton « Garder ». */
   document.querySelectorAll('.ebtn--fav').forEach(x => { x.hidden = !p; });
 }
 const majPioche = majPremium;   // ancien nom, gardé pour ne rien casser
 
 $('#qBtn').addEventListener('click', doSearch);
-$('#qInput').addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+$('#qInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ clearTimeout(chercheT); doSearch(); } });
+/* ── LA RECHERCHE RÉPOND DÈS LES PREMIÈRES LETTRES ───────────────────────
+   Il fallait valider pour voir quoi que ce soit — donc taper, s'arrêter,
+   appuyer, lire, effacer, recommencer. On cherche rarement le mot exact du
+   premier coup : c'est en voyant la liste se resserrer qu'on trouve.
+
+   Un quart de seconde de silence après la dernière touche suffit à ne pas
+   lancer une recherche par lettre frappée. Deux caractères au minimum : en
+   dessous, tout ressort et la liste n'apprend rien. */
+let chercheT = null;
+$('#qInput').addEventListener('input', ()=>{
+  clearTimeout(chercheT);
+  const q = $('#qInput').value.trim();
+  if(q.length < 2){ $('#qList').innerHTML = ''; return; }
+  chercheT = setTimeout(doSearch, 250);
+});
 
 async function doSearch(){
   const q = $('#qInput').value.trim(); if(!q) return;
@@ -4366,8 +4407,14 @@ function renderToc(){
       + '<span class="n">' + list.length + '</span>';
     g.appendChild(h);
 
-    const cap = q ? 400 : (tocShown[t.id] || (prets ? 400 : 24));
-    const wrap = el('div','toclist' + (prets ? ' toclist--rich' : ''));
+    /* `prets` n'a jamais existé : la ligne levait « prets is not defined » et
+       le sommaire s'arrêtait là, sans une seule entrée cliquable. Ce qu'elle
+       voulait dire, c'est « ces entrées portent-elles une accroche rédigée ? »
+       — auquel cas on en montre plus et on les affiche en pleine largeur.
+       C'est exactement ce que contient tocPrets. */
+    const riche = source.length > 0;
+    const cap = q ? 400 : (tocShown[t.id] || (riche ? 400 : 24));
+    const wrap = el('div','toclist' + (riche ? ' toclist--rich' : ''));
     list.slice(0, cap).forEach(x=>{
       const b = el('button','toc', esc(x.accroche));
       b.addEventListener('click', ()=> openSubject(t.id, x.titre, false));
@@ -4419,6 +4466,13 @@ async function openSubject(themeId, title, lockedU){
   }
   markSeen(item.title);
   const card = buildCard(item);
+  /* ── UN SUJET DEMANDÉ SE LIT EN ENTIER ─────────────────────────────────
+     On arrive ici parce qu'on a CHERCHÉ ce sujet — dans le sommaire ou dans
+     sa collection. En mode accroche, la fiche s'ouvrait alors sur sa seule
+     phrase d'accroche : on ne savait même pas si c'était le bon texte. Le
+     mode accroche sert à balayer, pas à répondre à une demande précise. */
+  card._deplie = true;
+  card.classList.add('deplie');
   /* ── RELIRE NE COÛTE PAS UNE ANECDOTE ──────────────────────────────────
      Une fiche rouverte depuis la collection ou le sommaire ne consomme pas
      la journée offerte : sinon garder une anecdote se retournerait contre
@@ -4426,6 +4480,7 @@ async function openSubject(themeId, title, lockedU){
      ce qui était exactement le cas. Ce qu'on a gardé est à soi. */
   card._counted = true;
   feed.insertBefore(card, feed.firstElementChild);
+  fillText(card, item);              // on redessine : la fiche est dépliée
   feed.scrollTop = 0; setActive(card);
   enrich(item);
 }
@@ -5373,8 +5428,13 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   });
 }
 
-const installe = () =>
-  window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+/* Déclaration de fonction, pas constante fléchée : elle est appelée par
+   majPremium() au tout premier rendu, bien avant cette ligne. Une `const` y
+   serait encore dans sa zone morte — « Cannot access before initialization »,
+   et toute l'application s'arrêtait là. */
+function installe(){
+  return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+}
 
 let promptInstall = null;
 window.addEventListener('beforeinstallprompt', e=>{
@@ -5391,8 +5451,11 @@ window.addEventListener('beforeinstallprompt', e=>{
    On propose donc partout, avec le mode d'emploi de la machine qu'on a sous
    les yeux : le bouton natif quand il existe, sinon le chemin en toutes
    lettres. Une seule fois — « Plus tard » vaut pour de bon. */
-function proposerInstall(){
-  if(installe() || LS.get('curio.install', false)) return;
+function proposerInstall(force){
+  if(installe()) return;
+  /* « Plus tard » vaut pour la bannière automatique, pas pour un appui
+     volontaire sur « Installer l'application ». */
+  if(!force && LS.get('curio.install', false)) return;
   if(document.querySelector('.install')) return;
 
   const ua = navigator.userAgent;

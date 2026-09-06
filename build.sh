@@ -28,8 +28,15 @@ LISIBLE=$(cat VERSION 2>/dev/null | tr -d '[:space:]')
 # On les grave donc AUSSI dans la page, a la construction. La page connait le
 # reglage des la premiere seconde, sans reseau ; index.json, quand il arrive,
 # garde le dernier mot — les deux viennent du meme fichier.
+# Le fichier de reglage appartient a l utilisateur : le paquet ne le livre plus
+# (il ecrasait un rythme deja regle a chaque import). On lit donc le sien s il
+# existe, et l exemple sinon.
+fichier_reglage() {
+  if [ -f "consignes/$1.txt" ]; then echo "consignes/$1.txt"
+  else echo "consignes/$1.exemple.txt"; fi
+}
 reglage() {
-  sed -n "s/^[[:space:]]*$1:[[:space:]]*//p" consignes/publication.txt 2>/dev/null \
+  sed -n "s/^[[:space:]]*$1:[[:space:]]*//p" "$(fichier_reglage publication)" 2>/dev/null \
     | head -1 | tr -d '[:space:]'
 }
 # --- le nom du produit ------------------------------------------------------
@@ -39,7 +46,7 @@ reglage() {
 # fichiers et le cache du service worker gardent « curio » : changer de nom
 # ne doit deconnecter personne de sa collection.
 marque() {
-  sed -n "s/^[[:space:]]*$1:[[:space:]]*//p" consignes/marque.txt 2>/dev/null | head -1 \
+  sed -n "s/^[[:space:]]*$1:[[:space:]]*//p" "$(fichier_reglage marque)" 2>/dev/null | head -1 \
     | sed 's/[[:space:]]*$//'
 }
 NOM=$(marque nom);            [ -n "$NOM" ] || NOM="Curio"
@@ -79,7 +86,7 @@ EOF
 # L'empreinte porte sur les SOURCES seules — jamais sur app.html, index.html
 # ni sw.js, ou elle est elle-meme inscrite : elle changerait alors a chaque
 # construction, et le service worker se croirait perime a chaque fois.
-SRC="parts VERSION manifest.source.webmanifest consignes/marque.txt"
+SRC="parts VERSION manifest.source.webmanifest"
 if command -v sha1sum >/dev/null 2>&1; then
   EMPREINTE=$(find $SRC -type f | sort | xargs cat | sha1sum | cut -c1-10)
 elif command -v shasum >/dev/null 2>&1; then
