@@ -80,14 +80,18 @@ jobs:
       - name: Reglage de la moisson
         id: reglage
         run: |
+          # Le paquet ne livre plus consignes/moisson.txt — il ecrasait votre
+          # reglage a chaque import. On lit le votre s il existe, l exemple sinon.
+          F=consignes/moisson.txt
+          [ -f "$F" ] || F=consignes/moisson.exemple.txt
           AUTO=oui
-          if [ -f consignes/moisson.txt ]; then
-            V=$(sed -n 's/^[[:space:]]*auto:[[:space:]]*//p' consignes/moisson.txt | head -1 | tr -d '[:space:]')
+          if [ -f "$F" ]; then
+            V=$(sed -n 's/^[[:space:]]*auto:[[:space:]]*//p' "$F" | head -1 | tr -d '[:space:]')
             [ -n "$V" ] && AUTO="$V"
           fi
           M=""
-          if [ -f consignes/moisson.txt ]; then
-            M=$(sed -n 's/^[[:space:]]*minutes:[[:space:]]*//p' consignes/moisson.txt | head -1 | tr -d '[:space:]')
+          if [ -f "$F" ]; then
+            M=$(sed -n 's/^[[:space:]]*minutes:[[:space:]]*//p' "$F" | head -1 | tr -d '[:space:]')
           fi
           echo "auto=$AUTO" >> $GITHUB_OUTPUT
           echo "minutes=$M" >> $GITHUB_OUTPUT
