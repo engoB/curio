@@ -1,27 +1,15 @@
-# ═══════════════════════════════════════════════════════════════════════════
-# LA MOISSON AUTOMATIQUE
-# ═══════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════
+# LA MOISSON AUTOMATIQUE — écrit par console.html
+# ═══════════════════════════════════════════════════════════════════
 #
-# L'action « 1 · Moissonner » est programmée toutes les nuits à minuit UTC.
-# Elle agrandit le catalogue de sujets — elle N'ÉCRIT RIEN et ne coûte pas un
-# centime : aucun appel payant, seulement Wikipédia.
+# « 1 · Moissonner » est programmée chaque nuit à minuit UTC. Elle
+# agrandit le catalogue de sujets et ne coûte rien : aucun appel payant.
 #
-# Ce fichier décide si le passage de la nuit fait quelque chose. Vous pouvez
-# le modifier ici sur GitHub, ou depuis console.html.
+#   oui  le catalogue s’agrandit chaque nuit
+#   non  la nuit ne fait rien — vous moissonnez à la main quand vous voulez
 #
-# ─────────────────────────────────────────────────────────────────────────
-#   oui   le catalogue s'agrandit chaque nuit                    (défaut)
-#   non   la nuit ne fait rien. L'action se lance, constate, et s'arrête en
-#         quelques secondes. Vous gardez la main : « Run workflow » moissonne
-#         quand VOUS le décidez.
-#
-# Mettez « non » quand vous avez assez de sujets d'avance et que vous voulez
-# vous concentrer sur l'écriture — c'est le cas dès qu'il vous reste plus de
-# sujets retenus que vous n'en écrirez ce mois-ci.
-# ─────────────────────────────────────────────────────────────────────────
-auto: oui
+# Un lancement à la main passe toujours outre ce réglage.
+auto: non
 
-# Le nombre de minutes accordé à chaque passage automatique. Une moisson
-# complète dure des heures : on en fait un morceau par nuit, et la suivante
-# reprend où celle-ci s'est arrêtée. 40 est un bon équilibre.
+# Minutes accordées à chaque passage automatique.
 minutes: 40
