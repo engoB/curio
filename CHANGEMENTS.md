@@ -1,4 +1,79 @@
-# Curio 8.8.0 — ce qui a changé depuis v6
+# Curio 8.8.2 — ce qui a changé depuis v6
+
+## 8.8.2 — le filtre d'univers ne filtrait rien
+
+### Le tirage ignorait vos univers
+
+Le défaut le plus sérieux de la 8.8. En gratuit, les cinq du jour étaient
+tirées dans les huit univers **quoi que le lecteur ait coché**. Cocher
+« Cosmos » ne changeait rien, et le filtre passait pour cassé — il l'était.
+
+Le tirage pioche maintenant dans les univers retenus. Si ceux-ci n'ont pas de
+quoi remplir la journée, on élargit plutôt que de servir trois fiches : une
+préférence n'est pas un mur.
+
+**Et le choix par défaut passe de deux univers à huit.** Tant que le tirage
+les ignorait, ce choix initial n'avait aucune conséquence ; maintenant qu'il
+le respecte, deux univers cochés d'office auraient contredit la promesse de la
+page d'accueil — « les huit sont ouverts, dès la version gratuite ».
+
+Enfin, changer d'univers en cours de journée **le dit** au lieu de laisser
+croire à une panne : *« C'est noté. Vos cinq du jour sont déjà tirées : votre
+choix s'appliquera demain matin. »* Les redistribuer à chaque changement
+reviendrait à donner autant d'anecdotes qu'il y a de combinaisons.
+
+### Le nom de l'univers disparaissait de la barre
+
+Sous 560 px, il ne restait qu'une pastille de couleur et un chevron : on ne
+savait plus ce qu'on lisait ni sur quoi on allait cliquer, et la barre passait
+pour coupée. Il y avait pourtant **cinquante pixels de vide juste à côté**.
+
+Le nom reste, et se contente de ce qu'on lui laisse — il se tronque proprement
+plutôt que de s'effacer.
+
+| Barre à 390 px | avant | maintenant |
+|---|---|---|
+| Bouton d'univers | 50 px, sans nom | **101 px, « Cosmos »** |
+| Espace vide | 54 px | 3 px |
+
+## 8.8.1 — le panneau au pouce, la barre à l'écran large
+
+### Deux formes pour un seul balisage
+
+Le panneau à sections répondait à un écran étroit ; sur un ordinateur, cacher
+le thème et la pioche derrière un bouton était un recul. La barre retrouve
+donc ses commandes dépliées **au-dessus de 1 100 px** — pas 900 : en dessous,
+la rangée dépassait du bord et « Piocher » sortait de l'écran. Une barre qui
+déborde est pire qu'un panneau.
+
+Les intitulés disparaissent en rangée (chaque commande porte son infobulle),
+la recherche redevient une icône seule, et la taille du texte reste au bouton
+dédié de la barre plutôt que d'être proposée deux fois.
+
+### Les accroches se suivent
+
+Une fiche ne portant qu'une phrase occupait quand même un écran entier : on
+voyait UNE accroche à la fois, c'est-à-dire exactement ce que le mode devait
+éviter. Les fiches s'enchaînent maintenant, hauteur libre, séparées d'un
+filet.
+
+| | avant | maintenant |
+|---|---|---|
+| Hauteur d'une accroche | 844 px | 214 px |
+| Visibles d'un coup | 1 | **4** |
+| Calage magnétique | actif | suspendu |
+
+Déplier rend à la fiche son écran entier, son magnétisme et sa rangée de fin :
+on est revenu en lecture, et rien ne la distingue plus d'une autre. Une
+accroche repliée ne consomme pas la journée offerte — sinon parcourir vingt
+accroches l'aurait épuisée en trois secondes.
+
+### La collection devient payante
+
+Elle n'avait aucun sens en gratuit : les cinq du jour s'en vont le lendemain,
+et garder l'une d'elles ne promettait rien qu'on puisse tenir. Le bouton
+« Ma collection » et le geste « Garder » disparaissent donc en gratuit, et la
+collection rejoint la pioche dans les avantages des trois formules payantes.
 
 ## 8.8.0 — valider n'est plus publier, et le nom devient un réglage
 

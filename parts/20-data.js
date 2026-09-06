@@ -191,6 +191,7 @@ const I18N = {
     'opt.explorer':'Explorer','opt.taille':'Taille du texte','opt.theme':'Th\u00e8me',
     'opt.palette':'Jeu de couleurs','opt.langue':'Langue','opt.chercher':'Rechercher un sujet',
     'opt.clair':'Clair','opt.sombre':'Sombre',
+    'uni.demain':'C’est noté. Vos cinq du jour sont déjà tirées : votre choix s’appliquera demain matin.',
     'acc.mode':'Accroches seules',
     'acc.on':'Accroches seules : une phrase par fiche, d\u00e9pliez celles qui intriguent.',
     'acc.off':'Fiches enti\u00e8res.',
@@ -241,9 +242,9 @@ const I18N = {
     plansTitle:{monthly:'Mensuel',yearly:'Annuel',lifetime:'À vie'},
     planTag:'Le meilleur rapport',
     planFeat:{
-      monthly:['Lecture illimitée','La pioche : une anecdote au hasard','Le sommaire et la recherche','Sans engagement'],
-      yearly:['Lecture illimitée','La pioche : une anecdote au hasard','Le sommaire et la recherche','Deux mois offerts'],
-      lifetime:['Lecture illimitée, pour toujours','La pioche : une anecdote au hasard','Toutes les anecdotes à venir','Un seul paiement']
+      monthly:['Lecture illimitée','La pioche : une anecdote au hasard','Ma collection','Sans engagement'],
+      yearly:['Lecture illimitée','La pioche : une anecdote au hasard','Ma collection','Deux mois offerts'],
+      lifetime:['Lecture illimitée, pour toujours','La pioche : une anecdote au hasard','Ma collection','Un seul paiement']
     },
     planCta:{monthly:"S'abonner",yearly:"S'abonner",lifetime:'Acheter à vie'},
     demo:'Lien de paiement non configuré — voir README.md'
@@ -327,6 +328,7 @@ const I18N = {
     'opt.explorer':'Explore','opt.taille':'Text size','opt.theme':'Theme',
     'opt.palette':'Colour set','opt.langue':'Language','opt.chercher':'Search a subject',
     'opt.clair':'Light','opt.sombre':'Dark',
+    'uni.demain':'Noted. Today’s five are already drawn: your choice applies tomorrow morning.',
     'acc.mode':'Hooks only',
     'acc.on':'Hooks only: one line per piece, unfold the ones that catch you.',
     'acc.off':'Full pieces.',
@@ -377,9 +379,9 @@ const I18N = {
     plansTitle:{monthly:'Monthly',yearly:'Yearly',lifetime:'Lifetime'},
     planTag:'Best value',
     planFeat:{
-      monthly:['Unlimited reading','The draw: one piece at random','Contents list and search','No commitment'],
-      yearly:['Unlimited reading','The draw: one piece at random','Contents list and search','Two months free'],
-      lifetime:['Unlimited reading, forever','The draw: one piece at random','Every piece still to come','One single payment']
+      monthly:['Unlimited reading','The draw: one piece at random','My collection','No commitment'],
+      yearly:['Unlimited reading','The draw: one piece at random','My collection','Two months free'],
+      lifetime:['Unlimited reading, forever','The draw: one piece at random','My collection','One single payment']
     },
     planCta:{monthly:'Subscribe',yearly:'Subscribe',lifetime:'Buy lifetime'},
     demo:'Checkout link not configured — see README.md'

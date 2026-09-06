@@ -256,20 +256,49 @@ a{color:var(--accent);text-decoration:none}
    build.sh l'éteint avec le bouton — sinon il resterait un intitulé en face
    du vide. */
 .iconbtn--more{position:relative}
-@media (min-width:900px){
-  /* Sur grand écran le panneau reste un panneau : il s'ouvre par le bouton
-     « … » comme sur un téléphone. L'ancienne version le dépliait dans la
-     barre, ce qui l'étalait sur toute la largeur et rendait le bouton
-     inutile — c'est précisément ce qui le faisait passer pour cassé. */
-  .tbmore{max-height:min(70vh,620px)}
-  /* Sur grand écran tout tient : le tiroir se déplie dans la barre, et le
-     bouton « … » n'a plus lieu d'être.
+/* ── SUR GRAND ÉCRAN, TOUT REVIENT DANS LA BARRE ──────────────────────────
+   Le panneau à sections est fait pour le pouce : il répond à un écran étroit
+   où l'on ne peut pas tout aligner. Sur un ordinateur, la place ne manque
+   pas, et cacher le thème ou la pioche derrière un bouton serait un recul —
+   on veut les voir d'un coup d'œil.
 
-     Le `!important` n'est pas une facilité : `.iconbtn{display:grid}` est
-     écrit PLUS BAS dans cette feuille, à spécificité égale, et l'emportait
-     donc sur ce `display:none`. Résultat, le bouton restait affiché à côté
-     d'un tiroir déjà déplié — on cliquait, il basculait une classe qui ne
-     changeait plus rien, et le bouton passait pour cassé. */
+   Un seul balisage, deux formes. Le panneau redevient une rangée : les
+   titres de section disparaissent, les intitulés aussi — chaque commande
+   porte son infobulle —, la taille du texte reste au bouton dédié de la
+   barre, et les actions reprennent l'aspect des pastilles d'avant. */
+/* Le seuil est à 1100 px, pas à 900 : en dessous, la rangée dépassait du
+   bord et « Piocher » sortait de l'écran. Une barre qui déborde est pire
+   qu'un panneau. */
+@media (min-width:1100px){
+  .iconbtn--more{display:none !important}
+  .tbmore{
+    position:static;display:flex;flex-direction:row;align-items:center;
+    width:auto;max-height:none;overflow:visible;
+    padding:0;border:0;background:none;box-shadow:none;gap:8px;
+  }
+  .opt__tete,.opt__sect{display:none}
+  /* La taille du texte a déjà son bouton dans la barre : deux fois le même
+     réglage côte à côte n'aide personne. */
+  #ligneTaille{display:none}
+  .opt__l{min-height:36px;padding:0;gap:8px}
+  /* Plus aucun intitulé : chaque commande porte son infobulle, et c'est ce
+     qui permet aux sept de tenir sur une ligne. */
+  .opt__l > span:first-child{display:none}
+  .opt__a{
+    width:auto;height:36px;padding:0 12px;border-radius:11px;
+    border:1px solid var(--line);background:var(--ink-2);
+    font-size:12.5px;font-weight:600;flex:none;white-space:nowrap;
+  }
+  .opt__a:hover{background:var(--ink-3)}
+  /* La recherche redevient une icône seule, comme avant : c'est le seul des
+     trois dont le pictogramme se passe de mot. */
+  #searchBtn{width:36px;padding:0;justify-content:center}
+  #searchBtn span{display:none}
+  .opt__pied{margin:0;padding:0;border:0;gap:8px}
+}
+/* En dessous, c'est un panneau : il s'ouvre par le bouton « … ». */
+@media (max-width:1099px){
+  .tbmore{max-height:min(78vh,560px)}
 }
 
 .brand{display:flex;align-items:baseline;gap:9px;letter-spacing:-.02em;min-width:0}
@@ -741,6 +770,52 @@ a{color:var(--accent);text-decoration:none}
 }
 .deplier:hover{background:var(--accent-soft);border-color:var(--accent)}
 .chip.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* ── LES ACCROCHES SE SUIVENT ─────────────────────────────────────────────
+   En mode accroche, une fiche n'occupe plus un écran entier : elle ne porte
+   qu'une phrase, et lui donner mille pixels de hauteur obligeait à faire
+   défiler autant pour lire la suivante. On voyait UNE accroche à la fois —
+   c'est-à-dire exactement ce que le mode devait éviter.
+
+   Les fiches s'enchaînent donc, hauteur libre, séparées d'un filet : cinq ou
+   six tiennent dans un écran, et l'œil compare. Le calage magnétique est
+   suspendu — il n'a de sens que pour des pages pleines.
+
+   Déplier une fiche lui rend son écran entier et son magnétisme : on est
+   revenu en lecture, et rien ne distingue plus cette fiche d'une autre. */
+[data-accroches] .feed{scroll-snap-type:none;scroll-padding-top:calc(var(--barre) + 8px)}
+[data-accroches] .card{
+  height:auto;min-height:0;scroll-snap-align:none;
+  border-bottom:1px solid var(--line);
+}
+[data-accroches] .card__body{
+  height:auto;padding-top:20px;padding-bottom:20px;overflow:visible;
+}
+[data-accroches] .card__body > :first-child{margin-top:0}
+[data-accroches] .card .lede{
+  flex:0 0 auto;max-height:none;overflow:visible;margin-bottom:0;
+}
+[data-accroches] .card h2{font-size:calc(clamp(21px,3vw,30px) * var(--lecture));margin-bottom:12px}
+[data-accroches] .card .lede p:first-child{font-size:calc(clamp(17px,2.2vw,20px) * var(--lecture))}
+/* En balayage, on cherche un sujet — on ne garde ni ne partage. La rangée de
+   fin appartient à la lecture, elle revient avec elle. */
+[data-accroches] .suivante,[data-accroches] .readmore,
+[data-accroches] .card:not(.deplie) .endrow{display:none}
+/* La première passe sous la barre : elle a besoin de son dégagement. */
+[data-accroches] .feed > .card:first-child .card__body{
+  padding-top:calc(env(safe-area-inset-top,0px) + var(--barre) + 22px);
+}
+/* Dépliée : la fiche redevient une fiche. */
+[data-accroches] .card.deplie{height:100dvh;scroll-snap-align:start;border-bottom:0}
+[data-accroches] .card.deplie .card__body{
+  height:100%;overflow:hidden;
+  padding-top:calc(env(safe-area-inset-top,0px) + var(--barre) + 26px);
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 30px);
+}
+[data-accroches] .card.deplie .lede{flex:1 1 auto;overflow-y:auto;margin-bottom:18px}
+[data-accroches] .card.deplie h2{font-size:calc(clamp(26px,4.6vw,44px) * var(--lecture));margin-bottom:20px}
+[data-accroches] .card.deplie .suivante{display:grid}
+[data-accroches] .card.deplie .endrow{display:flex}
 
 /* ── LA MARQUE DE LA FICHE DU JOUR ────────────────────────────────────── */
 .marquejour{
@@ -1330,8 +1405,19 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
   .quota #quotaTxt em{display:none}
 }
 @media (max-width:560px){
-  .chip--uni .lb{display:none}
-  .chip--uni{padding:0 10px;gap:5px}
+  /* ── L'UNIVERS RESTE LISIBLE ───────────────────────────────────────────
+     Son nom disparaissait sous 560 px : il ne restait qu'une pastille de
+     couleur et un chevron, et l'on ne savait plus ce qu'on lisait ni sur
+     quoi on allait cliquer. La barre passait pour coupée — d'autant qu'il y
+     avait cinquante pixels de vide juste à côté.
+
+     Le nom reste donc, et se contente de ce qu'on lui laisse : il se
+     tronque proprement plutôt que de s'effacer. */
+  .chip--uni{padding:0 10px;gap:5px;flex:0 1 auto;min-width:0}
+  .chip--uni .lb{
+    display:block;min-width:0;max-width:13ch;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
   .topbar{gap:6px}
   .quota{padding:0 10px;gap:6px}
   .quota .gauge{width:30px}
@@ -1377,6 +1463,7 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
 @media (max-width:360px){
   .topbar{gap:3px;padding-left:5px;padding-right:5px}
   .chip--uni svg{display:none}
+  .chip--uni .lb{max-width:8ch}
   .brand b{font-size:18px}
   .brand{gap:6px}
   .planbadge{font-size:8px;padding:3px 5px;letter-spacing:.06em}

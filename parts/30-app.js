@@ -68,7 +68,12 @@ const S = {
   /* Le mode accroche : on ne voit que la phrase d'ouverture de chaque fiche,
      et on déplie celles qui intriguent. Une façon de balayer vite. */
   accroches: LS.get('curio.accroches', false),
-  picked:    LS.get('curio.picked', ['cosmos','vivant']),
+  /* Les huit univers par défaut, et non deux. Tant que le tirage les
+     ignorait, ce choix initial n'avait pas de conséquence ; maintenant qu'il
+     le respecte, deux univers cochés d'office contrediraient la promesse de
+     la page — « les huit sont ouverts, dès la version gratuite ». On part
+     donc de tout, et c'est au lecteur de restreindre s'il le veut. */
+  picked:    LS.get('curio.picked', CONFIG.freeThemes.slice()),
   day:       LS.get('curio.day', today()),
   used:      LS.get('curio.used', 0),
   /* Le tirage du jour et la mémoire de ce qui a déjà été offert. */
@@ -868,11 +873,12 @@ function purgerServis(){
   if(bouge) LS.set('curio.servis', S.servis);
 }
 
-/* Toutes les anecdotes publiées, tous univers confondus. Huit fichiers
-   locaux, déjà en cache : rien ne part vers l'extérieur. */
-async function catalogueOffrable(){
+/* Les anecdotes publiées dans les univers demandés. Des fichiers locaux,
+   déjà en cache : rien ne part vers l'extérieur.
+   `unis` absent = les huit, ce qu'attend la pioche. */
+async function catalogueOffrable(unis){
   const out = [];
-  for(const tid of CONFIG.freeThemes){
+  for(const tid of (unis && unis.length ? unis : CONFIG.freeThemes)){
     const w = await loadWritten(S.lang, tid);
     if(!w) continue;
     for(const titre of Object.keys(w)){
@@ -889,7 +895,15 @@ async function tirageDuJour(){
   purgerServis();
   if(S.tirage && S.tirage.j === today() && S.tirage.c && S.tirage.c.length) return S.tirage.c;
 
-  const tout = await catalogueOffrable();
+  /* ── LE TIRAGE RESPECTE VOS UNIVERS ─────────────────────────────────────
+     Il piochait dans les huit quoi qu'on choisisse : cocher « Cosmos » ne
+     changeait rien, et le filtre passait pour cassé. Il pioche maintenant
+     dans les univers retenus — et si ceux-ci n'ont pas de quoi remplir la
+     journée, on élargit plutôt que de servir trois fiches : une préférence
+     n'est pas un mur. */
+  const choisis = activeThemes();
+  let tout = await catalogueOffrable(choisis);
+  if(tout.length < OFFRE_JOUR) tout = await catalogueOffrable();
   if(!tout.length) return [];
   const frais = tout.filter(k => !S.servis[k]);
   /* Quand le catalogue est plus petit que la mémoire, la promesse des deux
@@ -904,7 +918,9 @@ async function tirageDuJour(){
   const c = shuffle(source.slice()).slice(0, OFFRE_JOUR);
   const j = today();
   c.forEach(k => { S.servis[k] = j; });
-  S.tirage = { j, c };
+  /* On garde les univers du tirage : c'est ce qui permet de dire, si vous en
+     changez ensuite, que votre choix vaudra pour demain. */
+  S.tirage = { j, c, u: choisis.slice().sort().join(',') };
   LS.set('curio.tirage', S.tirage);
   LS.set('curio.servis', S.servis);
   return c;
@@ -1136,7 +1152,7 @@ function estPremium(){ return S.plan === 'lifetime' || S.plan === 'paid' || S.pl
 /* Une clé au hasard dans tout le catalogue, en évitant ce qui a été lu
    récemment. `exclure` est un Set de titres déjà présents dans le flux. */
 async function cleAuHasard(exclure){
-  const tout = await catalogueOffrable();
+  const tout = await catalogueOffrable();   // la pioche ignore les préférences : c'est le jeu
   if(!tout.length) return null;
   const vus = new Set(S.seen.map(k => k.slice(k.indexOf(':') + 1)));
   const titre = k => k.slice(k.indexOf('|') + 1);
@@ -1307,6 +1323,7 @@ function fillText(node, item){
      déplie. Le dépliage vaut pour cette fiche-là seulement : on peut lire
      celle qui accroche sans quitter le balayage. */
   if(S.accroches && !node._deplie){
+    node.classList.remove('deplie');
     const paras = (item.blocks && item.blocks.length ? item.blocks[0].p
                 : (item.paras && item.paras.length ? item.paras : [item.extract || '']));
     read.appendChild(el('p', null, md(paras[0] || '')));
@@ -1314,7 +1331,12 @@ function fillText(node, item){
     ouvrir.addEventListener('click', e=>{
       e.stopPropagation();
       node._deplie = true;
+      node.classList.add('deplie');       // la fiche reprend tout l'écran
       fillText(node, item);
+      requestAnimationFrame(()=>{
+        node.scrollIntoView({ behavior:'smooth', block:'start' });
+        setActive(node);
+      });
     });
     read.appendChild(ouvrir);
     if(node._endrow) read.appendChild(node._endrow);
@@ -1425,9 +1447,11 @@ function buildCard(item){
   // fini de lire — pas dans une colonne flottante posee sur le texte.
   const row = el('div','endrow');
 
+  /* « Garder » ne s'affiche que si la collection existe pour ce lecteur. */
   const bFav = el('button','ebtn ebtn--fav',
       '<svg viewBox="0 0 24 24"><path d="M6.5 3.5h11a1.5 1.5 0 011.5 1.5v15.2l-7-3.6-7 3.6V5a1.5 1.5 0 011.5-1.5z"/></svg>'
     + '<span class="lb">' + T()['act.keep'] + '</span>');
+  bFav.hidden = !estPremium();
   bFav.addEventListener('click', e=>{ e.stopPropagation(); basculerFavori(item, node); });
 
   const bShare = el('button','ebtn',
@@ -1658,7 +1682,12 @@ mo.observe(feed, { childList:true });
 function setActive(node){
   Array.from(feed.children).forEach(c => c.classList.toggle('is-active', c === node));
   // une fiche en aperçu n'a pas été lue : elle ne consomme rien
-  if(S.onboarded && node.dataset.kind === 'fact' && !node._counted && node.dataset.apercu !== '1'){
+  /* Une accroche repliée n'est pas une lecture : on n'a vu qu'une phrase.
+     Sans cette réserve, parcourir vingt accroches consommerait la journée
+     offerte en trois secondes. */
+  const replie = S.accroches && !node._deplie;
+  if(S.onboarded && node.dataset.kind === 'fact' && !node._counted && !replie
+     && node.dataset.apercu !== '1'){
     node._counted = true;
     if(S.plan === 'free'){ S.used++; LS.set('curio.used', S.used); renderQuota(); }
     if(typeof peutEtreInstall === 'function') peutEtreInstall();
@@ -1792,7 +1821,22 @@ $('#uniBtn').addEventListener('click', ()=>{ pickedSnapshot = S.picked.slice().s
 function applyPickedIfChanged(){
   if(!pickedSnapshot) return;
   const now = S.picked.slice().sort().join(',');
-  if(now !== pickedSnapshot){ pickedSnapshot = now; resetFeed(); }
+  if(now !== pickedSnapshot){
+    pickedSnapshot = now;
+    /* ── POURQUOI RIEN NE BOUGE, EN GRATUIT ────────────────────────────
+       Les cinq du jour sont tirées une fois, le matin. Les redistribuer
+       parce qu'on coche un univers reviendrait à donner autant d'anecdotes
+       qu'on a de combinaisons — la journée n'aurait plus de sens.
+
+       Alors on le DIT. Le choix est enregistré, il vaudra pour le tirage
+       de demain, et le lecteur ne reste pas devant un filtre qu'il croit
+       cassé. C'était le cas jusqu'ici : le tirage ignorait les univers, et
+       rien n'expliquait pourquoi. */
+    if(S.plan === 'free' && S.tirage && S.tirage.j === today()){
+      const memes = (S.tirage.u || '') === activeThemes().slice().sort().join(',');
+      if(!memes) toast(T()['uni.demain']);
+    } else resetFeed();
+  }
   pickedSnapshot = '';
 }
 $('#shuffleBtn').addEventListener('click', ()=>{
@@ -1850,6 +1894,7 @@ function estFavori(it){ return S.favs.some(f => (f.cle || f.url) === (cleFavori(
 
 function basculerFavori(it, node){
   if(!it) return;
+  if(!estPremium()){ open('#paywall'); return; }
   const cle = cleFavori(it);
   const i = S.favs.findIndex(f => (f.cle || f.url) === (cle || it.url));
   if(i >= 0){ S.favs.splice(i,1); toast(T().unsaved); }
@@ -1882,7 +1927,12 @@ function majCollection(){
   const d = $('#libDot');
   if(d) d.hidden = !S.favs.length;
 }
-$('#libBtn').addEventListener('click', ()=>{ renderLib(); open('#libSheet'); });
+$('#libBtn').addEventListener('click', ()=>{
+  /* Ceinture : même si le bouton réapparaissait, la collection reste une
+     contrepartie de l'abonnement. */
+  if(!estPremium()){ open('#paywall'); return; }
+  renderLib(); open('#libSheet');
+});
 function renderLib(){
   const l = $('#libList'); l.innerHTML='';
   if(!S.favs.length){ l.appendChild(el('div','empty', T().emptyLib)); return; }
@@ -1996,10 +2046,18 @@ $('#searchBtn').addEventListener('click', ()=>{
       peindre();
       /* On redessine les fiches en place : le lecteur ne perd pas sa position,
          il change seulement de façon de lire. */
+      const garde = current();
       Array.from(feed.children).forEach(c=>{
         if(c.dataset.kind !== 'fact' || !c._item) return;
         c._deplie = false;
+        c.classList.remove('deplie');
         fillText(c, c._item);
+      });
+      /* Changer de mode réordonne toute la page : on remet le lecteur devant
+         la fiche qu'il regardait, sinon il se retrouve ailleurs sans savoir
+         où. */
+      if(garde) requestAnimationFrame(()=>{
+        garde.scrollIntoView({ block:'start' }); setActive(garde);
       });
       toast(T()[S.accroches ? 'acc.on' : 'acc.off']);
     });
@@ -2008,11 +2066,21 @@ $('#searchBtn').addEventListener('click', ()=>{
   if(b) b.addEventListener('click', piocher);
 })();
 
-/* Le bouton Piocher n'apparaît que pour ceux qui y ont droit. */
-function majPioche(){
-  const b = $('#pioBtn');
-  if(b) b.hidden = !estPremium();
+/* ── CE QUI APPARTIENT AUX FORMULES PAYANTES ──────────────────────────────
+   La pioche, et la collection.
+
+   La collection n'avait aucun sens en gratuit : les cinq du jour s'en vont le
+   lendemain, garder l'une d'elles ne promettait rien qu'on puisse tenir. On
+   ne laisse pas un bouton qui ne sert à rien — on le retire, et il devient
+   une raison de plus de passer à l'abonnement. */
+function majPremium(){
+  const p = estPremium();
+  const b = $('#pioBtn'); if(b) b.hidden = !p;
+  const l = $('#libBtn'); if(l) l.hidden = !p;
+  /* Les fiches déjà à l'écran portent peut-être encore le bouton « Garder ». */
+  document.querySelectorAll('.ebtn--fav').forEach(x => { x.hidden = !p; });
 }
+const majPioche = majPremium;   // ancien nom, gardé pour ne rien casser
 
 $('#qBtn').addEventListener('click', doSearch);
 $('#qInput').addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
