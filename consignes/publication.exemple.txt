@@ -80,6 +80,23 @@ images: oui
 ordre: potentiel
 
 # ─────────────────────────────────────────────────────────────────────────
+# LE PASSAGE DE LA RELECTURE AU STOCK PRÊT À PUBLIER
+#
+# Relire, mettre au stock et publier sont TROIS marches distinctes :
+#
+#   1. relire    vous jugez chaque fiche dans console.html — Relecture
+#   2. le stock  vos jugements deviennent une réserve prête à sortir
+#   3. la sortie « 5 · Publier » en tire au rythme réglé ci-dessus
+#
+#   manuel   vous appuyez sur « Envoyer au stock prêt à publier »   (défaut)
+#   auto     chaque passage de publication prend d'abord vos validées
+#
+# Dans les deux cas, VALIDER NE MET JAMAIS RIEN EN LIGNE. C'est le rythme
+# ci-dessus, et lui seul, qui décide quand une fiche du stock sort.
+# ─────────────────────────────────────────────────────────────────────────
+stock: manuel
+
+# ─────────────────────────────────────────────────────────────────────────
 # PUBLIER MÊME CE QUI EST EN QUARANTAINE ? Non, évidemment. Ne mettez « oui »
 # que si vous savez exactement pourquoi.
 # ─────────────────────────────────────────────────────────────────────────

@@ -269,8 +269,18 @@ a{color:var(--accent);text-decoration:none}
 /* Le seuil est à 1100 px, pas à 900 : en dessous, la rangée dépassait du
    bord et « Piocher » sortait de l'écran. Une barre qui déborde est pire
    qu'un panneau. */
+/* ── LES DEUX RACCOURCIS DU TÉLÉPHONE ────────────────────────────────────
+   Piocher et le mode accroches sont les gestes du quotidien de qui paie :
+   les enterrer derrière « … » demandait deux gestes pour un réflexe. Ils
+   sont donc dans la barre — mais seulement là où le panneau est replié :
+   au-dessus de 1100 px la rangée dépliée les porte déjà en toutes lettres,
+   et deux fois la même commande dans une barre n'aide personne. */
+.iconbtn--or{color:var(--brass);border-color:var(--brass-soft);background:var(--brass-soft)}
+.iconbtn--or:hover{color:var(--brass);border-color:var(--brass)}
+.iconbtn--tel.on{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
 @media (min-width:1100px){
   .iconbtn--more{display:none !important}
+  .iconbtn--tel{display:none !important}
   .tbmore{
     position:static;display:flex;flex-direction:row;align-items:center;
     width:auto;max-height:none;overflow:visible;
@@ -301,7 +311,13 @@ a{color:var(--accent);text-decoration:none}
   .tbmore{max-height:min(78vh,560px)}
 }
 
-.brand{display:flex;align-items:baseline;gap:9px;letter-spacing:-.02em;min-width:0}
+/* Le nom est devenu un bouton — il ramène à l'accueil. Il n'en a pas l'air,
+   et c'est voulu : un titre qu'on peut appuyer, pas une commande de plus. */
+.brand{display:flex;align-items:baseline;gap:9px;letter-spacing:-.02em;min-width:0;
+  padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;
+  -webkit-tap-highlight-color:transparent}
+.brand:hover b{color:var(--accent)}
+.brand b{transition:color .16s}
 .brand b{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:21px;font-variation-settings:"SOFT" 40,"WONK" 1;flex:none}
 /* Le statut du compte, à côté du nom : on doit savoir en un coup d'œil si
    on est en gratuit ou en illimité. Trois mots au maximum, jamais tronqués. */
@@ -422,12 +438,27 @@ a{color:var(--accent);text-decoration:none}
      carte qui n'a que peu à dire. */
   [data-accroches] .card__body > :first-child{margin-top:auto}
 }
-.card.is-active .card__body > *{animation:rise .62s cubic-bezier(.16,1,.3,1) both}
-.card.is-active .card__body > *:nth-child(2){animation-delay:.06s}
-.card.is-active .card__body > *:nth-child(3){animation-delay:.12s}
-.card.is-active .card__body > *:nth-child(4){animation-delay:.18s}
+/* ── POURQUOI IL N'Y A PLUS D'ENTRÉE ANIMÉE ──────────────────────────────
+   Chaque bloc d'une fiche montait de seize pixels en s'allumant, l'un après
+   l'autre, dès que la fiche devenait active. Trois défauts, et le troisième
+   est le vrai :
+
+     · la fiche arrivait VIDE et se remplissait ensuite — au défilement, on
+       voyait un rafraîchissement, pas une lecture ;
+     · l'animation se rejouait à chaque passage, donc à chaque aller-retour
+       dans le flux ;
+     · les blocs étant décalés séparément, un bloc encore descendu recouvrait
+       le suivant : le texte passait par-dessus le titre. C'est très
+       exactement ce qu'on voyait à l'écran.
+
+   Une fiche n'a pas besoin d'entrer en scène : elle est là. Il reste un
+   fondu très court sur la carte entière — un seul élément, donc aucun
+   recouvrement possible — et il ne se joue qu'à la création de la carte,
+   presque toujours avant qu'on y arrive. */
+.card{animation:paraitre .28s ease both}
+@keyframes paraitre{from{opacity:0}to{opacity:1}}
 @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.card.is-active .card__body > *{animation:none}}
+@media (prefers-reduced-motion:reduce){.card{animation:none}}
 
 .eyebrow{
   display:flex;align-items:center;gap:9px;flex-wrap:nowrap;margin:0 0 14px;

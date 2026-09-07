@@ -40,6 +40,10 @@ const RETIRER  = opt('retirer', null);
 const RENDRE   = opt('rendre', null);
 const REFAIRE  = opt('refaire', null);
 const VALIDER  = !!opt('valider', false);   // appliquer consignes/validations.json
+/* Deux lectures qui ne modifient rien : l'une remet le registre d'accord avec
+   les fiches, l'autre cherche les redites parmi les seules fiches en ligne. */
+const REPARER  = !!opt('reparer', false);
+const DOUBLONS = !!opt('doublons', false);
 const VALIDS   = path.join(process.cwd(), 'consignes', 'validations.json');
 const FORCE    = opt('combien', null);
 /* ── PUBLIER TOUT CE QUI VAUT UNE CERTAINE NOTE ───────────────────────────
@@ -413,7 +417,216 @@ function bilan(groupes){
   return b;
 }
 
+/* ═══════════ REMETTRE LE REGISTRE D'ACCORD AVEC LES FICHES ══════════════
+   Deux fichiers répondaient à la même question, et pas la même chose :
+
+     • catalogue-maitre.json porte « statut », « ecrit », « publie » — un
+       REGISTRE, tenu par les outils au fil de leurs passages ;
+     • anecdotes/<langue>-<univers>.json porte les fiches, avec leur date de
+       mise en ligne — c'est ce que l'APPLICATION lit, et donc ce que le
+       lecteur reçoit.
+
+   Quand un passage s'interrompt, quand une fiche est retirée à la main,
+   quand une opération ancienne n'a mis à jour qu'un des deux, ils divergent.
+   On voyait alors un sujet marqué « EN LIGNE » à la sélection, absent des
+   publiés, et absent du site : trois réponses, aucune fiable.
+
+   Cette opération ne réécrit QUE le registre, jamais une fiche, jamais un
+   texte : les fiches font foi. Rien n'est publié, rien n'est dépublié, rien
+   n'est effacé. C'est une remise au propre, et elle est gratuite.        */
+async function reparerRegistre(){
+  const maitre = await lire(MAITRE, null);
+  if (!maitre || !Array.isArray(maitre.sujets)){
+    console.log('Pas de catalogue-maitre.json à réparer.');
+    return;
+  }
+  const par = await reglage();
+  const { fiches } = await charger();
+  const aujourdhui = jour();
+
+  /* Ce que les fiches savent, par sujet : langues écrites, langues en ligne,
+     et la date de la plus ancienne mise en ligne. */
+  const vues = new Map();     // qid -> { ecrites:Set, enligne:Set, date:string }
+  const parTitre = new Map(); // titre -> qid, pour les fiches sans identifiant
+  for (const s of maitre.sujets){
+    if (s.fr) parTitre.set(s.fr, s.qid);
+    if (s.en) parTitre.set(s.en, s.qid);
+  }
+  for (const f of fiches){
+    const q = f.rec.q || parTitre.get(f.titre);
+    if (!q) continue;
+    if (!vues.has(q)) vues.set(q, { ecrites:new Set(), enligne:new Set(), date:'' });
+    const v = vues.get(q);
+    v.ecrites.add(f.lang);
+    if (f.rec.p && String(f.rec.p) <= aujourdhui){
+      v.enligne.add(f.lang);
+      if (!v.date || String(f.rec.p) < v.date) v.date = String(f.rec.p);
+    }
+  }
+
+  let corriges = 0;
+  const detail = { publie:0, ecrit:0, aecrire:0, langues:0 };
+  for (const s of maitre.sujets){
+    if (!s || s.statut === 'retire') continue;   // un retrait est une décision : on n'y touche pas
+    const v = vues.get(s.qid);
+    const ecrites = v ? [...v.ecrites].sort() : [];
+    const existe  = [s.fr ? 'fr' : null, s.en ? 'en' : null].filter(Boolean);
+    /* Les langues attendues : celles que vous publiez, parmi celles où
+       l'article existe. Un sujet qui n'existe qu'en anglais alors que vous
+       ne publiez que le français n'est pas « à finir » : il est hors sujet. */
+    const attendues = par.langues.filter(l => existe.includes(l));
+
+    const avantL = (s.langues || []).join(',');
+    if (avantL !== ecrites.join(',')){ s.langues = ecrites; detail.langues++; }
+
+    const enligne = v ? [...v.enligne] : [];
+    const toutEnLigne = attendues.length > 0 && attendues.every(l => enligne.includes(l));
+    const toutEcrit   = attendues.length > 0 && attendues.every(l => ecrites.includes(l));
+
+    const statutAvant = s.statut, publieAvant = s.publie || null;
+    if (toutEnLigne){ s.statut = 'publie'; s.publie = v.date || s.publie || aujourdhui; }
+    else if (toutEcrit || ecrites.length){ s.statut = 'ecrit'; s.publie = null; s.ecrit = s.ecrit || aujourdhui; }
+    else { s.statut = 'a-ecrire'; s.publie = null; s.ecrit = null; }
+
+    if (statutAvant !== s.statut || publieAvant !== (s.publie || null)){
+      corriges++;
+      if (s.statut === 'publie') detail.publie++;
+      else if (s.statut === 'ecrit') detail.ecrit++;
+      else detail.aecrire++;
+    }
+  }
+
+  console.log('╔══════════════════════════════════════════════════════════════╗');
+  console.log('║  REGISTRE REMIS D’ACCORD AVEC LES FICHES                     ║');
+  console.log('╚══════════════════════════════════════════════════════════════╝');
+  console.log(`  langue(s) publiée(s) : ${par.langues.join(' + ')}`);
+  console.log(`  ${maitre.sujets.length} sujet(s) au registre, ${fiches.length} fiche(s) sur le disque.`);
+  console.log(`  ${detail.langues} liste(s) de langues corrigée(s).`);
+  console.log(`  ${corriges} statut(s) corrigé(s) : ${detail.publie} en ligne, `
+            + `${detail.ecrit} en réserve, ${detail.aecrire} à écrire.`);
+  if (!corriges && !detail.langues) console.log('  Rien à corriger : les deux disaient déjà la même chose.');
+  console.log('  Aucune fiche n’a été touchée. Rien n’a été publié ni dépublié.');
+
+  if (corriges || detail.langues){
+    maitre.genere = new Date().toISOString();
+    await ecrire(MAITRE, maitre);
+  }
+}
+
+/* ═══════════ LES DOUBLONS, SUR LES SEULES FICHES EN LIGNE ════════════════
+   Deux fiches qui racontent la même chose se voient : c'est le reproche que
+   fait un lecteur qui paie. L'identifiant Wikidata rend le doublon de SUJET
+   impossible — mais deux sujets différents peuvent porter la même anecdote,
+   et deux articles peuvent avoir été écrits sur le même fait.
+
+   On ne regarde que ce qui est EN LIGNE : ce qui dort en réserve ne gêne
+   personne, et on ne veut pas d'une liste de mille signalements dont neuf
+   cents portent sur des textes qui ne sortiront jamais.
+
+   Rien n'est modifié. On lit, on rapporte, on écrit doublons.csv, et c'est
+   vous qui tranchez ensuite — « retirer » prend le titre exact.          */
+function motsUtiles(t){
+  const vides = new Set(('le la les un une des du de d au aux et ou a à en dans sur pour par avec '
+    + 'que qui quoi dont ne pas plus est sont était étaient il elle ils elles on se sa son ses ce '
+    + 'cet cette ces leur leurs the of and to in is was were it its this that for with as at by '
+    + 'from he she they).').split(/\s+/));
+  return String(t || '').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/).filter(m => m.length > 3 && !vides.has(m));
+}
+function jaccard(a, b){
+  if (!a.size || !b.size) return 0;
+  let inter = 0;
+  for (const m of a) if (b.has(m)) inter++;
+  return inter / (a.size + b.size - inter);
+}
+async function chercherDoublons(){
+  const seuil = Math.max(0.05, Math.min(0.95, parseFloat(opt('seuil', '0.34')) || 0.34));
+  const { fiches } = await charger();
+  const par = await reglage();
+  const aujourdhui = jour();
+  const enLigne = fiches.filter(f => f.rec.p && String(f.rec.p) <= aujourdhui
+                                  && par.langues.includes(f.lang));
+  console.log('╔══════════════════════════════════════════════════════════════╗');
+  console.log('║  DOUBLONS — SUR LES FICHES EN LIGNE SEULEMENT                ║');
+  console.log('╚══════════════════════════════════════════════════════════════╝');
+  console.log(`  ${enLigne.length} fiche(s) en ligne examinée(s), seuil de ressemblance ${seuil}.`);
+  console.log('  Rien ne sera modifié : c’est une lecture.\n');
+
+  /* Un sac de mots par fiche : accroche + phrase à raconter + texte. Deux
+     fiches qui partagent un tiers de leur vocabulaire utile parlent presque
+     toujours de la même chose. */
+  const sacs = enLigne.map((f, i) => ({
+    i, f, mots: new Set(motsUtiles([f.rec.t, f.rec.r, f.rec.x].filter(Boolean).join(' ')))
+  }));
+
+  /* ── ON NE COMPARE PAS TOUT AVEC TOUT ───────────────────────────────────
+     Comparer chaque fiche à chaque autre, c'est n²/2 : à trois mille fiches
+     en ligne, quatre millions et demi de comparaisons de listes de mots —
+     l'action y passerait des minutes pour rien.
+
+     Un mot RARE suffit à trouver les candidats. On indexe donc les mots peu
+     répandus (moins d'une fiche sur vingt les emploie), et on ne compare que
+     les fiches qui en partagent au moins trois. Deux textes qui racontent la
+     même chose partagent forcément un nom propre, une date, un lieu : ils
+     passent. Deux textes qui n'ont rien à voir ne se rencontrent jamais. */
+  const index = new Map();                    // mot -> [indices]
+  for (const s of sacs) for (const m of s.mots){
+    if (!index.has(m)) index.set(m, []);
+    index.get(m).push(s.i);
+  }
+  const plafond = Math.max(3, Math.ceil(sacs.length / 20));
+  const candidats = new Map();                // "i|j" -> nombre de mots rares partagés
+  for (const [, liste] of index){
+    if (liste.length < 2 || liste.length > plafond) continue;
+    for (let a = 0; a < liste.length; a++)
+      for (let b = a + 1; b < liste.length; b++){
+        const k = liste[a] + '|' + liste[b];
+        candidats.set(k, (candidats.get(k) || 0) + 1);
+      }
+  }
+
+  /* On ne compare que dans la même langue : un français et un anglais du même
+     sujet ne sont pas un doublon, c'est la traduction voulue. */
+  const paires = [];
+  for (const [k, n] of candidats){
+    if (n < 3) continue;
+    const [ia, ib] = k.split('|').map(Number);
+    const A = sacs[ia], B = sacs[ib];
+    if (A.f.lang !== B.f.lang) continue;
+    if (A.f.rec.q && A.f.rec.q === B.f.rec.q) continue;      // même sujet : normal
+    const s = jaccard(A.mots, B.mots);
+    if (s >= seuil) paires.push({ s, a:A.f, b:B.f });
+  }
+  paires.sort((x, y) => y.s - x.s || String(x.a.titre).localeCompare(String(y.a.titre)));
+
+  if (!paires.length){
+    console.log('  Aucun doublon au-dessus du seuil. Rien à faire.');
+  } else {
+    console.log(`  ${paires.length} paire(s) à regarder, la plus ressemblante d’abord :\n`);
+    for (const p of paires.slice(0, 60)){
+      console.log(`  ${(p.s * 100).toFixed(0)} %  ${p.a.rec.t || p.a.titre}`);
+      console.log(`         ↔  ${p.b.rec.t || p.b.titre}`);
+      console.log(`         (${p.a.titre}  |  ${p.b.titre})`);
+    }
+    if (paires.length > 60) console.log(`\n  … et ${paires.length - 60} autre(s) dans doublons.csv.`);
+    console.log('\n  Pour en retirer une : 5 · Publier → retirer, avec le titre exact');
+    console.log('  indiqué entre parenthèses.');
+  }
+
+  const csv = ['﻿ressemblance;langue;titre_a;article_a;titre_b;article_b']
+    .concat(paires.map(p => [ (p.s * 100).toFixed(0) + ' %', p.a.lang,
+      p.a.rec.t || p.a.titre, p.a.titre, p.b.rec.t || p.b.titre, p.b.titre ]
+      .map(x => '"' + String(x).replace(/"/g, '""') + '"').join(';')))
+    .join('\n');
+  await fs.writeFile(path.join(process.cwd(), 'doublons.csv'), csv + '\n', 'utf8');
+  console.log('\n  Rapport complet : doublons.csv');
+}
+
 async function main(){
+  if (REPARER) return reparerRegistre();
+  if (DOUBLONS) return chercherDoublons();
   if (VALIDER) return appliquerValidations();
   if (REFAIRE && REFAIRE !== true) return refaire(REFAIRE);
   if (RETIRER && RETIRER !== true) return retirer(RETIRER, false);

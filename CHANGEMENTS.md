@@ -1,4 +1,139 @@
-# Curio 8.9.0 — ce qui a changé depuis v6
+# Curio 8.10.0 — ce qui a changé depuis v6
+
+## 8.10.0 — une édition du jour commune, et des états qui disent vrai
+
+### Les cinq du jour sont les mêmes pour tout le monde
+
+Elles étaient tirées au hasard dans chaque navigateur : deux personnes
+n'avaient jamais la même journée. Impossible d'en parler à quelqu'un,
+impossible d'annoncer « celle d'aujourd'hui », impossible d'en faire un
+rendez-vous. Une édition n'existe que si elle est commune.
+
+Le tirage se **déduit** maintenant de la date, et de rien d'autre : le
+catalogue publié est rangé dans un ordre stable, le numéro du jour désigne une
+fenêtre de cinq dans cet ordre, et la fenêtre avance de cinq chaque jour. Deux
+téléphones, deux pays, deux navigateurs : la même page. Personne ne revoit une
+anecdote avant que le catalogue entier ait défilé — la rotation le garantit
+d'elle-même. Il n'y a toujours ni compte, ni serveur, ni la moindre donnée qui
+sorte de l'appareil.
+
+**La fiche du jour** des abonnés suit la même règle, à une autre position :
+c'est un rendez-vous, et « celle d'aujourd'hui » ne veut rien dire si chacun a
+la sienne.
+
+### Le catalogue et les fiches ne racontent plus deux histoires
+
+C'était le point le plus gênant. Un sujet s'affichait **EN LIGNE** à la
+Sélection, restait introuvable dans les publiés, et manquait sur le site :
+trois réponses à la même question, aucune fiable.
+
+La cause : `catalogue-maitre.json` tient un *registre* (« écrit », « en
+ligne »), et `anecdotes/` porte la *vérité*, puisque c'est ce que
+l'application lit. Quand un passage s'interrompt, les deux divergent.
+
+Trois corrections :
+
+- **L'état d'un sujet se lit désormais dans les fiches**, pas dans le
+  registre. La console dit ce que le lecteur voit.
+- **Un désaccord se voit** : le sujet porte la marque `⚠ incohérent`, un
+  filtre les isole, et un chiffre les compte.
+- **Un outil les répare** : *4 · Contrôle → Remettre le registre d'accord avec
+  les fiches*. Gratuit, il ne touche aucune fiche, ne publie ni ne dépublie
+  rien — il recopie ce que disent les fiches dans le registre.
+
+### « À finir » avait cessé d'avoir un sens
+
+Il voulait dire « une langue sur deux ». Comme vous ne publiez que le
+français, des centaines de sujets étaient marqués inachevés parce qu'il leur
+manquait un anglais que personne n'attend.
+
+Un sujet est maintenant jugé sur **les langues que vous publiez**, croisées
+avec celles où l'article existe. En français seul, « à finir » ne peut plus
+apparaître. Et un sujet qui n'existe dans aucune langue publiée n'est ni à
+écrire ni inachevé : il est **hors langue publiée**, un état à part, avec son
+filtre.
+
+### « Pas encore relues » montrait des fiches publiées
+
+Les fiches mises en ligne par l'ancien chemin — celui où valider publiait — ne
+portent aucune trace de relecture. Elles remontaient donc dans « pas encore
+relues », déjà publiées.
+
+Le filtre de relecture ne parle plus que de ce qui **n'est pas** en ligne : une
+fiche publiée ne se relit plus, elle se retire ou se refait. Et quatre filtres
+nouveaux répondent aux questions qu'on se pose vraiment :
+
+| filtre | ce qu'il montre |
+|---|---|
+| Pas encore relues | écrites, pas en ligne, pas jugées |
+| À valider | écrites, pas en ligne, pas encore validées |
+| En réserve | tout ce qui n'est pas en ligne |
+| Prêtes à publier | dans le stock, en attente du rythme |
+
+### De la relecture au stock, en un bouton
+
+Trois marches, et une seule s'appelait « publier » — ce qui laissait croire
+que valider mettait en ligne :
+
+1. **relire** — vous jugez, dans votre navigateur ;
+2. **le stock** — vos jugements deviennent une réserve prête ;
+3. **la sortie** — *5 · Publication* en tire au rythme réglé.
+
+La marche 2 a maintenant son bouton, *Envoyer au stock prêt à publier*, et son
+réglage : `stock: manuel` (le bouton) ou `stock: auto` (chaque passage de
+publication prend d'abord vos validées). Dans les deux cas, valider ne met
+jamais rien en ligne.
+
+*Au passage :* `consignes/validations.json` n'était pas enregistré par
+l'action. L'outil le vidait après l'avoir appliqué, le vidage était perdu, et
+la relecture se rejouait à chaque passage.
+
+### Chercher les redites, sur les seules fiches en ligne
+
+*4 · Contrôle → Chercher les redites parmi les fiches EN LIGNE.* Il compare
+deux à deux, dans la même langue, ce que le lecteur voit — et rien d'autre :
+ce qui dort en réserve ne gêne personne. **Rien n'est retiré** ; vous lisez
+`doublons.csv` et vous choisissez, titre par titre.
+
+### Le défilement ne « rafraîchit » plus
+
+Chaque bloc d'une fiche montait de seize pixels en s'allumant, l'un après
+l'autre, dès que la fiche devenait active. La fiche arrivait donc **vide** et
+se remplissait ensuite ; l'animation se rejouait à chaque passage ; et comme
+les blocs étaient décalés séparément, **le texte passait par-dessus le
+titre**. C'est exactement ce qu'on voyait à l'écran.
+
+Une fiche n'a pas besoin d'entrer en scène : elle est là. Il reste un fondu
+très court sur la carte entière — un seul élément, donc aucun recouvrement
+possible.
+
+Une fiche ouverte depuis le sommaire arrive par le même chemin que les autres,
+alignée : elle était insérée en tête puis le flux sautait à zéro d'un coup, et
+la carte se posait à cheval sur la précédente.
+
+### La barre haute
+
+- **Le nom du produit ramène à l'accueil.** Quinze fiches plus bas, il fallait
+  recharger pour rentrer.
+- **Plus de compte à rebours en gratuit.** La jauge et « 3 restantes »
+  faisaient de la journée une ration. Le chiffre reste — c'est l'offre — mais
+  il ne bouge plus.
+- **Piocher et Accroches seules sont dans la barre** sur téléphone, pour qui
+  paie : deux gestes du quotidien n'ont pas à vivre derrière « … ». Au-dessus
+  de 1100 px, la rangée dépliée les porte déjà.
+- **« Tout mélanger » est retiré.** Il ne mélangeait rien : il recochait tous
+  les univers, et le choix se règle juste à côté.
+- **La version se lit, elle ne s'affiche pas** : au pied du panneau, et dans
+  l'infobulle du nom.
+
+### L'installation n'est plus un bouton
+
+C'était une ligne de plus dans le panneau, qui parlait d'un geste dont on
+n'avait pas encore envie. L'invitation arrive maintenant d'elle-même, **après
+trois anecdotes lues et deux minutes de lecture** — et « Plus tard » ne
+l'enterre plus pour toujours : elle revient une semaine après, trois fois au
+maximum. Passé la troisième, plus jamais.
+
 
 ## 8.9.0 — la console en six étapes, et deux bugs qui expliquaient beaucoup
 

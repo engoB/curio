@@ -140,6 +140,8 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .e-publie{background:var(--accent);color:var(--accent-encre)}
 .e-ecrit{background:var(--or-doux);color:var(--or)}
 .e-aecrire{border:1px solid var(--line);color:var(--texte-3)}
+.e-partielpub{background:var(--or-doux);color:var(--or)}
+.e-horslangue{border:1px dashed var(--line);color:var(--texte-3)}
 .e-retire{border:1px solid var(--line);color:var(--texte-3);text-decoration:line-through}
 /* La raison d'une quarantaine, en clair : « 22 % du texte repris de la
    source ». C'est elle qui permet de valider ou d'écarter en connaissance. */
@@ -435,9 +437,11 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       <select id="fEtat">
         <option value="">Tous les états</option>
         <option value="aecrire">À écrire — rien de fait</option>
-        <option value="partiel">À finir — une langue sur deux</option>
-        <option value="ecrit">Écrit</option>
+        <option value="reserve">En réserve — écrit, pas en ligne</option>
+        <option value="partiel">À finir — une langue publiée sur deux</option>
         <option value="publie">En ligne</option>
+        <option value="horslangue">Hors langue publiée</option>
+        <option value="incoherent">⚠ Incohérent — registre et fiches en désaccord</option>
         <option value="suspect">⚠ À vérifier — phrase sans rapport</option>
       </select>
       <select id="fPot">
@@ -477,10 +481,14 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       <select id="fUniR"><option value="">Tous les univers</option></select>
       <select id="fVal">
         <option value="">Toutes</option>
-        <option value="neutre">Pas encore relues</option>
+        <option value="neutre">Pas encore relues — hors ligne</option>
+        <option value="avalider">À valider — relues ou non, pas en ligne</option>
+        <option value="reserve">En réserve — tout ce qui n’est pas en ligne</option>
         <option value="valide">Validées</option>
+        <option value="pret">Prêtes à publier — dans le stock</option>
         <option value="refaire">À refaire</option>
         <option value="retire">À retirer</option>
+        <option value="quarantaine">En quarantaine</option>
         <option value="enligne">Déjà en ligne</option>
       </select>
       <!-- La note que le rédacteur s'est donnée. C'est elle qui décide ce
@@ -498,9 +506,16 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
     </div>
     <div class="cmd">
       <button class="btn v" id="toutValider">Valider tout ce qui est affiché</button>
+      <button class="btn p" id="versStock">Envoyer au stock prêt à publier</button>
       <button class="btn o" id="ouvrirFonds">Mettre en ligne…</button>
       <button class="btn" id="toutReplier">Replier tous les textes</button>
     </div>
+    <p class="apercuPub" id="aidRel" style="margin:0 0 12px">
+      <b>Valider</b> ne publie rien : c’est votre jugement de lecture, gardé dans ce
+      navigateur puis dans <code>validations.json</code>. <b>Envoyer au stock</b> transforme ce
+      jugement en réserve prête : les fiches validées prennent la marque <i>prête à
+      publier</i>, et <b>5 · Publication</b> les sort ensuite au rythme réglé. Rien ne va
+      en ligne avant ce moment-là.</p>
     <div class="liste" id="lRel"></div>
     <button class="btn plus" id="plusRel" hidden>Afficher la suite</button>
   </section>
@@ -562,6 +577,13 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
             <option value="fr">Français seul</option>
             <option value="fr,en">Français et anglais</option>
             <option value="en">Anglais seul</option>
+          </select>
+        </div>
+        <div>
+          <label for="pStock">Le passage au stock</label>
+          <select id="pStock">
+            <option value="manuel">À la main — bouton « Envoyer au stock »</option>
+            <option value="auto">Automatique — chaque passage prend vos validées</option>
           </select>
         </div>
         <div>
@@ -750,6 +772,13 @@ function localJson(chemin){
   return fetch(chemin+'?t='+Date.now(), {cache:'no-store'})
     .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
 }
+/* Le même, en texte brut. Les réglages doivent être lisibles SANS jeton :
+   c'est d'eux que dépend l'état des sujets — « à finir » n'a de sens que si
+   l'on sait quelles langues sont publiées. */
+function localTexte(chemin){
+  return fetch(chemin+'?t='+Date.now(), {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.text() : ''; }).catch(function(){ return ''; });
+}
 
 function chargerTout(){
   return localJson('catalogue-maitre.json').then(function(m){
@@ -764,7 +793,8 @@ function chargerTout(){
   }).then(function(){
     return S.cfg.token ? chargerDecisions() : null;
   }).then(function(){
-    return S.cfg.token ? Promise.all([lirePublication(), lireMoisson()]) : null;
+    return S.cfg.token ? Promise.all([lirePublication(), lireMoisson()])
+                       : lirePublicationLocale();
   }).then(function(){
     calculerEcrites();
     peindreCat(); peindreRel(); peindrePied();
@@ -829,12 +859,18 @@ function remplirUnivers(){
    n'a touché. On le sait pourtant : le catalogue maître porte « langues »
    depuis la 8.5.1, et à défaut les fiches déjà chargées le disent.        */
 var ECRITES = {};                     // qid -> {fr:true, en:true}
+var ENLIGNE = {};                     // qid -> {fr:true, en:true} — vraiment en ligne
 function calculerEcrites(){
-  ECRITES = {};
+  ECRITES = {}; ENLIGNE = {};
+  var auj = new Date().toISOString().slice(0,10);
   S.fiches.forEach(function(f){
     var q = f.rec && f.rec.q; if(!q) return;
     if(!ECRITES[q]) ECRITES[q] = {};
     ECRITES[q][f.lang] = true;
+    if(f.rec.p && String(f.rec.p) <= auj){
+      if(!ENLIGNE[q]) ENLIGNE[q] = {};
+      ENLIGNE[q][f.lang] = true;
+    }
   });
 }
 function languesDe(s){
@@ -844,16 +880,71 @@ function languesDe(s){
   return { fr: l.indexOf('fr')>=0, en: l.indexOf('en')>=0 };
 }
 
+/* ── CE QU'ON ATTEND D'UN SUJET ──────────────────────────────────────────
+   « À finir — une langue sur deux » était une énigme : vous ne publiez que
+   le français, et des sujets restaient marqués inachevés parce qu'il leur
+   manquait un anglais que personne n'attend. Un sujet est jugé sur les
+   langues que VOUS publiez, croisées avec celles où l'article existe.
+   Un sujet qui n'existe dans aucune langue publiée n'est ni à écrire ni
+   inachevé : il est hors de votre périmètre, et c'est un état à part. */
+function languesPubliees(){
+  var l = String(PUB.langues || 'fr').split(/[,\s]+/).filter(Boolean);
+  return l.length ? l : ['fr'];
+}
+function attenduesDe(s){
+  var existe = [];
+  if(s.fr) existe.push('fr');
+  if(s.en) existe.push('en');
+  if(!existe.length) existe = (s.langues && s.langues.length) ? s.langues.slice() : ['fr'];
+  return languesPubliees().filter(function(l){ return existe.indexOf(l)>=0; });
+}
+
+/* ── LES FICHES FONT FOI ─────────────────────────────────────────────────
+   Le catalogue maître portait « publie », et on lui faisait confiance. Mais
+   l'application ne lit pas le catalogue : elle lit anecdotes/. Un sujet
+   pouvait donc s'afficher « EN LIGNE » à la sélection, rester introuvable
+   dans les publiés, et manquer sur le site — trois réponses différentes à
+   la même question. L'état se lit désormais dans les fiches, qui sont ce
+   que le lecteur reçoit ; le catalogue ne sert plus que de secours. */
 function etatDe(s){
   if(s.statut==='retire') return 'retire';
+  var att = attenduesDe(s);
+  if(!att.length) return 'horslangue';
+  var e = ECRITES[s.qid], g = ENLIGNE[s.qid] || {};
+  if(e){
+    var enl = att.filter(function(l){ return g[l]; }).length;
+    if(enl === att.length) return 'publie';
+    if(enl) return 'partielpub';
+    var ec = att.filter(function(l){ return e[l]; }).length;
+    return ec === att.length ? 'ecrit' : (ec ? 'partiel' : 'aecrire');
+  }
+  /* Aucune fiche connue pour ce sujet : on retombe sur le registre. */
   if(s.publie) return 'publie';
   if(s.statut==='ecrit'||s.ecrit) return 'ecrit';
-  /* Ni tout à fait vierge, ni tout à fait écrit : une langue est faite. */
-  var l = languesDe(s);
-  if(l.fr !== l.en) return 'partiel';
   return 'aecrire';
 }
-var ETIQ={aecrire:'à écrire',partiel:'à finir',ecrit:'écrit',publie:'en ligne',retire:'retiré'};
+
+/* Le registre et les fiches se contredisent. On ne corrige pas en silence —
+   on le montre, et « 4 · Contrôle » a de quoi remettre les deux d'accord. */
+function incoherent(s){
+  var e = ECRITES[s.qid], g = ENLIGNE[s.qid];
+  if(s.publie && !(g && Object.keys(g).length)) return true;
+  if((s.statut==='ecrit'||s.ecrit) && !e) return true;
+  if(!s.publie && g && Object.keys(g).length) return true;
+  return false;
+}
+var ETIQ={aecrire:'à écrire',partiel:'à finir',partielpub:'à moitié en ligne',
+          ecrit:'en réserve',publie:'en ligne',retire:'retiré',
+          horslangue:'hors langue publiée'};
+var ETIQ_AIDE={
+  aecrire:'Rien n’est écrit pour ce sujet.',
+  partiel:'Une des langues que vous publiez est écrite, l’autre non.',
+  partielpub:'Une des langues que vous publiez est en ligne, l’autre attend.',
+  ecrit:'La fiche est écrite et attend son tour : c’est votre réserve.',
+  publie:'La fiche est en ligne : le lecteur la voit.',
+  retire:'Sujet retiré à la main.',
+  horslangue:'L’article n’existe dans aucune des langues que vous publiez : rien à écrire.'
+};
 
 function decDe(s){ return S.decisions[s.qid] || 'neutre'; }
 
@@ -880,6 +971,10 @@ function filtrerCat(){
        l'article ne partagent pas un seul mot signifiant — c'est ce qui
        trahit une fiche « Pac-Man » portant l'histoire d'un poulpe. */
     if(ef==='suspect'){ if(s.accord!==0) return false; }
+    /* La réserve : écrit, pas en ligne. C'est le stock qui attend son tour,
+       et c'est ce qu'on veut isoler d'un geste. */
+    else if(ef==='reserve'){ var er=etatDe(s); if(er!=='ecrit' && er!=='partiel') return false; }
+    else if(ef==='incoherent'){ if(!incoherent(s)) return false; }
     else if(ef && etatDe(s)!==ef) return false;
     if(q){
       if(!s._f) s._f = plier([s.fr,s.en,s.phrase,s.apercu,(NOMS[s.uni]||[''])[0]].filter(Boolean).join(' '));
@@ -910,7 +1005,8 @@ function ligneCat(s){
         + '<b class="note">'+(s.potentiel||1)+'/10</b>';
   src.forEach(function(x){ h += '<b class="s-'+x+'">'+esc(x==='saviez'?'le saviez-vous':x)+'</b>'; });
   if(src.length>=2) h += '<b class="croise">'+src.length+' sources</b>';
-  h += '<b class="e-'+et+'">'+ETIQ[et]+'</b>';
+  h += '<b class="e-'+et+'" title="'+esc(ETIQ_AIDE[et]||'')+'">'+ETIQ[et]+'</b>';
+  if(incoherent(s)) h += '<b class="doute" title="Le catalogue ma\u00eetre et les fiches ne disent pas la m\u00eame chose sur ce sujet. Ce sont les fiches que le lecteur re\u00e7oit : c\u2019est l\u2019\u00e9tat affich\u00e9 ici. Lancez \u00ab R\u00e9parer le registre \u00bb dans 4 \u00b7 Contr\u00f4le.">\u26a0 incoh\u00e9rent</b>';
   if(s.accord===0) h += '<b class="doute" title="La phrase ne partage aucun mot avec l\u2019article : \u00e0 regarder de pr\u00e8s avant d\u2019\u00e9crire.">\u26a0 \u00e0 v\u00e9rifier</b>';
   meta.innerHTML = h;
 
@@ -936,11 +1032,13 @@ function ligneCat(s){
 
 function peindreCat(){
   filtrerCat();
-  var c={total:S.sujets.length,retenu:0,ecarte:0,neutre:0,aecrire:0,ecrit:0,publie:0};
-  S.sujets.forEach(function(s){ c[decDe(s)]++; c[etatDe(s)] = (c[etatDe(s)]||0)+1; });
+  var c={total:S.sujets.length,retenu:0,ecarte:0,neutre:0,aecrire:0,ecrit:0,publie:0,incoherent:0};
+  S.sujets.forEach(function(s){ c[decDe(s)]++; c[etatDe(s)] = (c[etatDe(s)]||0)+1;
+                                if(incoherent(s)) c.incoherent++; });
   var box=$('#chCat'); box.innerHTML='';
   [['k',c.total,'au catalogue'],['v',c.retenu,'retenus'],['r',c.ecarte,'écartés'],
-   ['',c.neutre,'pas décidés'],['o',c.partiel||0,'à finir'],['o',c.ecrit,'écrits'],['k',c.publie,'en ligne']]
+   ['',c.neutre,'pas décidés'],['o',(c.ecrit||0)+(c.partiel||0),'en réserve'],
+   ['k',c.publie,'en ligne'],['r',c.incoherent,'incohérents']]
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
 
   $('#cCat').textContent = nb(S.vueCat.length)+' affiché'+(S.vueCat.length>1?'s':'');
@@ -1055,7 +1153,18 @@ function filtrerRel(){
     /* Le seuil de note. Une fiche sans note ne peut pas prétendre à un
        seuil : elle n'a pas été jugée. */
     if(nm && !(f.rec.s != null && f.rec.s >= nm)) return false;
+    /* ── UNE FICHE EN LIGNE N'EST PAS « PAS ENCORE RELUE » ────────────────
+       Les fiches mises en ligne par l'ancien chemin — où valider publiait —
+       ne portent aucune trace de relecture : valDe() répondait « neutre » et
+       elles remontaient dans « pas encore relues », déjà publiées. Le filtre
+       de relecture ne parle que de ce qui n'est PAS en ligne : une fiche
+       publiée ne se relit plus, elle se retire ou se refait. */
     if(vf==='enligne'){ if(!enLigne(f)) return false; }
+    else if(vf==='reserve'){ if(enLigne(f)) return false; }
+    else if(vf==='pret'){ if(enLigne(f) || f.rec.v!=='ok') return false; }
+    else if(vf==='quarantaine'){ if(f.rec.v!=='quarantaine') return false; }
+    else if(vf==='avalider'){ if(enLigne(f) || valDe(f)==='valide') return false; }
+    else if(vf==='neutre'){ if(enLigne(f) || valDe(f)!=='neutre') return false; }
     else if(vf && valDe(f)!==vf) return false;
     if(q){
       if(!f._f) f._f = plier([f.titre,f.rec.t,f.rec.x,f.rec.r].filter(Boolean).join(' '));
@@ -1075,7 +1184,13 @@ function ficheHtml(f){
   var h='<i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i><span>'+esc(uni[0])+'</span>'
       + '<span class="lg">'+f.lang.toUpperCase()+'</span>'
       + '<b class="note">'+(f.rec.s==null?'—':f.rec.s+'/10')+'</b>'
-      + (l ? '<b class="e-publie">en ligne</b>' : '<b class="e-ecrit">en réserve</b>')
+      /* Trois états, et un seul mot pour chacun : en ligne (le lecteur la
+         voit), prête à publier (elle est dans le stock, elle sortira au
+         rythme réglé), en réserve (écrite, elle attend d'être relue). */
+      + (l ? '<b class="e-publie" title="Le lecteur la voit sur le site.">en ligne</b>'
+           : f.rec.v==='ok'
+             ? '<b class="e-partielpub" title="Elle est dans le stock : elle sortira au rythme réglé dans 5 · Publication.">prête à publier</b>'
+             : '<b class="e-ecrit" title="Écrite, pas encore envoyée au stock.">en réserve</b>')
       /* La quarantaine sans sa raison n'apprend rien : on la porte au survol,
          et en clair sous la fiche. C'est ce qui permet de trancher. */
       + (f.rec.v==='quarantaine'
@@ -1180,11 +1295,18 @@ function apercuLecteur(f){
 
 function peindreRel(){
   filtrerRel();
-  var c={total:S.fiches.length,valide:0,refaire:0,retire:0,neutre:0,ligne:0};
-  S.fiches.forEach(function(f){ c[valDe(f)]++; if(enLigne(f)) c.ligne++; });
+  var c={total:S.fiches.length,valide:0,refaire:0,retire:0,neutre:0,ligne:0,pret:0,reserve:0};
+  S.fiches.forEach(function(f){
+    var l = enLigne(f);
+    if(l){ c.ligne++; return; }              // en ligne : sortie de la relecture
+    c.reserve++;
+    c[valDe(f)]++;
+    if(f.rec.v==='ok') c.pret++;
+  });
   var box=$('#chRel'); box.innerHTML='';
-  [['k',c.total,'fiches écrites'],['v',c.valide,'validées'],['o',c.refaire,'à refaire'],
-   ['r',c.retire,'à retirer'],['',c.neutre,'pas relues'],['k',c.ligne,'en ligne']]
+  [['k',c.total,'fiches écrites'],['k',c.ligne,'en ligne'],['o',c.reserve,'en réserve'],
+   ['v',c.valide,'validées'],['v',c.pret,'prêtes à publier'],
+   ['',c.neutre,'pas relues'],['o',c.refaire,'à refaire'],['r',c.retire,'à retirer']]
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
 
   $('#cRel').textContent = nb(S.vueRel.length)+' affichée'+(S.vueRel.length>1?'s':'');
@@ -1477,17 +1599,39 @@ function envoyerEcriture(){
   ovl.querySelector('[data-ecrire]').addEventListener('click', function(){ lancer(false); });
   nn.focus();
 }
+/* ── DE LA RELECTURE AU STOCK ─────────────────────────────────────────────
+   Trois marches, et une seule s'appelait « publier », ce qui faisait croire
+   que valider mettait en ligne :
+
+     1. relire       — vous jugez, ici, dans ce navigateur
+     2. le stock     — vos jugements deviennent une réserve prête (rec.v=ok)
+     3. la sortie    — 5 · Publication en tire au rythme réglé
+
+   Ce bouton fait la marche 2, et rien de plus. Les « à refaire » repassent à
+   écrire, les « à retirer » sortent : c'est la même opération, appliquée. */
 function envoyerPublication(){
-  var n = S.fiches.filter(function(f){ return valDe(f)==='valide'; }).length;
-  if(!window.confirm('Publier définitivement ' + n + ' fiche(s) validée(s) ?\n\n'
-    + 'Elles apparaîtront sur le site. Les fiches marquées « à refaire » ou « à retirer » '
-    + 'seront traitées en conséquence.')) return;
-  dit('Enregistrement de la relecture, puis publication…','info');
+  var v=0, r=0, x=0;
+  S.fiches.forEach(function(f){
+    var d = valDe(f);
+    if(enLigne(f) && d!=='retire' && d!=='refaire') return;
+    if(d==='valide') v++; else if(d==='refaire') r++; else if(d==='retire') x++;
+  });
+  if(!v && !r && !x){
+    dit('Rien à envoyer : aucune fiche n’est marquée validée, à refaire ou à retirer.','info');
+    return;
+  }
+  if(!window.confirm('Envoyer votre relecture au dépôt ?\n\n'
+    + '  • ' + v + ' fiche(s) validée(s) rejoignent le STOCK prêt à publier\n'
+    + '  • ' + r + ' fiche(s) « à refaire » repassent à écrire\n'
+    + '  • ' + x + ' fiche(s) « à retirer » sortent définitivement\n\n'
+    + 'Rien ne part en ligne maintenant : la sortie se fait au rythme réglé\n'
+    + 'dans 5 · Publication, ou d’un coup avec « Mettre en ligne… ».')) return;
+  dit('Enregistrement de la relecture, puis envoi au stock…','info');
   enregistrerValidations().then(function(){
     return lancerAction('5-publier.yml', { operation:'valider', combien:'', titre:'' });
   }).then(function(){
-    dit('La publication est lancée. Elle applique votre relecture : les validées partent en ligne, '
-      + 'les « à refaire » repassent à écrire, les « à retirer » sortent.','ok');
+    dit('Envoi lancé. Les <b>' + v + '</b> validées rejoignent le stock prêt à publier ; '
+      + 'suivez-le dans <b>Actions → 5 · Publier</b>, puis rechargez cette page.','ok');
   }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
 }
 
@@ -1496,7 +1640,7 @@ function envoyerPublication(){
    tous les jours et lit ce fichier. On l'édite ici, on le réécrit là-bas,
    commentaires compris — pour que le fichier reste lisible sur GitHub. */
 var PUB = { rythme:'quotidien', jours:[1], parPassage:3, ordre:'potentiel',
-            jusquAu:'', langues:'fr', images:'oui', sha:null };
+            jusquAu:'', langues:'fr', images:'oui', stock:'manuel', sha:null };
 /* La moisson vit dans son propre fichier : elle ne concerne pas la
    publication, et les mélanger obligerait à réécrire l'un pour l'autre. */
 var MOI = { auto:'oui', minutes:'40', sha:null };
@@ -1547,22 +1691,34 @@ function texteMoisson(){
    + 'minutes: ' + MOI.minutes + '\n';
 }
 
+function analyserPublication(texte){
+  String(texte||'').split(/\r?\n/).forEach(function(l){
+    var t=l.trim(); if(!t || t[0]==='#') return;
+    var m=t.match(/^([\w-]+)\s*[:=]\s*(.*)$/); if(!m) return;
+    var k=m[1].toLowerCase(), v=m[2].trim();
+    if(k==='rythme') PUB.rythme=v.toLowerCase();
+    else if(k==='jours') PUB.jours=v.split(/[,\s]+/).map(Number).filter(function(n){return n>=1&&n<=7;});
+    else if(k==='parpassage'||k==='par-passage'||k==='nombre') PUB.parPassage=Math.max(0,parseInt(v,10)||0);
+    else if(k==='ordre') PUB.ordre=v.toLowerCase();
+    else if(k==='jusqu-au'||k==='jusquau') PUB.jusquAu=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:'';
+    else if(k==='langues') PUB.langues=v.replace(/\s+/g,'').toLowerCase()||'fr,en';
+    else if(k==='images') PUB.images=(/^(oui|non|franches)$/.test(v.toLowerCase())?v.toLowerCase():'oui');
+    else if(k==='stock') PUB.stock=(v.toLowerCase()==='auto'?'auto':'manuel');
+  });
+}
 function lirePublication(){
   return lireAvecExemple('publication').then(function(r){
     PUB.sha = r.sha;
-    if(!r.texte) return;
-    String(r.texte).split(/\r?\n/).forEach(function(l){
-      var t=l.trim(); if(!t || t[0]==='#') return;
-      var m=t.match(/^([\w-]+)\s*[:=]\s*(.*)$/); if(!m) return;
-      var k=m[1].toLowerCase(), v=m[2].trim();
-      if(k==='rythme') PUB.rythme=v.toLowerCase();
-      else if(k==='jours') PUB.jours=v.split(/[,\s]+/).map(Number).filter(function(n){return n>=1&&n<=7;});
-      else if(k==='parpassage'||k==='par-passage'||k==='nombre') PUB.parPassage=Math.max(0,parseInt(v,10)||0);
-      else if(k==='ordre') PUB.ordre=v.toLowerCase();
-      else if(k==='jusqu-au'||k==='jusquau') PUB.jusquAu=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:'';
-      else if(k==='langues') PUB.langues=v.replace(/\s+/g,'').toLowerCase()||'fr,en';
-      else if(k==='images') PUB.images=(/^(oui|non|franches)$/.test(v.toLowerCase())?v.toLowerCase():'oui');
-    });
+    analyserPublication(r.texte);
+  }).catch(function(){});
+}
+/* Sans jeton, la console reste en lecture — mais elle doit quand même savoir
+   quelles langues vous publiez : c'est de ce réglage que dépend l'état de
+   chaque sujet. On lit alors le fichier du dépôt tel qu'il est servi. */
+function lirePublicationLocale(){
+  return localTexte('consignes/publication.txt').then(function(t){
+    if(t && /^\s*[\w-]+\s*:/m.test(t)){ analyserPublication(t); return; }
+    return localTexte('consignes/publication.exemple.txt').then(analyserPublication);
   }).catch(function(){});
 }
 
@@ -1643,6 +1799,7 @@ function peindrePub(){
   $('#pOrdre').value = PUB.ordre;
   $('#pDate').value = PUB.jusquAu;
   $('#pLangues').value = PUB.langues;
+  $('#pStock').value = PUB.stock;
   $('#pImages').value = PUB.images;
   peindreJours();
   var c={ecrites:S.fiches.length,enligne:0,prets:stockPret(),quarantaine:0};
@@ -1674,6 +1831,12 @@ function texteReglagePublication(){
    + 'langues: ' + PUB.langues + '\n\n'
    + '# Photos des fiches : oui (voilées) | franches (à nu) | non\n'
    + 'images: ' + PUB.images + '\n\n'
+   + '# Le passage de la relecture au STOCK prêt à publier.\n'
+   + '#   manuel  vous appuyez sur « Envoyer au stock » dans 3 · Relecture\n'
+   + '#   auto    chaque passage de publication prend d’abord vos validées\n'
+   + '# Dans les deux cas, valider ne met JAMAIS en ligne : c’est le rythme\n'
+   + '# ci-dessus qui décide quand une fiche du stock sort.\n'
+   + 'stock: ' + PUB.stock + '\n\n'
    + '# Ordre : potentiel | note | hasard\n'
    + 'ordre: ' + PUB.ordre + '\n\n'
    + '# Publier ce qui est en quarantaine ? Non.\n'
@@ -1736,7 +1899,25 @@ function enregistrerMoisson(){
    GitHub où il fallait déjà savoir ce qu'on cherchait. Ils sont ici, chacun
    avec ce qu'il fait et ce qu'il ne fait pas. */
 var OUTILS = [
-  { op:'verifier', nom:'Chercher les doublons',
+  /* ── LES DEUX OUTILS DE PROPRETÉ ────────────────────────────────────────
+     Ils répondent à deux questions qui n'avaient pas de réponse : « pourquoi
+     ce sujet est-il marqué en ligne alors qu'il n'y est pas ? » et « ai-je
+     publié deux fois la même chose ? » Aucun des deux ne modifie une fiche
+     ni ne publie quoi que ce soit. */
+  { op:'reparer', nom:'Remettre le registre d’accord avec les fiches',
+    quoi:'Le catalogue tient un registre — « écrit », « en ligne » — et les fiches portent '
+       + 'la vérité, puisque c’est elles que l’application lit. Quand les deux divergent, un '
+       + 'sujet s’affiche « en ligne » à la Sélection, reste introuvable dans les publiés et '
+       + 'manque sur le site. Cet outil recopie ce que disent les fiches dans le registre. '
+       + '<b>Aucune fiche n’est touchée, rien n’est publié ni dépublié.</b>',
+    quand:'Dès qu’un sujet porte la marque ⚠ incohérent à la Sélection.' },
+  { op:'doublons', nom:'Chercher les redites parmi les fiches EN LIGNE',
+    quoi:'Compare deux à deux, dans la même langue, les seules fiches que le lecteur voit, '
+       + 'et signale celles qui racontent visiblement la même chose. Ce qui dort en réserve '
+       + 'n’est pas examiné : il ne gêne personne. <b>Rien n’est retiré</b> — vous lisez le '
+       + 'rapport, et vous choisissez ensuite, titre par titre.',
+    quand:'Avant d’ouvrir le fonds, et de temps en temps ensuite.' },
+  { op:'verifier', nom:'Chercher les doublons de sujets au catalogue',
     quoi:'Reprend tout le catalogue et signale deux sujets qui désignent la même chose — '
        + 'même identifiant Wikidata, ou titres qui se recouvrent. Ne supprime rien.',
     quand:'Après chaque grosse moisson.' },
@@ -1758,14 +1939,16 @@ var OUTILS = [
     quand:'De temps en temps, quand le catalogue devient lourd.' }
 ];
 function peindreControle(){
-  var c = { fiches:S.fiches.length, quarantaine:0, nonRelues:0 };
+  var c = { fiches:S.fiches.length, quarantaine:0, nonRelues:0, incoherents:0 };
   S.fiches.forEach(function(f){
     if(f.rec.v==='quarantaine') c.quarantaine++;
     if(valDe(f)==='neutre' && !enLigne(f)) c.nonRelues++;
   });
+  S.sujets.forEach(function(s){ if(incoherent(s)) c.incoherents++; });
   var box = $('#chCtl'); box.innerHTML='';
   [['k',S.sujets.length,'sujets au catalogue'],['v',c.fiches,'fiches écrites'],
-   ['o',c.nonRelues,'pas encore relues'],['r',c.quarantaine,'en quarantaine']]
+   ['o',c.nonRelues,'pas encore relues'],['r',c.quarantaine,'en quarantaine'],
+   ['r',c.incoherents,'sujets incohérents']]
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],
      '<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
 
@@ -1933,13 +2116,14 @@ function ouvrirLeFonds(){
     .catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
 }
 
-['pRythme','pCombien','pOrdre','pDate','pLangues','pImages','pMoisson'].forEach(function(id){
+['pRythme','pCombien','pOrdre','pDate','pLangues','pStock','pImages','pMoisson'].forEach(function(id){
   $('#'+id).addEventListener('change',function(){
     PUB.rythme=$('#pRythme').value;
     PUB.parPassage=Math.max(0,parseInt($('#pCombien').value,10)||0);
     PUB.ordre=$('#pOrdre').value;
     PUB.jusquAu=$('#pDate').value||'';
     PUB.langues=$('#pLangues').value;
+    PUB.stock=$('#pStock').value;
     PUB.images=$('#pImages').value;
     MOI.auto=$('#pMoisson').value;
     if(PUB.rythme==='hebdomadaire' && PUB.jours.length>1) PUB.jours=[PUB.jours[0]];
@@ -2018,6 +2202,7 @@ $('#toutOublier').addEventListener('click',function(){
     + '<code>decisions.json</code> dans le dépôt.', 'ok');
 });
 $('#ouvrirFonds').addEventListener('click', ouvrirLeFonds);
+$('#versStock').addEventListener('click', envoyerPublication);
 $('#mEnregistrer').addEventListener('click', enregistrerMoisson);
 $('#plusLig').addEventListener('click', suiteLig);
 ['qL','fUniL'].forEach(function(id){

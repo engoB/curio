@@ -3,7 +3,13 @@
 <header class="topbar" id="topbar">
   <!-- Une seule ligne, toujours. Ce qui ne tient pas sur un téléphone passe
        derrière le bouton « … », qui se déplie en dessous. -->
-  <div class="brand"><b>__MARQUE__</b><span class="planbadge" id="planTag">Gratuit</span></div>
+  <!-- Le nom ramène à l'accueil : c'est le geste que tout le monde connaît
+       et le seul moyen de rentrer quand on s'est perdu au fond du flux.
+       Le numéro de version se lit au survol, et nulle part ailleurs dans la
+       barre : il intéresse une personne sur mille, il ne prend pas de place. -->
+  <button class="brand" id="brandBtn" type="button" title="Revenir à l’accueil">
+    <b>__MARQUE__</b><span class="planbadge" id="planTag">Gratuit</span>
+  </button>
 
   <button class="counter" id="tocBtn" title="Sommaire">
     <b id="tocCount">0</b>
@@ -17,9 +23,13 @@
     <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
   </button>
 
+  <!-- ── PAS DE COMPTE À REBOURS ─────────────────────────────────────────
+       Une jauge qui se vide et « 3 restantes » transforment une lecture en
+       ration. On lisait en regardant le compteur descendre. Le gratuit dit
+       ce qu'il donne — cinq anecdotes aujourd'hui — et ne dit plus ce qu'il
+       reprend. La cinquième finie, le mur de l'offre parle de lui-même. -->
   <div class="quota" id="quota">
-    <span class="gauge"><i id="gaugeFill" style="width:100%"></i></span>
-    <span id="quotaTxt"><b>10</b><em> restantes</em></span>
+    <span id="quotaTxt"><b>5</b><em> aujourd’hui</em></span>
   </div>
 
   <span class="tbgap"></span>
@@ -36,6 +46,20 @@
       <button data-size="1.32" aria-label="Très grand">A</button>
     </div>
   </div>
+  <!-- ── DEUX GESTES QUOTIDIENS, À PORTÉE DE POUCE ──────────────────────
+       Piocher et le mode accroches sont ce qu'on fait dix fois par jour
+       quand on paie. Les enterrer derrière « … » demandait deux gestes pour
+       un réflexe. Sur grand écran ils sont déjà dans la rangée dépliée :
+       ces deux boutons ne servent qu'en dessous de 1100 px, et seulement
+       pour qui a l'abonnement ou l'achat à vie. -->
+  <button class="iconbtn iconbtn--tel iconbtn--or" id="pioBar" hidden
+          title="Piocher au hasard" aria-label="Piocher au hasard">
+    <svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.6 5 .6-3.7 3.4 1 4.9L12 14.1 7.6 16.5l1-4.9L4.9 8.2l5-.6L12 3z"/></svg>
+  </button>
+  <button class="iconbtn iconbtn--tel" id="accBar" hidden
+          title="Accroches seules" aria-label="Accroches seules" aria-pressed="false">
+    <svg viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h11M4 17.5h7"/></svg>
+  </button>
   <button class="iconbtn" id="libBtn" title="Ma collection" aria-label="Ma collection">
     <svg viewBox="0 0 24 24"><path d="M6.5 3.5h11a1.5 1.5 0 011.5 1.5v15.2l-7-3.6-7 3.6V5a1.5 1.5 0 011.5-1.5z"/></svg>
     <i class="dot" id="libDot" hidden></i>
@@ -96,16 +120,9 @@
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
       <span data-i18n="opt.chercher">Rechercher un sujet</span>
     </button>
-    <button class="opt__a" id="shuffleBtn">
-      <svg viewBox="0 0 24 24"><path d="M3 6h4l10 12h4M3 18h4l3-3.6M14.5 8.6L17 6h4M18 3l3 3-3 3M18 15l3 3-3 3"/></svg>
-      <span data-i18n="shuffle">Tout mélanger</span>
-    </button>
-    <!-- Toujours atteignable : la bannière automatique ne se montre qu'une
-         fois, et « Plus tard » la faisait disparaître pour de bon. -->
-    <button class="opt__a" id="installBtn" hidden>
-      <svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M5 20h14"/></svg>
-      <span data-i18n="inst.menu">Installer l’application</span>
-    </button>
+    <!-- « Tout mélanger » ne mélangeait rien : il recochait tous les univers.
+         Le nom promettait un geste, le bouton en faisait un autre — et le
+         choix d'univers se règle déjà juste à côté. Retiré. -->
     <button class="opt__a opt__a--or" id="pioBtn" hidden>
       <svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.6 5 .6-3.7 3.4 1 4.9L12 14.1 7.6 16.5l1-4.9L4.9 8.2l5-.6L12 3z"/></svg>
       <span data-i18n="pio.cta">Piocher au hasard</span>

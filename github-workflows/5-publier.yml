@@ -114,7 +114,20 @@ jobs:
               C=""; if [ -n "${{ github.event.inputs.combien }}" ]; then C="--combien ${{ github.event.inputs.combien }}"; fi
               # Ouverture de fonds : tout ce qui atteint la note, d un seul coup.
               N=""; if [ "${{ github.event.inputs.note_mini }}" != "0" ] && [ -n "${{ github.event.inputs.note_mini }}" ]; then N="--note-mini ${{ github.event.inputs.note_mini }}"; fi
-              node tools/publier.mjs $C $N 2>&1 | tee curio.log
+              # « stock: auto » dans consignes/publication.txt : le passage verse
+              # d abord la relecture en attente dans le stock, puis publie au
+              # rythme regle. Valider ne met toujours rien en ligne tout seul.
+              # Le paquet ne livre plus consignes/publication.txt — il ecrasait
+              # votre rythme a chaque import. On lit le votre s il existe,
+              # l exemple sinon, exactement comme les outils.
+              : > curio.log
+              R=consignes/publication.txt
+              [ -f "$R" ] || R=consignes/publication.exemple.txt
+              if grep -Eqi '^[[:space:]]*stock[[:space:]]*:[[:space:]]*auto' "$R" 2>/dev/null; then
+                echo "stock: auto — la relecture en attente rejoint le stock avant publication." | tee -a curio.log
+                node tools/publier.mjs --valider 2>&1 | tee -a curio.log
+              fi
+              node tools/publier.mjs $C $N 2>&1 | tee -a curio.log
               node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
           esac
 
@@ -135,7 +148,11 @@ jobs:
           git config user.name  "curio-bot"
           git config user.email "curio-bot@users.noreply.github.com"
           rm -f curio.log
-          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json; do
+          # consignes/validations.json manquait a cet appel : publier.mjs le vide
+          # apres l avoir applique, et le vidage n etait jamais enregistre. La
+          # relecture etait donc rejouee a chaque passage, et le depot disait
+          # encore « a relire » ce qui etait deja au stock.
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json consignes/validations.json; do
             if [ -e "$p" ]; then
               git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
             fi

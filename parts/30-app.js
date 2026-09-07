@@ -839,23 +839,64 @@ function markSeen(title){
 
 /* ═══════════════════ LE TIRAGE DU JOUR ═══════════════════════════════════
    La version gratuite n'est plus un compteur qu'on épuise : c'est UNE
-   JOURNÉE. Cinq anecdotes, tirées au hasard le matin, à vous jusqu'à minuit.
-   Demain, cinq autres — et celles d'hier s'en vont.
+   JOURNÉE. Cinq anecdotes le matin, à vous jusqu'à minuit. Demain, cinq
+   autres — et celles d'hier s'en vont.
 
-   Trois promesses, et chacune est tenue par une ligne de ce bloc :
-     · tirées au hasard        → shuffle sur tout le catalogue publié
-     · jamais deux fois la même en deux mois → la mémoire `servis`
-     · uniquement le jour même → le tirage porte sa date et meurt avec elle
+   ── LES CINQ SONT LES MÊMES POUR TOUT LE MONDE ─────────────────────────
+   Elles étaient tirées au hasard dans chaque navigateur : deux personnes
+   n'avaient jamais la même journée. Impossible d'en parler à quelqu'un,
+   impossible d'annoncer « celle d'aujourd'hui », impossible d'en faire un
+   rendez-vous. Une édition du jour n'existe que si elle est commune.
 
-   Le tirage est ARRÊTÉ pour la journée : rouvrir l'application ne rebat pas
-   les cartes. Sans quoi il suffirait de recharger la page pour avoir cinq
-   nouvelles anecdotes, et la journée n'aurait plus de sens.
+   Le tirage se DÉDUIT donc de la date, et de rien d'autre :
 
-   Tout se joue dans ce navigateur, sans compte ni serveur. Quelqu'un qui
-   efface ses données repart à zéro : c'est le prix d'une application qui ne
-   demande pas d'inscription, et c'est un prix que nous acceptons. */
+     1. le catalogue publié est rangé dans un ordre stable — l'empreinte de
+        chaque clé, jamais l'alphabet, jamais le hasard local ;
+     2. le numéro du jour (les jours écoulés depuis 1970, en UTC) désigne
+        une fenêtre de cinq dans cet ordre ;
+     3. la fenêtre avance de cinq chaque jour, et fait le tour.
+
+   Deux téléphones, deux pays, deux navigateurs : la même page. Personne ne
+   revoit une anecdote avant que le catalogue entier ait défilé — la
+   rotation le garantit d'elle-même, sans mémoire à tenir. Et il n'y a
+   toujours ni compte, ni serveur, ni la moindre donnée qui sorte d'ici.
+
+   Le tirage reste ARRÊTÉ pour la journée : recharger ne rebat rien, puisque
+   rien n'est battu. */
 const OFFRE_JOUR   = CONFIG.freeDaily;      // cinq
 const MEMOIRE_JOURS = 60;                   // deux mois avant qu'une fiche revienne
+
+/* L'empreinte d'une clé : le même nombre partout, toujours. C'est elle qui
+   remplace le hasard local — d'où « déduit » plutôt qu'« aléatoire ».
+
+   Les trois dernières lignes ne sont pas décoratives. Sans elles, deux clés
+   qui se ressemblent — et elles se ressemblent toutes : « cosmos|… »,
+   « terre|… » — recevaient des nombres voisins, et l'ordre se regroupait par
+   univers : la journée servait cinq fiches du même monde. Ce brassage final
+   (celui de murmur3) disperse les bits, et la journée redevient variée. */
+function empreinte(s){
+  let h = 2166136261;
+  for(let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  h ^= h >>> 16; h = Math.imul(h, 2246822507);
+  h ^= h >>> 13; h = Math.imul(h, 3266489909);
+  h ^= h >>> 16;
+  return h >>> 0;
+}
+/* Le numéro du jour : les jours pleins écoulés depuis le 1er janvier 1970,
+   en UTC. La journée bascule donc à la même seconde pour tout le monde —
+   c'est ce qui fait que l'édition est commune. */
+function numeroDuJour(){
+  return Math.floor(Date.parse(today() + 'T00:00:00Z') / 86400000);
+}
+/* Le catalogue rangé dans l'ordre commun. On trie par empreinte, et non par
+   titre : l'ordre paraît quelconque, mais il est le même partout, et une
+   fiche ajoutée s'insère à sa place au lieu de tout redistribuer. */
+function ordreCommun(cles){
+  return cles.slice().sort(function(a, b){
+    const x = empreinte(a), y = empreinte(b);
+    return x - y || (a < b ? -1 : a > b ? 1 : 0);
+  });
+}
 
 function ilYaDesJours(n){
   const d = new Date(); d.setDate(d.getDate() - n);
@@ -891,41 +932,33 @@ async function catalogueOffrable(unis){
   return out;
 }
 
+/* La fenêtre du jour dans l'ordre commun : `combien` clés consécutives à
+   partir de la position que la date désigne, en faisant le tour. */
+function fenetreDuJour(range, combien, decalage){
+  if(!range.length) return [];
+  const n = Math.min(combien, range.length);
+  const depart = (((numeroDuJour() * OFFRE_JOUR + (decalage || 0)) % range.length) + range.length) % range.length;
+  const out = [];
+  for(let i = 0; i < n; i++) out.push(range[(depart + i) % range.length]);
+  return out;
+}
+
 async function tirageDuJour(){
   purgerServis();
   if(S.tirage && S.tirage.j === today() && S.tirage.c && S.tirage.c.length) return S.tirage.c;
 
-  /* ── LE TIRAGE RESPECTE VOS UNIVERS ─────────────────────────────────────
-     Il piochait dans les huit quoi qu'on choisisse : cocher « Cosmos » ne
-     changeait rien, et le filtre passait pour cassé. Il pioche maintenant
-     dans les univers retenus — et si ceux-ci n'ont pas de quoi remplir la
-     journée, on élargit plutôt que de servir trois fiches : une préférence
-     n'est pas un mur. */
-  /* ── EN GRATUIT, LES HUIT UNIVERS ──────────────────────────────────────
-     Choisir ses univers est une commande sur ce qu'on lit : elle appartient
-     aux formules payantes. Le gratuit, lui, reçoit cinq anecdotes tirées
-     dans TOUT le catalogue — c'est une découverte, pas une bibliothèque
-     qu'on trie. Un filtre qui n'a pas d'effet vaut mieux retiré qu'affiché. */
-  const choisis = estPremium() ? activeThemes() : CONFIG.freeThemes.slice();
-  let tout = await catalogueOffrable(choisis);
-  if(tout.length < OFFRE_JOUR) tout = await catalogueOffrable();
+  /* En gratuit, les huit univers : choisir ce qu'on lit est une commande, et
+     elle appartient aux formules payantes. L'édition du jour est la même
+     pour tous, elle ne peut donc dépendre d'aucune préférence. */
+  const tout = await catalogueOffrable();
   if(!tout.length) return [];
-  const frais = tout.filter(k => !S.servis[k]);
-  /* Quand le catalogue est plus petit que la mémoire, la promesse des deux
-     mois devient intenable : on reprend alors les plus anciennement offertes
-     d'abord, ce qui reste la meilleure approximation possible. */
-  let source = frais;
-  if(frais.length < OFFRE_JOUR){
-    const anciennes = tout.filter(k => S.servis[k])
-      .sort((a, b) => String(S.servis[a]).localeCompare(String(S.servis[b])));
-    source = frais.concat(anciennes);
-  }
-  const c = shuffle(source.slice()).slice(0, OFFRE_JOUR);
+  const c = fenetreDuJour(ordreCommun(tout), OFFRE_JOUR, 0);
   const j = today();
+  /* On garde encore la trace de ce qui a été servi : elle ne commande plus
+     le tirage — la rotation s'en charge — mais la pioche s'en sert pour ne
+     pas retomber sur ce qu'on vient de lire. */
   c.forEach(k => { S.servis[k] = j; });
-  /* On garde les univers du tirage : c'est ce qui permet de dire, si vous en
-     changez ensuite, que votre choix vaudra pour demain. */
-  S.tirage = { j, c, u: choisis.slice().sort().join(',') };
+  S.tirage = { j, c, u: 'tous' };
   LS.set('curio.tirage', S.tirage);
   LS.set('curio.servis', S.servis);
   return c;
@@ -941,12 +974,13 @@ async function ficheAperçu(){
     if(c._item) pris.add(c._item.article || c._item.title);
   });
   const tout = await catalogueOffrable();
-  const libre = tout.filter(k => !pris.has(k.slice(k.indexOf('|') + 1)));
+  const libre = ordreCommun(tout).filter(k => !pris.has(k.slice(k.indexOf('|') + 1)));
   if(!libre.length) return null;
-  /* Choisie d'après la date, pas au hasard : elle ne doit pas changer si on
-     remonte puis redescend dans le flux. */
-  const g = [...today()].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7);
-  return itemDeCle(libre[g % libre.length]);
+  /* La suivante dans l'ordre commun : elle ne change pas si on remonte puis
+     redescend dans le flux, et elle est la même pour tout le monde — comme
+     les cinq. C'est littéralement celle que la journée de demain ouvrira. */
+  const suite = fenetreDuJour(libre, 1, OFFRE_JOUR);
+  return suite.length ? itemDeCle(suite[0]) : null;
 }
 
 /* Le flux du gratuit : les cinq du jour, dans leur ordre, et rien d'autre. */
@@ -1254,13 +1288,23 @@ async function piocher(){
 }
 const sleepMs = ms => new Promise(r => setTimeout(r, ms));
 
-/* La fiche du jour : tirée une fois par jour, et gardée. Elle partage la
-   mémoire des deux mois du gratuit — personne ne doit retomber sur ce qu'il
-   vient de lire, quel que soit son plan. */
+/* ── LA FICHE DU JOUR EST LA MÊME POUR TOUT LE MONDE ──────────────────────
+   C'est un rendez-vous : « celle d'aujourd'hui » ne veut rien dire si chacun
+   a la sienne. Elle se déduit donc de la date, dans le même ordre commun que
+   les cinq du gratuit, mais à une autre position — de sorte qu'un abonné et
+   un lecteur gratuit n'ouvrent pas la même carte le même matin.
+
+   Elle reste gardée pour la journée : recharger ne la change pas. */
 async function ficheDuJour(){
   purgerServis();
   if(S.duJour && S.duJour.j === today() && S.duJour.c) return S.duJour.c;
-  const c = await cleAuHasard(null);
+  const tout = await catalogueOffrable();
+  if(!tout.length) return null;
+  const range = ordreCommun(tout);
+  /* Décalée d'une demi-longueur : elle tombe le plus loin possible des cinq
+     du jour, et la rotation la fait avancer au même pas qu'elles. */
+  const pick = fenetreDuJour(range, 1, Math.floor(range.length / 2));
+  const c = pick.length ? pick[0] : null;
   if(!c) return null;
   S.duJour = { j: today(), c };
   S.servis[c] = today();
@@ -1401,11 +1445,17 @@ function fillText(node, item){
   }
 }
 
-function buildCard(item){
+/* `deplie` : la carte s'ouvre en entier dès sa construction, même en mode
+   accroche. C'est le cas d'un sujet DEMANDÉ — par le sommaire, la recherche
+   ou la collection : on sait déjà lequel on veut, on ne balaie plus.
+   Le poser ici plutôt qu'après coup évite de remplir la zone de lecture deux
+   fois, ce qui se voyait à l'écran comme un rafraîchissement. */
+function buildCard(item, deplie){
   const node = el('article','card');
   node.dataset.kind = 'fact';
   node._item = item;
   item._node = node;
+  if(deplie){ node._deplie = true; node.classList.add('deplie'); }
   mediaFor(item, node);
   node.appendChild(el('div','card__scrim'));
 
@@ -1754,16 +1804,19 @@ function renderPlanTag(){
 function renderQuota(){
   renderPlanTag();
   marquerVerrous();
-  const box = $('#quota'), txt = $('#quotaTxt'), fill = $('#gaugeFill');
+  const box = $('#quota'), txt = $('#quotaTxt');
+  if(!box || !txt) return;
   if(S.plan !== 'free'){
     txt.innerHTML = '<b>' + T().unlimited + '</b>';
-    fill.style.width = '100%'; box.classList.remove('low');
+    box.classList.remove('low');
     return;
   }
-  const left = Math.max(0, CONFIG.freeDaily - S.used);
-  txt.innerHTML = T().quota(left);
-  fill.style.width = (left / CONFIG.freeDaily * 100) + '%';
-  box.classList.toggle('low', left <= 3);
+  /* ── ON ANNONCE, ON NE DÉCOMPTE PAS ────────────────────────────────────
+     La jauge et « 3 restantes » faisaient de la journée une ration : on
+     lisait en surveillant le compteur. Le chiffre reste — c'est l'offre,
+     et elle est généreuse — mais il ne bouge plus. */
+  txt.innerHTML = T().offreJour(CONFIG.freeDaily);
+  box.classList.remove('low');
 }
 
 /* Le sommaire et la recherche appartiennent à l'abonnement. En gratuit ils
@@ -1841,11 +1894,29 @@ function applyPickedIfChanged(){
   }
   pickedSnapshot = '';
 }
-$('#shuffleBtn').addEventListener('click', ()=>{
-  S.picked = (S.plan === 'free') ? CONFIG.freeThemes.slice() : THEMES.map(t=>t.id);
-  LS.set('curio.picked', S.picked); renderUniverses(); resetFeed();
-  toast(T().picked(S.picked.length));
-});
+/* ── LE NOM RAMÈNE À L'ACCUEIL ────────────────────────────────────────────
+   Quinze fiches plus bas, dans une feuille ouverte, on n'avait aucun moyen
+   de « rentrer » : il fallait recharger. Le nom du produit est le bouton
+   d'accueil de toutes les pages du monde — il l'est maintenant ici.
+
+   Il ne rebat rien : il ferme ce qui est ouvert et remonte à la première
+   fiche du jour. Un deuxième appui, quand on y est déjà, redemande la
+   journée — c'est le geste « rafraîchir » que le pouce connaît. */
+(function accueil(){
+  const n = $('#brandBtn');
+  if(!n) return;
+  n.addEventListener('click', ()=>{
+    close();
+    const premier = feed.firstElementChild;
+    if(premier && feed.scrollTop > 4){
+      feed.scrollTo({ top:0, behavior:'smooth' });
+      setActive(premier);
+      return;
+    }
+    resetFeed();
+    toast(T()['accueil.ok']);
+  });
+})();
 
 /* ============================ tarifs ============================ */
 function renderPlans(){
@@ -2028,21 +2099,25 @@ $('#searchBtn').addEventListener('click', ()=>{
   });
   document.addEventListener('keydown', e=>{ if(e.key === 'Escape') fermer(); });
 })();
-/* Le mode accroche et la pioche, dans le tiroir « … ». */
+/* Le mode accroche et la pioche, dans le tiroir « … » — et, sur téléphone,
+   directement dans la barre : ce sont les deux gestes du quotidien. */
 (function reglagesLecture(){
-  const a = $('#accBtn');
+  const a = $('#accBtn'), aBar = $('#accBar');
   if(a){
     const peindre = ()=>{
-      a.setAttribute('aria-pressed', S.accroches ? 'true' : 'false');
-      a.setAttribute('aria-checked', S.accroches ? 'true' : 'false');
-      a.classList.toggle('on', !!S.accroches);
+      [a, aBar].forEach(n=>{
+        if(!n) return;
+        n.setAttribute('aria-pressed', S.accroches ? 'true' : 'false');
+        n.setAttribute('aria-checked', S.accroches ? 'true' : 'false');
+        n.classList.toggle('on', !!S.accroches);
+      });
       /* La feuille de style a besoin de savoir : une carte qui n'affiche
          qu'une accroche se cale en bas, pas en haut. */
       if(S.accroches) document.documentElement.dataset.accroches = '1';
       else delete document.documentElement.dataset.accroches;
     };
     peindre();
-    a.addEventListener('click', ()=>{
+    const bascule = ()=>{
       S.accroches = !S.accroches;
       LS.set('curio.accroches', S.accroches);
       peindre();
@@ -2062,15 +2137,14 @@ $('#searchBtn').addEventListener('click', ()=>{
         garde.scrollIntoView({ block:'start' }); setActive(garde);
       });
       toast(T()[S.accroches ? 'acc.on' : 'acc.off']);
-    });
+    };
+    a.addEventListener('click', bascule);
+    if(aBar) aBar.addEventListener('click', bascule);
   }
   const b = $('#pioBtn');
   if(b) b.addEventListener('click', piocher);
-  const ins = $('#installBtn');
-  if(ins) ins.addEventListener('click', ()=>{
-    const d = document.querySelector('.install'); if(d) d.remove();
-    proposerInstall(true);
-  });
+  const bBar = $('#pioBar');
+  if(bBar) bBar.addEventListener('click', piocher);
 })();
 
 /* ── CE QUI APPARTIENT AUX FORMULES PAYANTES ──────────────────────────────
@@ -2083,9 +2157,11 @@ $('#searchBtn').addEventListener('click', ()=>{
 function majPremium(){
   const p = estPremium();
   const b = $('#pioBtn'); if(b) b.hidden = !p;
-  /* L'installation ne dépend pas de la formule : elle disparaît seulement
-     quand l'application EST installée. */
-  const ib = $('#installBtn'); if(ib) ib.hidden = installe();
+  /* Les deux raccourcis de la barre : payants comme leurs jumeaux du
+     panneau. La feuille de style les éteint au-dessus de 1100 px, où la
+     rangée dépliée les montre déjà. */
+  const bb = $('#pioBar'); if(bb) bb.hidden = !p;
+  const ab = $('#accBar'); if(ab) ab.hidden = !p;
   const l = $('#libBtn'); if(l) l.hidden = !p;
   /* Le choix des univers est une commande sur ce qu'on lit : en gratuit, les
      cinq du jour viennent des huit, et le bouton n'aurait rien à commander. */
@@ -2152,9 +2228,12 @@ function resultRow(item){
     + '<span class="tx"><h4>'+esc(item.title)+'</h4><p>'+esc(item.extract)+'</p></span>';
   b.addEventListener('click', ()=>{
     close();
-    const card = buildCard(item);
+    /* Un résultat de recherche est un sujet demandé : il s'ouvre en entier,
+       et il arrive aligné comme les autres — voir openSubject(). */
+    const card = buildCard(item, true);
+    card._counted = true;
     feed.insertBefore(card, feed.firstElementChild);
-    feed.scrollTop = 0; setActive(card);
+    requestAnimationFrame(()=>{ card.scrollIntoView({ block:'start' }); setActive(card); });
   });
   return b;
 }
@@ -2289,23 +2368,28 @@ async function openSubject(themeId, title, lockedU){
           url:'https://'+S.lang+'.wikipedia.org/wiki/'+encodeURIComponent(title.replace(/ /g,'_')), desc:'' };
   }
   markSeen(item.title);
-  const card = buildCard(item);
   /* ── UN SUJET DEMANDÉ SE LIT EN ENTIER ─────────────────────────────────
      On arrive ici parce qu'on a CHERCHÉ ce sujet — dans le sommaire ou dans
      sa collection. En mode accroche, la fiche s'ouvrait alors sur sa seule
      phrase d'accroche : on ne savait même pas si c'était le bon texte. Le
      mode accroche sert à balayer, pas à répondre à une demande précise. */
-  card._deplie = true;
-  card.classList.add('deplie');
+  const card = buildCard(item, true);
   /* ── RELIRE NE COÛTE PAS UNE ANECDOTE ──────────────────────────────────
      Une fiche rouverte depuis la collection ou le sommaire ne consomme pas
      la journée offerte : sinon garder une anecdote se retournerait contre
      celui qui la garde, et la collection ne servirait à rien en gratuit —
      ce qui était exactement le cas. Ce qu'on a gardé est à soi. */
   card._counted = true;
+  /* ── ELLE ARRIVE COMME N'IMPORTE QUELLE AUTRE FICHE ────────────────────
+     Elle était insérée en tête puis le flux sautait à zéro d'un coup, sans
+     alignement : la carte se posait à cheval sur la précédente, texte par
+     dessus titre. On l'insère, puis on la fait venir par le même chemin que
+     toutes les autres — l'alignement du flux s'en charge. */
   feed.insertBefore(card, feed.firstElementChild);
-  fillText(card, item);              // on redessine : la fiche est dépliée
-  feed.scrollTop = 0; setActive(card);
+  requestAnimationFrame(()=>{
+    card.scrollIntoView({ block:'start' });
+    setActive(card);
+  });
   enrich(item);
 }
 
@@ -3222,13 +3306,19 @@ function relock(){
 /* La version est gravée dans une balise <meta> par build.sh : on l'affiche
    telle quelle. Le numéro lisible suffit à l'écran, l'empreinte complète
    reste dans l'infobulle pour un diagnostic précis. */
+/* ── LA VERSION SE LIT, ELLE NE S'AFFICHE PAS ────────────────────────────
+   Elle doit être trouvable — sans elle, « quelle version avez-vous ? » n'a
+   pas de réponse — et elle ne doit prendre aucune place. Elle reste donc au
+   pied du panneau, en petit, ET dans l'infobulle du nom du produit : deux
+   endroits où l'on va quand on la cherche, aucun où l'on tombe dessus. */
 (function afficherVersion(){
   const m = document.querySelector('meta[name="curio-version"]');
   const v = m && m.getAttribute('content');
+  if(!v) return;
   const n = $('#tbVer');
-  if(!n || !v) return;
-  n.textContent = 'v' + v.split('+')[0];
-  n.title = '__MARQUE__ ' + v;
+  if(n){ n.textContent = 'v' + v.split('+')[0]; n.title = '__MARQUE__ ' + v; }
+  const b = $('#brandBtn');
+  if(b) b.title = '__MARQUE__ ' + v + ' — revenir à l’accueil';
 })();
 
 $('#streakN').textContent = S.streak;
@@ -3262,7 +3352,10 @@ function installe(){
 
 let promptInstall = null;
 window.addEventListener('beforeinstallprompt', e=>{
-  e.preventDefault(); promptInstall = e; proposerInstall();
+  /* On capture l'offre du navigateur, et on ne s'en sert PAS tout de suite :
+     elle arrive à la première seconde, avant qu'on ait lu une ligne. C'est
+     `peutEtreInstall()` qui décide du moment. */
+  e.preventDefault(); promptInstall = e;
 });
 
 /* ── PROPOSER L'INSTALLATION ──────────────────────────────────────────────
@@ -3274,12 +3367,17 @@ window.addEventListener('beforeinstallprompt', e=>{
 
    On propose donc partout, avec le mode d'emploi de la machine qu'on a sous
    les yeux : le bouton natif quand il existe, sinon le chemin en toutes
-   lettres. Une seule fois — « Plus tard » vaut pour de bon. */
+   lettres.
+
+   ── ET ON LE PROPOSE AU BON MOMENT ─────────────────────────────────────
+   C'était un bouton de plus dans le panneau : une ligne qu'on ne lit pas,
+   qui parle d'un geste dont on n'a pas encore envie. Le bouton est retiré.
+   L'invitation arrive maintenant d'elle-même, après un vrai temps de
+   lecture — voir `peutEtreInstall()` — et « Plus tard » ne l'enterre plus
+   pour toujours : elle revient une semaine après, trois fois au maximum.
+   Passé la troisième, on ne redemande plus jamais. */
 function proposerInstall(force){
   if(installe()) return;
-  /* « Plus tard » vaut pour la bannière automatique, pas pour un appui
-     volontaire sur « Installer l'application ». */
-  if(!force && LS.get('curio.install', false)) return;
   if(document.querySelector('.install')) return;
 
   const ua = navigator.userAgent;
@@ -3300,13 +3398,13 @@ function proposerInstall(force){
   ferme.setAttribute('aria-label', T()['inst.later']);
   ferme.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"'
                   + ' stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
-  ferme.addEventListener('click', ()=>{ LS.set('curio.install', true); box.remove(); });
+  ferme.addEventListener('click', ()=>{ plusTardInstall(); box.remove(); });
 
   if(promptInstall){
     const go = el('button','install__go', T()['inst.cta']);
     go.addEventListener('click', async ()=>{
       const p = promptInstall; promptInstall = null;
-      LS.set('curio.install', true);
+      LS.set('curio.install.fois', 9);          // proposé et accepté : on n'y revient pas
       box.remove();
       try{ await p.prompt(); }catch(e){}
     });
@@ -3314,14 +3412,42 @@ function proposerInstall(force){
   }
   box.appendChild(ferme);
   document.body.appendChild(box);
+  LS.set('curio.install.fois', (parseInt(LS.get('curio.install.fois', 0), 10) || 0) + 1);
+  LS.set('curio.install.vu', Date.now());
 }
 
-// on ne dérange personne au premier écran : la proposition arrive après
-// quelques anecdotes lues, quand l'intérêt est établi.
+/* « Plus tard » veut dire plus tard, pas jamais : on repose la question dans
+   une semaine. La troisième fois est la dernière. */
+function plusTardInstall(){
+  const n = parseInt(LS.get('curio.install.fois', 0), 10) || 0;
+  if(n >= 3) LS.set('curio.install', true);     // refusée trois fois : on se tait
+  LS.set('curio.install.vu', Date.now());
+}
+
+/* ── LE MOMENT DE L'INVITATION ────────────────────────────────────────────
+   Trois conditions, et les trois ensemble :
+
+     · l'accueil est passé — on ne parle pas d'installer à qui n'est pas
+       encore entré ;
+     · trois anecdotes ont été lues DANS CETTE SESSION, et deux minutes ont
+       passé — on s'adresse à quelqu'un qui lit, pas à quelqu'un qui vient
+       d'atterrir ;
+     · l'invitation n'a pas déjà été écartée cette semaine, et pas plus de
+       trois fois en tout.
+
+   Sur l'application déjà installée, rien de tout cela ne se produit. */
+const DEPART_SESSION = Date.now();
+let luesSession = 0;
 function peutEtreInstall(){
-  /* Deux fiches lues suffisent à savoir si l'endroit plaît. Au-delà, on
-     dérange quelqu'un qui a déjà pris ses habitudes dans un onglet. */
-  if(S.onboarded && S.used >= 2) proposerInstall();
+  if(installe()) return;
+  if(!S.onboarded) return;
+  if(LS.get('curio.install', false)) return;             // refusée trois fois
+  luesSession++;
+  if(luesSession < 3) return;
+  if(Date.now() - DEPART_SESSION < 120000) return;        // deux minutes de lecture
+  const vu = parseInt(LS.get('curio.install.vu', 0), 10) || 0;
+  if(vu && Date.now() - vu < 7 * 86400000) return;        // « plus tard » = une semaine
+  proposerInstall();
 }
 
 // Les deux fichiers d'état sont attendus avant le premier remplissage :
