@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#050E24" />
-<meta name="curio-version" content="8.11.0+560c6df4ec" />
+<meta name="curio-version" content="8.11.1+468e46cf69" />
 <meta name="curio-langues" content="fr" />
 <meta name="curio-images" content="oui" />
 <style>#langBtn,#ligneLangue{display:none !important}</style>
@@ -202,7 +202,7 @@ a{color:var(--accent);text-decoration:none}
    Il glisse depuis le bord droit — d'où l'on vient de toucher le bouton —
    et laisse le flux visible derrière lui, assombri. */
 .tbmore{
-  position:fixed;top:0;right:0;bottom:0;z-index:45;
+  position:fixed;top:0;right:0;bottom:0;z-index:2;
   display:flex;flex-direction:column;
   width:min(340px,86vw);max-height:none;overflow-y:auto;
   padding:calc(env(safe-area-inset-top,0px) + 10px) 10px
@@ -218,8 +218,11 @@ a{color:var(--accent);text-decoration:none}
 .tbmore.open{transform:none;visibility:visible}
 @media (prefers-reduced-motion:reduce){ .tbmore{transition:none} }
 /* Le voile : il dit que le reste attend, et il se ferme au doigt. */
+/* z-index 1 et 2, pas 44 et 45 : les deux sont enfants de `.topbar`, qui a
+   son propre contexte d'empilement. Les grands nombres n'y changeaient rien,
+   et le voile posé sur <body> passait au-dessus du tiroir. */
 .tbvoile{
-  position:fixed;inset:0;z-index:44;background:rgba(3,8,22,.55);
+  position:fixed;inset:0;z-index:1;background:rgba(3,8,22,.55);
   opacity:0;transition:opacity .26s;pointer-events:none;
 }
 .tbvoile.on{opacity:1;pointer-events:auto}
@@ -4458,11 +4461,20 @@ $('#searchBtn').addEventListener('click', ()=>{
 (function tiroir(){
   const b = $('#moreBtn'), m = $('#tbMore');
   if(!b || !m) return;
-  /* Le voile : il dit que le reste attend, et il referme au doigt. Il ne
-     sert qu'au tiroir — au-dessus de 1100 px la feuille l'éteint, puisque le
-     panneau y redevient une rangée de la barre. */
+  /* ── LE VOILE VIT DANS LA BARRE, PAS DANS LE CORPS ────────────────────
+     Il dit que le reste attend, et il referme au doigt.
+
+     Il était posé sur <body>, avec un z-index inférieur à celui du tiroir.
+     Sur le papier c'était juste ; en réalité, `.topbar` porte z-index:40 et
+     ouvre donc un CONTEXTE D'EMPILEMENT : le tiroir, qui est son enfant, ne
+     peut pas en sortir, quel que soit son z-index. Le voile passait donc
+     par-dessus le tiroir — et absorbait tous les clics. Le panneau
+     s'ouvrait, et plus rien ne répondait.
+
+     Le voile rejoint la barre : les deux partagent le même contexte, et
+     l'ordre entre eux redevient celui qu'on écrit. */
   const voile = el('div','tbvoile');
-  document.body.appendChild(voile);
+  m.parentNode.insertBefore(voile, m);
 
   const fermer = ()=>{
     m.classList.remove('open'); voile.classList.remove('on');

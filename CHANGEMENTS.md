@@ -1,4 +1,44 @@
-# Curio 8.11.0 — ce qui a changé depuis v6
+# Curio 8.11.1 — ce qui a changé depuis v6
+
+## 8.11.1 — le tiroir sous son propre voile, et quatre mots pour quatre états
+
+### Le panneau s'ouvrait, et plus rien ne répondait
+
+Un bug d'empilement, et il est instructif. `.topbar` porte `z-index:40` :
+elle ouvre donc un **contexte d'empilement**, et le tiroir, qui est son
+enfant, ne peut pas en sortir — quel que soit son `z-index`. Le voile, lui,
+était posé sur `<body>` avec un nombre plus petit. Sur le papier il passait
+dessous ; en réalité il passait **par-dessus le tiroir**, et absorbait tous
+les clics.
+
+Le voile rejoint la barre : les deux partagent le même contexte, et l'ordre
+entre eux redevient celui qu'on écrit. *Éprouvé* commande par commande, en
+regardant ce que le doigt atteint vraiment à chaque endroit du panneau :
+taille du texte, accroches, thème, couleurs, recherche, collection, pioche,
+fermeture — les huit répondent.
+
+### « Pas encore au stock » sur une fiche qu'on vient de valider
+
+Le mot était exact et inutilisable : vous veniez de la valider à l'écran, et
+la console répondait qu'elle n'y était pas — sans dire qu'il manquait
+seulement l'enregistrement au dépôt.
+
+Le produit n'avait pas de vocabulaire ; il en a un, et le même partout :
+
+> **écrite** — le texte existe → **relue** — vous l'avez jugée, dans ce
+> navigateur → **au stock** — votre jugement est enregistré au dépôt, elle
+> attend son tour → **en ligne** — le lecteur la voit.
+
+Cette phrase est affichée en tête de *3 · Relecture* et de *5 · Publication*,
+mot pour mot. Et l'étiquette de chaque fiche dit désormais laquelle des quatre
+marches elle occupe — dont l'état intermédiaire qui manquait :
+**« validée — à envoyer »**.
+
+**Et ce qui compte : le stock ne commande que le rythme automatique.** Dans
+*Sortir des sujets choisis*, vous passez outre — une fiche peut sortir même si
+elle n'est pas encore au stock. Seule la quarantaine reste bloquée, parce que
+c'est le contrôle et non le rythme. Le panneau le dit en toutes lettres.
+
 
 ## 8.11.0 — la recherche servait mes fiches de démonstration
 

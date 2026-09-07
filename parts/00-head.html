@@ -191,7 +191,7 @@ a{color:var(--accent);text-decoration:none}
    Il glisse depuis le bord droit — d'où l'on vient de toucher le bouton —
    et laisse le flux visible derrière lui, assombri. */
 .tbmore{
-  position:fixed;top:0;right:0;bottom:0;z-index:45;
+  position:fixed;top:0;right:0;bottom:0;z-index:2;
   display:flex;flex-direction:column;
   width:min(340px,86vw);max-height:none;overflow-y:auto;
   padding:calc(env(safe-area-inset-top,0px) + 10px) 10px
@@ -207,8 +207,11 @@ a{color:var(--accent);text-decoration:none}
 .tbmore.open{transform:none;visibility:visible}
 @media (prefers-reduced-motion:reduce){ .tbmore{transition:none} }
 /* Le voile : il dit que le reste attend, et il se ferme au doigt. */
+/* z-index 1 et 2, pas 44 et 45 : les deux sont enfants de `.topbar`, qui a
+   son propre contexte d'empilement. Les grands nombres n'y changeaient rien,
+   et le voile posé sur <body> passait au-dessus du tiroir. */
 .tbvoile{
-  position:fixed;inset:0;z-index:44;background:rgba(3,8,22,.55);
+  position:fixed;inset:0;z-index:1;background:rgba(3,8,22,.55);
   opacity:0;transition:opacity .26s;pointer-events:none;
 }
 .tbvoile.on{opacity:1;pointer-events:auto}

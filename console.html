@@ -181,6 +181,15 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
   text-transform:none;color:var(--or,#B8860B)}
 .doute{background:var(--rouge);color:#2A0509}
 /* Le tableau « Pourquoi ces chiffres ? » : deux comptes, et ce qui les sépare. */
+/* Le chemin d'une fiche : quatre états, une seule phrase, au même endroit
+   dans les deux onglets. C'est le vocabulaire du produit, il ne doit pas
+   varier d'un écran à l'autre. */
+.chemin{
+  margin:0 0 12px;padding:10px 12px;border-radius:10px;font-size:12.5px;line-height:1.65;
+  background:var(--ink-2);border:1px solid var(--line);color:var(--texte-2);
+}
+.chemin i{font-style:normal;font-weight:700;color:var(--accent)}
+.chemin b{color:var(--texte)}
 .liste--choix{max-height:min(46vh,420px);overflow-y:auto}
 .choix{display:flex;align-items:flex-start;gap:11px;padding:9px 11px;cursor:pointer;
   border-bottom:1px solid var(--line)}
@@ -348,7 +357,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          pouvait dire si le correctif était en place ou si le navigateur
          servait encore l'ancien fichier. La version est écrite ici par
          build.sh, à côté du titre, en petit. -->
-    <h1>Curio &middot; console<b class="ver" id="conVer">8.11.0</b></h1><!-- BUILD:CONSOLE -->
+    <h1>Curio &middot; console<b class="ver" id="conVer">8.11.1</b></h1><!-- BUILD:CONSOLE -->
 
     <!-- ── LES ÉTAPES, DANS L'ORDRE OÙ ON LES FAIT ──────────────────────
          Trois onglets nommés par leur contenu ne disaient pas par où
@@ -546,12 +555,15 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       <button class="btn o" id="ouvrirFonds">Mettre en ligne…</button>
       <button class="btn" id="toutReplier">Replier tous les textes</button>
     </div>
-    <p class="apercuPub" id="aidRel" style="margin:0 0 12px">
-      <b>Valider</b> ne publie rien : c’est votre jugement de lecture, gardé dans ce
-      navigateur puis dans <code>validations.json</code>. <b>Envoyer au stock</b> transforme ce
-      jugement en réserve prête : les fiches validées prennent la marque <i>prête à
-      publier</i>, et <b>5 · Publication</b> les sort ensuite au rythme réglé. Rien ne va
-      en ligne avant ce moment-là.</p>
+    <p class="chemin" id="aidRel">
+      <b>Une fiche passe par quatre états :</b>
+      <i>écrite</i> — le texte existe &nbsp;→&nbsp;
+      <i>relue</i> — vous la jugez ici, et cela ne quitte pas ce navigateur &nbsp;→&nbsp;
+      <i>au stock</i> — <b>Envoyer au stock</b> enregistre votre jugement au dépôt
+      &nbsp;→&nbsp; <i>en ligne</i> — le lecteur la voit.<br>
+      <b>Valider ne publie rien</b>, et n’envoie rien tant que vous n’avez pas appuyé sur
+      <b>Envoyer au stock</b>. La mise en ligne se décide dans <b>5 · Publication</b> :
+      au rythme réglé, ou sujet par sujet quand vous voulez.</p>
     <div class="liste" id="lRel"></div>
     <button class="btn plus" id="plusRel" hidden>Afficher la suite</button>
   </section>
@@ -670,9 +682,16 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          réglé » et espérer tomber dessus. On les coche. -->
     <div class="reglages" style="margin-bottom:16px">
       <h3>Sortir des sujets choisis, maintenant</h3>
-      <p>Cochez dans votre réserve ce que vous voulez mettre en ligne <b>aujourd’hui</b>,
-         quel que soit le rythme réglé au-dessus. Un sujet sort avec toutes ses langues
-         publiées. Ce qui est en quarantaine ne sort pas : validez-le d’abord.</p>
+      <p>Cochez ce que vous voulez mettre en ligne <b>aujourd’hui</b>, quel que soit le
+         rythme réglé au-dessus. Un sujet sort avec toutes ses langues publiées.</p>
+      <p class="chemin"><b>Une fiche passe par quatre états :</b>
+         <i>écrite</i> — le texte existe &nbsp;→&nbsp;
+         <i>relue</i> — vous l’avez jugée, dans ce navigateur &nbsp;→&nbsp;
+         <i>au stock</i> — votre jugement est enregistré au dépôt, elle attend son tour
+         &nbsp;→&nbsp; <i>en ligne</i> — le lecteur la voit.<br>
+         Le stock commande le <b>rythme automatique</b>. Ici, vous passez outre :
+         <b>une fiche peut sortir même si elle n’est pas encore au stock.</b>
+         Seule la quarantaine est bloquée — c’est le contrôle, pas le rythme.</p>
       <div class="cmd">
         <input type="search" id="qChoix" placeholder="Chercher dans la réserve…">
         <select id="fUniChoix"><option value="">Tous les univers</option></select>
@@ -1348,10 +1367,14 @@ function ficheHtml(f){
       /* Trois états, et un seul mot pour chacun : en ligne (le lecteur la
          voit), prête à publier (elle est dans le stock, elle sortira au
          rythme réglé), en réserve (écrite, elle attend d'être relue). */
+      /* Quatre états, quatre mots, les mêmes ici et dans 5 · Publication :
+         écrite → relue → au stock → en ligne. */
       + (l ? '<b class="e-publie" title="Le lecteur la voit sur le site.">en ligne</b>'
            : f.rec.v==='ok'
-             ? '<b class="e-partielpub" title="Elle est dans le stock : elle sortira au rythme réglé dans 5 · Publication.">prête à publier</b>'
-             : '<b class="e-ecrit" title="Écrite, pas encore envoyée au stock.">en réserve</b>')
+             ? '<b class="e-partielpub" title="Votre jugement est enregistré au dépôt. Elle sortira au rythme réglé dans 5 · Publication, ou tout de suite si vous la cochez là-bas.">au stock</b>'
+             : valDe(f)==='valide'
+               ? '<b class="e-partiel" title="Vous l’avez validée dans ce navigateur. Elle rejoindra le stock quand vous appuierez sur « Envoyer au stock ».">validée — à envoyer</b>'
+               : '<b class="e-ecrit" title="Écrite, pas encore relue.">en réserve</b>')
       /* La quarantaine sans sa raison n'apprend rien : on la porte au survol,
          et en clair sous la fiche. C'est ce qui permet de trancher. */
       + (f.rec.v==='quarantaine'
@@ -1987,6 +2010,17 @@ function filtrerChoix(){
   S_CHOIX.vue.sort(function(a,b){ return (b.rec.s||0)-(a.rec.s||0); });
 }
 function cleChoix(f){ return f.lang + '|' + f.titre; }
+/* Où en est cette fiche, en trois mots. « pas encore au stock » était exact et
+   inutilisable : on venait de la valider à l'écran, et la console répondait
+   qu'elle n'y était pas — sans dire qu'il manquait juste l'enregistrement. */
+function etatCourt(f){
+  if(f.rec.v === 'ok') return 'au stock, prête';
+  var d = valDe(f);
+  if(d === 'valide')  return 'validée ici — pas encore envoyée au stock';
+  if(d === 'refaire') return 'marquée à refaire';
+  if(d === 'retire')  return 'marquée à retirer';
+  return 'pas encore relue';
+}
 function compterChoix(){
   var n = 0; for(var k in CHOIX) if(CHOIX[k]) n++;
   var b = $('#choixPublier');
@@ -2008,7 +2042,7 @@ function ligneChoix(f){
     + '<span><i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i>'
     + esc(uni[0]) + ' · ' + esc(f.titre) + ' · '
     + (f.rec.s == null ? 'non notée' : f.rec.s + '/10')
-    + (f.rec.v === 'ok' ? ' · prête à publier' : ' · pas encore au stock') + '</span>';
+    + ' · ' + etatCourt(f) + '</span>';
   n.appendChild(d);
   return n;
 }

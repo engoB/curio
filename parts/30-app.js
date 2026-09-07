@@ -2134,11 +2134,20 @@ $('#searchBtn').addEventListener('click', ()=>{
 (function tiroir(){
   const b = $('#moreBtn'), m = $('#tbMore');
   if(!b || !m) return;
-  /* Le voile : il dit que le reste attend, et il referme au doigt. Il ne
-     sert qu'au tiroir — au-dessus de 1100 px la feuille l'éteint, puisque le
-     panneau y redevient une rangée de la barre. */
+  /* ── LE VOILE VIT DANS LA BARRE, PAS DANS LE CORPS ────────────────────
+     Il dit que le reste attend, et il referme au doigt.
+
+     Il était posé sur <body>, avec un z-index inférieur à celui du tiroir.
+     Sur le papier c'était juste ; en réalité, `.topbar` porte z-index:40 et
+     ouvre donc un CONTEXTE D'EMPILEMENT : le tiroir, qui est son enfant, ne
+     peut pas en sortir, quel que soit son z-index. Le voile passait donc
+     par-dessus le tiroir — et absorbait tous les clics. Le panneau
+     s'ouvrait, et plus rien ne répondait.
+
+     Le voile rejoint la barre : les deux partagent le même contexte, et
+     l'ordre entre eux redevient celui qu'on écrit. */
   const voile = el('div','tbvoile');
-  document.body.appendChild(voile);
+  m.parentNode.insertBefore(voile, m);
 
   const fermer = ()=>{
     m.classList.remove('open'); voile.classList.remove('on');
