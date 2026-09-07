@@ -68,6 +68,16 @@ case "$LANGUES" in
   *)   CACHE_LANGUE='<style>#langBtn,#ligneLangue{display:none !important}</style>' ;;
 esac
 
+# --- le sommaire et la recherche, en une ligne de reglage --------------------
+# « sommaire: non » dans consignes/publication.txt les retire du produit, des
+# la premiere seconde et sans une ligne de JavaScript. C'est votre catalogue :
+# vous devez pouvoir en fermer la porte sans attendre une version.
+SOMMAIRE=$(reglage sommaire); [ -n "$SOMMAIRE" ] || SOMMAIRE="oui"
+case "$SOMMAIRE" in
+  non|no|false) CACHE_SOMMAIRE='<style>#tocBtn,#searchBtn,#tocSheet,#searchSheet{display:none !important}</style>' ;;
+  *)            CACHE_SOMMAIRE="" ;;
+esac
+
 doc_head() {
 cat <<EOF
 <!doctype html>
@@ -80,6 +90,7 @@ cat <<EOF
 <meta name="curio-langues" content="$LANGUES" />
 <meta name="curio-images" content="$IMAGES" />
 $CACHE_LANGUE
+$CACHE_SOMMAIRE
 EOF
 }
 

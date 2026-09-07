@@ -39,10 +39,12 @@ on:
         options:
           - valider
           - publier
+          - choisis
           - etat
           - retirer
           - refaire
           - rendre
+          - tout-depublier
       note_mini:
         description: "Ouvrir le fonds : publier TOUTE la reserve notee au moins N (0 = non)"
         required: false
@@ -51,7 +53,8 @@ on:
         description: "Publier : combien de sujets (vide = ce que dit consignes/publication.txt)"
         default: ""
       titre:
-        description: "Retirer / refaire / rendre : le titre exact de l article, ou l accroche de la fiche"
+        description: "Retirer / refaire / rendre : le titre exact de l article, ou l accroche de la fiche.
+          Pour « choisis » : plusieurs titres separes par une barre verticale |"
         default: ""
 
 permissions:
@@ -92,6 +95,14 @@ jobs:
           case "$OP" in
             valider)
               node tools/publier.mjs --valider 2>&1 | tee curio.log
+              node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
+            choisis)
+              if [ -z "${{ github.event.inputs.titre }}" ]; then
+                echo "::error::Indiquez les titres a publier, separes par |."; exit 1; fi
+              node tools/publier.mjs --titres "${{ github.event.inputs.titre }}" 2>&1 | tee curio.log
+              node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
+            tout-depublier)
+              node tools/publier.mjs --tout-depublier 2>&1 | tee curio.log
               node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
             etat)
               node tools/publier.mjs --etat 2>&1 | tee curio.log ;;

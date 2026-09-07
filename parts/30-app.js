@@ -1162,10 +1162,18 @@ function applyWritten(item, uni){
 async function fetchNext(){
   if(!ready.length) await topUp();
   if(!ready.length){
-    // Les fiches de démonstration ne servent QUE de filet hors ligne. Un
-    // univers sans texte n'est pas une panne : on ne bouche pas le trou avec
-    // du contenu qui n'est pas le vôtre.
-    if(!offlineMode) return null;
+    /* ── LES FICHES DE DÉMONSTRATION NE SORTENT QUE D'UN DÉPÔT VIDE ──────
+       Elles ne servaient QUE de filet hors ligne — c'était l'intention, et
+       elle était trop large : « hors ligne » se déclenche sur un seul appel
+       réseau raté, ce qui arrive à tout le monde. Un catalogue de mille
+       fiches pouvait donc se voir compléter par du contenu d'exemple qui
+       n'appartient pas à son propriétaire, et qui n'est ni publié, ni
+       relu, ni à vendre.
+
+       La condition est maintenant la bonne : on ne bouche un trou avec de
+       la démonstration que s'il n'y a RIEN d'autre. Un dépôt qui a du texte
+       ne verra jamais une fiche qui n'est pas la sienne. */
+    if(!offlineMode || !catalogueVide()) return null;
     await chargerDemo();
     return nextOffline();
   }
@@ -1347,6 +1355,14 @@ function mediaFor(item, node){
 }
 function hash(s){ let h=2166136261; for(let i=0;i<(s||'').length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h,16777619);} return h>>>0; }
 
+/* Une accroche est une phrase courte qui ouvre. Quarante-cinq mots est le
+   seuil qu'emploie déjà « 3 · Contrôler » : au-delà, ce n'est plus une
+   accroche, c'est un paragraphe — et il se lit comme les autres. */
+function accrocheCourte(p){
+  const n = String(p || '').trim().split(/\s+/).filter(Boolean).length;
+  return n > 0 && n <= 45;
+}
+
 /* Remplit (ou re-remplit) la zone de lecture d'une carte. */
 function fillText(node, item){
   const read = node.querySelector('.lede');
@@ -1360,6 +1376,7 @@ function fillText(node, item){
     const paras = (item.blocks && item.blocks.length ? item.blocks[0].p
                 : (item.paras && item.paras.length ? item.paras : [item.extract || '']));
     paras.slice(0, 2).forEach(p => read.appendChild(el('p', null, md(p))));
+    read.classList.toggle('lede--accroche', accrocheCourte(paras[0]));
     read.classList.remove('more');
     const c0 = node.querySelector('.readmore'); if(c0) c0.hidden = true;
     read.onscroll = null;
@@ -1379,6 +1396,7 @@ function fillText(node, item){
     const paras = (item.blocks && item.blocks.length ? item.blocks[0].p
                 : (item.paras && item.paras.length ? item.paras : [item.extract || '']));
     read.appendChild(el('p', null, md(paras[0] || '')));
+    read.classList.toggle('lede--accroche', accrocheCourte(paras[0]));
     const ouvrir = el('button','deplier', T()['acc.open']);
     ouvrir.addEventListener('click', e=>{
       e.stopPropagation();
@@ -1399,15 +1417,30 @@ function fillText(node, item){
   }
 
   let words = 0;
+  let premier = '';
   if(item.blocks && item.blocks.length){
     item.blocks.forEach(b=>{
       if(b.h) read.appendChild(el('h3','sec', esc(b.h)));
-      b.p.forEach(p=>{ read.appendChild(el('p', null, md(p))); words += p.split(/\s+/).length; });
+      b.p.forEach(p=>{ if(!premier) premier = p;
+        read.appendChild(el('p', null, md(p))); words += p.split(/\s+/).length; });
     });
   }else{
     const paras = (item.paras && item.paras.length) ? item.paras : [item.extract || ''];
-    paras.forEach(p=>{ read.appendChild(el('p', null, md(p))); words += p.split(/\s+/).length; });
+    paras.forEach(p=>{ if(!premier) premier = p;
+      read.appendChild(el('p', null, md(p))); words += p.split(/\s+/).length; });
   }
+  /* ── L'HABILLAGE D'ACCROCHE SE MÉRITE ──────────────────────────────────
+     Le premier paragraphe recevait Fraunces 26 px et le filet bleu QUOI QU'IL
+     ARRIVE. Sur une fiche dont l'ouverture fait dix lignes — la consigne dit
+     vingt-cinq mots, mais rien ne l'imposait aux fiches écrites avant le
+     contrôle de structure — c'est un demi-écran en gros caractères derrière
+     une barre, et la fiche paraît cassée.
+
+     Une accroche est une phrase courte qui ouvre. Au-delà de quarante-cinq
+     mots — le seuil qu'emploie déjà « 3 · Contrôler » —, ce n'est plus une
+     accroche : c'est un paragraphe, et il se lit comme les autres. Le texte
+     n'est pas touché ; seul son habillage l'est. */
+  read.classList.toggle('lede--accroche', accrocheCourte(premier));
   /* On repose la phrase à raconter et la rangée de fin APRÈS les paragraphes :
      elles font partie du texte qui défile, pas du cadre fixe autour de lui. */
   if(node._dire)   read.appendChild(node._dire);
@@ -1849,6 +1882,7 @@ function abonnementRequis(){
 function uniCard(t, container){
   const b = el('button','uni' + (S.picked.includes(t.id) ? ' sel' : ''));
   b.type = 'button';
+  b.dataset.uni = t.id;
   const cv = el('canvas'); b.appendChild(cv);
   b.appendChild(el('h3', null, esc(t[S.lang].name)));
   b.appendChild(el('p', null, esc(t[S.lang].desc)));
@@ -1861,10 +1895,25 @@ function uniCard(t, container){
     if(i >= 0){ if(S.picked.length > 1) S.picked.splice(i,1); }
     else S.picked.push(t.id);
     LS.set('curio.picked', S.picked);
-    renderUniverses();
+    majSelectionUnivers();
   });
   container.appendChild(b);
   requestAnimationFrame(()=> paintCanvas(cv, t, hash(t.id)));
+}
+
+/* ── COCHER UN UNIVERS NE REDESSINE PLUS TOUT ─────────────────────────────
+   Chaque clic reconstruisait les deux grilles — seize cartes — et repeignait
+   seize canevas d'art procédural, chacun dans son requestAnimationFrame. Sur
+   un téléphone, cela se voit : on touche, et il ne se passe rien pendant un
+   temps qui suffit à croire que le clic n'a pas pris.
+
+   Un clic ne change qu'une chose : si cet univers-là est retenu ou non. On
+   retourne donc la carte concernée, et rien d'autre. Le dessin ne bouge pas,
+   puisqu'il ne dépend que de l'univers. */
+function majSelectionUnivers(){
+  document.querySelectorAll('.uni[data-uni]').forEach(b=>{
+    b.classList.toggle('sel', S.picked.includes(b.dataset.uni));
+  });
 }
 function renderUniverses(){
   ['#uniGrid','#obUniverses'].forEach(sel=>{
@@ -1875,7 +1924,7 @@ function renderUniverses(){
 }
 $('#uniAll').addEventListener('click', ()=>{
   if(S.plan === 'free'){ open('#paywall'); return; }
-  S.picked = THEMES.map(t=>t.id); LS.set('curio.picked', S.picked); renderUniverses();
+  S.picked = THEMES.map(t=>t.id); LS.set('curio.picked', S.picked); majSelectionUnivers();
 });
 let pickedSnapshot = '';
 $('#uniBtn').addEventListener('click', ()=>{ pickedSnapshot = S.picked.slice().sort().join(','); open('#uniSheet'); });
@@ -2085,30 +2134,46 @@ $('#searchBtn').addEventListener('click', ()=>{
 (function tiroir(){
   const b = $('#moreBtn'), m = $('#tbMore');
   if(!b || !m) return;
-  const fermer = ()=>{ m.classList.remove('open'); b.setAttribute('aria-expanded','false'); };
+  /* Le voile : il dit que le reste attend, et il referme au doigt. Il ne
+     sert qu'au tiroir — au-dessus de 1100 px la feuille l'éteint, puisque le
+     panneau y redevient une rangée de la barre. */
+  const voile = el('div','tbvoile');
+  document.body.appendChild(voile);
+
+  const fermer = ()=>{
+    m.classList.remove('open'); voile.classList.remove('on');
+    b.setAttribute('aria-expanded','false');
+    document.documentElement.classList.remove('panneau-ouvert');
+  };
+  const ouvrir = ()=>{
+    m.classList.add('open'); voile.classList.add('on');
+    b.setAttribute('aria-expanded','true');
+    document.documentElement.classList.add('panneau-ouvert');
+  };
   b.addEventListener('click', e=>{
     e.stopPropagation();
-    const ouvert = m.classList.toggle('open');
-    b.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+    m.classList.contains('open') ? fermer() : ouvrir();
   });
+  voile.addEventListener('click', fermer);
+  const x = $('#tbClose'); if(x) x.addEventListener('click', fermer);
   // le clic peut atterrir sur l'icône : on teste l'ancêtre, pas la cible exacte
   document.addEventListener('click', e=>{ if(!m.contains(e.target) && !b.contains(e.target)) fermer(); });
   /* On ne referme pas le panneau quand on change un réglage : on veut voir
      l'effet et parfois en changer un deuxième. Seules les ACTIONS le
      referment, parce qu'elles emmènent ailleurs. */
   m.addEventListener('click', e=>{
-    const b = e.target.closest('button');
-    if(b && b.classList.contains('opt__a')) fermer();
+    const c = e.target.closest('button');
+    if(c && c.classList.contains('opt__a')) fermer();
   });
   document.addEventListener('keydown', e=>{ if(e.key === 'Escape') fermer(); });
 })();
 /* Le mode accroche et la pioche, dans le tiroir « … » — et, sur téléphone,
    directement dans la barre : ce sont les deux gestes du quotidien. */
 (function reglagesLecture(){
-  const a = $('#accBtn'), aBar = $('#accBar');
+  const a = $('#accBtn');
   if(a){
     const peindre = ()=>{
-      [a, aBar].forEach(n=>{
+      [a].forEach(n=>{
         if(!n) return;
         n.setAttribute('aria-pressed', S.accroches ? 'true' : 'false');
         n.setAttribute('aria-checked', S.accroches ? 'true' : 'false');
@@ -2142,7 +2207,6 @@ $('#searchBtn').addEventListener('click', ()=>{
       toast(T()[S.accroches ? 'acc.on' : 'acc.off']);
     };
     a.addEventListener('click', bascule);
-    if(aBar) aBar.addEventListener('click', bascule);
   }
   const b = $('#pioBtn');
   if(b) b.addEventListener('click', piocher);
@@ -2164,7 +2228,6 @@ function majPremium(){
      panneau. La feuille de style les éteint au-dessus de 1100 px, où la
      rangée dépliée les montre déjà. */
   const bb = $('#pioBar'); if(bb) bb.hidden = !p;
-  const ab = $('#accBar'); if(ab) ab.hidden = !p;
   const l = $('#libBtn'); if(l) l.hidden = !p;
   /* Le choix des univers est une commande sur ce qu'on lit : en gratuit, les
      cinq du jour viennent des huit, et le bouton n'aurait rien à commander. */
@@ -2192,52 +2255,71 @@ $('#qInput').addEventListener('input', ()=>{
   chercheT = setTimeout(doSearch, 250);
 });
 
+/* ══════════════ LA RECHERCHE CHERCHE DANS VOTRE CATALOGUE ════════════════
+   Elle interrogeait WIKIPÉDIA. C'était juste au temps où l'application
+   servait des extraits d'encyclopédie ; depuis la version 8 elle ne sert que
+   des anecdotes rédigées, et chercher ailleurs ne pouvait donc remonter que
+   des choses qui n'existent pas dans le produit.
+
+   Pire : quand l'appel à Wikipédia échouait — un réseau qui bronche suffit —
+   on basculait sur `demo.json`, les TRENTE-DEUX FICHES DE DÉMONSTRATION
+   livrées avec le paquet. Un lecteur qui payait et qui cherchait « grand »
+   recevait « Le Grand Attracteur », « Le Vide du Bouvier », « La méduse qui
+   rajeunit » : du contenu d'exemple, présenté comme le sien. Introuvable
+   dans la console, évidemment — il n'a jamais été dans le catalogue. Et mal
+   mis en page, puisque ces textes-là sont d'un seul bloc.
+
+   La recherche lit maintenant ce que le lecteur peut lire, et rien d'autre :
+   les fiches PUBLIÉES, dans la langue affichée. Aucun appel réseau, donc une
+   réponse instantanée et le même résultat hors ligne. */
+async function chercherDansCatalogue(q){
+  const aiguille = replier(q);
+  const out = [];
+  for(const t of THEMES){
+    await loadWritten(S.lang, t.id);
+    const w = written.get(S.lang + '|' + t.id);
+    if(!w) continue;
+    for(const titre of Object.keys(w)){
+      const rec = w[titre];
+      if(!fichePubliee(rec)) continue;
+      if(rec.s != null && rec.s < (CONFIG.minInsolite || 0)) continue;
+      if(!rec._foin) rec._foin = replier([rec.t, titre, rec.r, rec.x].filter(Boolean).join(' '));
+      if(rec._foin.indexOf(aiguille) < 0) continue;
+      out.push({ uni:t.id, titre, rec });
+    }
+  }
+  /* Le titre d'abord, le corps ensuite : chercher « nyos » doit remonter le
+     lac avant une fiche qui le cite en passant. */
+  return out.sort((a, b)=>{
+    const pa = replier(a.rec.t || a.titre).indexOf(aiguille) >= 0 ? 0 : 1;
+    const pb = replier(b.rec.t || b.titre).indexOf(aiguille) >= 0 ? 0 : 1;
+    return pa - pb || (b.rec.s || 0) - (a.rec.s || 0);
+  });
+}
+
 async function doSearch(){
   const q = $('#qInput').value.trim(); if(!q) return;
   const list = $('#qList'); list.innerHTML = '<div class="empty">'+T().searching+'</div>';
-  if(offlineMode){
-    await chargerDemo();
-    const hits = OFFLINE.filter(o => (o[S.lang].ti+' '+o[S.lang].tx).toLowerCase().includes(q.toLowerCase()));
-    list.innerHTML='';
-    if(!hits.length){ list.appendChild(el('div','empty', T().noResult)); return; }
-    hits.forEach(o => list.appendChild(resultRow({ theme:o.t, title:o[S.lang].ti, extract:o[S.lang].tx, img:'', url:'https://'+S.lang+'.wikipedia.org/wiki/'+encodeURIComponent(o.k), desc:'' })));
-    return;
-  }
-  const url = 'https://' + S.lang + '.wikipedia.org/w/api.php?action=query&format=json&origin=*'
-            + '&generator=search&gsrsearch=' + encodeURIComponent(q) + '&gsrlimit=10'
-            + '&prop=pageimages|extracts&exintro=1&explaintext=1&piprop=thumbnail&pithumbsize=400';
-  try{
-    const r = await fetch(url); const j = await r.json();
-    const pages = j.query && j.query.pages ? Object.values(j.query.pages) : [];
-    list.innerHTML = '';
-    if(!pages.length){ list.appendChild(el('div','empty', T().noResult)); return; }
-    pages.sort((a,b)=>(a.index||0)-(b.index||0)).forEach(p=>{
-      list.appendChild(resultRow({
-        theme: activeThemes()[0], title:p.title, extract:trim(p.extract||''),
-        img: p.thumbnail ? sized(p.thumbnail.source, 1280) : '',
-        url: 'https://' + S.lang + '.wikipedia.org/wiki/' + encodeURIComponent(p.title.replace(/ /g,'_')),
-        desc:''
-      }));
-    });
-  }catch(e){
-    goOffline();
-    list.innerHTML = '<div class="empty">'+T().noResult+'</div>';
-  }
+  const hits = await chercherDansCatalogue(q);
+  list.innerHTML = '';
+  if(!hits.length){ list.appendChild(el('div','empty', T().noResult)); return; }
+  hits.slice(0, 60).forEach(h => list.appendChild(resultRow(h)));
+  if(hits.length > 60)
+    list.appendChild(el('div','empty', T()['find.more'](hits.length - 60)));
 }
-function resultRow(item){
+
+/* Une ligne de résultat : l'accroche en titre — c'est elle qui donne envie —
+   le début du texte en dessous, et la couleur de l'univers en vignette. */
+function resultRow(h){
   const b = el('button','item');
-  const hue = (themeById(item.theme)||{hue:200}).hue;
-  b.innerHTML = '<span class="thumb" style="background:linear-gradient(135deg,hsl('+hue+' 40% 30%),hsl('+((hue+34)%360)+' 34% 16%))"></span>'
-    + '<span class="tx"><h4>'+esc(item.title)+'</h4><p>'+esc(item.extract)+'</p></span>';
-  b.addEventListener('click', ()=>{
-    close();
-    /* Un résultat de recherche est un sujet demandé : il s'ouvre en entier,
-       et il arrive aligné comme les autres — voir openSubject(). */
-    const card = buildCard(item, true);
-    card._counted = true;
-    feed.insertBefore(card, feed.firstElementChild);
-    requestAnimationFrame(()=>{ card.scrollIntoView({ block:'start' }); setActive(card); });
-  });
+  const th = themeById(h.uni) || THEMES[0];
+  const debut = String(h.rec.x || '').split(/\n{2,}/)[0] || '';
+  b.innerHTML = '<span class="thumb" style="background:linear-gradient(135deg,hsl('+th.hue+' 40% 30%),hsl('+((th.hue+34)%360)+' 34% 16%))"></span>'
+    + '<span class="tx"><h4>' + esc(h.rec.t || h.titre) + '</h4>'
+    + '<p>' + esc(debut.slice(0, 190)) + (debut.length > 190 ? '…' : '') + '</p></span>';
+  /* Elle s'ouvre par le même chemin que le sommaire : une fiche demandée se
+     lit en entier, et arrive alignée comme les autres. */
+  b.addEventListener('click', ()=> openSubject(h.uni, h.titre, false));
   return b;
 }
 
@@ -2269,6 +2351,26 @@ let tocShown = {};
    écrites. Jamais les sujets du catalogue — un lecteur ne doit pas voir neuf
    cents entrées quand il n'y a que vingt textes. */
 let tocPrets = new Map();          // univers -> [{titre, accroche}]
+
+/* ── LE SOMMAIRE NE MONTRE QUE CE QUI EST PUBLIÉ ─────────────────────────
+   C'est ce qu'on achète : la carte de tout ce qui est lisible. Une fiche de
+   la réserve n'y a rien à faire — elle n'est pas encore à vendre, et la voir
+   apparaître dans une recherche est le genre de fuite qui coûte cher.
+
+   Le filtre existait en amont, dans loadWritten(). On le refait ICI, sur la
+   date de publication elle-même, pour deux raisons : la garantie se lit à
+   l'endroit où elle compte plutôt que trois fonctions plus haut, et une
+   fiche sans date franche — il n'y en a plus après la remise au propre, mais
+   on ne pariera pas là-dessus — reste dehors.
+
+   Une fiche en quarantaine ou retirée est dehors aussi : elle est peut-être
+   datée, elle n'est pas montrable. */
+function fichePubliee(rec){
+  if(!rec || !rec.x) return false;
+  if(rec.v === 'retire' || rec.v === 'quarantaine') return false;
+  if(!rec.p) return false;                       // ni null, ni absente
+  return String(rec.p) <= today();
+}
 async function tocCharger(){
   tocPrets = new Map();
   for(const t of THEMES){
@@ -2276,7 +2378,7 @@ async function tocCharger(){
     const w = written.get(S.lang + '|' + t.id);
     if(!w) continue;
     const items = Object.keys(w)
-      .filter(k => w[k] && w[k].x && (w[k].s == null || w[k].s >= (CONFIG.minInsolite || 0)))
+      .filter(k => fichePubliee(w[k]) && (w[k].s == null || w[k].s >= (CONFIG.minInsolite || 0)))
       .map(k => ({ titre:k, accroche: w[k].t || k }));
     if(items.length) tocPrets.set(t.id, items);
   }
@@ -2287,7 +2389,13 @@ function renderToc(){
   const box = $('#tocBody'); box.innerHTML = '';
 
   const loc = S.lang === 'fr' ? 'fr-FR' : 'en-US';
-  const ecrites = statTotal();
+  /* ── LE CHIFFRE EST CELUI DE LA LISTE ─────────────────────────────────
+     Il venait d'anecdotes/index.json, la liste des fichiers du disque : deux
+     sources pour un seul nombre, et rien ne signalait qu'elles divergent. Le
+     sommaire annonce maintenant ce qu'il contient réellement — si la liste
+     n'a pas ce qu'elle annonce, cela se voit tout de suite. */
+  let ecrites = 0;
+  tocPrets.forEach(v => { ecrites += v.length; });
   const w = statWeek();
   box.appendChild(el('p','toctotal',
     '<b>' + ecrites.toLocaleString(loc) + '</b><span>' + T()['toc.total'] + '</span>'

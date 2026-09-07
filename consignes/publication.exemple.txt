@@ -80,6 +80,19 @@ images: oui
 ordre: potentiel
 
 # ─────────────────────────────────────────────────────────────────────────
+# LE SOMMAIRE ET LA RECHERCHE
+#   oui   le lecteur peut parcourir et chercher tout ce qui est en ligne —
+#         c'est la carte au trésor, et l'une des raisons d'acheter (défaut)
+#   non   les deux disparaissent du produit. On lit au fil du flux, et rien
+#         d'autre.
+#
+# Le sommaire ne montre JAMAIS la réserve : seules les fiches dont la date de
+# publication est passée y figurent. Ce réglage est gravé dans la page à la
+# construction : il s'applique dès la première seconde, hors ligne compris.
+# ─────────────────────────────────────────────────────────────────────────
+sommaire: oui
+
+# ─────────────────────────────────────────────────────────────────────────
 # LE PASSAGE DE LA RELECTURE AU STOCK PRÊT À PUBLIER
 #
 # Relire, mettre au stock et publier sont TROIS marches distinctes :

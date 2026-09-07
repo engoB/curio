@@ -44,6 +44,11 @@ const VALIDER  = !!opt('valider', false);   // appliquer consignes/validations.j
    les fiches, l'autre cherche les redites parmi les seules fiches en ligne. */
 const REPARER  = !!opt('reparer', false);
 const DOUBLONS = !!opt('doublons', false);
+/* Tout dépublier : les fiches repassent en réserve, rien n'est effacé. */
+const DEPUBLIER = !!opt('tout-depublier', false);
+/* Publier NOMMÉMENT ces sujets-là, tout de suite, quel que soit le rythme.
+   Les titres sont séparés par « | » — un titre peut contenir une virgule. */
+const CHOISIS  = opt('titres', null);
 const VALIDS   = path.join(process.cwd(), 'consignes', 'validations.json');
 const FORCE    = opt('combien', null);
 /* ── PUBLIER TOUT CE QUI VAUT UNE CERTAINE NOTE ───────────────────────────
@@ -659,7 +664,124 @@ async function chercherDoublons(){
   console.log('\n  Rapport complet : doublons.csv');
 }
 
+/* ═══════════ TOUT RENVOYER AU STOCK, ET REPARTIR PROPREMENT ══════════════
+   Publier au fil de l'eau finit par produire une mise en ligne qui n'est
+   plus celle qu'on aurait choisie : des fiches sorties avant leur relecture,
+   un ordre subi, un fonds qu'on voudrait rouvrir autrement.
+
+   Cette opération dépublie TOUT — les fiches repassent en réserve, avec leur
+   marque de contrôle intacte — et vous repartez du rythme et de l'ordre que
+   vous voulez. Rien n'est effacé : ni un texte, ni une note, ni une
+   relecture. C'est le contraire d'un retrait : un retrait sort une fiche
+   pour de bon et l'inscrit aux exclusions ; ceci la remet simplement dans
+   la file d'attente.
+
+   Le site se vide donc jusqu'à la prochaine publication. C'est voulu, et
+   c'est pourquoi l'opération demande confirmation dans la console. */
+async function toutDepublier(){
+  const { paquets, fiches } = await charger();
+  const maitre = await lire(MAITRE, null);
+  const aujourdhui = jour();
+
+  let rendues = 0, gardees = 0;
+  for (const f of fiches){
+    /* Une fiche retirée reste retirée : elle a fait l'objet d'une décision,
+       et ce n'est pas à cette opération de la défaire. */
+    if (f.rec.v === 'retire'){ gardees++; continue; }
+    const etait = f.rec.p !== undefined && f.rec.p !== null && String(f.rec.p) <= aujourdhui;
+    if (f.rec.p === null) continue;              // déjà en réserve
+    f.rec.p = null;
+    const p = paquets.get(f.chemin);
+    if (p) p.modifie = true;
+    if (etait) rendues++;
+  }
+  await sauver(paquets);
+
+  if (maitre && Array.isArray(maitre.sujets)){
+    for (const s of maitre.sujets){
+      if (!s || s.statut === 'retire') continue;
+      if (s.statut === 'publie' || s.publie){ s.statut = 'ecrit'; s.publie = null; }
+    }
+    maitre.genere = new Date().toISOString();
+    await ecrire(MAITRE, maitre);
+  }
+
+  console.log('╔══════════════════════════════════════════════════════════════╗');
+  console.log('║  TOUT EST RENVOYÉ AU STOCK                                   ║');
+  console.log('╚══════════════════════════════════════════════════════════════╝');
+  console.log(`  ${rendues} fiche(s) dépubliée(s) : elles repassent en réserve.`);
+  if (gardees) console.log(`  ${gardees} fiche(s) retirée(s) n’ont pas bougé : un retrait est une décision.`);
+  console.log('  Aucun texte, aucune note, aucune relecture n’a été touché.');
+  console.log('  Le site est vide jusqu’à votre prochaine publication.');
+  console.log('  Pour rouvrir un fonds d’un coup : « publier » avec une note minimale.');
+}
+
+/* ═══════════ PUBLIER CEUX-LÀ, MAINTENANT ════════════════════════════════
+   Le rythme sert au quotidien : tant de sujets, tel jour. Mais il arrive
+   qu'on veuille sortir CEUX-LÀ — les trois qui vont avec l'actualité, la
+   série qu'on a préparée. Il fallait alors publier « les N suivants dans
+   l'ordre réglé » et espérer tomber dessus.
+
+   On les nomme. Les titres viennent de la console, séparés par « | », et
+   ce sont ceux de l'article ou de l'accroche — les deux sont acceptés.
+   Un sujet publie toutes ses langues publiées le même jour, comme partout
+   ailleurs : le lecteur anglophone et le francophone voient la même chose. */
+async function publierChoisis(brut){
+  const voulus = String(brut).split('|').map(x => x.trim().toLowerCase()).filter(Boolean);
+  if (!voulus.length){ console.log('Aucun titre indiqué.'); return; }
+
+  const par = await reglage();
+  const maitre = await lire(MAITRE, null);
+  const { paquets, fiches } = await charger();
+  const aujourdhui = jour();
+  const cible = new Set(voulus);
+
+  /* On retrouve d'abord les fiches nommées, puis on élargit à tout le sujet :
+     nommer le français d'un sujet publie aussi son anglais. */
+  const nommees = fiches.filter(f => cible.has(String(f.titre).toLowerCase())
+                                  || cible.has(String(f.rec.t || '').toLowerCase()));
+  if (!nommees.length){
+    console.log('Aucune fiche ne porte ces titres. Attendus : le titre de l’article, ou l’accroche.');
+    return;
+  }
+  const groupes = grouper(fiches, maitre);
+  const retenus = groupes.filter(g => g.fiches.some(f => nommees.includes(f)));
+
+  let sortis = 0, deja = 0, bloques = 0;
+  for (const g of retenus){
+    const aPublier = g.fiches.filter(f => par.langues.includes(f.lang));
+    /* La quarantaine et les retraits ne se publient pas sur demande : ce
+       serait contourner le contrôle par la porte de service. */
+    if (aPublier.some(f => f.rec.v === 'quarantaine' || f.rec.v === 'retire')){
+      bloques++;
+      console.log(`  ⚠ ${g.fiches[0].rec.t || g.fiches[0].titre} : en quarantaine ou retiré — non publié.`);
+      continue;
+    }
+    let bouge = false;
+    for (const f of aPublier){
+      if (f.rec.p && String(f.rec.p) <= aujourdhui) continue;   // déjà en ligne
+      f.rec.p = aujourdhui;
+      const p = paquets.get(f.chemin); if (p) p.modifie = true;
+      bouge = true;
+    }
+    if (bouge){
+      sortis++;
+      console.log(`  → ${g.fiches[0].rec.t || g.fiches[0].titre}`);
+      if (g.sujet){ g.sujet.statut = 'publie'; g.sujet.publie = aujourdhui; }
+    } else deja++;
+  }
+  await sauver(paquets);
+  if (maitre) await ecrire(MAITRE, maitre);
+
+  console.log('');
+  console.log(`${sortis} sujet(s) mis en ligne aujourd’hui.`);
+  if (deja)    console.log(`${deja} l’étaient déjà : rien n’a été redaté.`);
+  if (bloques) console.log(`${bloques} bloqué(s) par le contrôle — validez-les d’abord.`);
+}
+
 async function main(){
+  if (DEPUBLIER) return toutDepublier();
+  if (CHOISIS && CHOISIS !== true) return publierChoisis(CHOISIS);
   if (REPARER) return reparerRegistre();
   if (DOUBLONS) return chercherDoublons();
   if (VALIDER) return appliquerValidations();

@@ -181,6 +181,16 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
   text-transform:none;color:var(--or,#B8860B)}
 .doute{background:var(--rouge);color:#2A0509}
 /* Le tableau « Pourquoi ces chiffres ? » : deux comptes, et ce qui les sépare. */
+.liste--choix{max-height:min(46vh,420px);overflow-y:auto}
+.choix{display:flex;align-items:flex-start;gap:11px;padding:9px 11px;cursor:pointer;
+  border-bottom:1px solid var(--line)}
+.choix:last-child{border-bottom:0}
+.choix:hover{background:var(--ink-2)}
+.choix.on{background:var(--accent-doux,rgba(63,169,255,.10))}
+.choix input{margin-top:3px;flex:none;width:16px;height:16px;accent-color:var(--accent)}
+.choix__tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.choix__tx b{font-size:13.5px;font-weight:600;color:var(--texte)}
+.choix__tx span{font-size:11.5px;color:var(--texte-3)}
 table.diag{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 10px}
 table.diag td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 table.diag tr:last-child td{border-bottom:0}
@@ -338,7 +348,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          pouvait dire si le correctif était en place ou si le navigateur
          servait encore l'ancien fichier. La version est écrite ici par
          build.sh, à côté du titre, en petit. -->
-    <h1>Curio &middot; console<b class="ver" id="conVer">8.10.3</b></h1><!-- BUILD:CONSOLE -->
+    <h1>Curio &middot; console<b class="ver" id="conVer">8.11.0</b></h1><!-- BUILD:CONSOLE -->
 
     <!-- ── LES ÉTAPES, DANS L'ORDRE OÙ ON LES FAIT ──────────────────────
          Trois onglets nommés par leur contenu ne disaient pas par où
@@ -562,6 +572,21 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          rapportent, et ne modifient que si vous le demandez explicitement.</p>
       <div class="outils" id="outils"></div>
     </div>
+
+    <!-- ══ REPARTIR PROPREMENT ══════════════════════════════════════════
+         Publier au fil de l'eau finit par produire une mise en ligne qui
+         n'est plus celle qu'on aurait choisie. Ceci la défait, sans rien
+         détruire. -->
+    <div class="reglages" style="margin-top:16px;border-color:var(--rouge)">
+      <h3>Repartir de zéro sur la mise en ligne</h3>
+      <p><b>Tout renvoyer au stock</b> dépublie l’ensemble de vos fiches : elles repassent
+         en réserve, avec leur note, leur relecture et leur marque de contrôle intactes.
+         <b>Aucun texte n’est effacé.</b> Ce n’est pas un retrait — un retrait sort une fiche
+         pour de bon ; ceci la remet dans la file d’attente.</p>
+      <p class="quand">Le site se vide jusqu’à votre prochaine publication. À faire quand vous
+         voulez reprendre la main sur l’ordre de sortie.</p>
+      <button class="btn r" id="toutDepublier">Tout renvoyer au stock…</button>
+    </div>
   </section>
 
   <!-- ═══════════════ 5 · PUBLICATION ═══════════════ -->
@@ -635,6 +660,35 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
         <button class="btn p" id="pEnregistrer">Enregistrer le rythme</button>
         <button class="btn" id="pPublierNow">Publier maintenant…</button>
         <button class="btn" id="pEtat">Voir l’état du stock</button>
+      </div>
+    </div>
+
+    <!-- ══ CHOISIR CE QUI SORT MAINTENANT ═══════════════════════════════
+         Le rythme sert au quotidien. Mais il arrive qu'on veuille sortir
+         CEUX-LÀ : les trois qui vont avec l'actualité, la série qu'on a
+         préparée. Il fallait alors publier « les N suivants dans l'ordre
+         réglé » et espérer tomber dessus. On les coche. -->
+    <div class="reglages" style="margin-bottom:16px">
+      <h3>Sortir des sujets choisis, maintenant</h3>
+      <p>Cochez dans votre réserve ce que vous voulez mettre en ligne <b>aujourd’hui</b>,
+         quel que soit le rythme réglé au-dessus. Un sujet sort avec toutes ses langues
+         publiées. Ce qui est en quarantaine ne sort pas : validez-le d’abord.</p>
+      <div class="cmd">
+        <input type="search" id="qChoix" placeholder="Chercher dans la réserve…">
+        <select id="fUniChoix"><option value="">Tous les univers</option></select>
+        <select id="fNoteChoix">
+          <option value="">Toutes les notes</option>
+          <option value="10">10/10 seulement</option>
+          <option value="9">9/10 et au-dessus</option>
+          <option value="8">8/10 et au-dessus</option>
+        </select>
+        <span class="compte" id="cChoix"></span>
+      </div>
+      <div class="liste liste--choix" id="lChoix"></div>
+      <button class="btn plus" id="plusChoix" hidden>Afficher la suite</button>
+      <div class="cmd" style="margin:12px 0 0">
+        <button class="btn p" id="choixPublier" disabled>Mettre en ligne la sélection</button>
+        <button class="btn" id="choixVider">Tout décocher</button>
       </div>
     </div>
 
@@ -1900,6 +1954,83 @@ function apercuPublication(){
         + '</b> est publié : le bouton FR/EN disparaît du site et de l’application.');
 }
 
+/* ══════════════ CHOISIR CE QUI SORT MAINTENANT ═══════════════════════════
+   La réserve, cochable. Un sujet coché sort aujourd'hui, quel que soit le
+   rythme. On travaille par SUJET — cocher le français sort aussi l'anglais
+   quand vous publiez les deux — mais la liste montre les fiches, parce que
+   c'est l'accroche qu'on reconnaît, pas l'identifiant. */
+var CHOIX = {};                    // "lang|titre" -> true
+var S_CHOIX = { vue:[], n:0 };
+
+function reserveDisponible(){
+  var lg = languesPubliees();
+  return S.fiches.filter(function(f){
+    if(lg.indexOf(f.lang) < 0) return false;
+    if(enLigne(f)) return false;                       // déjà lue par vos lecteurs
+    if(f.rec.v === 'quarantaine' || f.rec.v === 'retire') return false;
+    return true;
+  });
+}
+function filtrerChoix(){
+  var q = plier(($('#qChoix').value||'').trim()),
+      u = $('#fUniChoix').value,
+      nm = parseInt($('#fNoteChoix').value,10) || 0;
+  S_CHOIX.vue = reserveDisponible().filter(function(f){
+    if(u && f.uni !== u) return false;
+    if(nm && !(f.rec.s != null && f.rec.s >= nm)) return false;
+    if(q){
+      if(!f._f) f._f = plier([f.titre, f.rec.t, f.rec.x, f.rec.r].filter(Boolean).join(' '));
+      if(f._f.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+  S_CHOIX.vue.sort(function(a,b){ return (b.rec.s||0)-(a.rec.s||0); });
+}
+function cleChoix(f){ return f.lang + '|' + f.titre; }
+function compterChoix(){
+  var n = 0; for(var k in CHOIX) if(CHOIX[k]) n++;
+  var b = $('#choixPublier');
+  if(b){ b.disabled = !n; b.textContent = n ? ('Mettre en ligne ces ' + nb(n)) : 'Mettre en ligne la sélection'; }
+  return n;
+}
+function ligneChoix(f){
+  var uni = NOMS[f.uni] || [f.uni,200], k = cleChoix(f);
+  var n = el('label','choix' + (CHOIX[k] ? ' on' : ''));
+  var c = document.createElement('input'); c.type='checkbox'; c.checked = !!CHOIX[k];
+  c.addEventListener('change', function(){
+    if(c.checked) CHOIX[k] = true; else delete CHOIX[k];
+    n.classList.toggle('on', c.checked);
+    compterChoix();
+  });
+  n.appendChild(c);
+  var d = el('span','choix__tx');
+  d.innerHTML = '<b>' + esc(f.rec.t || f.titre) + '</b>'
+    + '<span><i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i>'
+    + esc(uni[0]) + ' · ' + esc(f.titre) + ' · '
+    + (f.rec.s == null ? 'non notée' : f.rec.s + '/10')
+    + (f.rec.v === 'ok' ? ' · prête à publier' : ' · pas encore au stock') + '</span>';
+  n.appendChild(d);
+  return n;
+}
+function suiteChoix(){
+  var frag = document.createDocumentFragment();
+  var fin = Math.min(S_CHOIX.n + LOT, S_CHOIX.vue.length);
+  for(var i = S_CHOIX.n; i < fin; i++) frag.appendChild(ligneChoix(S_CHOIX.vue[i]));
+  $('#lChoix').appendChild(frag); S_CHOIX.n = fin;
+  $('#plusChoix').hidden = S_CHOIX.n >= S_CHOIX.vue.length;
+  $('#plusChoix').textContent = 'Afficher la suite (' + nb(S_CHOIX.vue.length - S_CHOIX.n) + ' restants)';
+}
+function peindreChoix(){
+  filtrerChoix();
+  $('#cChoix').textContent = nb(S_CHOIX.vue.length) + ' en réserve';
+  var l = $('#lChoix'); l.innerHTML = ''; S_CHOIX.n = 0;
+  if(!S_CHOIX.vue.length){
+    l.appendChild(el('div','vide','Rien en réserve ne correspond.'));
+    $('#plusChoix').hidden = true; compterChoix(); return;
+  }
+  suiteChoix(); compterChoix();
+}
+
 function peindrePub(){
   $('#pRythme').value = PUB.rythme;
   $('#pCombien').value = PUB.parPassage;
@@ -1909,6 +2040,15 @@ function peindrePub(){
   $('#pStock').value = PUB.stock;
   $('#pImages').value = PUB.images;
   peindreJours();
+  var selU = $('#fUniChoix');
+  if(selU && selU.options.length <= 1){
+    var us = {}; S.fiches.forEach(function(f){ us[f.uni] = (us[f.uni]||0)+1; });
+    Object.keys(us).sort().forEach(function(k){
+      var o = document.createElement('option'); o.value = k;
+      o.textContent = (NOMS[k]||[k])[0]; selU.appendChild(o);
+    });
+  }
+  peindreChoix();
   var c={ecrites:S.fiches.length,enligne:0,prets:stockPret(),quarantaine:0};
   S.fiches.forEach(function(f){ if(enLigne(f)) c.enligne++; if(f.rec.v==='quarantaine') c.quarantaine++; });
   var box=$('#chPub'); box.innerHTML='';
@@ -2390,6 +2530,59 @@ $('#toutOublier').addEventListener('click',function(){
 });
 $('#ouvrirFonds').addEventListener('click', ouvrirLeFonds);
 $('#versStock').addEventListener('click', envoyerPublication);
+
+/* Les commandes de la sélection à publier. */
+['qChoix','fUniChoix','fNoteChoix'].forEach(function(id){
+  var e = $('#'+id); if(!e) return;
+  e.addEventListener(id==='qChoix' ? 'input' : 'change', peindreChoix);
+});
+$('#plusChoix').addEventListener('click', suiteChoix);
+$('#choixVider').addEventListener('click', function(){ CHOIX = {}; peindreChoix(); });
+$('#choixPublier').addEventListener('click', function(){
+  var titres = Object.keys(CHOIX).filter(function(k){ return CHOIX[k]; })
+                     .map(function(k){ return k.slice(k.indexOf('|')+1); });
+  /* Un même sujet peut être coché dans ses deux langues : l'outil publie de
+     toute façon le sujet entier, on ne l'envoie donc qu'une fois. */
+  titres = titres.filter(function(t,i){ return titres.indexOf(t) === i; });
+  if(!titres.length) return;
+  if(titres.some(function(t){ return t.indexOf('|') >= 0; })){
+    dit('Un titre contient une barre verticale : impossible de l’envoyer sans ambiguïté. '
+      + 'Publiez-le seul avec « Retirer / refaire » ou renommez-le.','ko'); return;
+  }
+  if(!window.confirm('Mettre en ligne ' + titres.length + ' sujet(s) AUJOURD’HUI ?\n\n'
+    + 'Ils sortent quel que soit le rythme réglé. C’est immédiat et visible sur le site.\n'
+    + 'Une fiche publiée peut être retirée, mais elle aura été vue.')) return;
+  dit('Mise en ligne de la sélection…','info');
+  lancerAction('5-publier.yml', { operation:'choisis', titre:titres.join('|'), combien:'', note_mini:'0' })
+    .then(function(){
+      CHOIX = {}; peindreChoix();
+      dit('<b>'+nb(titres.length)+'</b> sujet(s) partent en ligne. Suivez-le dans '
+        + '<b>Actions → 5 · Publier</b>, puis rechargez cette page.','ok');
+    })
+    .catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
+});
+
+/* Tout renvoyer au stock : deux confirmations, parce que le site se vide. */
+$('#toutDepublier').addEventListener('click', function(){
+  var n = S.fiches.filter(enLigne).length;
+  if(!n){ dit('Rien n’est en ligne : il n’y a rien à renvoyer au stock.','info'); return; }
+  if(!window.confirm('Renvoyer au stock les ' + nb(n) + ' fiche(s) en ligne ?\n\n'
+    + 'Elles repassent en réserve avec leur note, leur relecture et leur contrôle intacts.\n'
+    + 'AUCUN TEXTE N’EST EFFACÉ — ce n’est pas un retrait.\n\n'
+    + 'Votre site sera VIDE jusqu’à la prochaine publication.')) return;
+  if(!window.confirm('Confirmez une seconde fois.\n\n'
+    + 'Après cela, vous choisissez ce qui ressort et quand :\n'
+    + '  • « Mettre en ligne… » rouvre un fonds à partir d’une note\n'
+    + '  • « Sortir des sujets choisis » en sort quelques-uns\n'
+    + '  • le rythme fait le reste, semaine après semaine.')) return;
+  dit('Dépublication en cours…','info');
+  lancerAction('5-publier.yml', { operation:'tout-depublier', titre:'', combien:'', note_mini:'0' })
+    .then(function(){
+      dit('Tout est renvoyé au stock. Suivez-le dans <b>Actions → 5 · Publier</b>, '
+        + 'puis rechargez cette page — vous repartirez d’une réserve complète.','ok');
+    })
+    .catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
+});
 $('#mEnregistrer').addEventListener('click', enregistrerMoisson);
 $('#plusLig').addEventListener('click', suiteLig);
 ['qL','fUniL'].forEach(function(id){

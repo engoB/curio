@@ -1,4 +1,112 @@
-# Curio 8.10.3 — ce qui a changé depuis v6
+# Curio 8.11.0 — ce qui a changé depuis v6
+
+## 8.11.0 — la recherche servait mes fiches de démonstration
+
+### « Le Grand Attracteur » n'a jamais été à vous
+
+C'est la réponse, et elle est gênante. Chercher « grand » remontait *Le Grand
+Attracteur*, *Le Vide du Bouvier*, *Le disque d'or des sondes Voyager*, *La
+méduse qui rajeunit* — les **trente-deux fiches de démonstration** livrées
+dans `demo.json`. Du contenu d'exemple, présenté à vos lecteurs comme le vôtre.
+
+Tout s'explique d'un coup : introuvables dans la console (elles n'ont jamais
+été au catalogue), absentes des publiés, jamais rencontrées en faisant
+défiler, et mal mises en page — ces textes-là sont d'un seul bloc.
+
+Deux causes, corrigées toutes les deux.
+
+**La recherche interrogeait Wikipédia.** C'était juste au temps où
+l'application servait des extraits d'encyclopédie ; depuis la version 8 elle
+ne sert que des anecdotes rédigées, et chercher ailleurs ne pouvait donc
+remonter que des choses qui n'existent pas dans le produit. Quand l'appel
+échouait — un réseau qui bronche suffit — on basculait sur la démonstration.
+
+La recherche lit maintenant **votre catalogue publié**, et rien d'autre :
+aucun appel réseau, réponse instantanée, même résultat hors ligne. *Éprouvé* :
+« attracteur » et « méduse » ne donnent plus rien, une fiche en réserve ne
+donne rien, et « accroche » remonte exactement les 32 fiches en ligne du banc
+d'essai — pas une de plus.
+
+**Et la démonstration ne sort plus que d'un dépôt vide.** Elle ne servait
+« que de filet hors ligne » — l'intention était bonne, la condition trop
+large : « hors ligne » se déclenche sur un seul appel raté. Un catalogue de
+mille fiches pouvait donc se voir compléter par du contenu qui n'appartient
+pas à son propriétaire. Désormais : s'il y a du texte, on ne bouche aucun trou.
+
+### Tout renvoyer au stock, et repartir proprement
+
+*4 · Contrôle → **Tout renvoyer au stock***. Vos fiches sont dépubliées d'un
+trait et repassent en réserve, **avec leur note, leur relecture et leur marque
+de contrôle intactes**. Aucun texte n'est effacé : ce n'est pas un retrait —
+un retrait sort une fiche pour de bon, ceci la remet dans la file d'attente.
+Deux confirmations, parce que le site se vide jusqu'à la publication suivante.
+
+### Choisir ce qui sort maintenant
+
+*5 · Publication → **Sortir des sujets choisis, maintenant***. Votre réserve,
+cochable, avec recherche, filtre d'univers et seuil de note. Ce que vous
+cochez part en ligne aujourd'hui, quel que soit le rythme. La quarantaine ne
+passe pas : validez-la d'abord.
+
+### La barre : cinq choses, et un tiroir
+
+Elle en portait neuf, et sur un téléphone elles ne tenaient plus. Deux lignes
+réglaient le débordement mais donnaient une application encombrée avant
+d'avoir commencé. On choisit donc au lieu d'empiler.
+
+**Restent dans la barre** : le nom, le compteur, l'univers — on en change en
+lisant — et la pioche, le geste du quotidien.
+
+**Passent dans le tiroir** : taille du texte, accroches, thème, couleurs,
+langue, recherche, collection. Il glisse **depuis la droite**, prend toute la
+hauteur, s'assombrit derrière, et se ferme d'un doigt à côté, par la croix ou
+par Échap. Sur grand écran, rien ne change : la rangée dépliée reste.
+
+### Cocher un univers ne redessine plus seize cartes
+
+Chaque clic reconstruisait les deux grilles et repeignait **seize canevas**
+d'art procédural. Sur un téléphone, on touchait et il ne se passait rien assez
+longtemps pour croire que le clic n'avait pas pris. Un clic ne retourne plus
+que la carte touchée : **six clics en 38 ms** au lieu de six reconstructions.
+
+
+## 8.10.4 — le sommaire, et l'accroche qui n'en était pas une
+
+### Le sommaire ne montre que ce qui est publié
+
+Le filtre existait, mais en amont, trois fonctions plus haut. Il est refait
+**à l'endroit où il compte**, sur la date de publication elle-même : une
+fiche sans date franche, en quarantaine ou retirée n'entre pas dans le
+sommaire, quoi qu'il arrive ailleurs dans le code.
+
+Une fiche de la réserve n'a rien à faire dans une recherche : elle n'est pas
+encore à vendre. *Éprouvé* sur 80 fiches dont 48 en réserve : le sommaire en
+liste 32, chercher le titre exact d'une fiche en réserve donne zéro résultat.
+
+**Et le chiffre du sommaire est celui de sa liste.** Il venait de
+`anecdotes/index.json` — deux sources pour un seul nombre, et rien ne
+signalait qu'elles divergent. Le sommaire annonce désormais ce qu'il
+contient : si la liste n'a pas ce qu'elle annonce, cela se voit.
+
+### L'habillage d'accroche se mérite
+
+Le premier paragraphe recevait Fraunces 26 px et le filet bleu **quoi qu'il
+arrive**. Sur une fiche dont l'ouverture fait dix lignes — la consigne dit
+vingt-cinq mots, mais rien ne l'imposait aux fiches écrites avant le contrôle
+de structure — c'est un demi-écran en gros caractères derrière une barre, et
+la fiche paraît cassée. C'est très exactement ce qu'on voyait.
+
+Au-delà de **quarante-cinq mots** — le seuil qu'emploie déjà *3 · Contrôler*
+— ce n'est plus une accroche : c'est un paragraphe, et il se lit comme les
+autres. Le texte n'est pas touché ; seul son habillage l'est.
+
+### Et si le sommaire vous déplaît quand même
+
+`sommaire: non` dans `consignes/publication.txt` retire le sommaire **et** la
+recherche du produit, gravé dans la page à la construction — dès la première
+seconde, hors ligne compris, sans une ligne de JavaScript. C'est votre
+catalogue : vous devez pouvoir en fermer la porte sans attendre une version.
+
 
 ## 8.10.3 — il y avait deux définitions de « en ligne »
 
