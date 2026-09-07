@@ -603,7 +603,10 @@ async function enrich(item){
 function goOffline(){
   if(offlineMode) return;
   offlineMode = true;
-  $('#offlineTag').classList.add('show');
+  /* L'étiquette « Collection embarquée » a été retirée de la barre : lire
+     hors ligne est devenu la règle, pas une exception à signaler. Le drapeau
+     reste — c'est lui qui autorise les fiches de démonstration. */
+  const t = $('#offlineTag'); if(t) t.classList.add('show');
 }
 
 /* ================= compteurs publics ================= */
@@ -1787,14 +1790,14 @@ function renderPlanTag(){
   const nom = p === 'lifetime' ? T()['plan.life']
             : p === 'free'     ? T()['plan.free']
             :                    T()['plan.paid'];   // sub, monthly, yearly
-  // En gratuit, la pastille porte aussi le reste du jour : sur un téléphone
-  // c'est le seul endroit où l'information tient, et elle répond aux deux
-  // questions à la fois — quelle formule, et combien il me reste.
-  const reste = Math.max(0, CONFIG.freeDaily - S.used);
-  n.innerHTML = esc(nom) + (p === 'free' ? '<i>' + reste + '</i>' : '');
+  /* La pastille portait le reste du jour, et le décomptait : c'était le
+     second compteur à rebours, après la jauge. Elle ne dit plus que la
+     formule ; le nombre offert vit à côté, dans « 5 anecdotes aujourd'hui »,
+     et il ne bouge pas. */
+  n.textContent = nom;
   n.classList.toggle('paye', p === 'monthly' || p === 'yearly' || p === 'sub');
   n.classList.toggle('vie',  p === 'lifetime');
-  n.classList.toggle('bas',  p === 'free' && reste <= 3);
+  n.classList.remove('bas');
   n.title = p === 'free' ? T()['plan.freeTip'] : T()['plan.paidTip'];
   if(n2){ n2.innerHTML = n.innerHTML; n2.className = n.className; n2.title = n.title; }
   // la jauge n'a plus de sens quand la lecture est illimitée
@@ -3315,7 +3318,7 @@ function relock(){
   const m = document.querySelector('meta[name="curio-version"]');
   const v = m && m.getAttribute('content');
   if(!v) return;
-  const n = $('#tbVer');
+  const n = $('#ver');
   if(n){ n.textContent = 'v' + v.split('+')[0]; n.title = '__MARQUE__ ' + v; }
   const b = $('#brandBtn');
   if(b) b.title = '__MARQUE__ ' + v + ' — revenir à l’accueil';

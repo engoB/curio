@@ -858,23 +858,54 @@ function remplirUnivers(){
    manque l'anglais — mais rien ne le distinguait d'un sujet auquel personne
    n'a touché. On le sait pourtant : le catalogue maître porte « langues »
    depuis la 8.5.1, et à défaut les fiches déjà chargées le disent.        */
-var ECRITES = {};                     // qid -> {fr:true, en:true}
-var ENLIGNE = {};                     // qid -> {fr:true, en:true} — vraiment en ligne
+/* ── RETROUVER LA FICHE D'UN SUJET ───────────────────────────────────────
+   On les rapprochait par le seul identifiant Wikidata que la fiche porte
+   (`rec.q`). Or les fiches écrites avant la 8.5 ne le portent pas : elles
+   n'étaient rattachées à aucun sujet, et leur sujet paraissait donc « en
+   réserve » alors que la fiche était en ligne depuis des semaines — c'est
+   exactement ce qu'on voyait sur la méduse et le Grand attracteur, et c'est
+   pourquoi la Sélection comptait 171 sujets en ligne quand l'onglet En ligne
+   en comptait 268.
+
+   On rapproche maintenant par identifiant QUAND IL EXISTE, et par titre
+   d'article sinon — le titre est ce qui sert de clé dans anecdotes/, il est
+   donc toujours là. Les deux index sont construits ensemble. */
+var ECRITES = {};                     // clé -> {fr:true, en:true}
+var ENLIGNE = {};                     // clé -> {fr:true, en:true} — vraiment en ligne
 function calculerEcrites(){
   ECRITES = {}; ENLIGNE = {};
   var auj = new Date().toISOString().slice(0,10);
   S.fiches.forEach(function(f){
-    var q = f.rec && f.rec.q; if(!q) return;
-    if(!ECRITES[q]) ECRITES[q] = {};
-    ECRITES[q][f.lang] = true;
-    if(f.rec.p && String(f.rec.p) <= auj){
-      if(!ENLIGNE[q]) ENLIGNE[q] = {};
-      ENLIGNE[q][f.lang] = true;
-    }
+    var cles = [];
+    if(f.rec && f.rec.q) cles.push('q:'+f.rec.q);
+    if(f.titre) cles.push('t:'+f.lang+'|'+f.titre);
+    var enl = f.rec && f.rec.p && String(f.rec.p) <= auj;
+    cles.forEach(function(k){
+      if(!ECRITES[k]) ECRITES[k] = {};
+      ECRITES[k][f.lang] = true;
+      if(enl){
+        if(!ENLIGNE[k]) ENLIGNE[k] = {};
+        ENLIGNE[k][f.lang] = true;
+      }
+    });
   });
 }
+/* Ce que les fiches savent d'un sujet, par identifiant ou par titre. */
+function fusionner(a, b){
+  if(!a && !b) return null;
+  var o = {};
+  if(a){ if(a.fr) o.fr = true; if(a.en) o.en = true; }
+  if(b){ if(b.fr) o.fr = true; if(b.en) o.en = true; }
+  return o;
+}
+function vuDe(index, s){
+  var par = s.qid ? index['q:'+s.qid] : null;
+  var fr  = s.fr ? index['t:fr|'+s.fr] : null;
+  var en  = s.en ? index['t:en|'+s.en] : null;
+  return fusionner(par, fusionner(fr, en));
+}
 function languesDe(s){
-  var e = ECRITES[s.qid];
+  var e = vuDe(ECRITES, s);
   if(e) return { fr:!!e.fr, en:!!e.en };
   var l = s.langues || [];
   return { fr: l.indexOf('fr')>=0, en: l.indexOf('en')>=0 };
@@ -910,7 +941,7 @@ function etatDe(s){
   if(s.statut==='retire') return 'retire';
   var att = attenduesDe(s);
   if(!att.length) return 'horslangue';
-  var e = ECRITES[s.qid], g = ENLIGNE[s.qid] || {};
+  var e = vuDe(ECRITES, s), g = vuDe(ENLIGNE, s) || {};
   if(e){
     var enl = att.filter(function(l){ return g[l]; }).length;
     if(enl === att.length) return 'publie';
@@ -927,10 +958,11 @@ function etatDe(s){
 /* Le registre et les fiches se contredisent. On ne corrige pas en silence —
    on le montre, et « 4 · Contrôle » a de quoi remettre les deux d'accord. */
 function incoherent(s){
-  var e = ECRITES[s.qid], g = ENLIGNE[s.qid];
-  if(s.publie && !(g && Object.keys(g).length)) return true;
+  var e = vuDe(ECRITES, s), g = vuDe(ENLIGNE, s);
+  var enLigne = !!(g && (g.fr || g.en));
+  if(s.publie && !enLigne) return true;
   if((s.statut==='ecrit'||s.ecrit) && !e) return true;
-  if(!s.publie && g && Object.keys(g).length) return true;
+  if(!s.publie && enLigne) return true;
   return false;
 }
 var ETIQ={aecrire:'à écrire',partiel:'à finir',partielpub:'à moitié en ligne',

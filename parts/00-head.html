@@ -515,7 +515,23 @@ a{color:var(--accent);text-decoration:none}
    l'œil elle se confondait avec le corps, et on entrait dans l'article
    sans voir qu'on avait commencé. Elle a maintenant sa typographie, son
    filet et de l'air autour d'elle.                                      */
-.card .lede p:first-child{
+/* ── ET SEULEMENT SI C'EST UNE ACCROCHE ──────────────────────────────────
+   `:first-child` seul habillait aussi le premier paragraphe d'une fiche qui
+   n'en a qu'un — et une fiche d'un seul bloc se retrouvait entièrement en
+   Fraunces 26 px derrière un filet bleu, du premier mot au dernier. C'est ce
+   qu'on voyait sur les fiches ouvertes depuis le sommaire.
+
+   Une accroche est une phrase QUI EN ANNONCE D'AUTRES : `:not(:last-of-type)`
+   le dit exactement. `:not(:last-child)` ne suffisait pas — la phrase à
+   raconter suit toujours le texte, donc le paragraphe unique n'était jamais
+   le dernier enfant. Et le combinateur `>` écarte le paragraphe de cette
+   phrase à raconter, qui n'a rien d'une accroche.
+
+   Second cas : en mode accroche, la fiche repliée ne montre QUE sa phrase
+   d'ouverture. Elle est alors seule de son type, et c'est pourtant bien une
+   accroche — d'où la deuxième ligne du sélecteur. */
+.card .lede > p:first-child:not(:last-of-type),
+[data-accroches] .card:not(.deplie) .lede > p:first-child{
   font-family:Fraunces,Georgia,serif;font-weight:450;font-variation-settings:"SOFT" 26,"WONK" 1;
   font-size:calc(clamp(21px,2.7vw,26px) * var(--lecture));
   line-height:1.36;letter-spacing:-.012em;color:var(--text);
@@ -524,7 +540,10 @@ a{color:var(--accent);text-decoration:none}
   text-wrap:balance;
 }
 /* Dans l'accroche, le gras n'ajoute rien : elle est déjà au premier plan. */
-.card .lede p:first-child strong{color:inherit;box-shadow:none;font-weight:600}
+.card .lede > p:first-child:not(:last-of-type) strong,
+[data-accroches] .card:not(.deplie) .lede > p:first-child strong{
+  color:inherit;box-shadow:none;font-weight:600
+}
 .card .lede p:last-child{margin-bottom:.4em}
 /* Le gras porte les chiffres qui frappent : lisibles d'un coup d'œil, sans
    transformer le texte en surligneur. */
@@ -661,11 +680,20 @@ a{color:var(--accent);text-decoration:none}
 
 /* la version qui tourne, discrète mais lisible : c'est ce qu'on demande en
    premier quand quelque chose ne se comporte pas comme prévu */
-.tbver{
+/* La version, dans le coin, presque effacée. Elle ne prend aucune place dans
+   la barre haute et ne se met en travers de rien : on ne peut pas la cliquer,
+   et elle s'éclaire quand on passe dessus. */
+.ver{
+  position:fixed;z-index:5;pointer-events:none;
+  right:calc(env(safe-area-inset-right,0px) + 10px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:10.5px;letter-spacing:.02em;color:var(--text-3);
-  padding:0 4px;white-space:nowrap;font-variant-numeric:tabular-nums;
+  font-size:9.5px;letter-spacing:.04em;color:var(--text-3);
+  opacity:.28;transition:opacity .2s;font-variant-numeric:tabular-nums;
+  user-select:none;
 }
+.ver:hover{opacity:.75}
+@media (max-width:640px){ .ver{font-size:9px;opacity:.2;bottom:calc(env(safe-area-inset-bottom,0px) + 5px)} }
 
 /* ---------- proposition d'installation sur l'ecran d'accueil ---------- */
 .install{
@@ -827,7 +855,7 @@ a{color:var(--accent);text-decoration:none}
   flex:0 0 auto;max-height:none;overflow:visible;margin-bottom:0;
 }
 [data-accroches] .card h2{font-size:calc(clamp(21px,3vw,30px) * var(--lecture));margin-bottom:12px}
-[data-accroches] .card .lede p:first-child{font-size:calc(clamp(17px,2.2vw,20px) * var(--lecture))}
+[data-accroches] .card:not(.deplie) .lede > p:first-child{font-size:calc(clamp(17px,2.2vw,20px) * var(--lecture))}
 /* En balayage, on cherche un sujet — on ne garde ni ne partage. La rangée de
    fin appartient à la lecture, elle revient avec elle. */
 [data-accroches] .suivante,[data-accroches] .readmore,
@@ -1440,6 +1468,29 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
   .counter{padding:0 13px}
   .quota #quotaTxt em{display:none}
 }
+/* ── SUR TÉLÉPHONE, LA BARRE PREND DEUX LIGNES ───────────────────────────
+   Tout tenait sur une ligne à condition de rétrécir : le nom de l'univers à
+   huit caractères, le chevron retiré, les boutons à 34 px. Passé un certain
+   point on ne rétrécit plus, on coupe — et c'est ce qui arrivait dès que le
+   compteur d'anecdotes atteignait trois chiffres et que la pioche et les
+   accroches sont venues s'ajouter.
+
+   Alors la barre respire sur deux lignes : ce qu'on lit à gauche — le nom,
+   le compteur, l'univers — et ce qu'on actionne à droite, en dessous. Rien
+   n'est caché, rien n'est tronqué, et le pouce atteint tout.
+
+   Le mécanisme tient en une ligne : l'espaceur `.tbgap`, qui poussait les
+   boutons à droite, prend toute la largeur et devient un retour à la ligne.
+   Aucun élément n'a bougé dans le balisage. */
+@media (max-width:760px){
+  /* La hauteur de barre est un jeton : tout ce qui doit passer dessous —
+     le texte des fiches, le calage du mode accroche, l'ancrage du sommaire —
+     le lit déjà. Une seule valeur à changer, et rien ne passe sous la barre. */
+  :root{--barre:108px}
+  .topbar{flex-wrap:wrap;row-gap:8px}
+  .tbgap{flex:0 0 100% !important;height:0;margin:0}
+  #sizeBtn{margin-left:auto}          /* la seconde ligne se range à droite */
+}
 @media (max-width:560px){
   /* ── L'UNIVERS RESTE LISIBLE ───────────────────────────────────────────
      Son nom disparaissait sous 560 px : il ne restait qu'une pastille de
@@ -1488,11 +1539,11 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
   .brand b{font-size:20px}
 }
 
-/* Sur téléphone la jauge ferait doublon avec la pastille de statut, qui
-   porte déjà le nombre restant. Une seule information, un seul endroit. */
-@media (max-width:820px){ .topbar .quota{display:none} }
-/* Sur grand écran la jauge affiche le reste : le badge se contente du nom. */
-@media (min-width:821px){ .planbadge i{display:none} }
+/* La pastille de statut portait le nombre restant, et le décomptait : on
+   masquait donc l'un des deux sur téléphone pour ne pas dire deux fois la
+   même chose. La pastille ne dit plus que la formule, et le nombre — cinq,
+   fixe — reste visible partout. Sous 640 px il ne reste que le chiffre. */
+.planbadge i{display:none}
 
 /* Très petit écran (iPhone SE et compagnie) : le nom de marque et l'univers
    se réduisent, mais rien ne disparaît — tout reste atteignable au pouce. */

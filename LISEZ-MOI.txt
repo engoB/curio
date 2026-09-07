@@ -1,12 +1,115 @@
-Ce dossier contient une copie du fichier .github/workflows/curio.yml.
+CURIO 8.5.0 — ÉCRIRE PAR LOTS, PUBLIER À VOTRE RYTHME, FRANÇAIS SEUL
+=====================================================================
 
-Pourquoi : le dossier .github commence par un point, donc iOS et Android le
-masquent, et l'import GitHub le saute silencieusement. Ce dossier-ci, dont le
-nom est visible, monte normalement.
 
-À faire une seule fois, sur GitHub :
-  Add file -> Create new file
-  Nom du fichier :  .github/workflows/curio.yml
-  Collez le contenu de curio.yml, puis Commit changes.
+VOTRE PLAN, ÉTAPE PAR ÉTAPE
+===========================
 
-L'action apparaît ensuite dans l'onglet Actions, sous le nom "Curio".
+Vous avez 1 200 sujets. Voici exactement ce que je ferais.
+
+  ÉTAPE 0 — le réglage qui divise la facture par deux
+  ---------------------------------------------------
+  Console → onglet PUBLICATION → « Langues publiées » = Français seul.
+  → Enregistrer le rythme.
+
+  Le bouton FR/EN disparaît du site et de l'application. Vous écrirez le
+  français d'abord, l'anglais quand vous voudrez.
+
+  ÉTAPE 1 — cinq sujets, pour voir            environ 7 centimes
+  ---------------------------------------------------
+  Console → Catalogue → filtre « Potentiel 9 et plus » → « Retenir ces 451 »
+  → « Enregistrer mes décisions » → bouton « Écrire ».
+  Il vous demande : combien ? → 5.  Deux langues ? → ANNULER (français seul).
+  Écrire pour de bon ? → OK.
+
+  Relisez les cinq fiches dans l'onglet Relecture. Si le ton ne va pas,
+  corrigez consignes/fr.md — c'est gratuit — et refaites cinq autres.
+
+  ÉTAPE 2 — le premier lot                    environ 4 €
+  ---------------------------------------------------
+  Même bouton, 300 sujets, français seul, Sonnet 5.
+  (Champ « Modele » de l'action : claude-sonnet-5)
+
+  ÉTAPE 3 et 4 — les lots suivants            environ 4 € chacun
+  ---------------------------------------------------
+  300, puis 300, puis les derniers. Vous lancez quand vous voulez ; un sujet
+  déjà écrit n'est jamais repayé.
+
+  TOTAL FRANÇAIS : 1 200 textes ≈ 16 $ ≈ 15 €
+  L'anglais plus tard, au même prix, quand le français aura fait ses preuves.
+
+
+CE QUI EST NOUVEAU
+==================
+
+1. ON ÉCRIT UN NOMBRE DE SUJETS, PLUS UN BUDGET
+
+   L'action « 2 · Écrire » a un champ « sujets ». 5 pour un essai, 300 pour un
+   lot. Il prime sur le budget en euros, qui reste là si vous préférez.
+
+2. UN CHAMP « LANGUES » : fr,en · fr · en
+
+   Le français seul divise la facture par deux et NE PERD RIEN. Un sujet n'est
+   marqué « écrit » que lorsque ses deux fiches existent vraiment. Un sujet
+   écrit en français reste donc « à écrire », la tranche anglaise le
+   retrouvera, et le français ne sera jamais repayé.
+
+   Le journal vous le dira :
+     « 300 sujet(s) écrits dans une seule langue : ils restent à écrire et
+       attendent leur tranche dans l'autre langue. Rien ne sera repayé. »
+
+3. UN ONGLET PUBLICATION DANS LA CONSOLE
+
+   Fréquence : tous les jours · une fois par semaine · certains jours
+   seulement (à cocher) · en pause.
+   Combien par passage. Dans quel ordre.
+   OU BIEN une date : « tout sortir d'ici le 31 décembre » — le nombre par
+   passage est alors calculé, et recalculé à chaque exécution.
+   Quelles langues sont publiées.
+
+   Un aperçu sous les réglages dit ce que ça donne :
+     « 2 sujets à chaque passage (34 prêts répartis sur 17 passages d'ici le
+       2026-12-31), 1 passage par semaine. Réserve : de quoi tenir
+       17 semaines. »
+
+   Plus deux boutons : « Publier maintenant… », qui passe outre le rythme, et
+   « Voir l'état du stock ».
+
+   Tout cela s'écrit dans consignes/publication.txt, que vous pouvez aussi
+   modifier à la main sur GitHub. L'action tourne toujours tous les jours ;
+   c'est ce fichier qui décide si aujourd'hui compte.
+
+4. L'ANGLAIS DISPARAÎT TOUT SEUL DU SITE ET DE L'APPLICATION
+
+   Tant qu'une seule langue est publiée, le bouton FR/EN est retiré et la
+   langue affichée s'aligne. Rien à régler, et il revient de lui-même le jour
+   où des fiches anglaises sont en ligne.
+
+
+VÉRIFIÉ
+=======
+
+  · rythme hebdomadaire réglé sur lundi, exécuté un jeudi : rien ne sort ;
+    réglé sur jeudi : 3 sujets sortent ;
+  · jours 2,5 puis 2,4,5 : le calendrier est respecté ;
+  · étalement jusqu'au 31 octobre : 26 passages, 2 sujets par passage ;
+  · langues = fr : seules les fiches françaises sortent ;
+  · anglais rallumé : seules les fiches anglaises sortent, et les dates de
+    publication françaises ne sont pas réécrites ;
+  · console : les cinq réglages, l'aperçu, l'écriture de publication.txt et le
+    lancement d'une tranche de 5 sujets en français — aucune erreur.
+
+
+UN MOT SUR « SANS PERTE D'INSTRUCTION »
+=======================================
+
+Vous aviez raison de le préciser. Aucune des économies de cette version ne
+touche à ce que le modèle reçoit :
+
+  · la consigne est mise en cache, donc envoyée ENTIÈRE à chaque appel, mais
+    facturée une fois (version 8.4.5) ;
+  · la fiche de faits n'est pas raccourcie ;
+  · écrire le français seul ne change pas un mot de la consigne française.
+
+La seule chose qui change vraiment le résultat, c'est le modèle. Testez
+Sonnet 5 sur vos cinq premiers sujets : c'est cinq centimes et une lecture.

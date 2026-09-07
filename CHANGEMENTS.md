@@ -1,4 +1,67 @@
-# Curio 8.10.0 — ce qui a changé depuis v6
+# Curio 8.10.1 — ce qui a changé depuis v6
+
+## 8.10.1 — la console ne reconnaissait pas ses propres fiches
+
+### 171 en ligne à la Sélection, 268 dans l'onglet En ligne
+
+Même dépôt, même seconde, deux réponses. La cause est nette : la console
+rapprochait une fiche de son sujet par le seul **identifiant Wikidata** que la
+fiche porte (`rec.q`). Les fiches écrites avant la 8.5 ne le portent pas.
+Elles n'étaient donc rattachées à aucun sujet, et leur sujet paraissait
+« en réserve » alors que la fiche était en ligne depuis des semaines — c'est
+très exactement ce qu'on voyait sur la méduse qui ne vieillit pas et sur le
+Grand attracteur, tous deux publiés, tous deux lisibles depuis le sommaire.
+
+Le rapprochement se fait maintenant par identifiant **quand il existe**, et
+par **titre d'article** sinon — le titre est la clé dans `anecdotes/`, il est
+toujours là. Les deux comptes disent désormais la même chose, et les sujets
+concernés portent la marque `⚠ incohérent` : le registre du catalogue, lui,
+ne sait toujours pas qu'ils sont publiés. *4 · Contrôle → Remettre le
+registre d'accord avec les fiches* le lui apprend, en une minute et
+gratuitement.
+
+*(L'outil de réparation, lui, rapprochait déjà par titre : c'était bien la
+console qui se trompait, pas le dépôt.)*
+
+### Une fiche d'un seul paragraphe s'affichait entièrement en accroche
+
+Le premier paragraphe d'une fiche porte l'habillage de l'accroche : Fraunces,
+26 px, filet bleu. La règle disait « le premier ». Quand la fiche n'a qu'un
+paragraphe, ce premier est aussi le dernier — et le texte entier se retrouvait
+en gros caractères derrière un filet, du premier mot au dernier.
+
+Une accroche est une phrase **qui en annonce d'autres**. Seule, elle redevient
+du texte.
+
+### La barre haute prend deux lignes sur téléphone
+
+Tout tenait sur une ligne à condition de rétrécir : le nom de l'univers à huit
+caractères, le chevron retiré, les boutons à 34 px. Passé un certain point on
+ne rétrécit plus, **on coupe** — et c'est ce qui arrivait depuis que le
+compteur affiche trois chiffres et que Piocher et Accroches sont venus s'y
+ajouter.
+
+La barre respire donc sur deux lignes : ce qu'on lit à gauche — le nom, le
+compteur, l'univers — et ce qu'on actionne à droite, en dessous. Rien n'est
+caché, rien n'est tronqué, et le pouce atteint tout. Le texte des fiches
+descend d'autant : une seule valeur commande la hauteur de barre.
+
+### Le numéro de version quitte la barre
+
+Il s'affichait en clair dans la rangée dépliée du grand écran, à côté de
+« Collection embarquée ». Il se pose maintenant **dans le coin en bas à
+droite de l'écran**, presque effacé, et s'éclaire au survol.
+
+**« Collection embarquée » est retirée.** Elle annonçait la lecture hors
+ligne ; celle-ci est devenue la règle — l'application ne lit plus que des
+fiches locales —, l'étiquette n'apprenait donc plus rien.
+
+### Le second compte à rebours
+
+La jauge avait disparu en 8.10.0, mais la pastille de statut portait encore le
+reste du jour et le décomptait : « GRATUIT 5 », « GRATUIT 4 »… Elle ne dit
+plus que la formule. Le nombre offert vit à côté, et il ne bouge pas.
+
 
 ## 8.10.0 — une édition du jour commune, et des états qui disent vrai
 
