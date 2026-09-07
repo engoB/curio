@@ -5866,9 +5866,9 @@
    "potentiel": 9,
    "editions": 50,
    "ajoute": "2026-09-03",
-   "statut": "ecrit",
+   "statut": "publie",
    "ecrit": "2026-09-07",
-   "publie": null,
+   "publie": "2026-09-07",
    "accord": 2,
    "langues": [
     "fr"
