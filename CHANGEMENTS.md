@@ -1,4 +1,49 @@
-# Curio 8.11.1 — ce qui a changé depuis v6
+# Curio 8.11.2 — ce qui a changé depuis v6
+
+## 8.11.2 — un bureau de relecture, un stock, et un seul mot
+
+### Trois onglets, trois métiers, aucun recouvrement
+
+| | ce qu'on y voit | ce qu'on y fait |
+|---|---|---|
+| **3 · Relecture** | les fiches **écrites**, ni au stock ni en ligne | juger le fond et la forme, envoyer au stock |
+| **5 · Publication** | **le stock** — ce qui est jugé et attend | régler le rythme, sortir des sujets choisis |
+| **6 · En ligne** | ce que le lecteur voit | retirer |
+
+**On ne publie plus depuis la Relecture.** Le bouton *Mettre en ligne…* en a
+été retiré : il est devenu *Ouvrir le fonds à partir d'une note…*, dans
+Publication, à côté du stock. Un bureau de relecture ne met rien en ligne.
+
+**Et la Relecture ne montre plus que ce qu'elle a à relire.** Une fiche en
+ligne ne se relit pas — elle se retire ou se refait. Une fiche au stock est
+jugée — elle appartient à Publication. Les filtres se réduisent donc à ce qui
+reste vraiment à traiter : *à relire* (par défaut), *validées — en attente
+d'envoi*, *à refaire*, *à retirer*, *en quarantaine*.
+
+**Le stock de Publication est enfin le stock** : les fiches dont le jugement
+est enregistré au dépôt et qui ne sont pas encore en ligne — exactement la
+définition qu'emploient le compteur et l'outil de publication. Une seule
+définition, trois endroits.
+
+### Un mot, pas deux
+
+« Réserve » et « stock » désignaient la même chose, et cohabitaient d'un
+onglet à l'autre. **« Stock » l'emporte**, partout : dans les deux pages, dans
+les compteurs, dans les confirmations, et jusque dans le journal des actions.
+Le mot « réserve » n'apparaît plus à l'écran.
+
+Le chemin, affiché en tête de la Relecture et de la Publication :
+
+> **écrite** — le texte existe → **relue** — vous la jugez en 3 · Relecture →
+> **au stock** — *Envoyer au stock* enregistre votre jugement au dépôt →
+> **en ligne** — le lecteur la voit.
+
+*Éprouvé de bout en bout* : sur 80 fiches (24 en ligne, 16 au stock, 40 à
+relire), la Relecture en montre 40 et aucune autre ; une fiche validée y reste
+sous « validées — en attente d'envoi » et n'apparaît pas encore au stock ;
+après *Envoyer au stock*, elle quitte la Relecture (39) et rejoint le stock
+de Publication (17).
+
 
 ## 8.11.1 — le tiroir sous son propre voile, et quatre mots pour quatre états
 

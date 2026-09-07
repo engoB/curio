@@ -280,7 +280,7 @@ async function appliquerValidations(){
   await fs.writeFile(VALIDS, '{}\n', 'utf8');
 
   console.log(`\n╔══ RELECTURE APPLIQUÉE ════════════════════════════════════`);
-  console.log(`║  ${valides} sujet(s) validé(s) — ils rejoignent la RÉSERVE.`);
+  console.log(`║  ${valides} sujet(s) validé(s) — ils rejoignent le STOCK.`);
   console.log(`║  Ils sortiront au rythme de consignes/publication.txt, ou tout de suite`);
   console.log(`║  avec l’opération « publier ».`);
   console.log(`║  ${refaites} remis à écrire`);
@@ -542,7 +542,7 @@ async function reparerRegistre(){
     + ` elles étaient déjà servies au lecteur, elles le restent.`);
   console.log(`  ${detail.langues} liste(s) de langues corrigée(s).`);
   console.log(`  ${corriges} statut(s) corrigé(s) : ${detail.publie} en ligne, `
-            + `${detail.ecrit} en réserve, ${detail.aecrire} à écrire.`);
+            + `${detail.ecrit} au stock ou à relire, ${detail.aecrire} à écrire.`);
   if (!corriges && !detail.langues && !datees) console.log('  Rien à corriger : les deux disaient déjà la même chose.');
   console.log('  Aucun texte n’a été touché. Rien n’a été publié ni dépublié :');
   console.log('  les fiches datées ci-dessus étaient déjà en ligne pour vos lecteurs.');
@@ -709,7 +709,7 @@ async function toutDepublier(){
   console.log('╔══════════════════════════════════════════════════════════════╗');
   console.log('║  TOUT EST RENVOYÉ AU STOCK                                   ║');
   console.log('╚══════════════════════════════════════════════════════════════╝');
-  console.log(`  ${rendues} fiche(s) dépubliée(s) : elles repassent en réserve.`);
+  console.log(`  ${rendues} fiche(s) dépubliée(s) : elles repassent au stock.`);
   if (gardees) console.log(`  ${gardees} fiche(s) retirée(s) n’ont pas bougé : un retrait est une décision.`);
   console.log('  Aucun texte, aucune note, aucune relecture n’a été touché.');
   console.log('  Le site est vide jusqu’à votre prochaine publication.');
@@ -810,7 +810,7 @@ async function main(){
 
   console.log(`\n╔══ LE STOCK ═══════════════════════════════════════════════`);
   console.log(`║  ${b.publies} sujet(s) EN LIGNE`);
-  console.log(`║  ${b.prets} prêt(s) à publier`);
+  console.log(`║  ${b.prets} sujet(s) AU STOCK, prêts à sortir`);
   console.log(`║  ${b.nonControles} écrit(s) mais pas encore contrôlé(s)`);
   console.log(`║  ${b.quarantaine} en quarantaine`);
   console.log(`║  ${b.retires} retiré(s)`);
@@ -825,7 +825,7 @@ async function main(){
     const parJour = FORCE ? (parseInt(FORCE, 10) || 0) : par.parPassage;
     if (parJour > 0){
       const jours = Math.floor(b.prets / parJour);
-      console.log(`\nAu rythme de ${parJour} par passage, la réserve tient ${jours} passage(s).`);
+      console.log(`\nAu rythme de ${parJour} par passage, le stock tient ${jours} passage(s).`);
     }
   }
 
@@ -886,7 +886,7 @@ async function main(){
     candidats = candidats.filter(g => note(g) >= NOTE_MINI);
     combien = candidats.length;
     console.log(`\n▸ Ouverture du fonds : note ${NOTE_MINI}/10 minimum.`);
-    console.log(`  ${candidats.length} sujet(s) sur ${avant} de la réserve atteignent ce seuil.`);
+    console.log(`  ${candidats.length} sujet(s) sur ${avant} du stock atteignent ce seuil.`);
     if (!candidats.length){
       console.log('  Rien à ce niveau : relisez et validez d’abord, ou baissez le seuil.');
       return;
@@ -915,7 +915,7 @@ async function main(){
   if (maitre) await ecrire(MAITRE, maitre);
 
   const reste = candidats.length - choisis.length;
-  console.log(`\n${choisis.length} sujet(s) publié(s). ${reste} encore en réserve.`);
+  console.log(`\n${choisis.length} sujet(s) publié(s). ${reste} encore au stock.`);
   console.log('Lancez « recompter » (ou laissez l’action le faire) pour rafraîchir les chiffres.');
 }
 

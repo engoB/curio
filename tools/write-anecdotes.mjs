@@ -1693,7 +1693,7 @@ async function buildIndex(){
       images:  await imagesPubliees(),
       total, weekly, byUniverse, reserve:enReserve });
   console.log(`  index.json : ${sujets.size} sujet(s) EN LIGNE — ${JSON.stringify({fr:total.fr||0, en:total.en||0})} textes`
-            + (enReserve ? `, ${enReserve} en réserve.` : '.'));
+            + (enReserve ? `, ${enReserve} au stock ou à relire.` : '.'));
 }
 
 main().catch(e => { console.error('\n✗', e.message); process.exit(1); });
