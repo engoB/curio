@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <meta name="theme-color" content="#050E24" />
-<meta name="curio-version" content="8.11.2+ffa76e78cf" />
+<meta name="curio-version" content="8.12.0+1e21baa969" />
 <meta name="curio-langues" content="fr" />
 <meta name="curio-images" content="oui" />
 <style>#langBtn,#ligneLangue{display:none !important}</style>
@@ -148,6 +148,14 @@
 }
 
 *,*::before,*::after{box-sizing:border-box}
+/* ── PAS DE PINCEMENT DANS L'APPLICATION ─────────────────────────────────
+   Le double-appui qui zoome, et le pincement : les deux décalent la mise en
+   page d'une application installée, coupent la barre haute et ne se remettent
+   jamais droit. `touch-action:manipulation` supprime le double-appui ;
+   le méta viewport écrit par build.sh supprime le pincement.
+   Le réglage de taille de texte — quatre crans, dans le panneau — fait le
+   même travail proprement, et il est mémorisé. */
+html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{height:100%}
 body{
   margin:0; background:var(--ink); color:var(--text);
@@ -2994,7 +3002,26 @@ function statTotal(){
   }
   return builtinTotal(S.lang);
 }
+/* ── « NOUVEAU CETTE SEMAINE » SE RECALCULE ICI ──────────────────────────
+   Le chiffre venait d'anecdotes/index.json, écrit par l'action. Tant que
+   l'action tourne tous les jours il est juste — mais il suffit d'un passage
+   manqué pour qu'il reste sur la valeur de la semaine d'avant, sans que rien
+   ne le dise.
+
+   Dès que le sommaire a été chargé, on compte nous-mêmes : les fiches dont
+   la date de publication tombe dans les sept derniers jours. Le fichier ne
+   sert plus que d'avance, avant le premier chargement. */
+function ilYaUneSemaine(){
+  const d = new Date(); d.setDate(d.getDate() - 7);
+  return d.toISOString().slice(0,10);
+}
 function statWeek(){
+  if(tocPrets && tocPrets.size){
+    const cut = ilYaUneSemaine();
+    let n = 0;
+    tocPrets.forEach(v => v.forEach(x => { if(String(x.date || '') >= cut) n++; }));
+    return n;
+  }
   if(!STATS || !STATS.weekly) return 0;
   return (typeof STATS.weekly.sujets === 'number' ? STATS.weekly.sujets : STATS.weekly[S.lang]) || 0;
 }
@@ -4715,7 +4742,7 @@ async function tocCharger(){
     if(!w) continue;
     const items = Object.keys(w)
       .filter(k => fichePubliee(w[k]) && (w[k].s == null || w[k].s >= (CONFIG.minInsolite || 0)))
-      .map(k => ({ titre:k, accroche: w[k].t || k }));
+      .map(k => ({ titre:k, accroche: w[k].t || k, date: w[k].p || '' }));
     if(items.length) tocPrets.set(t.id, items);
   }
 }
@@ -4847,7 +4874,7 @@ async function openSubject(themeId, title, lockedU){
 $('#tocBtn').addEventListener('click', async ()=>{
   if(!abonnementRequis()) return;
   tocShown = {}; $('#tocQ').value='';
-  open('#tocSheet'); await tocCharger(); renderToc();
+  open('#tocSheet'); await tocCharger(); renderToc(); renderTocCount();
 });
 $('#tocQ').addEventListener('input', renderToc);
 

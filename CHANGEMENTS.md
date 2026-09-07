@@ -1,4 +1,67 @@
-# Curio 8.11.2 — ce qui a changé depuis v6
+# Curio 8.12.0 — ce qui a changé depuis v6
+
+## 8.12.0 — moins de boutons, et chacun à sa place
+
+### L'application ne se laisse plus pincer
+
+Une application installée n'est pas une page web : le pincement y décale la
+mise en page, coupe la barre haute et ne se remet jamais droit. Le double-appui
+aussi. Les deux sont désormais bloqués — dans **l'application seulement**.
+Le site, lui, reste zoomable : c'est une page, et on doit pouvoir l'agrandir.
+
+Rien n'est perdu pour qui a besoin de plus gros : le réglage de taille du
+texte, quatre crans mémorisés, fait le même travail sans casser le cadre.
+
+### « Nouveau cette semaine » se recalcule
+
+Le chiffre venait de `anecdotes/index.json`, écrit par l'action. Tant qu'elle
+tourne il est juste — mais un passage manqué suffisait à le laisser sur la
+valeur de la semaine d'avant, sans que rien ne le dise.
+
+Deux corrections. Le comptage ne se replie plus sur la date d'**écriture**
+quand la date de publication manque : « nouveau » veut dire *récemment mis en
+ligne*, et rien d'autre. Et **l'application recalcule elle-même** dès que le
+sommaire a été chargé — le fichier ne sert plus que d'avance. *Éprouvé* avec
+un `index.json` figé à +99 : il affiche +99 au démarrage, puis **+16** dès
+qu'on ouvre le sommaire, tout seul.
+
+### La relecture : on coche, on envoie
+
+Le bouton **valider** faisait double emploi avec la sélection, et le mot
+ajoutait un état de plus à retenir. C'est une **case** maintenant, et elle dit
+ce qu'elle fait : *garder* — cette fiche part au stock. *À refaire* et
+*retirer* restent des boutons : elles ne partent pas au même endroit.
+
+Les gestes de l'onglet sont dans l'onglet, sous les filtres : *Envoyer ces N
+au stock*, *Tout cocher*, *Tout décocher*, **Enregistrer ma relecture**.
+La barre du bas ne les double plus — elle ne fait que dire où l'on en est —
+et son bouton *Publier les validées* a disparu : on ne publie pas depuis un
+bureau de relecture.
+
+### « Ouvrir le fonds » est retiré
+
+Il demandait une note dans une fenêtre système et publiait un nombre qu'on ne
+voyait pas avant de valider. La liste cochable de *5 · Publication* fait la
+même chose, en montrant exactement ce qui va sortir.
+
+### La sélection ne montre plus que ce qui se décide
+
+Elle s'ouvre sur **ce qui n'est pas écrit** — son seul métier : retenir, ou
+écarter. Ce qui est déjà écrit a quitté la sélection et vit en Relecture, en
+Publication ou En ligne ; il reste atteignable par un filtre, mais il n'est
+plus le sujet.
+
+Les états passent de sept à trois : *à écrire*, *déjà écrites*, *tous*. « À
+finir » et « à moitié en ligne » ont disparu — deux nuances qui ne changeaient
+aucune décision. Les compteurs suivent : *au catalogue · pas décidés · retenus
+· écartés · à écrire · déjà écrites · incohérents*.
+
+### Ce que cette version ne touche pas
+
+`consignes/publication.txt`, `moisson.txt`, `marque.txt`, `decisions.json`,
+`validations.json`, `anecdotes/`, `catalogue-maitre.json`, `catalog.json` :
+**aucun n'est dans le paquet**. Vérifié fichier par fichier avant l'envoi.
+
 
 ## 8.11.2 — un bureau de relecture, un stock, et un seul mot
 

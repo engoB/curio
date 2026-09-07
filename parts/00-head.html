@@ -137,6 +137,14 @@
 }
 
 *,*::before,*::after{box-sizing:border-box}
+/* ── PAS DE PINCEMENT DANS L'APPLICATION ─────────────────────────────────
+   Le double-appui qui zoome, et le pincement : les deux décalent la mise en
+   page d'une application installée, coupent la barre haute et ne se remettent
+   jamais droit. `touch-action:manipulation` supprime le double-appui ;
+   le méta viewport écrit par build.sh supprime le pincement.
+   Le réglage de taille de texte — quatre crans, dans le panneau — fait le
+   même travail proprement, et il est mémorisé. */
+html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{height:100%}
 body{
   margin:0; background:var(--ink); color:var(--text);

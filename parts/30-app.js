@@ -667,7 +667,26 @@ function statTotal(){
   }
   return builtinTotal(S.lang);
 }
+/* ── « NOUVEAU CETTE SEMAINE » SE RECALCULE ICI ──────────────────────────
+   Le chiffre venait d'anecdotes/index.json, écrit par l'action. Tant que
+   l'action tourne tous les jours il est juste — mais il suffit d'un passage
+   manqué pour qu'il reste sur la valeur de la semaine d'avant, sans que rien
+   ne le dise.
+
+   Dès que le sommaire a été chargé, on compte nous-mêmes : les fiches dont
+   la date de publication tombe dans les sept derniers jours. Le fichier ne
+   sert plus que d'avance, avant le premier chargement. */
+function ilYaUneSemaine(){
+  const d = new Date(); d.setDate(d.getDate() - 7);
+  return d.toISOString().slice(0,10);
+}
 function statWeek(){
+  if(tocPrets && tocPrets.size){
+    const cut = ilYaUneSemaine();
+    let n = 0;
+    tocPrets.forEach(v => v.forEach(x => { if(String(x.date || '') >= cut) n++; }));
+    return n;
+  }
   if(!STATS || !STATS.weekly) return 0;
   return (typeof STATS.weekly.sujets === 'number' ? STATS.weekly.sujets : STATS.weekly[S.lang]) || 0;
 }
@@ -2388,7 +2407,7 @@ async function tocCharger(){
     if(!w) continue;
     const items = Object.keys(w)
       .filter(k => fichePubliee(w[k]) && (w[k].s == null || w[k].s >= (CONFIG.minInsolite || 0)))
-      .map(k => ({ titre:k, accroche: w[k].t || k }));
+      .map(k => ({ titre:k, accroche: w[k].t || k, date: w[k].p || '' }));
     if(items.length) tocPrets.set(t.id, items);
   }
 }
@@ -2520,7 +2539,7 @@ async function openSubject(themeId, title, lockedU){
 $('#tocBtn').addEventListener('click', async ()=>{
   if(!abonnementRequis()) return;
   tocShown = {}; $('#tocQ').value='';
-  open('#tocSheet'); await tocCharger(); renderToc();
+  open('#tocSheet'); await tocCharger(); renderToc(); renderTocCount();
 });
 $('#tocQ').addEventListener('input', renderToc);
 

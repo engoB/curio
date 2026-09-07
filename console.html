@@ -190,6 +190,17 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 }
 .chemin i{font-style:normal;font-weight:700;color:var(--accent)}
 .chemin b{color:var(--texte)}
+/* La case « garder » d'une fiche en relecture : elle DIT ce qu'elle fait —
+   cette fiche part au stock — là où « valider » demandait de se souvenir de
+   ce que le mot voulait dire. */
+.coche{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 7px;
+  border-radius:8px;border:1px solid var(--line);background:var(--ink);
+  font-size:11.5px;font-weight:700;color:var(--texte-3);cursor:pointer;
+  transition:color .14s,border-color .14s,background .14s}
+.coche:hover{color:var(--texte);border-color:var(--line-strong)}
+.coche input{width:15px;height:15px;margin:0;accent-color:var(--accent);cursor:pointer}
+.coche.on{background:var(--accent-doux,rgba(63,169,255,.12));
+  border-color:var(--accent);color:var(--accent)}
 .liste--choix{max-height:min(46vh,420px);overflow-y:auto}
 .choix{display:flex;align-items:flex-start;gap:11px;padding:9px 11px;cursor:pointer;
   border-bottom:1px solid var(--line)}
@@ -357,7 +368,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          pouvait dire si le correctif était en place ou si le navigateur
          servait encore l'ancien fichier. La version est écrite ici par
          build.sh, à côté du titre, en petit. -->
-    <h1>Curio &middot; console<b class="ver" id="conVer">8.11.2</b></h1><!-- BUILD:CONSOLE -->
+    <h1>Curio &middot; console<b class="ver" id="conVer">8.12.0</b></h1><!-- BUILD:CONSOLE -->
 
     <!-- ── LES ÉTAPES, DANS L'ORDRE OÙ ON LES FAIT ──────────────────────
          Trois onglets nommés par leur contenu ne disaient pas par où
@@ -479,13 +490,14 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
         <option value="retenu">Retenus</option>
         <option value="ecarte">Écartés</option>
       </select>
+      <!-- Cet onglet sert à DÉCIDER quoi faire écrire. Il s'ouvre donc sur
+           ce qui n'est pas écrit — le reste a déjà quitté la sélection et
+           vit en 3 · Relecture, 5 · Publication ou 6 · En ligne. Les autres
+           états restent atteignables, mais ils ne sont pas le sujet. -->
       <select id="fEtat">
-        <option value="">Tous les états</option>
         <option value="aecrire">À écrire — rien de fait</option>
-        <option value="reserve">Écrite — le texte existe, pas en ligne</option>
-        <option value="partiel">À finir — une langue publiée sur deux</option>
-        <option value="partielpub">À moitié en ligne — une langue publiée sur deux</option>
-        <option value="publie">En ligne</option>
+        <option value="">Tous, y compris ce qui est déjà écrit</option>
+        <option value="ecrites">Déjà écrites — elles ont quitté la sélection</option>
         <option value="incoherent">⚠ Incohérent — registre et fiches en désaccord</option>
         <option value="suspect">⚠ À vérifier — phrase sans rapport</option>
       </select>
@@ -549,11 +561,14 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       <span class="compte" id="cRel"></span>
     </div>
     <div class="cmd">
-      <button class="btn v" id="toutValider">Valider tout ce qui est affiché</button>
-      <button class="btn p" id="versStock">Envoyer au stock</button>
+      <!-- Un seul geste : on coche ce qu'on garde, on envoie. « Valider »
+           faisait double emploi avec la case, et le mot ajoutait un état de
+           plus à retenir. -->
+      <button class="btn p" id="versStock" disabled>Envoyer au stock</button>
+      <button class="btn" id="relTout">Tout cocher</button>
+      <button class="btn" id="relRien">Tout décocher</button>
+      <button class="btn" id="relEnr">Enregistrer ma relecture</button>
       <button class="btn" id="toutReplier">Replier tous les textes</button>
-      <!-- « Mettre en ligne… » a quitté cet onglet : on ne publie pas depuis
-           un bureau de relecture. Il est dans 5 · Publication. -->
     </div>
     <p class="chemin" id="aidRel">
       <b>Une fiche passe par quatre états :</b>
@@ -709,8 +724,10 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       <div class="cmd" style="margin:12px 0 0">
         <button class="btn p" id="choixPublier" disabled>Mettre en ligne la sélection</button>
         <button class="btn" id="choixVider">Tout décocher</button>
-        <!-- L'ouverture de fonds appartient à la publication, pas à la relecture. -->
-        <button class="btn o" id="ouvrirFonds">Ouvrir le fonds à partir d’une note…</button>
+        <!-- « Ouvrir le fonds » a été retiré : il demandait une note dans une
+             fenêtre système et publiait un nombre qu'on ne voyait pas avant
+             de valider. La liste ci-dessus fait la même chose, en montrant
+             exactement ce qui va sortir. -->
       </div>
     </div>
 
@@ -1126,9 +1143,9 @@ function filtrerCat(){
        l'article ne partagent pas un seul mot signifiant — c'est ce qui
        trahit une fiche « Pac-Man » portant l'histoire d'un poulpe. */
     if(ef==='suspect'){ if(s.accord!==0) return false; }
-    /* La réserve : écrit, pas en ligne. C'est le stock qui attend son tour,
-       et c'est ce qu'on veut isoler d'un geste. */
-    else if(ef==='reserve'){ var er=etatDe(s); if(er!=='ecrit' && er!=='partiel') return false; }
+    /* « Déjà écrites » : tout ce qui a un texte, quel que soit son sort
+       ensuite. Ces sujets-là ne se décident plus ici. */
+    else if(ef==='ecrites'){ if(etatDe(s)==='aecrire') return false; }
     else if(ef==='incoherent'){ if(!incoherent(s)) return false; }
     else if(ef && etatDe(s)!==ef) return false;
     if(q){
@@ -1195,10 +1212,12 @@ function peindreCat(){
   /* Tous les états ont leur case. « À moitié en ligne » n'en avait pas :
      un quart du catalogue y tombait sans que rien ne l'affiche, et deux
      compteurs se contredisaient sans qu'on puisse voir où passait l'écart. */
-  [['k',c.total,'au catalogue'],['v',c.retenu,'retenus'],['r',c.ecarte,'écartés'],
-   ['',c.neutre,'pas décidés'],['o',(c.ecrit||0)+(c.partiel||0),'écrites'],
-   ['o',c.partielpub||0,'à moitié en ligne'],
-   ['k',c.publie,'en ligne'],['r',c.incoherent,'incohérents']]
+  /* Ce qui se décide ICI d'abord ; ce qui a déjà quitté la sélection ensuite. */
+  var dejaEcrites = (c.ecrit||0)+(c.partiel||0)+(c.partielpub||0)+(c.publie||0);
+  [['k',c.total,'au catalogue'],['',c.neutre,'pas décidés'],
+   ['v',c.retenu,'retenus'],['r',c.ecarte,'écartés'],
+   ['o',c.aecrire||0,'à écrire'],['k',dejaEcrites,'déjà écrites'],
+   ['r',c.incoherent,'incohérents']]
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
 
   $('#cCat').textContent = nb(S.vueCat.length)+' affiché'+(S.vueCat.length>1?'s':'');
@@ -1388,11 +1407,28 @@ function ficheHtml(f){
     meta.appendChild(el('span','motif','⚠ '+esc(f.rec.motif)));
 
   var g=el('span','gestes');
+  /* ── ON COCHE, ON N'A PAS À « VALIDER » ────────────────────────────────
+     « Valider » et la sélection faisaient deux fois le même geste, et le mot
+     ajoutait un état de plus à retenir. La case DIT ce qu'elle fait : cette
+     fiche part au stock. Les deux autres décisions restent des boutons, car
+     elles ne partent pas au même endroit. */
+  var lab=el('label','coche' + (v==='valide' ? ' on' : ''));
+  var c=document.createElement('input'); c.type='checkbox'; c.checked = (v==='valide');
+  c.title='Cocher : cette fiche part au stock au prochain envoi';
+  c.addEventListener('change', function(){
+    var k=f.lang+'|'+f.titre;
+    if(c.checked) S.validations[k]='valide'; else delete S.validations[k];
+    lab.classList.toggle('on', c.checked);
+    S.sale=true; memoriser(); majEnvoi();
+  });
+  lab.appendChild(c);
+  lab.appendChild(el('span',null,'garder'));
+  g.appendChild(lab);
   var oeil=el('button','g','aperçu lecteur'); oeil.type='button';
   oeil.title='Voir la carte telle que le lecteur la verra — sans rien publier';
   oeil.addEventListener('click', function(){ apercuLecteur(f); });
   g.appendChild(oeil);
-  [['valide','valider','on-v'],['refaire','à refaire','on-r'],['retire','retirer','on-r']].forEach(function(x){
+  [['refaire','à refaire','on-r'],['retire','retirer','on-r']].forEach(function(x){
     var b=el('button','g'+(v===x[0]?' '+x[2]:''),x[1]); b.type='button';
     b.addEventListener('click', function(){
       var k=f.lang+'|'+f.titre;
@@ -1480,6 +1516,17 @@ function apercuLecteur(f){
   document.body.appendChild(vue);
 }
 
+/* Combien de fiches partiront au prochain envoi. Le bouton le dit, et il
+   reste éteint tant qu'il n'y a rien à envoyer. */
+function majEnvoi(){
+  var n=0; S.fiches.forEach(function(f){ if(valDe(f)==='valide') n++; });
+  var b=$('#versStock'); if(!b) return n;
+  b.disabled = !n;
+  b.textContent = n ? ('Envoyer ces '+nb(n)+' au stock') : 'Envoyer au stock';
+  var e=$('#relEnr'); if(e){ e.className = 'btn' + (S.sale ? ' p' : ''); }
+  return n;
+}
+
 function peindreRel(){
   filtrerRel();
   var c={total:S.fiches.length,valide:0,refaire:0,retire:0,neutre:0,ligne:0,stock:0,arelire:0};
@@ -1497,9 +1544,7 @@ function peindreRel(){
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
 
   $('#cRel').textContent = nb(S.vueRel.length)+' affichée'+(S.vueRel.length>1?'s':'');
-  /* Même règle que dans le catalogue : le bouton dit combien. */
-  $('#toutValider').textContent = 'Valider ces '+nb(S.vueRel.length);
-  $('#toutValider').disabled = !S.vueRel.length;
+  majEnvoi();
   var l=$('#lRel'); l.innerHTML=''; S.nRel=0;
   if(!S.vueRel.length){
     l.appendChild(el('div','vide', S.fiches.length
@@ -1524,16 +1569,20 @@ function peindrePied(){
     var ret0=0, eca0=0, val0=0;
     S.sujets.forEach(function(s){ var d=decDe(s); if(d==='retenu')ret0++; else if(d==='ecarte')eca0++; });
     S.fiches.forEach(function(f){ if(valDe(f)==='valide') val0++; });
-    var fait = S.onglet==='cat' ? (nb(ret0)+' retenus · '+nb(eca0)+' écartés') : (nb(val0)+' validées');
+    var fait = S.onglet==='cat' ? (nb(ret0)+' retenus · '+nb(eca0)+' écartés')
+                                : (nb(val0)+' cochées pour le stock');
     r.innerHTML = '<b>'+fait+'</b>, gardés dans ce navigateur. '
-                + 'Enregistrez-les : par le jeton, ou en déposant le fichier vous-même.';
-    if(S.onglet==='cat')
-      a.appendChild(boutonFichier('decisions.json', S.decisions, '<b>2 · Écrire</b>'));
-    else
-      a.appendChild(boutonFichier('validations.json', S.validations, '<b>5 · Publier → valider</b>'));
+                + 'Connectez le dépôt pour les enregistrer d’un clic — ou déposez le fichier vous-même.';
+    /* Sans jeton, le seul geste utile est de se connecter ; le téléchargement
+       du fichier reste possible, mais il ne mérite pas la première place. */
     var b=el('button','btn p','Connecter le dépôt');
     b.addEventListener('click',function(){ $('#reglages').hidden=false; window.scrollTo(0,0); });
-    a.appendChild(b); return;
+    a.appendChild(b);
+    if(S.onglet==='cat')
+      a.appendChild(boutonFichier('decisions.json', S.decisions, '<b>2 · Écrire</b>'));
+    else if(S.onglet==='rel')
+      a.appendChild(boutonFichier('validations.json', S.validations, '<b>5 · Publier → valider</b>'));
+    return;
   }
   if(S.onglet==='cat'){
     var ret=0, eca=0;
@@ -1565,16 +1614,16 @@ function peindrePied(){
     p1.addEventListener('click', enregistrerPublication);
     a.appendChild(p1);
   }else{
+    /* ── LA BARRE DU BAS NE DOUBLE PLUS L'ONGLET ────────────────────────
+       « Enregistrer ma relecture » et « Publier les validées » vivaient ici,
+       loin des fiches qu'ils concernaient — et le second publiait depuis un
+       bureau de relecture, ce qu'on ne veut pas. Les deux gestes sont
+       maintenant dans l'onglet, sous les filtres. Le pied ne fait plus que
+       ce qu'un pied doit faire : dire où l'on en est. */
     var val=0, ref=0, ret2=0;
     S.fiches.forEach(function(f){ var v=valDe(f); if(v==='valide')val++; else if(v==='refaire')ref++; else if(v==='retire')ret2++; });
-    r.innerHTML = '<b>'+nb(val)+'</b> validées · '+nb(ref)+' à refaire · '+nb(ret2)+' à retirer'
+    r.innerHTML = '<b>'+nb(val)+'</b> cochées pour le stock · '+nb(ref)+' à refaire · '+nb(ret2)+' à retirer'
                 + (S.sale ? ' · <span style="color:var(--or)">non enregistré</span>' : '');
-    var c1=el('button','btn'+(S.sale?' p':''),'Enregistrer ma relecture');
-    c1.addEventListener('click', enregistrerValidations);
-    var c2=el('button','btn v','Publier les '+nb(val)+' validées');
-    c2.disabled = !val;
-    c2.addEventListener('click', envoyerPublication);
-    a.appendChild(c1); a.appendChild(c2);
   }
 }
 
@@ -2458,30 +2507,10 @@ document.querySelectorAll('.onglets button').forEach(function(b){
   b.addEventListener('click', function(){ onglet(b.dataset.vue); });
 });
 
-/* Ouvrir le fonds : mettre en ligne d'un coup tout le stock qui atteint une
-   note. C'est le geste qu'on fait une fois, au lancement. Il vit dans
-   5 · Publication : on ne publie pas depuis un bureau de relecture. */
-function ouvrirLeFonds(){
-  var n = window.prompt(
-    'Mettre en ligne TOUT le stock à partir de quelle note ?\n\n'
-    + '10 = uniquement les meilleures\n'
-    + ' 9 = les 9 et les 10   (le fonds de lancement conseillé)\n'
-    + ' 8 = les 8, 9 et 10\n\n'
-    + 'Seules les fiches DU STOCK sortent. Le reste attend son tour au rythme\n'
-    + 'réglé dans l’onglet Publication.', '9');
-  if(n === null) return;
-  n = Math.max(1, Math.min(10, parseInt(n, 10) || 0));
-  if(!window.confirm('Publier maintenant tout le stock noté ' + n + '/10 ou plus ?\n\n'
-    + 'C’est immédiat et visible sur le site. Une fiche publiée peut être retirée,\n'
-    + 'mais elle aura été vue.')) return;
-  dit('Ouverture du fonds…','info');
-  lancerAction('5-publier.yml', { operation:'publier', note_mini:String(n), combien:'', titre:'' })
-    .then(function(){
-      dit('Ouverture lancée : tout le stock à <b>' + n + '/10</b> ou plus part en ligne. '
-        + 'Suivez-la dans <b>Actions → 5 · Publier</b>.','ok');
-    })
-    .catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });
-}
+/* « Ouvrir le fonds » a été retiré : il demandait une note dans une fenêtre
+   système et publiait un nombre qu'on ne voyait pas avant de valider. La liste
+   cochable de 5 · Publication fait la même chose, en montrant ce qui va
+   sortir. */
 
 ['pRythme','pCombien','pOrdre','pDate','pLangues','pStock','pImages','pMoisson'].forEach(function(id){
   $('#'+id).addEventListener('change',function(){
@@ -2568,7 +2597,6 @@ $('#toutOublier').addEventListener('click',function(){
   dit('Les '+nb(n)+' décisions sont effacées. <b>Enregistrer mes décisions</b> videra aussi '
     + '<code>decisions.json</code> dans le dépôt.', 'ok');
 });
-$('#ouvrirFonds').addEventListener('click', ouvrirLeFonds);
 $('#versStock').addEventListener('click', envoyerPublication);
 
 /* Les commandes de la sélection à publier. */
@@ -2630,16 +2658,22 @@ $('#plusLig').addEventListener('click', suiteLig);
   e.addEventListener('input', function(){ filtrerLig(); peindreLig(); });
   e.addEventListener('change', function(){ filtrerLig(); peindreLig(); });
 });
-$('#toutValider').addEventListener('click',function(){
-  var n=S.vueRel.length, lg=$('#fLang').value==='fr'?'françaises':'anglaises';
-  if(!n) return;
-  if(n>50 && !window.confirm('Valider les '+nb(n)+' fiches '+lg+' affichées ?\n\n'
-    + 'Elles partiront en publication au prochain passage.')) return;
+$('#relTout').addEventListener('click',function(){
+  var n=S.vueRel.length; if(!n) return;
+  if(n>50 && !window.confirm('Cocher les '+nb(n)+' fiches affichées ?\n\n'
+    + 'Elles partiront au stock au prochain envoi. Rien n’est publié.')) return;
   S.vueRel.forEach(function(f){ S.validations[f.lang+'|'+f.titre]='valide'; });
   S.sale=true; memoriser(); peindreRel();
-  var v=0; S.fiches.forEach(function(f){ if(valDe(f)==='valide') v++; });
-  dit('<b>'+nb(n)+'</b> fiche(s) '+lg+' validées. Au total : <b>'+nb(v)+'</b> validées, '
-    + 'les deux langues confondues.','ok'); });
+  dit('<b>'+nb(n)+'</b> fiche(s) cochées. Appuyez sur <b>Envoyer au stock</b> quand vous '
+    + 'aurez fini de relire.','ok'); });
+$('#relRien').addEventListener('click',function(){
+  S.vueRel.forEach(function(f){
+    var k=f.lang+'|'+f.titre;
+    if(S.validations[k]==='valide') delete S.validations[k];
+  });
+  S.sale=true; memoriser(); peindreRel();
+});
+$('#relEnr').addEventListener('click', enregistrerValidations);
 $('#toutReplier').addEventListener('click',function(){
   [].forEach.call(document.querySelectorAll('#lRel .corps'),function(c){
     [].forEach.call(c.querySelectorAll('p'),function(p,i){ if(i>=2) p.hidden=true; }); }); });
@@ -2648,6 +2682,10 @@ window.addEventListener('beforeunload',function(e){
   if(S.sale){ e.preventDefault(); e.returnValue=''; }
 });
 
+/* La sélection s'ouvre sur ce qui reste à décider : les sujets non écrits.
+   C'est son métier ; le reste est ailleurs. */
+var _fe = $('#fEtat'); if(_fe) _fe.value = 'aecrire';
+var _fv = $('#fVal');  if(_fv) _fv.value = 'neutre';
 lireCfg(); relireBrouillon(); peindreCfg(); peindreEssais();
 if(S.cfg.token) marquerCx(false,'vérification…');
 chargerTout();

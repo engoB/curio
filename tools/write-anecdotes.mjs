@@ -1667,8 +1667,12 @@ async function buildIndex(){
     const items = entrees.map(([, v]) => v);
 
     total[lang]  = (total[lang]  || 0) + items.length;
-    // « nouveau » = récemment PUBLIÉ. C'est ce que voit le lecteur.
-    weekly[lang] = (weekly[lang] || 0) + items.filter(i => ((i.p || i.d) || '') >= cut).length;
+    /* « nouveau » = récemment PUBLIÉ, et rien d'autre. Le repli sur `d` — la
+       date d'ÉCRITURE — faisait compter comme nouveauté une fiche écrite
+       cette semaine mais mise en ligne il y a des mois, et pouvait figer le
+       chiffre d'une semaine sur l'autre. Toute fiche en ligne porte
+       désormais une date de publication : le repli n'a plus lieu d'être. */
+    weekly[lang] = (weekly[lang] || 0) + items.filter(i => String(i.p || '') >= cut).length;
     byUniverse[uni] = byUniverse[uni] || {};
     byUniverse[uni][lang] = items.length;
 
@@ -1677,7 +1681,7 @@ async function buildIndex(){
       const cle = uni + '|' + (lang === 'en' ? (versFr.get(titre) || titre) : titre);
       sujets.add(cle);
       sujetsUni[uni].add(cle);
-      if (((v.p || v.d) || '') >= cut) sujetsSemaine.add(cle);
+      if (String(v.p || '') >= cut) sujetsSemaine.add(cle);
     }
   }
 

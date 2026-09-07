@@ -78,13 +78,23 @@ case "$SOMMAIRE" in
   *)            CACHE_SOMMAIRE="" ;;
 esac
 
+# --- le zoom, dans l'application seulement -----------------------------------
+# Une application installee n'est pas une page web : le pincement y decale la
+# mise en page, coupe la barre haute et ne se remet jamais droit. L'application
+# a son propre reglage de taille de texte — quatre crans, memorises — qui fait
+# le meme travail sans casser le cadre. Le SITE, lui, reste zoomable : c'est
+# une page, et on doit pouvoir l'agrandir.
+VUE_APP='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover'
+VUE_SITE='width=device-width,initial-scale=1,viewport-fit=cover'
+
 doc_head() {
+VUE="${1:-$VUE_SITE}"
 cat <<EOF
 <!doctype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="viewport" content="$VUE" />
 <meta name="theme-color" content="#050E24" />
 <meta name="curio-version" content="$PLEINE" />
 <meta name="curio-langues" content="$LANGUES" />
@@ -111,12 +121,12 @@ PLEINE="$LISIBLE+$EMPREINTE"
 sed "s/__MARQUE__/$NOM/g" manifest.source.webmanifest > manifest.webmanifest
 
 # --- application ---
-{ doc_head; cat parts/00-head.html; echo "</head>"; echo "<body>"; \
+{ doc_head "$VUE_APP"; cat parts/00-head.html; echo "</head>"; echo "<body>"; \
   cat parts/10-body.html parts/20-data.js parts/30-app.js; echo "</body>"; echo "</html>"; } \
   | sed "s/__MARQUE__/$NOM/g" > app.html
 
 # --- site vitrine ---
-{ doc_head; cat parts/L0-head.html; echo "</head>"; echo "<body>"; \
+{ doc_head "$VUE_SITE"; cat parts/L0-head.html; echo "</head>"; echo "<body>"; \
   cat parts/L1-body.html parts/L2-app.js; echo "</body>"; echo "</html>"; } \
   | sed "s/__MARQUE__/$NOM/g" > index.html
 
