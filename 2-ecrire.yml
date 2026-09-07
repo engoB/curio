@@ -1,0 +1,142 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  CURIO — 2 · ECRIRE UNE TRANCHE
+#
+#  Deux facons de dimensionner une tranche :
+#    · « sujets » — un nombre de sujets. 5 pour un essai, 300 pour un lot.
+#      C est le reglage le plus lisible, et il prime sur le budget.
+#    · « budget » — en euros, si vous preferez raisonner en argent.
+#
+#  « langues » choisit ce qu on ecrit MAINTENANT. « fr » seul ecrit le
+#  francais et laisse l anglais pour plus tard : le sujet reste « a ecrire »,
+#  et la tranche anglaise d un autre jour le reprendra sans jamais repayer
+#  le francais.
+#
+#  Cochez « estimer seulement » pour voir le plan sans depenser un centime.
+#  Rien n est visible sur le site tant que « 3 · Controler » et « 5 · Publier »
+#  ne sont pas passes.
+# ═══════════════════════════════════════════════════════════════════════════
+name: 2 · Ecrire une tranche
+
+on:
+  workflow_dispatch:
+    inputs:
+      sujets:
+        description: "Combien de SUJETS ecrire (0 = utiliser le budget)"
+        required: false
+        default: "0"
+      budget:
+        description: "Budget de la tranche, en euros (ignore si sujets > 0)"
+        required: true
+        default: "30"
+      potentiel:
+        description: "Potentiel minimum du sujet, de 0 a 10 (0 = pas de seuil)"
+        required: false
+        default: "0"
+      langues:
+        description: "Langues de cette tranche"
+        required: true
+        default: "fr"
+        type: choice
+        options:
+          - "fr"
+          - "fr,en"
+          - "en"
+      estimer:
+        description: "Estimer seulement, sans rien depenser"
+        type: boolean
+        default: false
+      plafond:
+        description: "Plafond de depense en dollars (0 = automatique, 2,5x l estimation)"
+        required: false
+        default: "0"
+      modele:
+        description: "Modele"
+        required: true
+        default: "claude-sonnet-5"
+        type: choice
+        options:
+          - "claude-sonnet-5"
+          - "claude-opus-5"
+
+permissions:
+  contents: write
+
+jobs:
+  curio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CURIO_CONTACT: "https://github.com/${{ github.repository }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: tools/.cache
+          key: curio-cache-${{ github.run_id }}
+          restore-keys: |
+            curio-cache-
+      - name: Verifier les scripts
+        run: |
+          for f in tools/build-catalog.mjs tools/write-anecdotes.mjs tools/controler.mjs tools/publier.mjs; do
+            [ -f "$f" ] || { echo "::error::$f est absent du depot. Importez le dossier tools/ en entier."; exit 1; }
+            node --check "$f"
+          done
+
+      - name: Ecrire
+        run: |
+          set -o pipefail
+          E=""; if [ "${{ github.event.inputs.estimer }}" = "true" ]; then E="--estimer"; fi
+          if [ -z "$E" ] && [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::Aucune cle API. Settings -> Secrets and variables -> Actions -> ANTHROPIC_API_KEY."
+            exit 1
+          fi
+          M=""; if [ -n "${{ github.event.inputs.modele }}" ]; then M="--modele ${{ github.event.inputs.modele }}"; fi
+          S=""; if [ "${{ github.event.inputs.sujets }}" != "0" ] && [ -n "${{ github.event.inputs.sujets }}" ]; then S="--sujets ${{ github.event.inputs.sujets }}"; fi
+          L="--langues ${{ github.event.inputs.langues }}"
+          # Le seuil de potentiel : « je ne veux que les meilleurs ». 0 = aucun seuil.
+          Q=""; if [ "${{ github.event.inputs.potentiel }}" != "0" ] && [ -n "${{ github.event.inputs.potentiel }}" ]; then Q="--potentiel ${{ github.event.inputs.potentiel }}"; fi
+          C=""; if [ "${{ github.event.inputs.plafond }}" != "0" ] && [ -n "${{ github.event.inputs.plafond }}" ]; then C="--plafond ${{ github.event.inputs.plafond }}"; fi
+          P=""; if [ -z "$ANTHROPIC_API_KEY" ] && [ -n "$OPENAI_API_KEY" ]; then P="--fournisseur openai"; fi
+          node tools/write-anecdotes.mjs --budget "${{ github.event.inputs.budget }}" $S $L $Q $C $E $M $P 2>&1 | tee curio.log
+
+      - name: Compte rendu
+        if: always()
+        run: |
+          {
+            echo "## Curio — tranche de ${{ github.event.inputs.budget }} EUR"
+            echo ""
+            echo '```'
+            tail -70 curio.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Enregistrer
+        if: always()
+        run: |
+          git config user.name  "curio-bot"
+          git config user.email "curio-bot@users.noreply.github.com"
+          rm -f curio.log
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json; do
+            if [ -e "$p" ]; then
+              git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
+            fi
+          done
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau a enregistrer."
+            echo "> Rien de nouveau a enregistrer." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git commit -m "curio: ecriture"
+          git pull --rebase --autostash || true
+          if git push; then
+            echo "Enregistre et publie."
+          else
+            echo "::error::Le push a echoue. Settings -> Actions -> General -> Workflow permissions -> Read and write."
+            exit 1
+          fi

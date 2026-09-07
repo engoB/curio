@@ -1,0 +1,147 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  CURIO — ENTRETIEN
+#
+#    purger      sort du catalogue maitre tout ce que vous avez mis dans
+#                consignes/exclusions.txt. C est le geste qui suit « Copier
+#                pour exclusions.txt » dans la curation.
+#    recompter   recalcule anecdotes/index.json, donc les chiffres du site
+#    verifier    controle que les articles existent toujours sur Wikipedia
+#    nettoyer    retire les doublons herites des versions anterieures
+#    reclasser   recalcule les potentiels de l ancien catalog.json
+#    accorder    (re)mesure l accord entre votre phrase et l article, et
+#                allume le badge « a verifier » sur ceux qui n ont aucun mot
+#                en commun. Instantane, gratuit, ne retire rien.
+#    auditer     LA PASSE QUALITE. Reprend un par un les seuls sujets que
+#                vous avez RETENUS dans la console, verifie que l article
+#                existe toujours, qu il est assez fourni, que ce n est pas une
+#                page d homonymie, que votre phrase parle bien de cet
+#                article-la. Ecrit audit-retenus.csv. Ne supprime rien.
+#                Cochez « appliquer » pour ecarter d un coup ce qui echoue.
+#    reparer     LA REMISE AU PROPRE. catalogue-maitre.json tient un registre
+#                (« ecrit », « en ligne ») et anecdotes/ porte la verite,
+#                puisque c est ce que l application lit. Quand les deux
+#                divergent, un sujet s affiche « en ligne » a la Selection,
+#                reste introuvable dans les publies et manque sur le site.
+#                Cette operation recopie ce que disent les fiches dans le
+#                registre. Aucune fiche n est touchee, rien n est publie ni
+#                depublie. Gratuit.
+#    doublons    cherche les redites parmi les seules fiches EN LIGNE, dans
+#                la meme langue. Ecrit doublons.csv. Ne retire rien : c est
+#                vous qui tranchez, avec « 5 · Publier → retirer ».
+#    ranger      remet chaque sujet dans son univers d apres son article.
+#                Les archives « Le saviez-vous ? » ont des sections datees,
+#                qui ne disent rien du sujet : tout tombait dans Mysteres.
+#                Ne touche ni vos sujets phares ni les fiches deja ecrites.
+#
+#  Les deux derniers ne servent qu aux depots anterieurs a la version 8 :
+#  le catalogue maitre ne peut plus contenir de doublon.
+# ═══════════════════════════════════════════════════════════════════════════
+name: Entretien
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Quelle operation ?"
+        required: true
+        default: purger
+        type: choice
+        options:
+          - purger
+          - recompter
+          - verifier
+          - nettoyer
+          - reclasser
+          - accorder
+          - ranger
+          - auditer
+          - reparer
+          - doublons
+      appliquer:
+        description: "auditer : ecarter ce qui echoue (sinon on ne fait que lire)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  curio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CURIO_CONTACT: "https://github.com/${{ github.repository }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: tools/.cache
+          key: curio-cache-${{ github.run_id }}
+          restore-keys: |
+            curio-cache-
+      - name: Verifier les scripts
+        run: |
+          for f in tools/build-catalog.mjs tools/write-anecdotes.mjs tools/controler.mjs tools/publier.mjs; do
+            [ -f "$f" ] || { echo "::error::$f est absent du depot. Importez le dossier tools/ en entier."; exit 1; }
+            node --check "$f"
+          done
+
+      - name: Executer
+        run: |
+          set -o pipefail
+          case "${{ github.event.inputs.operation }}" in
+            purger)    node tools/build-catalog.mjs --purger    2>&1 | tee curio.log ;;
+            recompter) node tools/write-anecdotes.mjs --index   2>&1 | tee curio.log ;;
+            verifier)  node tools/build-catalog.mjs --verifier  2>&1 | tee curio.log ;;
+            nettoyer)  node tools/build-catalog.mjs --nettoyer  2>&1 | tee curio.log ;;
+            reclasser) node tools/build-catalog.mjs --reclasser 2>&1 | tee curio.log ;;
+            accorder)  node tools/build-catalog.mjs --accorder  2>&1 | tee curio.log ;;
+            ranger)    node tools/build-catalog.mjs --ranger    2>&1 | tee curio.log ;;
+            auditer)   node tools/build-catalog.mjs --auditer ${{ github.event.inputs.appliquer == 'true' && '--appliquer' || '' }} 2>&1 | tee curio.log ;;
+            reparer)   node tools/publier.mjs --reparer  2>&1 | tee curio.log
+                       node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
+            doublons)  node tools/publier.mjs --doublons 2>&1 | tee curio.log ;;
+          esac
+
+      - name: Compte rendu
+        if: always()
+        run: |
+          {
+            echo "## Curio — entretien"
+            echo ""
+            echo '```'
+            tail -70 curio.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Enregistrer
+        if: always()
+        run: |
+          git config user.name  "curio-bot"
+          git config user.email "curio-bot@users.noreply.github.com"
+          rm -f curio.log
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv audit-retenus.csv doublons.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json; do
+            if [ -e "$p" ]; then
+              git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
+            fi
+          done
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau a enregistrer."
+            echo "> Rien de nouveau a enregistrer." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git commit -m "curio: entretien"
+          git pull --rebase --autostash || true
+          if git push; then
+            echo "Enregistre et publie."
+          else
+            echo "::error::Le push a echoue. Settings -> Actions -> General -> Workflow permissions -> Read and write."
+            exit 1
+          fi

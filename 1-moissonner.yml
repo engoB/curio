@@ -1,0 +1,167 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  CURIO — 1 · MOISSONNER
+#
+#  Construit LE CATALOGUE MAITRE : la liste de reference, unique, verifiee.
+#  Quatre sources rapprochees — vos sujets phares, les listes d articles
+#  insolites, « Le saviez-vous ? » — ramenees a un identifiant Wikidata par
+#  sujet. C est ce qui rend les doublons impossibles.
+#
+#  Reddit entre dans la meme moisson des que consignes/reddit.txt liste des
+#  subreddits. Vide par defaut : rien ne se passe tant que vous ne l activez
+#  pas.
+#
+#  Produit  catalogue-maitre.json   la nomenclature
+#           catalogue-maitre.csv    la meme chose, pour votre tableur
+#           catalog.json            la vue de l application
+#
+#  RELANCER NE DETRUIT RIEN. Les sujets deja presents gardent leur etat —
+#  ecrit, publie, retire — et seuls les nouveaux sont ajoutes. Le journal dit
+#  combien, et pourquoi les autres ont ete refuses.
+#
+#  Gratuit. Aucun appel paye.
+#
+#  ELLE NE FAIT PAS TOUT EN UNE FOIS, ET C EST VOULU. Wikipedia impose une
+#  cadence : une moisson complete represente des dizaines de milliers
+#  d appels, soit plusieurs heures. On se donne 40 minutes par passe, on
+#  enregistre ce qui est fait, et la nuit suivante reprend la suite — plus
+#  vite, grace au cache. Le catalogue s agrandit nuit apres nuit et rien
+#  n est jamais perdu.
+#
+#  ELLE TOURNE TOUTE SEULE chaque nuit a minuit — SI consignes/moisson.txt
+#  dit « auto: oui ». Mettez « non » et la nuit ne fait plus rien : l action
+#  se lance, constate, et s arrete en quelques secondes. Un lancement A LA
+#  MAIN passe toujours outre ce reglage.
+#
+#  Le reglage se change ici sur GitHub, ou depuis l onglet Publication de
+#  console.html.
+# ═══════════════════════════════════════════════════════════════════════════
+name: 1 · Moissonner
+
+# Chaque passe dure au plus 40 minutes et enregistre ce qu elle a fait ; la
+# suivante reprend la suite. Pour changer la cadence, la ligne « cron » :
+#     0 0 * * *     chaque nuit a minuit        <- par defaut
+#     0 0 * * 0     tous les dimanches
+#     0 0 1 * *     le 1er de chaque mois
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "Duree max de la passe, en minutes (le reste attendra la suivante)"
+        default: "40"
+
+# Une seule moisson a la fois. Sans cela, deux executions peuvent se marcher
+# dessus et se voler le catalogue en s enregistrant l une apres l autre.
+concurrency:
+  group: curio-moisson
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  curio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      REDDIT_ID: ${{ secrets.REDDIT_ID }}
+      REDDIT_SECRET: ${{ secrets.REDDIT_SECRET }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CURIO_CONTACT: "https://github.com/${{ github.repository }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── LA MOISSON DE LA NUIT EST-ELLE DEMANDEE ? ───────────────────────
+      # Le declenchement programme obeit a consignes/moisson.txt. Un lancement
+      # A LA MAIN passe toujours : quand vous cliquez, vous savez ce que vous
+      # faites. Le cron, lui, ne doit pas tourner dans votre dos.
+      - name: Reglage de la moisson
+        id: reglage
+        run: |
+          # Le paquet ne livre plus consignes/moisson.txt — il ecrasait votre
+          # reglage a chaque import. On lit le votre s il existe, l exemple sinon.
+          F=consignes/moisson.txt
+          [ -f "$F" ] || F=consignes/moisson.exemple.txt
+          AUTO=oui
+          if [ -f "$F" ]; then
+            V=$(sed -n 's/^[[:space:]]*auto:[[:space:]]*//p' "$F" | head -1 | tr -d '[:space:]')
+            [ -n "$V" ] && AUTO="$V"
+          fi
+          M=""
+          if [ -f "$F" ]; then
+            M=$(sed -n 's/^[[:space:]]*minutes:[[:space:]]*//p' "$F" | head -1 | tr -d '[:space:]')
+          fi
+          echo "auto=$AUTO" >> $GITHUB_OUTPUT
+          echo "minutes=$M" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$AUTO" != "oui" ]; then
+            echo "passer=oui" >> $GITHUB_OUTPUT
+            echo "La moisson automatique est sur « non » dans consignes/moisson.txt : rien a faire cette nuit." \
+              >> $GITHUB_STEP_SUMMARY
+          else
+            echo "passer=non" >> $GITHUB_OUTPUT
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: tools/.cache
+          key: curio-cache-${{ github.run_id }}
+          restore-keys: |
+            curio-cache-
+      - name: Verifier les scripts
+        run: |
+          for f in tools/build-catalog.mjs tools/write-anecdotes.mjs tools/controler.mjs tools/publier.mjs; do
+            [ -f "$f" ] || { echo "::error::$f est absent du depot. Importez le dossier tools/ en entier."; exit 1; }
+            node --check "$f"
+          done
+
+      - name: Moissonner
+        if: steps.reglage.outputs.passer != 'oui'
+        run: |
+          set -o pipefail
+          # Le nombre de minutes : celui que vous saisissez, sinon celui de
+          # consignes/moisson.txt, sinon 40.
+          M="${{ github.event.inputs.minutes }}"
+          [ -z "$M" ] && M="${{ steps.reglage.outputs.minutes }}"
+          [ -z "$M" ] && M=40
+          node tools/build-catalog.mjs --maitre --minutes "$M" 2>&1 | tee curio.log
+
+      - name: Compte rendu
+        if: always() && steps.reglage.outputs.passer != 'oui'
+        run: |
+          {
+            echo "## Curio — catalogue maitre"
+            echo ""
+            echo '```'
+            tail -70 curio.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Enregistrer
+        if: always() && steps.reglage.outputs.passer != 'oui'
+        run: |
+          git config user.name  "curio-bot"
+          git config user.email "curio-bot@users.noreply.github.com"
+          rm -f curio.log
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json; do
+            if [ -e "$p" ]; then
+              git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
+            fi
+          done
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau a enregistrer."
+            echo "> Rien de nouveau a enregistrer." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git commit -m "curio: moisson"
+          git pull --rebase --autostash || true
+          if git push; then
+            echo "Enregistre et publie."
+          else
+            echo "::error::Le push a echoue. Settings -> Actions -> General -> Workflow permissions -> Read and write."
+            exit 1
+          fi
