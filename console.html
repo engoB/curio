@@ -61,7 +61,15 @@ body{background:var(--ink);color:var(--texte);
 
 /* ---------- barre haute ---------- */
 .haut{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
-h1{font-size:20px;margin:0;letter-spacing:-.01em;flex:none}
+h1{font-size:20px;margin:0;letter-spacing:-.01em;flex:none;display:flex;align-items:baseline;gap:7px}
+/* La version, en petit à côté du titre : c'est la première chose à regarder
+   quand un chiffre ne correspond pas à ce qu'on attend. */
+h1 .ver{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10px;font-weight:600;letter-spacing:.02em;color:var(--texte-3);
+  border:1px solid var(--line);border-radius:6px;padding:2px 6px;
+  font-variant-numeric:tabular-nums;
+}
 .onglets{display:flex;gap:4px;background:var(--ink-2);border:1px solid var(--line);border-radius:11px;padding:3px}
 .onglets button{font:inherit;font-size:13.5px;font-weight:600;color:var(--texte-2);background:none;
   border:0;border-radius:8px;padding:7px 15px;cursor:pointer}
@@ -172,6 +180,17 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .motif{flex-basis:100%;font-size:11.5px;font-weight:500;letter-spacing:0;
   text-transform:none;color:var(--or,#B8860B)}
 .doute{background:var(--rouge);color:#2A0509}
+/* Le tableau « Pourquoi ces chiffres ? » : deux comptes, et ce qui les sépare. */
+table.diag{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 10px}
+table.diag td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.diag tr:last-child td{border-bottom:0}
+table.diag td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;
+  font-weight:700;color:var(--texte);width:1%}
+table.diag td.q{color:var(--texte-3);font-size:12px}
+.ecart{margin:0;padding:9px 11px;border-radius:9px;font-size:12.5px;
+  background:var(--rouge-doux,rgba(255,90,110,.10));color:var(--texte);
+  border:1px solid var(--line)}
+.ecart.ok{background:none;color:var(--texte-3);border-color:transparent;padding-left:0}
 .item h2{font-size:15.5px;margin:0 0 2px;font-weight:650}
 .item h2 a{color:inherit;text-decoration:none} .item h2 a:hover{color:var(--accent)}
 .autre{font-size:12px;color:var(--texte-3);margin:0 0 5px}
@@ -313,7 +332,14 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
 <div class="env">
 
   <div class="haut">
-    <h1>Curio · console</h1>
+    <!-- ── LA CONSOLE DIT SA VERSION ──────────────────────────────────────
+         Elle ne le disait pas, et c'est ce qui a fait perdre le plus de
+         temps : devant deux chiffres qui se contredisent, personne ne
+         pouvait dire si le correctif était en place ou si le navigateur
+         servait encore l'ancien fichier. La version est écrite ici par
+         build.sh, à côté du titre, en petit. -->
+    <h1>Curio &middot; console<b class="ver" id="conVer">8.10.3</b></h1><!-- BUILD:CONSOLE -->
+
     <!-- ── LES ÉTAPES, DANS L'ORDRE OÙ ON LES FAIT ──────────────────────
          Trois onglets nommés par leur contenu ne disaient pas par où
          commencer ni ce qui venait après. Six étapes numérotées le disent :
@@ -439,8 +465,8 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
         <option value="aecrire">À écrire — rien de fait</option>
         <option value="reserve">En réserve — écrit, pas en ligne</option>
         <option value="partiel">À finir — une langue publiée sur deux</option>
+        <option value="partielpub">À moitié en ligne — une langue publiée sur deux</option>
         <option value="publie">En ligne</option>
-        <option value="horslangue">Hors langue publiée</option>
         <option value="incoherent">⚠ Incohérent — registre et fiches en désaccord</option>
         <option value="suspect">⚠ À vérifier — phrase sans rapport</option>
       </select>
@@ -523,6 +549,13 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
   <!-- ═══════════ 4 · CONTRÔLE ═══════════ -->
   <section id="vueCtl" hidden>
     <div class="chiffres" id="chCtl"></div>
+    <div class="reglages" style="margin-bottom:16px">
+      <h3>Pourquoi ces chiffres ?</h3>
+      <p>Ce que disent vos <b>fiches</b> — ce que le lecteur reçoit — et ce que dit le
+         <b>catalogue</b>, côte à côte. Rien n’est modifié, rien n’est demandé au réseau.
+         S’ils ne concordent pas, la ligne du bas le dit.</p>
+      <div id="diag"></div>
+    </div>
     <div class="reglages">
       <h3>Vérifier avant de publier</h3>
       <p>Cinq outils, tous <b>gratuits</b> et tous <b>sans destruction</b> : ils lisent, ils
@@ -879,7 +912,10 @@ function calculerEcrites(){
     var cles = [];
     if(f.rec && f.rec.q) cles.push('q:'+f.rec.q);
     if(f.titre) cles.push('t:'+f.lang+'|'+f.titre);
-    var enl = f.rec && f.rec.p && String(f.rec.p) <= auj;
+    /* La même règle que l'application, à la lettre : sans champ « p », la
+       fiche est servie au lecteur, donc elle est en ligne. */
+    var p = f.rec && f.rec.p;
+    var enl = (p === undefined) || (!!p && String(p) <= auj);
     cles.forEach(function(k){
       if(!ECRITES[k]) ECRITES[k] = {};
       ECRITES[k][f.lang] = true;
@@ -922,12 +958,23 @@ function languesPubliees(){
   var l = String(PUB.langues || 'fr').split(/[,\s]+/).filter(Boolean);
   return l.length ? l : ['fr'];
 }
+/* ── ON N'ÉCRIT PAS DANS LA LANGUE DE L'ARTICLE ──────────────────────────
+   Je croisais les langues publiées avec celles où l'ARTICLE existe. C'était
+   faux, et cela cachait un quart du catalogue.
+
+   Un texte français s'écrit très bien à partir d'un article anglais :
+   l'outil d'écriture le fait depuis la 7.5, et vos fichiers le montrent —
+   `anecdotes/fr-terre.json` contient « Hoba meteorite », « Ball's Pyramid »,
+   « Lake Peigneur », des fiches françaises tirées d'articles anglais. Ces
+   sujets-là étaient rangés « hors langue publiée » et disparaissaient du
+   compte : 268 fiches en ligne, 171 sujets seulement affichés en ligne.
+
+   Ce qu'on attend d'un sujet, ce sont donc les langues que VOUS publiez, un
+   point c'est tout. Un sujet n'est hors de votre périmètre que s'il n'a
+   d'article dans aucune langue — c'est-à-dire jamais. */
 function attenduesDe(s){
-  var existe = [];
-  if(s.fr) existe.push('fr');
-  if(s.en) existe.push('en');
-  if(!existe.length) existe = (s.langues && s.langues.length) ? s.langues.slice() : ['fr'];
-  return languesPubliees().filter(function(l){ return existe.indexOf(l)>=0; });
+  if(!s.fr && !s.en) return [];
+  return languesPubliees();
 }
 
 /* ── LES FICHES FONT FOI ─────────────────────────────────────────────────
@@ -1067,9 +1114,14 @@ function peindreCat(){
   var c={total:S.sujets.length,retenu:0,ecarte:0,neutre:0,aecrire:0,ecrit:0,publie:0,incoherent:0};
   S.sujets.forEach(function(s){ c[decDe(s)]++; c[etatDe(s)] = (c[etatDe(s)]||0)+1;
                                 if(incoherent(s)) c.incoherent++; });
+  ETATS_VUS = c;                     // le diagnostic de 4 · Contrôle s'en sert
   var box=$('#chCat'); box.innerHTML='';
+  /* Tous les états ont leur case. « À moitié en ligne » n'en avait pas :
+     un quart du catalogue y tombait sans que rien ne l'affiche, et deux
+     compteurs se contredisaient sans qu'on puisse voir où passait l'écart. */
   [['k',c.total,'au catalogue'],['v',c.retenu,'retenus'],['r',c.ecarte,'écartés'],
    ['',c.neutre,'pas décidés'],['o',(c.ecrit||0)+(c.partiel||0),'en réserve'],
+   ['o',c.partielpub||0,'à moitié en ligne'],
    ['k',c.publie,'en ligne'],['r',c.incoherent,'incohérents']]
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
 
@@ -1152,7 +1204,30 @@ function suiteCat(){
 
 /* ══════════════════════════ RELECTURE ══════════════════════════ */
 function valDe(f){ var k=f.lang+'|'+f.titre; return S.validations[k]||'neutre'; }
-function enLigne(f){ return f.rec.p && String(f.rec.p) <= new Date().toISOString().slice(0,10); }
+
+/* ── UNE SEULE DÉFINITION DE « EN LIGNE » ────────────────────────────────
+   Il y en avait deux, et c'est le défaut le plus grave de cette série.
+
+   L'application, le site et le recomptage disent : une fiche est en ligne si
+   sa date de publication est passée, OU si elle n'a pas de champ « p » du
+   tout — les fiches écrites avant la version 8 n'en ont pas, et les
+   considérer comme non publiées aurait vidé le site du jour au lendemain.
+
+   La console, elle, exigeait une vraie date. Les fiches d'avant la version 8
+   étaient donc lisibles sur le site, dans le flux et dans le sommaire, et
+   pourtant absentes de l'onglet « En ligne » et rangées « en réserve » à la
+   Sélection. C'est exactement ce qu'on voyait sur le Grand attracteur :
+   trouvable en cherchant, introuvable dans les publiés.
+
+   La console adopte la règle de l'application — celle que le LECTEUR
+   éprouve, puisque c'est elle qui décide ce qu'il reçoit. Et « 4 · Contrôle
+   → Remettre le registre d'accord » inscrit une vraie date sur ces fiches,
+   une fois pour toutes : après quoi il n'y a plus d'ambiguïté à arbitrer. */
+function enLigne(f){
+  var p = f.rec.p;
+  if(p === undefined) return true;                 // fiche d'avant la v8 : déjà servie
+  return !!p && String(p) <= new Date().toISOString().slice(0,10);
+}
 
 /* Combien de fiches à chaque seuil de note, dans la langue et l'univers
    affichés. C'est ce compte qui répond à « combien puis-je mettre en ligne
@@ -1311,7 +1386,7 @@ function apercuLecteur(f){
       + (f.lang==='en' ? 'the line to tell' : 'à raconter ce soir')
       + '</b><p>'+esc(f.rec.r)+'</p></div>' : '')
   + '      <p class="notule">note '+(f.rec.s==null?'—':f.rec.s+'/10')
-  + ' · ' + (f.rec.p ? 'en ligne depuis le '+esc(f.rec.p) : 'pas encore publiée')
+  + ' · ' + (enLigne(f) ? (f.rec.p ? 'en ligne depuis le '+esc(f.rec.p) : 'en ligne, sans date') : 'pas encore publiée')
   + ' · aperçu, rien n’est mis en ligne</p>'
   + '    </div>'
   + '  </div>'
@@ -1794,7 +1869,7 @@ function stockPret(){
     if(f.rec.v==='quarantaine'||f.rec.v==='retire') return;
     var k=f.rec.q||f.titre;
     if(!par[k]) par[k]={enligne:true,ok:false};
-    if(!f.rec.p) par[k].enligne=false;
+    if(!enLigne(f)) par[k].enligne=false;   // la règle du lecteur, pas une autre
     if(f.rec.v==='ok') par[k].ok=true;
   });
   var n=0; Object.keys(par).forEach(function(k){ if(!par[k].enligne && par[k].ok) n++; });
@@ -1835,7 +1910,7 @@ function peindrePub(){
   $('#pImages').value = PUB.images;
   peindreJours();
   var c={ecrites:S.fiches.length,enligne:0,prets:stockPret(),quarantaine:0};
-  S.fiches.forEach(function(f){ if(f.rec.p) c.enligne++; if(f.rec.v==='quarantaine') c.quarantaine++; });
+  S.fiches.forEach(function(f){ if(enLigne(f)) c.enligne++; if(f.rec.v==='quarantaine') c.quarantaine++; });
   var box=$('#chPub'); box.innerHTML='';
   [['k',c.ecrites,'fiches écrites'],['v',c.enligne,'fiches en ligne'],
    ['o',c.prets,'sujets prêts'],['r',c.quarantaine,'en quarantaine']]
@@ -1970,6 +2045,86 @@ var OUTILS = [
        + 'disparu. Vos décisions et vos fiches écrites ne sont jamais touchées.',
     quand:'De temps en temps, quand le catalogue devient lourd.' }
 ];
+/* ══════════════ POURQUOI CES CHIFFRES ? ═══════════════════════════════════
+   Deux compteurs se sont contredits pendant deux versions — 268 fiches en
+   ligne d'un côté, 171 sujets en ligne de l'autre — et rien dans la page ne
+   permettait de voir où passait l'écart. Il fallait ouvrir les fichiers.
+
+   Ce tableau montre les deux comptes côte à côte et ce qui les sépare :
+   combien de fiches n'ont trouvé aucun sujet, et combien de sujets sont dans
+   chaque état. Il ne modifie rien, ne demande rien au réseau, et se lit en
+   dix secondes. */
+var ETATS_VUS = {};
+function peindreDiagnostic(){
+  var boite = $('#diag'); if(!boite) return;
+  var auj = new Date().toISOString().slice(0,10);
+  var lg = languesPubliees();
+
+  /* Les fiches, telles que le lecteur les reçoit — donc avec la règle de
+     l'application, `enLigne()`. On compte à part celles qui n'ont aucune
+     date : ce sont les fiches d'avant la version 8, servies au lecteur mais
+     sans trace de publication. La réparation leur en inscrit une. */
+  var f = { total:0, ligne:0, reserve:0, publiees:0, sansDate:0 };
+  S.fiches.forEach(function(x){
+    f.total++;
+    if(lg.indexOf(x.lang) < 0) return;      // écrite mais pas dans une langue publiée
+    f.publiees++;
+    if(x.rec.p === undefined) f.sansDate++;
+    if(enLigne(x)) f.ligne++; else f.reserve++;
+  });
+  void auj;
+
+  /* Les fiches qu'aucun sujet du catalogue ne réclame : c'est là que se
+     cachent les écarts, et c'est la seule chose vraiment anormale. */
+  var reclamees = {};
+  S.sujets.forEach(function(s){
+    if(s.qid) reclamees['q:'+s.qid] = 1;
+    if(s.fr) reclamees['t:fr|'+s.fr] = 1;
+    if(s.en) reclamees['t:en|'+s.en] = 1;
+  });
+  var orphelines = S.fiches.filter(function(x){
+    if(lg.indexOf(x.lang) < 0) return false;
+    if(x.rec && x.rec.q && reclamees['q:'+x.rec.q]) return false;
+    return !reclamees['t:'+x.lang+'|'+x.titre];
+  });
+
+  var c = ETATS_VUS;
+  var somme = (c.publie||0) + (c.partielpub||0);
+  var lignes = [
+    ['Fiches sur le disque, dans vos langues publiées', nb(f.publiees), ''],
+    ['— dont en ligne', nb(f.ligne), ''],
+    ['— dont en réserve', nb(f.reserve), ''],
+    ['— dont servies sans date de publication', nb(f.sansDate),
+      (f.sansDate ? 'fiches d’avant la version 8 : lues par vos lecteurs, sans trace de publication — la réparation leur inscrit une date' : '')],
+    ['Sujets comptés « en ligne »', nb(c.publie||0), ''],
+    ['Sujets comptés « à moitié en ligne »', nb(c.partielpub||0), ''],
+    ['Sujets comptés « en réserve »', nb((c.ecrit||0)+(c.partiel||0)), ''],
+    ['Sujets marqués incohérents', nb(c.incoherent||0),
+      (c.incoherent ? 'le registre et les fiches se contredisent — l’outil ci-dessous les remet d’accord' : '')],
+    ['<b>Fiches qu’aucun sujet du catalogue ne réclame</b>', '<b>'+nb(orphelines.length)+'</b>',
+      (orphelines.length ? 'ces fiches sont en ligne mais leur sujet a disparu du catalogue' : 'aucune — tout est rattaché')]
+  ];
+  var h = '<table class="diag"><tbody>' + lignes.map(function(l){
+    return '<tr><td>'+l[0]+'</td><td class="n">'+l[1]+'</td><td class="q">'+esc(l[2])+'</td></tr>';
+  }).join('') + '</tbody></table>';
+
+  /* Un sujet vaut ses deux langues : avec le français seul, un sujet en
+     ligne = une fiche en ligne, et les deux nombres doivent coïncider. */
+  if(lg.length === 1 && somme !== f.ligne){
+    h += '<p class="ecart">⚠ <b>'+nb(f.ligne)+'</b> fiche(s) en ligne pour <b>'+nb(somme)
+       + '</b> sujet(s) : il en manque <b>'+nb(Math.abs(f.ligne-somme))+'</b>. '
+       + 'Vous ne publiez qu’une langue, les deux devraient être égaux. '
+       + 'Dites-le-moi : c’est un défaut, pas un réglage.</p>';
+  } else {
+    h += '<p class="ecart ok">Les deux comptes concordent.</p>';
+  }
+  if(orphelines.length){
+    h += '<p class="ecart">Exemples de fiches orphelines : '
+       + esc(orphelines.slice(0,6).map(function(x){ return x.titre; }).join(' · ')) + '</p>';
+  }
+  boite.innerHTML = h;
+}
+
 function peindreControle(){
   var c = { fiches:S.fiches.length, quarantaine:0, nonRelues:0, incoherents:0 };
   S.fiches.forEach(function(f){
@@ -2078,7 +2233,7 @@ function ligneEnLigne(f){
   meta.innerHTML = '<i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i>'
     + '<span>'+esc(uni[0])+'</span><span class="lg">'+f.lang.toUpperCase()+'</span>'
     + '<b class="note">'+(f.rec.s==null?'—':f.rec.s+'/10')+'</b>'
-    + '<b class="e-publie">en ligne depuis le '+esc(f.rec.p||'?')+'</b>';
+    + '<b class="e-publie">' + (f.rec.p ? 'en ligne depuis le '+esc(f.rec.p) : 'en ligne, sans date') + '</b>';
   n.appendChild(meta);
   n.appendChild(el('h3', null, esc(f.rec.t || f.titre)));
   if(f.rec.r) n.appendChild(el('p','raconte', esc(f.rec.r)));
@@ -2116,7 +2271,7 @@ function onglet(nom){
   });
   if(nom==='pub') peindrePub();
   if(nom==='moi') peindreMoisson();
-  if(nom==='ctl') peindreControle();
+  if(nom==='ctl'){ peindreCat(); peindreControle(); peindreDiagnostic(); }
   if(nom==='lig') { filtrerLig(); peindreLig(); }
   peindrePied();
 }

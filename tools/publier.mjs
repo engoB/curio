@@ -441,8 +441,33 @@ async function reparerRegistre(){
     return;
   }
   const par = await reglage();
-  const { fiches } = await charger();
+  const { paquets, fiches } = await charger();
   const aujourdhui = jour();
+
+  /* ── D'ABORD, ON LÈVE L'AMBIGUÏTÉ ─────────────────────────────────────
+     Il y avait DEUX définitions de « en ligne » dans le produit. Une fiche
+     sans champ « p » — les fiches d'avant la version 8 n'en ont pas — était
+     servie au lecteur par l'application, le site et le recomptage, et
+     comptée « en réserve » par la console. La même fiche, deux réponses.
+
+     On ne choisit pas entre les deux au hasard : le lecteur les lit déjà,
+     donc elles SONT publiées, et on l'écrit — leur date d'écriture si on
+     l'a, aujourd'hui sinon. Après ce passage, toute fiche porte une date ou
+     un `null` franc, et la question ne se pose plus jamais.
+
+     C'est la seule chose que cette opération écrit dans une fiche, et elle
+     ne change rien à ce que le lecteur voit : ces fiches étaient déjà en
+     ligne, elles le restent, avec la date qu'elles auraient dû porter. */
+  let datees = 0;
+  for (const f of fiches){
+    if (f.rec.p !== undefined) continue;
+    f.rec.p = (typeof f.rec.d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(f.rec.d))
+      ? f.rec.d : aujourdhui;
+    const paquet = paquets.get(f.chemin);
+    if (paquet) paquet.modifie = true;
+    datees++;
+  }
+  if (datees) await sauver(paquets);
 
   /* Ce que les fiches savent, par sujet : langues écrites, langues en ligne,
      et la date de la plus ancienne mise en ligne. */
@@ -470,11 +495,18 @@ async function reparerRegistre(){
     if (!s || s.statut === 'retire') continue;   // un retrait est une décision : on n'y touche pas
     const v = vues.get(s.qid);
     const ecrites = v ? [...v.ecrites].sort() : [];
-    const existe  = [s.fr ? 'fr' : null, s.en ? 'en' : null].filter(Boolean);
-    /* Les langues attendues : celles que vous publiez, parmi celles où
-       l'article existe. Un sujet qui n'existe qu'en anglais alors que vous
-       ne publiez que le français n'est pas « à finir » : il est hors sujet. */
-    const attendues = par.langues.filter(l => existe.includes(l));
+    /* ── ON N'ÉCRIT PAS DANS LA LANGUE DE L'ARTICLE ──────────────────────
+       Les langues attendues étaient croisées avec celles où l'ARTICLE
+       existe. C'était faux : un texte français s'écrit très bien à partir
+       d'un article anglais, et l'outil d'écriture le fait depuis la 7.5 —
+       anecdotes/fr-terre.json contient « Hoba meteorite » et « Lake
+       Peigneur », des fiches françaises tirées d'articles anglais.
+
+       Avec l'ancienne règle, ces sujets-là n'attendaient AUCUNE langue :
+       leur fiche en ligne ne comptait pas, et la réparation leur retirait
+       leur date de publication. Ce qu'on attend d'un sujet, ce sont les
+       langues que vous publiez, un point c'est tout. */
+    const attendues = (s.fr || s.en) ? par.langues.slice() : [];
 
     const avantL = (s.langues || []).join(',');
     if (avantL !== ecrites.join(',')){ s.langues = ecrites; detail.langues++; }
@@ -501,11 +533,14 @@ async function reparerRegistre(){
   console.log('╚══════════════════════════════════════════════════════════════╝');
   console.log(`  langue(s) publiée(s) : ${par.langues.join(' + ')}`);
   console.log(`  ${maitre.sujets.length} sujet(s) au registre, ${fiches.length} fiche(s) sur le disque.`);
+  if (datees) console.log(`  ${datees} fiche(s) sans date de publication ont reçu la leur :`
+    + ` elles étaient déjà servies au lecteur, elles le restent.`);
   console.log(`  ${detail.langues} liste(s) de langues corrigée(s).`);
   console.log(`  ${corriges} statut(s) corrigé(s) : ${detail.publie} en ligne, `
             + `${detail.ecrit} en réserve, ${detail.aecrire} à écrire.`);
-  if (!corriges && !detail.langues) console.log('  Rien à corriger : les deux disaient déjà la même chose.');
-  console.log('  Aucune fiche n’a été touchée. Rien n’a été publié ni dépublié.');
+  if (!corriges && !detail.langues && !datees) console.log('  Rien à corriger : les deux disaient déjà la même chose.');
+  console.log('  Aucun texte n’a été touché. Rien n’a été publié ni dépublié :');
+  console.log('  les fiches datées ci-dessus étaient déjà en ligne pour vos lecteurs.');
 
   if (corriges || detail.langues){
     maitre.genere = new Date().toISOString();

@@ -1,4 +1,95 @@
-# Curio 8.10.1 — ce qui a changé depuis v6
+# Curio 8.10.3 — ce qui a changé depuis v6
+
+## 8.10.3 — il y avait deux définitions de « en ligne »
+
+C'est le défaut le plus grave de la série, et c'est le Grand attracteur qui
+l'a révélé : trouvable en cherchant dans le sommaire, lisible en entier,
+**absent des publiés** et rangé « en réserve » à la Sélection.
+
+Deux règles cohabitaient, et elles ne disaient pas la même chose :
+
+| | une fiche sans champ `p` est… |
+|---|---|
+| l'application, le site, le recomptage | **en ligne** — servie au lecteur |
+| la console (Sélection, En ligne, stock) | **en réserve** |
+
+Les fiches écrites avant la version 8 n'ont pas ce champ. Les traiter comme
+non publiées aurait vidé le site du jour au lendemain : la tolérance était
+donc justifiée côté lecteur. Mais la console, elle, exigeait une vraie date —
+et ces fiches disparaissaient de tous ses comptes tout en restant lisibles.
+
+**La console adopte la règle de l'application** : celle que le lecteur
+éprouve, puisque c'est elle qui décide ce qu'il reçoit. Les quatre endroits
+qui comptaient à leur façon — l'onglet En ligne, le stock prêt à publier, les
+compteurs de publication, l'aperçu lecteur — passent tous par la même
+fonction.
+
+**Et la réparation lève l'ambiguïté dans les données.** *4 · Contrôle →
+Remettre le registre d'accord avec les fiches* inscrit désormais une vraie
+date sur toute fiche qui n'en a pas — sa date d'écriture si elle l'a,
+aujourd'hui sinon. Ces fiches étaient déjà servies au lecteur : elles le
+restent, avec la date qu'elles auraient dû porter. Après ce passage, toute
+fiche porte une date ou un `null` franc, et la question ne se pose plus.
+
+C'est la seule chose que cette opération écrit dans une fiche. Aucun texte
+n'est touché, rien n'est publié ni dépublié.
+
+*Éprouvé* sur 80 fiches dont 24 sans champ `p` : avant, la console comptait
+32 en ligne quand l'application en servait 56. Après, les deux disent 56 — et
+le sommaire de l'application en liste exactement 56.
+
+### Le tableau « Pourquoi ces chiffres ? » compte aussi ces fiches
+
+Une ligne de plus : *« — dont servies sans date de publication »*. C'est le
+nombre qui explique l'écart, et il tombe à zéro après la réparation.
+
+
+## 8.10.2 — un quart du catalogue était jugé « hors langue »
+
+### 268 fiches en ligne, 171 sujets en ligne
+
+Le correctif de la 8.10.1 était bon mais ne suffisait pas : les deux comptes
+se contredisaient toujours. La vraie cause était ailleurs, et elle est nette.
+
+Vos fichiers le montrent : `anecdotes/fr-terre.json` contient
+**« Hoba meteorite »**, **« Ball's Pyramid »**, **« Lake Peigneur »**. Ce sont
+des fiches **françaises** écrites à partir d'articles qui n'existent qu'en
+**anglais** — ce que l'outil d'écriture sait faire depuis la 7.5, et qu'il
+fait très bien.
+
+Or je jugeais un sujet sur la langue de son **article**, pas sur celle de sa
+**fiche** : les langues publiées étaient croisées avec celles où l'article
+existe. Un sujet n'ayant qu'un article anglais n'attendait donc **aucune**
+langue, tombait dans « hors langue publiée », et sa fiche française en ligne
+ne comptait pas. D'où l'écart, et d'où « 0 incohérent » : rien ne se
+contredisait, le sujet était simplement rangé dans un état invisible.
+
+Ce qu'on attend d'un sujet, ce sont **les langues que vous publiez**, un
+point c'est tout. « Hors langue publiée » disparaît.
+
+**Le même défaut était dans l'outil de réparation.** Si vous avez lancé
+*Remettre le registre d'accord avec les fiches* en 8.10.1, il a retiré leur
+date de publication à ces sujets-là dans le registre — **sans toucher à une
+seule fiche**, donc sans rien changer pour vos lecteurs. Relancez-le une fois
+en 8.10.2 : il repart des fiches et rétablit tout exactement.
+
+### Deux garde-fous, pour que cela ne se reproduise pas
+
+**La console dit sa version**, en petit à côté de son titre, gravée par la
+construction. Devant deux chiffres qui se contredisent, la première question
+est « quel fichier tourne dans ce navigateur ? » — elle a maintenant une
+réponse.
+
+**Un tableau « Pourquoi ces chiffres ? »** ouvre l'onglet *4 · Contrôle*. Il
+met côte à côte ce que disent les **fiches** — ce que le lecteur reçoit — et
+ce que dit le **catalogue**, compte les fiches qu'aucun sujet ne réclame, et
+dit en toutes lettres si les deux concordent. Il ne modifie rien et ne demande
+rien au réseau.
+
+Enfin, **tous les états ont leur case** dans les compteurs de la Sélection.
+« À moitié en ligne » n'en avait pas : c'est ce qui a permis à un quart du
+catalogue de disparaître sans que rien ne l'affiche.
+
 
 ## 8.10.1 — la console ne reconnaissait pas ses propres fiches
 

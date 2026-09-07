@@ -127,8 +127,21 @@ awk -v v="$SWV" '
   { print }
 ' sw.js > sw.js.tmp && mv sw.js.tmp sw.js
 
+# --- la console dit sa version ----------------------------------------------
+# Elle ne le disait pas, et c'est ce qui a coute le plus de temps : devant deux
+# chiffres qui se contredisent, personne ne pouvait dire si le correctif etait
+# en place ou si le navigateur servait encore l'ancien fichier. On grave donc
+# le numero lisible dans la seule ligne marquee BUILD:CONSOLE.
+if [ -f console.html ]; then
+  awk -v v="$LISIBLE" '
+    /BUILD:CONSOLE/{
+      print "    <h1>Curio &middot; console<b class=\"ver\" id=\"conVer\">" v "</b></h1><!-- BUILD:CONSOLE -->"; next }
+    { print }
+  ' console.html > console.html.tmp && mv console.html.tmp console.html
+fi
+
 # --- version.json : lu par l'action pour afficher la version dans son rapport
 printf '{"version":"%s","build":"%s","date":"%s"}\n' \
   "$LISIBLE" "$EMPREINTE" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > version.json
 
-echo "Curio $PLEINE — app.html, index.html, version.json, service worker"
+echo "Curio $PLEINE — app.html, index.html, console.html, version.json, service worker"
