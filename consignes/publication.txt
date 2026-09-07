@@ -23,6 +23,13 @@ langues: fr
 # Photos des fiches : oui (voilées) | franches (à nu) | non
 images: oui
 
+# Le passage de la relecture au STOCK prêt à publier.
+#   manuel  vous appuyez sur « Envoyer au stock » dans 3 · Relecture
+#   auto    chaque passage de publication prend d’abord vos validées
+# Dans les deux cas, valider ne met JAMAIS en ligne : c’est le rythme
+# ci-dessus qui décide quand une fiche du stock sort.
+stock: manuel
+
 # Ordre : potentiel | note | hasard
 ordre: potentiel
 
