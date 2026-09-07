@@ -28,7 +28,7 @@ images: oui
 #   auto    chaque passage de publication prend d’abord vos validées
 # Dans les deux cas, valider ne met JAMAIS en ligne : c’est le rythme
 # ci-dessus qui décide quand une fiche du stock sort.
-stock: manuel
+stock: auto
 
 # Ordre : potentiel | note | hasard
 ordre: potentiel
