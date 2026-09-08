@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <meta name="theme-color" content="#050E24" />
-<meta name="curio-version" content="8.16.0+0991c68717" />
+<meta name="curio-version" content="8.16.1+821fa568da" />
 <meta name="curio-langues" content="fr" />
 <meta name="curio-images" content="oui" />
 <style>#langBtn,#ligneLangue{display:none !important}</style>
@@ -3073,15 +3073,36 @@ function ilYaUneSemaine(){
   const d = new Date(); d.setDate(d.getDate() - 7);
   return d.toISOString().slice(0,10);
 }
+/* ── UNE REMISE EN LIGNE N'EST PAS UNE SEMAINE DE NOUVEAUTÉS ───────────────
+   Le badge « +N » du sommaire compte les fiches mises en ligne depuis sept
+   jours. Le compte est juste — mais il ne dit pas ce qu'on croit.
+
+   Une remise en ligne massive — « Tout renvoyer au stock » puis republier,
+   une reprise en main, une migration — pose la même date de publication sur
+   tout le catalogue. Le badge annonce alors « +269 » à un lecteur qui n'a
+   rien vu de neuf : sur un produit qu'on vend, c'est une promesse fausse.
+
+   La règle : quand la « semaine » représente la moitié du catalogue ou plus,
+   ce n'est pas une semaine, c'est une mise en ligne. On n'affiche rien plutôt
+   que d'annoncer un chiffre qui ne veut rien dire. Le seuil de vingt fiches
+   protège le cas légitime du dépôt tout neuf, dont les premières anecdotes
+   sont vraiment toutes de cette semaine. */
+function nouveautesReelles(semaine, total){
+  if(!semaine) return 0;
+  if(total >= 20 && semaine >= total / 2) return 0;
+  return semaine;
+}
 function statWeek(){
   if(tocPrets && tocPrets.size){
     const cut = ilYaUneSemaine();
-    let n = 0;
-    tocPrets.forEach(v => v.forEach(x => { if(String(x.date || '') >= cut) n++; }));
-    return n;
+    let n = 0, total = 0;
+    tocPrets.forEach(v => v.forEach(x => { total++; if(String(x.date || '') >= cut) n++; }));
+    return nouveautesReelles(n, total);
   }
   if(!STATS || !STATS.weekly) return 0;
-  return (typeof STATS.weekly.sujets === 'number' ? STATS.weekly.sujets : STATS.weekly[S.lang]) || 0;
+  const w = (typeof STATS.weekly.sujets === 'number' ? STATS.weekly.sujets : STATS.weekly[S.lang]) || 0;
+  const t = (STATS.total && (typeof STATS.total.sujets === 'number' ? STATS.total.sujets : STATS.total[S.lang])) || 0;
+  return nouveautesReelles(w, t);
 }
 
 /* ================= anecdotes rédigées =================
