@@ -1,291 +1,199 @@
 # Curio
 
-Une anecdote vraie par écran, en français et en anglais, tirée de Wikipédia et
-réécrite pour être lue. Site statique, hébergé par GitHub Pages, sans serveur.
+Une anecdote vraie par écran, tirée de Wikipédia et réécrite pour être lue.
+Site statique hébergé par GitHub Pages, sans serveur, sans compte lecteur.
+
+**Vous n'ouvrez qu'une page pour travailler : `console.html`.**
 
 ---
 
 ## Vos liens
 
-Remplacez `VOTRE-COMPTE` par votre nom d'utilisateur GitHub et gardez cette
-section en favori — c'est tout ce dont vous vous servez au quotidien.
+Remplacez `VOTRE-COMPTE` par votre nom d'utilisateur GitHub, et gardez la
+console en favori.
 
 | | adresse |
 |---|---|
-| **Le site** | `https://VOTRE-COMPTE.github.io/curio/` |
-| **L'application** | `https://VOTRE-COMPTE.github.io/curio/app.html` |
 | **LA CONSOLE** — à mettre en favori | `https://VOTRE-COMPTE.github.io/curio/console.html` |
+| Le site | `https://VOTRE-COMPTE.github.io/curio/` |
+| L'application | `https://VOTRE-COMPTE.github.io/curio/app.html` |
 | Le catalogue en lecture seule | `https://VOTRE-COMPTE.github.io/curio/catalogue.html` |
-| **La curation** *(privé)* | `https://VOTRE-COMPTE.github.io/curio/app.html?curation=1` |
-| **Les actions** | `https://github.com/VOTRE-COMPTE/curio/actions` |
-| **Le catalogue maître** | `https://github.com/VOTRE-COMPTE/curio/blob/main/catalogue-maitre.csv` |
-| **Le rapport sur vos sujets phares** | `https://github.com/VOTRE-COMPTE/curio/blob/main/rapport-phares.csv` |
-| **L'audit des sujets retenus** | `https://github.com/VOTRE-COMPTE/curio/blob/main/audit-retenus.csv` |
-| **Vos réglages** | `https://github.com/VOTRE-COMPTE/curio/tree/main/consignes` |
+| Les actions | `https://github.com/VOTRE-COMPTE/curio/actions` |
+| Vos réglages | `https://github.com/VOTRE-COMPTE/curio/tree/main/consignes` |
 
-Les cinq actions, directement :
-
-```
-.../actions/workflows/1-moissonner.yml     construire le catalogue maître
-.../actions/workflows/2-ecrire.yml         écrire N sujets, dans la ou les langues voulues
-.../actions/workflows/3-controler.yml      contrôler avant mise en ligne
-.../actions/workflows/5-publier.yml        publier — tourne seule chaque jour
-.../actions/workflows/entretien.yml        auditer, ranger, accorder, purger…
-```
-
-Sur chacune : bouton **Run workflow**, en haut à droite.
-
-> La curation n'est pas protégée par un mot de passe : elle est simplement non
-> référencée. C'est un atelier, pas un coffre. Ne diffusez pas l'adresse.
+**Pour essayer l'application comme un lecteur** : ajoutez `?pro=0` (gratuit),
+`?pro=sub` (abonné) ou `?pro=1` (achat à vie) à l'adresse de `app.html`. Le
+réglage ne vaut que pour le navigateur qui ouvre le lien. Les trois liens sont
+aussi dans la console, onglet *Publication*.
 
 ---
 
-## La console — l'endroit où tout se passe
+## Le chemin d'une fiche — les quatre mots du produit
 
-`console.html`. Une page, trois vues, et vous n'ouvrez rien d'autre.
+C'est le vocabulaire de toute l'interface. Il ne varie jamais.
 
-**Catalogue** — tout ce que la moisson a trouvé (elle tourne chaque nuit à
-minuit, toute seule). Vous lisez, vous retenez ou vous écartez, à la main.
-Deux boutons en bas : **Enregistrer mes décisions**, qui les écrit dans le
-dépôt, et **Écrire**, qui lance une tranche.
-
-**Six filtres, dont le potentiel.** Univers, provenance, décision, état,
-**potentiel** (*10 seulement · 9 et plus · 8 et plus · 7 et plus · 6 et
-moins*) et recherche. C'est le potentiel qui répond à « je ne veux que les
-meilleurs » : sur 16 185 sujets, *7 et plus* en garde 2 449, *9 et plus* en
-garde 451.
-
-**Les boutons de lot agissent sur le filtre en cours, et le disent.** Filtrez
-sur *Articles insolites*, et le bouton devient **Retenir ces 114** ; la ligne
-sous les boutons nomme le filtre et rappelle où en est la sélection —
-« 114 retenus, 0 écarté, 814 sans décision ». Sans filtre, un lot de plus de
-cinquante sujets demande confirmation. **Tout oublier** efface toutes les
-décisions si une manœuvre ancienne a brouillé le compte : le catalogue et les
-fiches écrites ne bougent pas.
-
-**La passe qualité, avant de payer.** Le bouton **Vérifier les N retenus**
-reprend chaque sujet retenu : l'article existe-t-il encore, son introduction
-est-elle assez fournie, n'est-ce pas une page d'homonymie, votre phrase
-parle-t-elle bien de cet article ? Il écrit `audit-retenus.csv`, les ennuis en
-tête, et ne supprime rien — il ne fait que dire, sauf si vous lui demandez
-d'écarter ce qui échoue. C'est le geste à faire entre la sélection et
-l'écriture.
-
-**Relecture** — les fiches écrites, en entier : titre, texte complet, note,
-phrase à raconter. Vous validez une par une ou d'un bloc, et **Publier les
-validées** les met en ligne. Ce que vous marquez « à refaire » repasse à
-écrire ; « à retirer » sort définitivement.
-
-**Publication** — le rythme de sortie, réglé ici plutôt que dans un fichier de
-code : tous les jours, une fois par semaine, certains jours seulement, ou en
-pause ; combien de sujets à chaque passage ; ou bien une date — *tout sortir
-d'ici le 31 décembre* — et le nombre par passage se calcule tout seul. Et
-**quelles langues sont publiées** : `fr` seul retire l'anglais du site et de
-l'application, sans rien supprimer, jusqu'au jour où vous le rallumez.
-
-**Écrire par lots.** Le bouton *Écrire* demande un **nombre de sujets** — 5
-pour un essai, 300 pour un lot — puis les langues. Le français seul divise la
-facture par deux et ne perd rien.
-
-**Et ces sujets-là se voient.** Un sujet écrit en français mais pas en anglais
-porte l'état **« à finir »**, badge doré, avec le badge `FR` plein et le badge
-`EN` creux ; un filtre et un compteur les isolent. Ce ne sont ni des sujets
-vierges, ni des sujets terminés. La tranche anglaise d'un autre jour les
-reprendra sans jamais repayer le français : avant tout appel, la rédaction lit
-le fichier de sortie et saute les titres qui s'y trouvent déjà.
-
-Elle parle à GitHub avec un jeton que vous créez et qui **ne quitte jamais
-votre navigateur**. Réglages → un jeton à portée fine, limité à ce dépôt,
-permissions `Contents: Read and write` et `Actions: Read and write`.
-
-**Vous pouvez vous en passer.** Sans jeton, la console montre tout et garde
-vos décisions dans le navigateur ; le bouton *Télécharger decisions.json* vous
-donne le fichier, que vous déposez sur GitHub par *Add file → Upload files*
-dans `consignes/`. Le résultat est identique — ce sont ces fichiers que les
-outils lisent. Vous lancez alors les actions depuis l'onglet Actions.
-
-**Ne collez jamais un jeton dans une conversation**, avec moi ou avec qui que
-ce soit. S'il vous échappe, révoquez-le : rien n'est cassé, vous en refaites
-un en une minute.
+> **écrite** — le texte existe
+> → **relue** — vous l'avez jugée, dans votre navigateur
+> → **au stock** — votre jugement est enregistré au dépôt, elle attend son tour
+> → **en ligne** — le lecteur la voit
 
 ---
 
-## La chaîne, en cinq gestes
+## Les six onglets de la console
 
-```
-   1 · Moissonner   →  catalogue-maitre.json     gratuit, ~40 min, chaque nuit
-        ↓
-   [ vous choisissez ]  console.html, filtre par potentiel → Retenir
-        ↓
-   [ on vérifie ]     Vérifier les N retenus     gratuit, quelques minutes
-        ↓
-   2 · Écrire       →  N sujets, FR seul ou FR+EN
-        ↓
-   3 · Contrôler    →  quarantaine               gratuit, instantané
-        ↓
-   5 · Publier      →  tous les jours, tout seul
-```
-
-Rien n'apparaît sur le site tant que les quatre étapes ne sont pas passées.
-Une fiche écrite n'est pas une fiche en ligne : c'est tout le principe.
-
-Le détail de chaque étape est dans **`consignes/GUIDE.md`**.
-
----
-
-## Regarder avant d'écrire
-
-Deux façons, aucune ne coûte un centime.
-
-**Sur une page** — ouvrez **`catalogue.html`**. C'est le tableau de bord :
-les compteurs en haut, la liste complète en dessous, une recherche qui ignore
-les accents, et un filtre par univers, par provenance, par état et par
-**potentiel**. Elle ne fait rien — pas de case à cocher, pas de bouton qui engage — elle montre.
-C'est la page à mettre en favori.
-
-**Dans un tableur** — ouvrez `catalogue-maitre.csv`. Une ligne par sujet :
-identifiant, univers, titre français, titre anglais, sources, potentiel,
-**accord**, statut, dates, la phrase du contributeur et un **aperçu français**
-de l'article. Trois mille lignes se parcourent vite avec un filtre.
-
-**La colonne `accord`** compte les mots signifiants que votre phrase partage
-avec l'article. **Zéro veut dire qu'ils ne parlent peut-être pas de la même
-chose** — c'est ce chiffre qui aurait signalé la fiche « Pac-Man » portant
-l'histoire d'un poulpe évadé. Filtrez dessus : `console.html` et
-`catalogue.html` ont le badge ⚠ **à vérifier**, le filtre et le tri « les moins
-sûrs d'abord ». Rien n'est retiré pour autant : c'est un doute, pas un verdict.
-
-**Et `rapport-phares.csv`** dit, ligne par ligne de votre fichier de sujets
-phares, comment elle a été résolue (`exact`, `redirection`, `recherche`), où
-elle a abouti et ce qu'elle est devenue. Les ennuis sont en tête du fichier :
-ce sont les seules lignes à relire.
-
-**Dans la curation** — `app.html?curation=1`. Chaque ligne porte sa provenance
-(★ phare · liste insolite · le saviez-vous), son potentiel, son état, et deux
-lignes de français. Tout est déjà téléchargé : le défilement ne demande rien
-au réseau.
-
-**Pour écarter ce qui ne va pas** : cochez les quelques sujets dont vous ne
-voulez pas — pas ceux que vous voulez, ils sont bien trop nombreux — puis
-**« Copier pour exclusions.txt »**. Collez dans `consignes/exclusions.txt`,
-lancez **Entretien → purger**. Ils sortent du catalogue et ne reviendront
-jamais.
-
----
-
-## Les fichiers qui sont à vous
-
-Aucun ne touche au code. Modifiez-les directement sur GitHub, les outils les
-relisent à chaque exécution.
-
-| fichier | ce qu'il décide |
-|---|---|
-| `consignes/sujets-phares.txt` | les sujets que vous imposez, avec votre phrase |
-| `consignes/publication.txt` | combien de sujets sortent à chaque passage |
-| `consignes/exclusions.txt` | ce qui ne doit jamais revenir |
-| `consignes/univers.txt` | les univers en plus des huit |
-| `consignes/reddit.txt` | les subreddits à moissonner, et les seuils. Vide par défaut |
-| `consignes/ajouts.json` | un sujet ponctuel, de n'importe quelle source — voir `ajouts.LISEZ-MOI.md` |
-| `consignes/decisions.json` | écrit par la console : ce que vous retenez |
-| `consignes/validations.json` | écrit par la console : ce que vous validez |
-| `consignes/fr.md`, `en.md` | la consigne d'écriture, mot pour mot |
-
----
-
-## Ce que produisent les outils
-
-| fichier | qui l'écrit | ce que c'est |
+| | ce qu'on y voit | ce qu'on y fait |
 |---|---|---|
-| `catalogue-maitre.json` | 1 · Moissonner | **la vérité du projet** : un enregistrement par sujet, identifié par Wikidata |
-| `catalogue-maitre.csv` | 1 · Moissonner | la même chose, pour votre tableur |
-| `rapport-phares.csv` | 1 · Moissonner | vos sujets phares, ligne par ligne, et ce qu'ils sont devenus |
-| `audit-retenus.csv` | Entretien → auditer | la passe qualité sur les seuls sujets retenus, ennuis en tête |
-| `catalogue.html` | *(livré)* | le tableau de bord : il lit le maître, il ne l'écrit pas |
-| `catalog.json` | 1 · Moissonner | la vue dont l'application a besoin |
-| `anecdotes/*.json` | 2 · Écrire | les fiches, une par langue et par univers |
-| `anecdotes/index.json` | 5 · Publier | les chiffres du site — ne compte que le **publié** |
-| `controle.csv` | 3 · Contrôler | ce qui ne passe pas, et pourquoi |
+| **1 · Moisson** | ce qui est au catalogue | agrandir le catalogue — **gratuit** |
+| **2 · Sélection** | les sujets **pas encore écrits** | retenir, écarter, envoyer à l'écriture — **payant** |
+| **3 · Relecture** | les fiches **écrites**, ni au stock ni en ligne | juger le texte, cocher, envoyer au stock |
+| **4 · Contrôle** | l'état de santé du catalogue | des outils qui lisent et rapportent, sans rien détruire |
+| **5 · Publication** | **le stock** | le rythme, le nom et le logo, sortir des sujets choisis |
+| **6 · En ligne** | ce que le lecteur voit | corriger un texte, retirer une fiche |
 
-**Ne supprimez jamais le dépôt.** `catalogue-maitre.json` et `anecdotes/` sont
-vos données : une demi-heure de moisson et tout votre budget d'écriture. Une
-mise à jour se fait par *Add file → Upload files* — GitHub remplace les
-fichiers de même chemin et laisse le reste intact.
+Aucun onglet n'empiète sur le métier d'un autre. **On ne publie jamais depuis
+la Relecture.**
 
----
+### Le jeton — utile, pas obligatoire
 
-## Mise en route, une seule fois
+Sans jeton, la console lit tout et vous laisse **télécharger** vos décisions
+pour les déposer vous-même dans `consignes/`. Avec un jeton à portée fine, elle
+écrit et lance les actions à votre place. Le panneau *réglages*, en haut à
+droite, explique comment en créer un et quelles deux permissions suffisent
+(`Contents` et `Actions`, en lecture-écriture).
 
-1. **Settings → Pages** → Source : *Deploy from a branch*, branche `main`,
-   dossier `/ (root)`. Le site est en ligne une minute plus tard.
-2. **Settings → Actions → General → Workflow permissions** →
-   *Read and write permissions*. Sans cela, les actions ne peuvent rien
-   enregistrer et vous ne verrez jamais un résultat.
-3. **Settings → Secrets and variables → Actions → New repository secret** →
-   nom `ANTHROPIC_API_KEY`, valeur votre clé. Seule l'étape 2 s'en sert.
-4. Lancez **1 · Moissonner** une première fois. Ensuite elle tourne toute
-   seule **chaque dimanche à 5 h**, et la publication chaque matin à 6 h.
-   Vous ne déclenchez plus que l'écriture, parce qu'elle seule coûte.
+> **Ne collez jamais un jeton dans une conversation, avec qui que ce soit.**
 
 ---
 
-## Ce que ça coûte
-
-Tout est gratuit sauf l'écriture. Une fiche revient à environ quatre centimes
-avec Claude Opus ; un sujet en vaut deux, français et anglais. Une tranche de
-trente euros écrit à peu près quatre cent cinquante sujets.
-
-L'action **2 · Écrire** avec « estimer seulement » affiche le compte exact
-avant d'engager quoi que ce soit.
-
----
-
-## Structure du dépôt
+## La chaîne, du sujet au lecteur
 
 ```
-index.html              le site — assemblé, ne pas éditer à la main
-app.html                l'application — idem
-console.html            LA CONSOLE — décider, écrire, relire, publier
-catalogue.html          le catalogue en lecture seule, sans jeton
-sw.js                   le service worker (cache hors ligne)
-build.sh                assemble index.html et app.html depuis parts/
-VERSION                 le numéro de version, lisible
-
-parts/                  LES SOURCES. C'est ici qu'on modifie le code.
-  00-head.html            styles de l'application
-  10-body.html            structure de l'application
-  20-data.js              univers, traductions
-  30-app.js               tout le comportement
-  L0/L1/L2                les mêmes trois pour le site
-
-tools/
-  build-catalog.mjs       moisson, catalogue maître, purge, entretien
-  write-anecdotes.mjs     écriture par tranches, index
-  controler.mjs           le contrôle avant production
-  publier.mjs             la publication étalée, le retrait d'une fiche
-
-consignes/              vos réglages (voir plus haut)
-icones/                 les icônes de l'application installée
-.github/workflows/      les cinq actions
+1 · Moissonner   →  le catalogue maître (gratuit, chaque nuit si vous voulez)
+2 · Écrire       →  les fiches            ← LA SEULE ÉTAPE QUI COÛTE DE L'ARGENT
+3 · Contrôler    →  la forme est vérifiée, ce qui échoue part en quarantaine
+   (relecture)   →  vous jugez, vous envoyez au stock
+5 · Publier      →  le stock sort au rythme réglé — tourne seule chaque jour
 ```
 
-Après toute modification dans `parts/`, lancez `bash build.sh` : il
-reconstruit `index.html`, `app.html`, `version.json` et grave le numéro de
-version dans le service worker. Sans cela, rien ne change pour personne.
+Une seule étape est payante : **l'écriture**. Tout le reste ne coûte que du
+temps de machine.
+
+**Coût mesuré, par fiche** : Sonnet **0,0177 $** · Opus **0,0442 $**.
+Sonnet est le défaut, et la différence ne se voit pas à la lecture.
 
 ---
 
-## Si quelque chose cloche
+## Les réglages — tout est dans `consignes/`
 
-**L'application affiche une vieille version.** Le menu « … » affiche le numéro
-qui tourne réellement. Rechargez deux fois : le service worker sert le réseau
-d'abord, mais la bascule demande un passage.
+Le paquet ne livre **jamais** vos fichiers de réglage : il livre des
+`*.exemple.txt`. Tout ce qui les lit prend le vôtre s'il existe, l'exemple
+sinon. **Importer une nouvelle version n'écrase donc aucun de vos réglages.**
 
-**Une action se termine en vert sans rien changer.** Regardez le résumé : il
-dit « Rien de nouveau à enregistrer ». C'est souvent normal — une moisson
-relancée n'ajoute que le neuf.
+| fichier | ce qu'il commande |
+|---|---|
+| `publication.txt` | le rythme, les langues publiées, les photos, le sommaire, le passage au stock |
+| `marque.txt` | le nom du produit, la signature, le logo |
+| `moisson.txt` | la moisson automatique de la nuit |
+| `sujets-phares.txt` | vos sujets imposés, une ligne par sujet |
+| `exclusions.txt` | ce qui ne doit jamais revenir — *5 · Publier → retirer* y écrit tout seul |
+| `fr.md`, `en.md` | les consignes d'écriture — c'est là que se règle le style |
+| `reddit.txt` | les subreddits à moissonner (vide = Reddit ignoré) |
+| `ajouts.json` | des sujets qui ne viennent pas de Wikipédia |
 
-**Le site n'annonce aucune anecdote.** C'est voulu tant que rien n'est publié.
-Un sujet collecté n'est pas un produit.
+Le rythme, le nom, le logo, les langues et le sommaire se règlent **depuis la
+console**, sans toucher à un fichier.
 
-**Une fiche ne va pas.** *5 · Publier → retirer*, avec son titre. Elle sort,
-les deux langues, et son titre s'inscrit dans `exclusions.txt`.
+### Changer le nom, la signature ou le logo
+
+*5 · Publication → **Le nom et le logo***. Vous écrivez, vous enregistrez, et
+la console reconstruit le site toute seule.
+
+Pour un logo : déposez votre image dans `icones/` par **Add file → Upload
+files**, puis écrivez son chemin — `icones/logo.svg` par exemple. Vide, c'est
+le nom en toutes lettres. Une image nette de 400 px de large suffit ; le SVG
+est idéal.
+
+**L'icône de l'application installée** est un fichier à part. Remplacez
+`icones/curio-192.png`, `curio-512.png`, `curio-512-maskable.png` et
+`curio-180.png` par les vôtres, **aux mêmes noms et aux mêmes tailles**.
+
+Changer de nom ne casse rien pour vos lecteurs : leur collection, leurs
+favoris et leur formule sont rangés sous des clés qui ne changent pas.
+
+---
+
+## Corriger, retirer, refaire
+
+| ce qui ne va pas | ce qu'on fait |
+|---|---|
+| une coquille dans une fiche **en ligne** | *6 · En ligne → **corriger le texte***. La fiche reste en ligne, à sa place. |
+| le sujet est bon, le **texte** est raté | *5 · Publier → **refaire***. Les fiches sont effacées, le sujet repasse « à écrire ». |
+| le sujet n'a pas sa place | *5 · Publier → **retirer***. Il sort, et son titre entre dans `exclusions.txt` : il ne reviendra pas. |
+| vous voulez **reprendre la main** sur toute la mise en ligne | *4 · Contrôle → **Tout renvoyer au stock***. Rien n'est effacé. |
+| deux fiches racontent la même chose | *4 · Contrôle → **Chercher les redites***. Elle rapporte, vous tranchez. |
+| les chiffres se contredisent | *4 · Contrôle → **Pourquoi ces chiffres ?*** puis **Remettre le registre d'accord**. |
+
+---
+
+## Quand quelque chose paraît cassé
+
+**Regardez d'abord la version.** La console l'affiche à côté de son titre,
+l'application en bas à droite de l'écran. Si elle ne correspond pas à ce que
+vous venez d'importer, c'est le cache : rechargement forcé.
+
+Ensuite, *4 · Contrôle → **Pourquoi ces chiffres ?***. Ce tableau met côte à
+côte ce que disent vos **fiches** — ce que le lecteur reçoit — et ce que dit le
+**catalogue**. Il conclut par « Les deux comptes concordent », ou vous dit
+combien il en manque.
+
+---
+
+## Ce que la version gratuite donne
+
+**Cinq anecdotes par jour, les mêmes pour tout le monde** — elles sont déduites
+de la date, pas tirées au hasard : une édition du jour n'existe que si elle est
+commune. La barre de lecture n'affiche aucun compteur.
+
+Les formules payantes ouvrent l'accès illimité, le sommaire, la recherche, la
+collection, le choix des univers et la pioche au hasard.
+
+> La vérification de la formule est **côté navigateur** : c'est un rappel poli,
+> pas un verrou. Un vrai contrôle demande un serveur — c'est le prochain
+> chantier.
+
+---
+
+## Le dépôt, en un coup d'œil
+
+```
+parts/          les sources — 00/10/20/30 pour l'application, L0/L1/L2 pour le site
+build.sh        recompose app.html et index.html, grave la version partout
+console.html    la console de pilotage        ← votre outil
+catalogue.html  un tableau de bord en lecture seule
+tools/          moisson, écriture, contrôle, publication
+consignes/      vos réglages et vos consignes d'écriture
+anecdotes/      les fiches écrites, un fichier par langue et par univers
+icones/         l'icône de l'application installée, et votre logo
+github-workflows/  à recopier dans .github/workflows/
+```
+
+**Après toute modification d'un fichier de `parts/`, il faut reconstruire.**
+La console le fait pour vous quand vous enregistrez le nom ou le rythme ;
+sinon, *Actions → Entretien → reconstruire*.
+
+`CHANGEMENTS.md` raconte l'histoire version par version : les défauts trouvés,
+et pourquoi ils existaient. C'est la meilleure lecture pour comprendre le
+produit avant d'y toucher.
+
+---
+
+## Installation, si vous repartez de zéro
+
+1. Créez un dépôt **public** nommé `curio`.
+2. Déposez tout le contenu du paquet à la racine — *Add file → Upload files*.
+3. *Settings → Pages* → Source : **Deploy from a branch**, branche `main`,
+   dossier `/ (root)`.
+4. *Settings → Actions → General → Workflow permissions* : **Read and write**.
+5. *Settings → Secrets and variables → Actions* : ajoutez `ANTHROPIC_API_KEY`.
+   **Elle ne va nulle part ailleurs — jamais dans un fichier du dépôt.**
+6. Ouvrez `console.html` et lancez **1 · Moissonner**.

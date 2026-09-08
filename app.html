@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <meta name="theme-color" content="#050E24" />
-<meta name="curio-version" content="8.12.0+1e21baa969" />
+<meta name="curio-version" content="8.13.0+0d03160584" />
 <meta name="curio-langues" content="fr" />
 <meta name="curio-images" content="oui" />
 <style>#langBtn,#ligneLangue{display:none !important}</style>
@@ -368,6 +368,11 @@ a{color:var(--accent);text-decoration:none}
   padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;
   -webkit-tap-highlight-color:transparent}
 .brand:hover b{color:var(--accent)}
+/* Le logo, quand consignes/marque.txt en désigne un. Il prend la place du nom
+   écrit, à la même hauteur : on remplace une marque par une autre, on ne
+   redessine pas la barre. */
+.marquelogo{display:block;height:26px;width:auto;max-width:min(190px,42vw);object-fit:contain;flex:none}
+@media (max-width:640px){ .marquelogo{height:22px;max-width:38vw} }
 .brand b{transition:color .16s}
 .brand b{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:21px;font-variation-settings:"SOFT" 40,"WONK" 1;flex:none}
 /* Le statut du compte, à côté du nom : on doit savoir en un coup d'œil si
@@ -938,6 +943,8 @@ a{color:var(--accent);text-decoration:none}
 /* ── LA PIOCHE ────────────────────────────────────────────────────────────
    Un fond qui se retire, une phrase, un trait qui se remplit. Aucune roue :
    une machine à sous n'a rien à faire dans une application de lecture. */
+/* Le trait sous la phrase se remplit pendant toute la pioche : il dit
+   combien de temps il reste, et c'est ce qui rend l'attente supportable. */
 .pioche{
   position:fixed;inset:0;z-index:90;display:grid;place-items:center;align-content:center;
   gap:26px;padding:32px;
@@ -961,7 +968,7 @@ a{color:var(--accent);text-decoration:none}
 .pioche__trait i{display:block;height:100%;width:0;background:var(--accent)}
 @media (prefers-reduced-motion:no-preference){
   .pioche.on .pioche__mot{ animation:souffle .7s cubic-bezier(.16,1,.3,1) both }
-  .pioche.on .pioche__trait i{ animation:remplit 1.25s cubic-bezier(.4,0,.2,1) forwards }
+  .pioche.on .pioche__trait i{ animation:remplit 2.5s cubic-bezier(.4,0,.2,1) forwards }
 }
 @media (prefers-reduced-motion:reduce){ .pioche__trait i{width:100%} }
 @keyframes souffle{ from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
@@ -1634,13 +1641,19 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
     <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
   </button>
 
-  <!-- ── PAS DE COMPTE À REBOURS ─────────────────────────────────────────
-       Une jauge qui se vide et « 3 restantes » transforment une lecture en
-       ration. On lisait en regardant le compteur descendre. Le gratuit dit
-       ce qu'il donne — cinq anecdotes aujourd'hui — et ne dit plus ce qu'il
-       reprend. La cinquième finie, le mur de l'offre parle de lui-même. -->
-  <div class="quota" id="quota">
-    <span id="quotaTxt"><b>5</b><em> aujourd’hui</em></span>
+  <!-- ── NI COMPTE À REBOURS, NI COMPTE TOUT COURT ───────────────────────
+       Il y a eu une jauge qui se vidait, puis « 3 restantes », puis le
+       chiffre 5 immobile. Les trois disaient au lecteur qu'on lui mesure
+       quelque chose, et on lisait en les regardant.
+
+       Il ne reste rien. Le gratuit donne cinq anecdotes par jour, la page
+       d'accueil et l'offre le disent en toutes lettres ; la barre de lecture
+       n'a pas à le répéter. La cinquième finie, le mur parle de lui-même.
+
+       Le nœud reste dans la page — le code s'en sert comme point d'ancrage —
+       mais il ne montre plus rien. -->
+  <div class="quota" id="quota" hidden aria-hidden="true">
+    <span id="quotaTxt"></span>
   </div>
 
   <span class="tbgap"></span>
@@ -3636,7 +3649,13 @@ async function piocher(){
     const item = cle ? await itemDeCle(cle) : null;
     /* L'animation a une durée plancher : sans elle, un catalogue en cache
        répond en dix millisecondes et le geste n'existe pas. */
-    await sleepMs(1150);
+    /* ── LE TEMPS DE LIRE LA PHRASE ─────────────────────────────────────
+       Une seconde et un dixième : la phrase apparaissait, on en lisait la
+       moitié, la fiche arrivait. Le geste avait alors l'air d'un
+       chargement, pas d'un instant. Deux secondes et demie, c'est le temps
+       d'une phrase de dix mots lue tranquillement — et c'est court, pour un
+       geste qu'on fait quand on a décidé de prendre son temps. */
+    await sleepMs(2500);
     if(!item){ toast(T()['pio.none']); return; }
     markSeen(item.article || item.title);
     const carte = buildCard(item);
@@ -4188,25 +4207,20 @@ function renderPlanTag(){
   n.title = p === 'free' ? T()['plan.freeTip'] : T()['plan.paidTip'];
   if(n2){ n2.innerHTML = n.innerHTML; n2.className = n.className; n2.title = n.title; }
   // la jauge n'a plus de sens quand la lecture est illimitée
-  const q = $('#quota'); if(q) q.hidden = (p !== 'free');
+  /* La barre ne porte plus aucun compteur, dans aucune formule : le nœud
+     reste comme point d'ancrage, il ne s'affiche jamais. */
+  const q = $('#quota'); if(q) q.hidden = true;
 }
 
 function renderQuota(){
   renderPlanTag();
   marquerVerrous();
-  const box = $('#quota'), txt = $('#quotaTxt');
-  if(!box || !txt) return;
-  if(S.plan !== 'free'){
-    txt.innerHTML = '<b>' + T().unlimited + '</b>';
-    box.classList.remove('low');
-    return;
-  }
-  /* ── ON ANNONCE, ON NE DÉCOMPTE PAS ────────────────────────────────────
-     La jauge et « 3 restantes » faisaient de la journée une ration : on
-     lisait en surveillant le compteur. Le chiffre reste — c'est l'offre,
-     et elle est généreuse — mais il ne bouge plus. */
-  txt.innerHTML = T().offreJour(CONFIG.freeDaily);
-  box.classList.remove('low');
+  /* ── PLUS AUCUN COMPTEUR DANS LA BARRE ─────────────────────────────────
+     Il y a eu une jauge qui se vidait, puis « 3 restantes », puis le chiffre
+     5 immobile. Les trois disaient au lecteur qu'on lui mesure quelque
+     chose, et on lisait en les regardant. L'offre est annoncée sur la page
+     d'accueil et dans le mur ; la barre de lecture n'a pas à la répéter. */
+  const box = $('#quota'); if(box) box.hidden = true;
 }
 
 /* Le sommaire et la recherche appartiennent à l'abonnement. En gratuit ils

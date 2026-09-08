@@ -1301,7 +1301,13 @@ async function piocher(){
     const item = cle ? await itemDeCle(cle) : null;
     /* L'animation a une durée plancher : sans elle, un catalogue en cache
        répond en dix millisecondes et le geste n'existe pas. */
-    await sleepMs(1150);
+    /* ── LE TEMPS DE LIRE LA PHRASE ─────────────────────────────────────
+       Une seconde et un dixième : la phrase apparaissait, on en lisait la
+       moitié, la fiche arrivait. Le geste avait alors l'air d'un
+       chargement, pas d'un instant. Deux secondes et demie, c'est le temps
+       d'une phrase de dix mots lue tranquillement — et c'est court, pour un
+       geste qu'on fait quand on a décidé de prendre son temps. */
+    await sleepMs(2500);
     if(!item){ toast(T()['pio.none']); return; }
     markSeen(item.article || item.title);
     const carte = buildCard(item);
@@ -1853,25 +1859,20 @@ function renderPlanTag(){
   n.title = p === 'free' ? T()['plan.freeTip'] : T()['plan.paidTip'];
   if(n2){ n2.innerHTML = n.innerHTML; n2.className = n.className; n2.title = n.title; }
   // la jauge n'a plus de sens quand la lecture est illimitée
-  const q = $('#quota'); if(q) q.hidden = (p !== 'free');
+  /* La barre ne porte plus aucun compteur, dans aucune formule : le nœud
+     reste comme point d'ancrage, il ne s'affiche jamais. */
+  const q = $('#quota'); if(q) q.hidden = true;
 }
 
 function renderQuota(){
   renderPlanTag();
   marquerVerrous();
-  const box = $('#quota'), txt = $('#quotaTxt');
-  if(!box || !txt) return;
-  if(S.plan !== 'free'){
-    txt.innerHTML = '<b>' + T().unlimited + '</b>';
-    box.classList.remove('low');
-    return;
-  }
-  /* ── ON ANNONCE, ON NE DÉCOMPTE PAS ────────────────────────────────────
-     La jauge et « 3 restantes » faisaient de la journée une ration : on
-     lisait en surveillant le compteur. Le chiffre reste — c'est l'offre,
-     et elle est généreuse — mais il ne bouge plus. */
-  txt.innerHTML = T().offreJour(CONFIG.freeDaily);
-  box.classList.remove('low');
+  /* ── PLUS AUCUN COMPTEUR DANS LA BARRE ─────────────────────────────────
+     Il y a eu une jauge qui se vidait, puis « 3 restantes », puis le chiffre
+     5 immobile. Les trois disaient au lecteur qu'on lui mesure quelque
+     chose, et on lisait en les regardant. L'offre est annoncée sur la page
+     d'accueil et dans le mur ; la barre de lecture n'a pas à la répéter. */
+  const box = $('#quota'); if(box) box.hidden = true;
 }
 
 /* Le sommaire et la recherche appartiennent à l'abonnement. En gratuit ils

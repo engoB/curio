@@ -201,6 +201,21 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .coche input{width:15px;height:15px;margin:0;accent-color:var(--accent);cursor:pointer}
 .coche.on{background:var(--accent-doux,rgba(63,169,255,.12));
   border-color:var(--accent);color:var(--accent)}
+/* L'éditeur de correction : trois champs, rien de plus. Il vit dans le même
+   cadre que l'aperçu lecteur, pour qu'on comprenne qu'on parle de la même
+   fiche. */
+.cadre--edit{max-width:760px}
+.edit{padding:18px 20px 20px;display:flex;flex-direction:column;gap:6px}
+.edit label{font-size:11.5px;font-weight:700;letter-spacing:.02em;color:var(--texte-3);margin-top:10px}
+.edit label b,.edit label i{color:var(--texte-2)}
+.edit input,.edit textarea{
+  width:100%;font:inherit;font-size:13.5px;line-height:1.6;color:var(--texte);
+  background:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 11px;
+  resize:vertical;
+}
+.edit input:focus,.edit textarea:focus{outline:none;border-color:var(--accent)}
+.edit textarea{min-height:220px;font-family:inherit}
+.edit .quand{margin:12px 0 0}
 .liste--choix{max-height:min(46vh,420px);overflow-y:auto}
 .choix{display:flex;align-items:flex-start;gap:11px;padding:9px 11px;cursor:pointer;
   border-bottom:1px solid var(--line)}
@@ -368,7 +383,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          pouvait dire si le correctif était en place ou si le navigateur
          servait encore l'ancien fichier. La version est écrite ici par
          build.sh, à côté du titre, en petit. -->
-    <h1>Curio &middot; console<b class="ver" id="conVer">8.12.0</b></h1><!-- BUILD:CONSOLE -->
+    <h1>Curio &middot; console<b class="ver" id="conVer">8.13.0</b></h1><!-- BUILD:CONSOLE -->
 
     <!-- ── LES ÉTAPES, DANS L'ORDRE OÙ ON LES FAIT ──────────────────────
          Trois onglets nommés par leur contenu ne disaient pas par où
@@ -691,6 +706,46 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       </div>
     </div>
 
+    <!-- ══ LE NOM ET LE LOGO ════════════════════════════════════════════
+         Ils étaient dans consignes/marque.txt, ce qui était déjà mieux que
+         dans le code — mais il fallait éditer le fichier à la main ET
+         attendre qu'on vous livre un paquet, puisque le nom est gravé dans
+         les pages à la construction. Les deux obstacles sont levés : on
+         écrit le fichier ici, et la reconstruction se lance toute seule. -->
+    <div class="reglages" style="margin-bottom:16px">
+      <h3>Le nom et le logo</h3>
+      <p>Le nom est recopié partout où le lecteur peut le lire : le titre des pages,
+         l’en-tête, la FAQ, le manifeste d’installation. <b>Rien ne casse</b> pour vos
+         lecteurs — la mémoire de leur collection, leurs favoris et leur formule sont
+         rangés sous des clés qui ne changent pas.</p>
+      <div class="champs">
+        <div>
+          <label for="mNom">Le nom du produit</label>
+          <input type="text" id="mNom" placeholder="Curio" maxlength="40">
+        </div>
+        <div>
+          <label for="mBaseline">La signature, sous le nom sur le site</label>
+          <input type="text" id="mBaseline" placeholder="Le monde est plus étrange" maxlength="80">
+        </div>
+        <div>
+          <label for="mLogo">Le logo — chemin du fichier</label>
+          <input type="text" id="mLogo" placeholder="icones/logo.svg">
+        </div>
+      </div>
+      <p class="apercuPub" id="apercuMarque"></p>
+      <p class="quand">Pour changer de logo : déposez votre image dans <code>icones/</code> par
+         <b>Add file → Upload files</b>, puis écrivez son chemin ci-dessus — par exemple
+         <code>icones/logo.svg</code>. Laissez vide pour afficher le nom en toutes lettres.
+         Une image nette et large de 400 px suffit ; le SVG est idéal.<br>
+         <b>L’icône de l’application installée</b> est un fichier à part : remplacez
+         <code>icones/curio-192.png</code>, <code>curio-512.png</code>,
+         <code>curio-512-maskable.png</code> et <code>curio-180.png</code> par les vôtres,
+         aux mêmes noms et aux mêmes tailles.</p>
+      <div class="cmd" style="margin:14px 0 0">
+        <button class="btn p" id="mqEnregistrer">Enregistrer et reconstruire le site</button>
+      </div>
+    </div>
+
     <!-- ══ CHOISIR CE QUI SORT MAINTENANT ═══════════════════════════════
          Le rythme sert au quotidien. Mais il arrive qu'on veuille sortir
          CEUX-LÀ : les trois qui vont avec l'actualité, la série qu'on a
@@ -919,8 +974,8 @@ function chargerTout(){
   }).then(function(){
     return S.cfg.token ? chargerDecisions() : null;
   }).then(function(){
-    return S.cfg.token ? Promise.all([lirePublication(), lireMoisson()])
-                       : lirePublicationLocale();
+    return S.cfg.token ? Promise.all([lirePublication(), lireMoisson(), lireMarque()])
+                       : Promise.all([lirePublicationLocale(), lireMarqueLocale()]);
   }).then(function(){
     calculerEcrites();
     peindreCat(); peindreRel(); peindrePied();
@@ -1942,6 +1997,88 @@ function analyserPublication(texte){
     else if(k==='stock') PUB.stock=(v.toLowerCase()==='auto'?'auto':'manuel');
   });
 }
+/* ══════════════════ LE NOM, LA SIGNATURE ET LE LOGO ══════════════════════
+   Ils vivent dans consignes/marque.txt, et la construction les grave dans les
+   pages. Les écrire ici ne suffit donc pas : il faut reconstruire — c'est
+   l'action « Entretien → reconstruire », que le bouton lance tout seul. */
+var MQ = { nom:'Curio', baseline:'', logo:'', sha:null };
+function analyserMarque(texte){
+  String(texte||'').split(/\r?\n/).forEach(function(l){
+    var t=l.trim(); if(!t || t[0]==='#') return;
+    var m=t.match(/^([\w-]+)\s*:\s*(.*)$/); if(!m) return;
+    var k=m[1].toLowerCase(), v=m[2].trim();
+    if(k==='nom') MQ.nom=v;
+    else if(k==='baseline') MQ.baseline=v;
+    else if(k==='logo') MQ.logo=v;
+  });
+}
+function lireMarque(){
+  return lireAvecExemple('marque').then(function(r){
+    MQ.sha = r.sha; analyserMarque(r.texte);
+  }).catch(function(){});
+}
+function lireMarqueLocale(){
+  return localTexte('consignes/marque.txt').then(function(t){
+    if(t && /^\s*[\w-]+\s*:/m.test(t)){ analyserMarque(t); return; }
+    return localTexte('consignes/marque.exemple.txt').then(analyserMarque);
+  }).catch(function(){});
+}
+function texteMarque(){
+  return '# ═══════════════════════════════════════════════════════════════════\n'
+   + '# LE NOM DU PRODUIT — écrit par console.html\n'
+   + '# ═══════════════════════════════════════════════════════════════════\n'
+   + '#\n'
+   + '# Ce nom est recopié dans tout ce que le lecteur voit : le titre des\n'
+   + '# pages, l’en-tête, la FAQ, les messages, le manifeste d’installation.\n'
+   + '#\n'
+   + '# Ce qu’il NE change PAS, et c’est voulu : les clés de mémoire du\n'
+   + '# navigateur, les noms de fichiers, le cache du service worker. La\n'
+   + '# marque change, vos lecteurs ne perdent ni leur collection ni leur\n'
+   + '# formule.\n'
+   + 'nom: ' + MQ.nom + '\n\n'
+   + '# La signature qui accompagne le nom dans l’en-tête du site.\n'
+   + '# Laissez vide pour n’afficher que le nom.\n'
+   + 'baseline: ' + MQ.baseline + '\n\n'
+   + '# LE LOGO. Le chemin d’une image du dépôt — par exemple icones/logo.svg.\n'
+   + '# Elle remplace le nom écrit dans l’en-tête du site ET de l’application.\n'
+   + '# Vide, ou fichier absent : on garde le nom en toutes lettres.\n'
+   + '# Déposez votre image par Add file → Upload files, puis écrivez son\n'
+   + '# chemin ici. L’icône de l’application installée est un fichier à part :\n'
+   + '# icones/curio-192.png, curio-512.png, curio-512-maskable.png,\n'
+   + '# curio-180.png — à remplacer aux mêmes noms.\n'
+   + 'logo: ' + MQ.logo + '\n';
+}
+function peindreMarque(){
+  $('#mNom').value = MQ.nom;
+  $('#mBaseline').value = MQ.baseline;
+  $('#mLogo').value = MQ.logo;
+  var a = $('#apercuMarque');
+  a.innerHTML = MQ.logo
+    ? 'L’en-tête affichera votre image <code>' + esc(MQ.logo) + '</code>. '
+      + 'Si le fichier n’existe pas dans le dépôt, le nom <b>' + esc(MQ.nom) + '</b> reste affiché.'
+    : 'L’en-tête affichera le nom <b>' + esc(MQ.nom) + '</b> en toutes lettres.';
+}
+function enregistrerMarque(){
+  MQ.nom = $('#mNom').value.trim() || 'Curio';
+  MQ.baseline = $('#mBaseline').value.trim();
+  MQ.logo = $('#mLogo').value.trim().replace(/^\/+/, '');
+  peindreMarque();
+  dit('Enregistrement du nom…','info');
+  return ecrireFichier('consignes/marque.txt', texteMarque(), MQ.sha,
+      'console : le produit s’appelle « ' + MQ.nom + ' »')
+    .then(function(sha){
+      MQ.sha = sha;
+      /* Le nom est gravé dans les pages à la construction : l'écrire ne
+         suffit pas, il faut recomposer. On le fait pour vous. */
+      return lancerAction('entretien.yml', { operation:'reconstruire', appliquer:'false' });
+    })
+    .then(function(){
+      dit('Enregistré. Le site se reconstruit — suivez-le dans <b>Actions → Entretien</b>. '
+        + 'Comptez une minute, puis rechargez le site avec un rafraîchissement forcé.','ok');
+    })
+    .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+}
+
 function lirePublication(){
   return lireAvecExemple('publication').then(function(r){
     PUB.sha = r.sha;
@@ -2136,6 +2273,7 @@ function peindrePub(){
       o.textContent = (NOMS[k]||[k])[0]; selU.appendChild(o);
     });
   }
+  peindreMarque();
   peindreChoix();
   var c={ecrites:S.fiches.length,enligne:0,prets:stockPret(),quarantaine:0};
   S.fiches.forEach(function(f){ if(enLigne(f)) c.enligne++; if(f.rec.v==='quarantaine') c.quarantaine++; });
@@ -2478,9 +2616,94 @@ function ligneEnLigne(f){
       .then(function(){ dit('Retrait lancé. Rechargez cette page quand l’action est verte.','ok'); })
       .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
   });
-  g.appendChild(oeil); g.appendChild(ret);
+  var cor = el('button','g','corriger le texte'); cor.type='button';
+  cor.title = 'Rectifier une coquille sans dépublier : la fiche reste en ligne';
+  cor.addEventListener('click', function(){ corrigerFiche(f); });
+  g.appendChild(oeil); g.appendChild(cor); g.appendChild(ret);
   n.appendChild(g);
   return n;
+}
+
+/* ══════════════ CORRIGER UNE FICHE DÉJÀ EN LIGNE ═════════════════════════
+   Une coquille, un chiffre faux, une tournure qu'on regrette : il fallait
+   retirer la fiche, la refaire écrire — un appel payé — et la republier. Pour
+   une virgule, c'est absurde.
+
+   On modifie ici le texte, l'accroche et la phrase à raconter, et on réécrit
+   le fichier d'anecdotes directement. Ce qui n'est PAS touché : la date de
+   publication, la note, la marque de contrôle, l'identifiant, l'image. La
+   fiche reste en ligne, à sa place, avec son historique.
+
+   C'est la seule écriture de la console qui modifie une fiche. Elle est donc
+   explicite, limitée à trois champs, et elle relit le fichier juste avant
+   d'écrire — pour ne jamais écraser une modification arrivée entre-temps. */
+function corrigerFiche(f){
+  var chemin = 'anecdotes/' + f.lang + '-' + f.uni + '.json';
+  var ovl = el('div','apercu');
+  ovl.innerHTML =
+    '<div class="cadre cadre--edit">'
+  + '  <div class="barreApp"><span class="marque">Corriger — ' + esc(f.titre) + '</span>'
+  + '    <button class="fermer" type="button">Fermer (Échap)</button></div>'
+  + '  <div class="edit">'
+  + '    <label>L’accroche — le titre que le lecteur voit</label>'
+  + '    <input type="text" id="edT" maxlength="120">'
+  + '    <label>Le texte — un paragraphe par bloc, séparés par une ligne vide.'
+  + '      <b>**gras**</b> et <i>*italique*</i> sont reconnus.</label>'
+  + '    <textarea id="edX" rows="16"></textarea>'
+  + '    <label>La phrase à raconter</label>'
+  + '    <input type="text" id="edR" maxlength="300">'
+  + '    <p class="quand">La date de publication, la note, le contrôle et l’image ne sont pas'
+  + '       touchés : la fiche reste en ligne, à sa place. Vos lecteurs verront la correction'
+  + '       à leur prochain chargement.</p>'
+  + '    <div class="cmd"><button class="btn p" id="edOk">Mettre à jour la fiche en ligne</button>'
+  + '      <button class="btn" id="edNon">Annuler</button></div>'
+  + '  </div>'
+  + '</div>';
+  var fermer = function(){ ovl.remove(); document.removeEventListener('keydown', auClavier); };
+  var auClavier = function(e){ if(e.key === 'Escape') fermer(); };
+  ovl.addEventListener('click', function(e){ if(e.target === ovl) fermer(); });
+  document.addEventListener('keydown', auClavier);
+  document.body.appendChild(ovl);
+  ovl.querySelector('.fermer').addEventListener('click', fermer);
+  ovl.querySelector('#edNon').addEventListener('click', fermer);
+  ovl.querySelector('#edT').value = f.rec.t || '';
+  ovl.querySelector('#edX').value = f.rec.x || '';
+  ovl.querySelector('#edR').value = f.rec.r || '';
+
+  ovl.querySelector('#edOk').addEventListener('click', function(){
+    if(!S.connecte){
+      dit('Connectez votre dépôt pour corriger une fiche : cette opération écrit '
+        + 'directement dans <code>' + esc(chemin) + '</code>.','ko');
+      return;
+    }
+    var t = ovl.querySelector('#edT').value.trim();
+    var x = ovl.querySelector('#edX').value.trim();
+    var r = ovl.querySelector('#edR').value.trim();
+    if(!x){ dit('Le texte ne peut pas être vide.','ko'); return; }
+    dit('Relecture du fichier, puis correction…','info');
+    /* On relit AVANT d'écrire : une action a pu modifier ce fichier depuis le
+       chargement de la page, et on ne veut écraser le travail de personne. */
+    lireFichier(chemin).then(function(res){
+      var j;
+      try{ j = JSON.parse(res.texte); }catch(e){ throw new Error('fichier illisible'); }
+      if(!j || !j.items || !j.items[f.titre])
+        throw new Error('« ' + f.titre + ' » n’est plus dans ce fichier');
+      var rec = j.items[f.titre];
+      rec.t = t; rec.x = x; rec.r = r;
+      rec.corrige = new Date().toISOString().slice(0,10);   // trace de la correction
+      return ecrireFichier(chemin, JSON.stringify(j, null, 1), res.sha,
+        'console : correction du texte de « ' + (t || f.titre) + ' »')
+        .then(function(){
+          f.rec.t = t; f.rec.x = x; f.rec.r = r;            // la page suit, sans rechargement
+        });
+    })
+    .then(function(){
+      fermer(); filtrerLig(); peindreLig();
+      dit('Fiche corrigée. Elle est toujours en ligne, à sa place — vos lecteurs verront '
+        + 'le nouveau texte à leur prochain chargement.','ok');
+    })
+    .catch(function(e){ dit('Échec de la correction : '+esc(e.message),'ko'); });
+  });
 }
 
 /* ══════════════════════════ branchements ══════════════════════════ */
@@ -2527,7 +2750,32 @@ document.querySelectorAll('.onglets button').forEach(function(b){
     peindreJours(); apercuPublication();
   });
 });
-$('#pEnregistrer').addEventListener('click', enregistrerPublication);
+$('#mqEnregistrer').addEventListener('click', enregistrerMarque);
+['mNom','mBaseline','mLogo'].forEach(function(id){
+  var e=$('#'+id); if(!e) return;
+  e.addEventListener('input', function(){
+    MQ.nom=$('#mNom').value.trim()||'Curio';
+    MQ.baseline=$('#mBaseline').value.trim();
+    MQ.logo=$('#mLogo').value.trim();
+    var a=$('#apercuMarque');
+    a.innerHTML = MQ.logo
+      ? 'L’en-tête affichera votre image <code>'+esc(MQ.logo)+'</code>. '
+        + 'Si le fichier n’existe pas dans le dépôt, le nom <b>'+esc(MQ.nom)+'</b> reste affiché.'
+      : 'L’en-tête affichera le nom <b>'+esc(MQ.nom)+'</b> en toutes lettres.';
+  });
+});
+/* Enregistrer le rythme reconstruit aussi le site : « langues », « images » et
+   « sommaire » sont gravés dans les pages à la construction, et sans cela un
+   changement de ces trois-là n'aurait aucun effet visible. */
+$('#pEnregistrer').addEventListener('click', function(){
+  enregistrerPublication().then(function(){
+    return lancerAction('entretien.yml', { operation:'reconstruire', appliquer:'false' });
+  }).then(function(){
+    dit('Réglages enregistrés, et le site se reconstruit — <b>Actions → Entretien</b>. '
+      + 'Le rythme s’applique dès le prochain passage de <b>5 · Publier</b>.','ok');
+  }).catch(function(e){ dit('Enregistré, mais la reconstruction n’a pas démarré : '
+      + esc(e.message) + ' — lancez <b>Actions → Entretien → reconstruire</b> à la main.','ko'); });
+});
 $('#pEtat').addEventListener('click',function(){
   enregistrerPublication().then(function(){
     return lancerAction('5-publier.yml', { operation:'etat', combien:'', titre:'' });

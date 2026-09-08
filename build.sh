@@ -51,6 +51,19 @@ marque() {
 }
 NOM=$(marque nom);            [ -n "$NOM" ] || NOM="Curio"
 BASELINE=$(marque baseline)
+
+# --- le logo ----------------------------------------------------------------
+# « logo: icones/logo.svg » dans consignes/marque.txt remplace le nom ecrit par
+# une image, dans l en-tete du site ET de l application. Vide, ou fichier
+# absent : on garde le nom en toutes lettres, ce qui est un choix parfaitement
+# valable. Le fichier lui-meme se depose par Add file -> Upload files : aucune
+# ligne de code a toucher pour changer de logo.
+LOGO=$(marque logo)
+if [ -n "$LOGO" ] && [ -f "$LOGO" ]; then
+  TITRE="<img class=\"marquelogo\" src=\"$LOGO\" alt=\"$NOM\" />"
+else
+  TITRE="<b>$NOM</b>"
+fi
 LANGUES=$(reglage langues); [ -n "$LANGUES" ] || LANGUES="fr,en"
 IMAGES=$(reglage images);   [ -n "$IMAGES" ]   || IMAGES="oui"
 
@@ -123,18 +136,18 @@ sed "s/__MARQUE__/$NOM/g" manifest.source.webmanifest > manifest.webmanifest
 # --- application ---
 { doc_head "$VUE_APP"; cat parts/00-head.html; echo "</head>"; echo "<body>"; \
   cat parts/10-body.html parts/20-data.js parts/30-app.js; echo "</body>"; echo "</html>"; } \
-  | sed "s/__MARQUE__/$NOM/g" > app.html
+  | sed "s|__MARQUE_TITRE__|$TITRE|g; s/__MARQUE__/$NOM/g" > app.html
 
 # --- site vitrine ---
 { doc_head "$VUE_SITE"; cat parts/L0-head.html; echo "</head>"; echo "<body>"; \
   cat parts/L1-body.html parts/L2-app.js; echo "</body>"; echo "</html>"; } \
-  | sed "s/__MARQUE__/$NOM/g" > index.html
+  | sed "s|__MARQUE_TITRE__|$TITRE|g; s/__MARQUE__/$NOM/g" > index.html
 
 # --- versions Artifact (sans squelette de document) ---
 cat parts/00-head.html parts/10-body.html parts/20-data.js parts/30-app.js \
-  | sed "s/__MARQUE__/$NOM/g" > build/curio-app.artifact.html
+  | sed "s|__MARQUE_TITRE__|$TITRE|g; s/__MARQUE__/$NOM/g" > build/curio-app.artifact.html
 cat parts/L0-head.html parts/L1-body.html parts/L2-app.js \
-  | sed "s/__MARQUE__/$NOM/g" > build/curio-site.artifact.html
+  | sed "s|__MARQUE_TITRE__|$TITRE|g; s/__MARQUE__/$NOM/g" > build/curio-site.artifact.html
 
 
 # --- version du service worker ----------------------------------------------

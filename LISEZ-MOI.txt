@@ -1,5 +1,13 @@
-CURIO 8.5.0 — ÉCRIRE PAR LOTS, PUBLIER À VOTRE RYTHME, FRANÇAIS SEUL
-=====================================================================
+CURIO — LE PREMIER PLAN, ÉTAPE PAR ÉTAPE
+=========================================
+
+Ce fichier est le plan de démarrage : comment passer de 1 200 sujets au
+catalogue à des fiches en ligne, sans se ruiner. Il ne change pas d'une
+version à l'autre.
+
+Pour le mode d'emploi courant — les six onglets, les quatre mots du produit,
+les réglages, quoi faire quand quelque chose paraît cassé — lisez README.md.
+Pour ce qui a changé version par version, CHANGEMENTS.md.
 
 
 VOTRE PLAN, ÉTAPE PAR ÉTAPE

@@ -23,3 +23,23 @@ nom: Curio
 # La signature qui accompagne le nom dans l'en-tête du site.
 # Laissez vide pour n'afficher que le nom.
 baseline: Le monde est plus étrange
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LE LOGO
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Le chemin d'une image du dépôt. Elle remplace le nom écrit dans l'en-tête du
+# site ET de l'application. Vide, ou fichier absent : on garde le nom en
+# toutes lettres — ce qui est un choix parfaitement valable.
+#
+#   1. déposez votre image dans icones/ par Add file → Upload files
+#   2. écrivez son chemin ici, ou dans la console (5 · Publication)
+#
+# Une image nette et large de 400 px suffit ; le SVG est idéal.
+#
+# L'ICÔNE DE L'APPLICATION INSTALLÉE est un fichier à part. Remplacez
+# icones/curio-192.png, curio-512.png, curio-512-maskable.png et
+# curio-180.png par les vôtres, aux mêmes noms et aux mêmes tailles.
+#
+#   logo: icones/logo.svg
+logo:

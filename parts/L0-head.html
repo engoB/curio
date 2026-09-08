@@ -122,6 +122,11 @@ img{max-width:100%}
 }
 .nav .wrap{display:flex;align-items:center;gap:12px;height:64px}
 .brand{display:flex;align-items:baseline;gap:9px;margin-right:auto}
+/* Le logo, quand consignes/marque.txt en désigne un. Il prend la place du nom
+   écrit, à la même hauteur : on remplace une marque par une autre, on ne
+   redessine pas la barre. */
+.marquelogo{display:block;height:26px;width:auto;max-width:min(190px,42vw);object-fit:contain;flex:none}
+@media (max-width:640px){ .marquelogo{height:22px;max-width:38vw} }
 .brand b{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:23px;letter-spacing:-.02em;font-variation-settings:"SOFT" 40,"WONK" 1}
 .brand i{font-style:normal;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--text-3);border-left:1px solid var(--line);padding-left:9px}
 .navlinks{display:flex;gap:24px;margin-right:18px}

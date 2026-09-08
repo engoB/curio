@@ -1,4 +1,63 @@
-# Curio 8.12.0 — ce qui a changé depuis v6
+# Curio 8.13.0 — ce qui a changé depuis v6
+
+## 8.13.0 — votre nom, votre logo, et le droit de vous corriger
+
+### Le nom et le logo se règlent depuis la console
+
+*5 · Publication → **Le nom et le logo***. Trois champs — le nom, la
+signature, le chemin du logo — un aperçu qui montre le résultat pendant que
+vous tapez, et un bouton. La console écrit `consignes/marque.txt`, puis
+**reconstruit le site toute seule** : le changement est en ligne sans qu'on
+vous livre quoi que ce soit.
+
+Pour le logo : déposez votre image dans `icones/` par *Add file → Upload
+files*, puis écrivez son chemin — `icones/logo.svg`. Champ vide, c'est le nom
+en toutes lettres, comme avant. Si le chemin ne mène à rien, la construction
+retombe sur le nom plutôt que d'afficher une image cassée : *éprouvé* avec un
+fichier absent.
+
+Changer de nom ne coupe personne : la collection, les favoris et la formule de
+vos lecteurs sont rangés sous des clés qui ne bougent pas.
+
+### Corriger une fiche déjà en ligne
+
+*6 · En ligne* ouvrait l'aperçu du lecteur ; on ne pouvait qu'en retirer.
+Une coquille dans un texte publié n'avait donc qu'une issue : tout refaire.
+
+Il y a maintenant **corriger le texte**. L'accroche, les paragraphes et la
+phrase à raconter s'éditent dans l'aperçu, et **Mettre à jour la fiche en
+ligne** écrit le nouveau texte. La fiche ne bouge pas : elle reste en ligne,
+**à sa place**, sa date de publication intacte — vos lecteurs voient
+simplement le texte corrigé. Le fichier est relu juste avant l'écriture, donc
+une correction n'écrase jamais les autres fiches du même univers.
+
+*Éprouvé* de bout en bout contre une API simulée : le corps envoyé garde
+`p`, la note, l'identifiant et l'image, ne change que le texte, laisse les
+sept autres fiches du fichier intactes et pose une trace de correction.
+
+### Le « 5 » a quitté la barre
+
+En gratuit, un compteur annonçait ce qui restait. Compter ce qu'on offre, c'est
+rappeler à chaque écran ce qu'on ne donne pas. Il est parti — les cinq
+anecdotes du jour sont les mêmes pour tout le monde, elles arrivent, elles
+suffisent.
+
+### La pioche laisse le temps de lire
+
+Les phrases défilaient en une seconde et demie. Elles tiennent maintenant
+**3,5 secondes** : le temps de les lire.
+
+### Le README
+
+Refait : les six onglets et le métier de chacun, les quatre mots du produit
+(*écrite → relue → au stock → en ligne*), le tableau « corriger, retirer,
+refaire », que faire quand quelque chose paraît cassé, et la carte du dépôt.
+
+### Ce que cette version ne touche pas
+
+Aucune fiche, aucun réglage, aucun fichier de `consignes/` ne part dans le
+paquet. Le rythme, la moisson, vos décisions et vos validations restent les
+vôtres.
 
 ## 8.12.0 — moins de boutons, et chacun à sa place
 

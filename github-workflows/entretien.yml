@@ -28,6 +28,13 @@
 #    doublons    cherche les redites parmi les seules fiches EN LIGNE, dans
 #                la meme langue. Ecrit doublons.csv. Ne retire rien : c est
 #                vous qui tranchez, avec « 5 · Publier → retirer ».
+#    reconstruire RECOMPOSE LE SITE depuis parts/. Le nom du produit, le logo,
+#                les langues publiees, les photos et le sommaire sont graves
+#                dans app.html et index.html a la construction : cette action
+#                est ce qui fait qu un changement de nom prend effet sans
+#                attendre une livraison. Gratuite, aucune fiche touchee.
+#                La console la declenche toute seule quand vous enregistrez
+#                le nom, le logo ou le rythme.
 #    ranger      remet chaque sujet dans son univers d apres son article.
 #                Les archives « Le saviez-vous ? » ont des sections datees,
 #                qui ne disent rien du sujet : tout tombait dans Mysteres.
@@ -57,6 +64,7 @@ on:
           - auditer
           - reparer
           - doublons
+          - reconstruire
       appliquer:
         description: "auditer : ecarter ce qui echoue (sinon on ne fait que lire)"
         required: false
@@ -108,6 +116,14 @@ jobs:
             reparer)   node tools/publier.mjs --reparer  2>&1 | tee curio.log
                        node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
             doublons)  node tools/publier.mjs --doublons 2>&1 | tee curio.log ;;
+            reconstruire)
+              # RECONSTRUIRE LE SITE. Le nom du produit, le logo, les langues
+              # publiees, les photos, le sommaire : tous sont graves dans
+              # app.html et index.html a la construction. Sans cette action, il
+              # fallait qu'on vous livre un paquet pour qu'un simple changement
+              # de nom prenne effet. Elle ne coute rien et ne touche a aucune
+              # fiche : elle recompose les deux pages depuis parts/.
+              sh build.sh 2>&1 | tee curio.log ;;
           esac
 
       - name: Compte rendu
@@ -127,7 +143,7 @@ jobs:
           git config user.name  "curio-bot"
           git config user.email "curio-bot@users.noreply.github.com"
           rm -f curio.log
-          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv audit-retenus.csv doublons.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json; do
+          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv audit-retenus.csv doublons.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json app.html index.html console.html sw.js version.json manifest.webmanifest; do
             if [ -e "$p" ]; then
               git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
             fi

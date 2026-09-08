@@ -8,7 +8,7 @@
        Le numéro de version se lit au survol, et nulle part ailleurs dans la
        barre : il intéresse une personne sur mille, il ne prend pas de place. -->
   <button class="brand" id="brandBtn" type="button" title="Revenir à l’accueil">
-    <b>__MARQUE__</b><span class="planbadge" id="planTag">Gratuit</span>
+    __MARQUE_TITRE__<span class="planbadge" id="planTag">Gratuit</span>
   </button>
 
   <button class="counter" id="tocBtn" title="Sommaire">
@@ -23,13 +23,19 @@
     <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
   </button>
 
-  <!-- ── PAS DE COMPTE À REBOURS ─────────────────────────────────────────
-       Une jauge qui se vide et « 3 restantes » transforment une lecture en
-       ration. On lisait en regardant le compteur descendre. Le gratuit dit
-       ce qu'il donne — cinq anecdotes aujourd'hui — et ne dit plus ce qu'il
-       reprend. La cinquième finie, le mur de l'offre parle de lui-même. -->
-  <div class="quota" id="quota">
-    <span id="quotaTxt"><b>5</b><em> aujourd’hui</em></span>
+  <!-- ── NI COMPTE À REBOURS, NI COMPTE TOUT COURT ───────────────────────
+       Il y a eu une jauge qui se vidait, puis « 3 restantes », puis le
+       chiffre 5 immobile. Les trois disaient au lecteur qu'on lui mesure
+       quelque chose, et on lisait en les regardant.
+
+       Il ne reste rien. Le gratuit donne cinq anecdotes par jour, la page
+       d'accueil et l'offre le disent en toutes lettres ; la barre de lecture
+       n'a pas à le répéter. La cinquième finie, le mur parle de lui-même.
+
+       Le nœud reste dans la page — le code s'en sert comme point d'ancrage —
+       mais il ne montre plus rien. -->
+  <div class="quota" id="quota" hidden aria-hidden="true">
+    <span id="quotaTxt"></span>
   </div>
 
   <span class="tbgap"></span>
