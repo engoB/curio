@@ -1,4 +1,68 @@
-# Curio 8.13.0 — ce qui a changé depuis v6
+# Curio 8.14.0 — ce qui a changé depuis v6
+
+## 8.14.0 — vider la poubelle, et choisir sa veine
+
+### Le catalogue se vide, sans rien perdre
+
+« Le saviez-vous ? » compte des milliers de pages et il s'en ajoute une chaque
+jour depuis vingt ans. La moisson tourne toutes les nuits. Au bout de quelques
+mois, le catalogue porte des dizaines de milliers de sujets dont on n'a rien
+dit — et on ne sait plus où regarder. Ce n'est pas une réserve, c'est une
+poubelle, et une poubelle ne se trie pas : elle se vide.
+
+*4 · Contrôle → **Repartir à zéro***, et *Entretien → repartir-a-zero* pour qui
+préfère l'action. **Ce qui reste, quoi qu'il arrive** : tout sujet qui a une
+fiche — écrite, au stock ou en ligne — vos sujets phares, vos ajouts manuels,
+et ce que vous aviez retiré. Un seul choix : *ménage* garde aussi vos retenus
+pas encore écrits, *table rase* les vide.
+
+**Aucune fiche n'est ouverte, rien de ce qui est en ligne ne bouge, et un sujet
+déjà écrit ne peut pas revenir à l'écriture** : un sujet est un identifiant
+Wikidata, et le sien reste au catalogue. L'ancien catalogue est recopié dans
+`catalogue-maitre.avant-remise-a-zero.json` avant la première écriture. Si le
+tri ne garde rien du tout, l'outil s'arrête sans avoir écrit une ligne.
+
+*Éprouvé* sur un catalogue de 59 sujets reproduisant les cas réels — fiche sans
+identifiant retrouvée par son titre, fiche française tirée d'un article
+anglais-seul, phare que le registre avait oublié de marquer, ajout manuel,
+sujet retiré : 14 gardés / 45 sortis en ménage, 8 / 51 en table rase, fiches
+inchangées au bit près, décisions devenues sans objet retirées.
+
+**Un défaut trouvé en chemin, et il aurait été grave.** Les fiches du dépôt
+sont rangées sous `{ items: { titre: fiche } }`, et l'outil lisait l'objet à
+plat : il aurait compté UNE fiche nommée « items » et n'aurait reconnu aucun
+sujet écrit. Le garde-fou « si le tri ne garde rien, on n'écrit pas » aurait
+sauvé la mise — de justesse. C'est le jeu d'essai au vrai format qui l'a
+révélé.
+
+### La console et l'outil comptent enfin pareil
+
+La carte annonce ce qui va rester et ce qui va sortir **avant** de lancer quoi
+que ce soit. Elle applique la règle de l'outil mot pour mot — et pour cela elle
+lit désormais `consignes/sujets-phares.txt` elle-même, comme lui. Elle
+annonçait sinon moins de phares qu'il n'en garderait : deux comptes pour une
+seule chose, exactement le défaut qui avait coûté deux versions.
+
+### Moissonner une veine à la fois
+
+Le code savait choisir sa source depuis longtemps ; l'action ne le lui a jamais
+demandé, et la moisson prenait tout à chaque fois. *1 · Moisson* offre
+maintenant le choix, pour un lancement à la main :
+
+| | |
+|---|---|
+| **tout** | les trois veines — ce que fait la nuit |
+| **les articles insolites seuls** | quatre pages en français, vingt en anglais : très ciblé, et fini une fois lu |
+| **« Le saviez-vous ? » seul** | la seule veine qui se renouvelle, et celle qui remplit le plus vite |
+| **vos sujets phares seuls** | aucun appel aux listes Wikipédia |
+
+Une valeur inconnue retombe sur « tout » : un réglage mal orthographié ne doit
+pas vider une moisson.
+
+### Ce que cette version ne touche pas
+
+Aucune fiche, aucun réglage, aucun fichier de `consignes/` ne part dans le
+paquet. La publication, le rythme, la relecture et l'affichage sont inchangés.
 
 ## 8.13.0 — votre nom, votre logo, et le droit de vous corriger
 

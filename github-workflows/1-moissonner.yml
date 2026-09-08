@@ -6,6 +6,15 @@
 #  insolites, « Le saviez-vous ? » — ramenees a un identifiant Wikidata par
 #  sujet. C est ce qui rend les doublons impossibles.
 #
+#  QUELLE VEINE OUVRIR — le choix « source », a la main seulement :
+#    tout      les trois (defaut, et ce que fait la nuit)
+#    phares    vos seuls sujets phares, aucun appel aux listes Wikipedia
+#    insolite  vos phares + les listes d articles insolites. Tres cible, et
+#              fini une fois lu : quatre pages en francais, vingt en anglais.
+#    saviez    vos phares + « Le saviez-vous ? ». Des milliers de pages, une
+#              de plus chaque jour depuis vingt ans : la seule veine qui se
+#              renouvelle, et celle qui remplit le catalogue le plus vite.
+#
 #  Reddit entre dans la meme moisson des que consignes/reddit.txt liste des
 #  subreddits. Vide par defaut : rien ne se passe tant que vous ne l activez
 #  pas.
@@ -50,6 +59,16 @@ on:
       minutes:
         description: "Duree max de la passe, en minutes (le reste attendra la suivante)"
         default: "40"
+      source:
+        description: "Quelle veine ouvrir ?"
+        required: false
+        default: tout
+        type: choice
+        options:
+          - tout
+          - insolite
+          - saviez
+          - phares
 
 # Une seule moisson a la fois. Sans cela, deux executions peuvent se marcher
 # dessus et se voler le catalogue en s enregistrant l une apres l autre.
@@ -128,7 +147,11 @@ jobs:
           M="${{ github.event.inputs.minutes }}"
           [ -z "$M" ] && M="${{ steps.reglage.outputs.minutes }}"
           [ -z "$M" ] && M=40
-          node tools/build-catalog.mjs --maitre --minutes "$M" 2>&1 | tee curio.log
+          # Quelle veine ouvrir. « tout » par defaut, y compris la nuit : un
+          # declenchement programme ne passe aucune entree.
+          S="${{ github.event.inputs.source }}"
+          [ -z "$S" ] && S=tout
+          node tools/build-catalog.mjs --maitre --minutes "$M" --source "$S" 2>&1 | tee curio.log
 
       - name: Compte rendu
         if: always() && steps.reglage.outputs.passer != 'oui'

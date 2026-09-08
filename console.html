@@ -122,6 +122,8 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .btn.p{background:var(--accent);color:var(--accent-encre);border-color:var(--accent)}
 .btn.v{background:var(--vert);color:var(--accent-encre);border-color:var(--vert)}
 .btn.o{background:var(--or);color:#17120A;border-color:var(--or)}
+.btn.r{background:var(--rouge-doux);color:var(--rouge);border-color:var(--rouge);font-weight:700}
+.btn.r:hover{color:var(--rouge);border-color:var(--rouge)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
 /* ---------- lignes ---------- */
@@ -383,7 +385,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          pouvait dire si le correctif était en place ou si le navigateur
          servait encore l'ancien fichier. La version est écrite ici par
          build.sh, à côté du titre, en petit. -->
-    <h1>Curio &middot; console<b class="ver" id="conVer">8.13.0</b></h1><!-- BUILD:CONSOLE -->
+    <h1>Curio &middot; console<b class="ver" id="conVer">8.14.0</b></h1><!-- BUILD:CONSOLE -->
 
     <!-- ── LES ÉTAPES, DANS L'ORDRE OÙ ON LES FAIT ──────────────────────
          Trois onglets nommés par leur contenu ne disaient pas par où
@@ -474,7 +476,22 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
           <label for="pMinutes">Minutes par passage</label>
           <input type="number" id="pMinutes" min="5" max="300" step="5">
         </div>
+        <div>
+          <label for="pSource">Quelle veine ouvrir</label>
+          <select id="pSource">
+            <option value="tout">Tout — vos phares, l’insolite et le saviez-vous</option>
+            <option value="insolite">Les articles insolites seuls</option>
+            <option value="saviez">« Le saviez-vous ? » seul</option>
+            <option value="phares">Vos sujets phares seuls</option>
+          </select>
+        </div>
       </div>
+      <p class="apercuPub" style="margin-top:10px">La veine ne vaut que pour le lancement
+         à la main, juste en dessous — la nuit prend tout. <b>Les articles insolites</b> :
+         quatre pages en français, vingt en anglais, très ciblées et vite épuisées.
+         <b>« Le saviez-vous ? »</b> : des milliers de pages, une de plus chaque jour
+         depuis vingt ans — c’est la seule veine qui se renouvelle, et celle qui remplit
+         le catalogue le plus vite.</p>
       <p class="apercuPub" style="margin-top:10px">Mettez « non » quand vous avez plus de
          sujets d’avance que vous n’en écrirez ce mois-ci. Un lancement à la main passe
          toujours outre ce réglage.</p>
@@ -971,6 +988,20 @@ function chargerTout(){
     }
     remplirUnivers();
     return chargerFiches();
+  }).then(function(){
+    /* Les titres de consignes/sujets-phares.txt. Le fichier est public : il se
+       lit sans jeton. Sans lui, la carte « repartir à zéro » compterait moins
+       de phares que l'outil n'en gardera — deux comptes pour une seule chose,
+       et c'est précisément le défaut qu'on ne veut plus. */
+    return localTexte('consignes/sujets-phares.txt').then(function(t){
+      S.phares = {};
+      String(t||'').split(/\r?\n/).forEach(function(l){
+        var x = l.trim();
+        if(!x || x.charAt(0)==='#' || x.indexOf('|')<0) return;
+        var titre = x.split('|')[0].trim();
+        if(titre) S.phares[titre.toLowerCase()] = 1;
+      });
+    });
   }).then(function(){
     return S.cfg.token ? chargerDecisions() : null;
   }).then(function(){
@@ -2491,6 +2522,89 @@ function peindreDiagnostic(){
   boite.innerHTML = h;
 }
 
+/* ═══════════ REPARTIR À ZÉRO — vider la poubelle du catalogue ═════════════
+   Le catalogue grossit chaque nuit et « Le saviez-vous ? » ne s'épuise
+   jamais : au bout de quelques mois on a des dizaines de milliers de sujets
+   dont on n'a rien dit, et on ne sait plus où regarder.
+
+   Cette carte compte, ICI, avant de lancer quoi que ce soit : ce qui reste
+   et ce qui part. La règle est la même que celle de l'outil, mot pour mot —
+   si les deux divergeaient, le chiffre affiché serait un mensonge. */
+function trierRemiseAZero(mode){
+  var pharesTitres = S.phares || {};
+  var r = { fiche:0, phare:0, ajout:0, retire:0, retenu:0, sortis:0 };
+  S.sujets.forEach(function(s){
+    var src = s.sources || [];
+    if(vuDe(ECRITES, s)) { r.fiche++; return; }
+    if(s.statut==='ecrit' || s.statut==='publie' || s.statut==='controle'){ r.fiche++; return; }
+    if(src.indexOf('phare') >= 0){ r.phare++; return; }
+    if((s.fr && pharesTitres[String(s.fr).toLowerCase()])
+    || (s.en && pharesTitres[String(s.en).toLowerCase()])){ r.phare++; return; }
+    if(src.indexOf('manuel') >= 0 || String(s.qid).indexOf('M-')===0){ r.ajout++; return; }
+    if(s.statut==='retire'){ r.retire++; return; }
+    if(mode==='menage' && decDe(s)==='retenu'){ r.retenu++; return; }
+    r.sortis++;
+  });
+  r.gardes = r.fiche + r.phare + r.ajout + r.retire + r.retenu;
+  return r;
+}
+
+function carteRemiseAZero(){
+  var d = el('div','outil');
+  function texte(mode){
+    var r = trierRemiseAZero(mode);
+    return '<p><b>' + nb(r.gardes) + '</b> sujet(s) resteraient, <b>' + nb(r.sortis)
+         + '</b> sortiraient.</p>'
+         + '<p class="quand">Gardés : ' + nb(r.fiche) + ' qui ont une fiche · '
+         + nb(r.phare) + ' sujets phares · ' + nb(r.ajout) + ' ajouts · '
+         + nb(r.retire) + ' que vous aviez retirés'
+         + (mode==='menage' ? ' · ' + nb(r.retenu) + ' que vous aviez retenus' : '')
+         + '.</p>';
+  }
+  d.innerHTML = '<h4>Repartir à zéro — vider la poubelle du catalogue</h4>'
+    + '<p>« Le saviez-vous ? » ne s’épuise jamais : le catalogue finit par porter des '
+    + 'dizaines de milliers de sujets dont vous n’avez rien dit, et on ne sait plus où '
+    + 'regarder. Cet outil vide cette masse-là, et <b>elle seule</b>.</p>'
+    + '<p><b>Ce qui reste, quoi qu’il arrive</b> : tout sujet qui a une fiche — écrite, '
+    + 'au stock ou en ligne — vos sujets phares, vos ajouts manuels, et ce que vous aviez '
+    + 'retiré. <b>Aucune fiche n’est ouverte, rien de ce qui est en ligne ne bouge</b>, et '
+    + 'un sujet déjà écrit ne peut pas revenir à l’écriture : son identifiant Wikidata est '
+    + 'resté au catalogue.</p>'
+    + '<p>L’ancien catalogue est recopié dans <code>catalogue-maitre.avant-remise-a-zero.json</code> '
+    + 'avant la première écriture : pour revenir en arrière, renommez-le.</p>'
+    + '<div class="champs" style="margin-top:12px"><div>'
+    + '<label for="zMode">Vos sujets retenus mais pas encore écrits</label>'
+    + '<select id="zMode">'
+    + '<option value="menage">Les garder — ménage</option>'
+    + '<option value="rase">Les vider aussi — table rase</option>'
+    + '</select></div></div>'
+    + '<div id="zApercu"></div>';
+  var apercu = function(){ d.querySelector('#zApercu').innerHTML = texte(d.querySelector('#zMode').value); };
+  var b = el('button','btn r','Repartir à zéro');
+  b.addEventListener('click', function(){
+    var mode = d.querySelector('#zMode').value;
+    var r = trierRemiseAZero(mode);
+    if(!r.gardes){ dit('Le tri ne garderait aucun sujet : rien n’est lancé.','ko'); return; }
+    if(!window.confirm('Vider la poubelle du catalogue ?\n\n'
+      + nb(r.gardes) + ' sujet(s) resteraient.\n'
+      + nb(r.sortis) + ' sortiraient du catalogue.\n\n'
+      + 'Aucune fiche n’est touchée. Rien de ce qui est en ligne ne bouge.\n'
+      + 'L’ancien catalogue est conservé à côté, pour revenir en arrière.')) return;
+    dit('Lancement…','info');
+    lancerAction('entretien.yml', { operation:'repartir-a-zero', garder:mode,
+                                    confirmer:'VIDER', appliquer:'false' })
+      .then(function(){ dit('Lancé. Le compte rendu est dans <b>Actions → Entretien</b>. '
+        + 'Rechargez cette page quand l’action est verte.','ok'); })
+      .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+  });
+  d.appendChild(b);
+  window.setTimeout(function(){
+    apercu();
+    d.querySelector('#zMode').addEventListener('change', apercu);
+  }, 0);
+  return d;
+}
+
 function peindreControle(){
   var c = { fiches:S.fiches.length, quarantaine:0, nonRelues:0, incoherents:0 };
   S.fiches.forEach(function(f){
@@ -2547,6 +2661,10 @@ function peindreControle(){
     d.appendChild(b);
     l.appendChild(d);
   });
+
+  /* En dernier, seul de son espèce : c'est le seul outil du produit qui
+     retire des lignes du catalogue. */
+  l.appendChild(carteRemiseAZero());
 }
 
 /* ═══════════════════ 6 · EN LIGNE ═══════════════════════════════════════ */
@@ -2799,11 +2917,17 @@ $('#pPublierNow').addEventListener('click',function(){
 $('#mLancer').addEventListener('click',function(){
   if(!S.connecte){ dit('Connectez votre dépôt d’abord : la moisson se lance par l’API GitHub.','ko');
     $('#reglages').hidden=false; window.scrollTo(0,0); return; }
+  var veine = ($('#pSource') && $('#pSource').value) || 'tout';
+  var DITE = { tout:'tout — vos phares, l’insolite et le saviez-vous',
+               insolite:'les articles insolites seuls',
+               saviez:'« Le saviez-vous ? » seul',
+               phares:'vos sujets phares seuls' };
   if(!window.confirm('Lancer la moisson maintenant ?\n\n'
+    + 'Veine : ' + DITE[veine] + '\n\n'
     + 'Elle est gratuite. Comptez quelques minutes — une demi-heure la toute première fois.\n'
-    + 'Elle tourne de toute façon chaque nuit à minuit.')) return;
+    + 'Elle tourne de toute façon chaque nuit à minuit, et la nuit prend tout.')) return;
   dit('Lancement…','info');
-  lancerAction('1-moissonner.yml', {}).then(function(){
+  lancerAction('1-moissonner.yml', { source:veine }).then(function(){
     dit('La moisson est lancée. Suivez-la dans l’onglet <b>Actions</b> de votre dépôt, '
       + 'puis rechargez cette page quand elle est verte.','ok');
   }).catch(function(e){ dit('Échec du lancement : '+esc(e.message),'ko'); });

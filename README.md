@@ -43,15 +43,44 @@ C'est le vocabulaire de toute l'interface. Il ne varie jamais.
 
 | | ce qu'on y voit | ce qu'on y fait |
 |---|---|---|
-| **1 · Moisson** | ce qui est au catalogue | agrandir le catalogue — **gratuit** |
+| **1 · Moisson** | ce qui est au catalogue | agrandir le catalogue, veine par veine — **gratuit** |
 | **2 · Sélection** | les sujets **pas encore écrits** | retenir, écarter, envoyer à l'écriture — **payant** |
 | **3 · Relecture** | les fiches **écrites**, ni au stock ni en ligne | juger le texte, cocher, envoyer au stock |
-| **4 · Contrôle** | l'état de santé du catalogue | des outils qui lisent et rapportent, sans rien détruire |
+| **4 · Contrôle** | l'état de santé du catalogue | des outils qui lisent et rapportent — et le seul qui vide |
 | **5 · Publication** | **le stock** | le rythme, le nom et le logo, sortir des sujets choisis |
 | **6 · En ligne** | ce que le lecteur voit | corriger un texte, retirer une fiche |
 
 Aucun onglet n'empiète sur le métier d'un autre. **On ne publie jamais depuis
 la Relecture.**
+
+### Les trois veines de la moisson
+
+Le catalogue vient de trois endroits, et *1 · Moisson* laisse choisir lesquels
+ouvrir pour un lancement à la main. La nuit, elle prend tout.
+
+| veine | ce que c'est |
+|---|---|
+| **vos sujets phares** | `consignes/sujets-phares.txt` — la seule liste que vous tenez |
+| **les articles insolites** | quatre pages en français, vingt en anglais. Très ciblé, et **fini** une fois lu. |
+| **« Le saviez-vous ? »** | des milliers de pages, une de plus chaque jour depuis vingt ans. La seule veine qui se renouvelle — et celle qui remplit le catalogue le plus vite. |
+
+### Vider la poubelle du catalogue
+
+« Le saviez-vous ? » ne s'épuise jamais : au bout de quelques mois, le
+catalogue porte des dizaines de milliers de sujets dont vous n'avez rien dit,
+et on ne sait plus où regarder. *4 · Contrôle → **Repartir à zéro*** vide cette
+masse-là, et elle seule.
+
+**Ce qui reste, quoi qu'il arrive** : tout sujet qui a une fiche — écrite, au
+stock ou en ligne — vos sujets phares, vos ajouts manuels, et ce que vous aviez
+retiré. Un choix, et un seul : garder ou non vos **retenus pas encore écrits**
+(*ménage* / *table rase*).
+
+Aucune fiche n'est ouverte, rien de ce qui est en ligne ne bouge, et **un sujet
+déjà écrit ne peut pas revenir à l'écriture** : son identifiant Wikidata reste
+au catalogue. L'ancien catalogue est recopié dans
+`catalogue-maitre.avant-remise-a-zero.json` — pour revenir en arrière,
+renommez-le `catalogue-maitre.json`.
 
 ### Le jeton — utile, pas obligatoire
 
@@ -132,6 +161,7 @@ favoris et leur formule sont rangés sous des clés qui ne changent pas.
 | vous voulez **reprendre la main** sur toute la mise en ligne | *4 · Contrôle → **Tout renvoyer au stock***. Rien n'est effacé. |
 | deux fiches racontent la même chose | *4 · Contrôle → **Chercher les redites***. Elle rapporte, vous tranchez. |
 | les chiffres se contredisent | *4 · Contrôle → **Pourquoi ces chiffres ?*** puis **Remettre le registre d'accord**. |
+| le catalogue est devenu une poubelle | *4 · Contrôle → **Repartir à zéro***. Vos écrits, vos phares et vos ajouts restent. |
 
 ---
 

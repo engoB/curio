@@ -55,13 +55,23 @@ const DEPTH      = parseInt(opt('profondeur', '2'), 10);   // 3 explose le nombr
 const MAX_POOL   = parseInt(opt('pool', '6000'), 10);      // borne du bassin de candidats
 const ONLY       = opt('univers', null);
 const EXTRA_CATS = (opt('categories', '') || '').toString().split(',').map(s => s.trim()).filter(Boolean);
-/* D'où viennent les sujets :
- *   insolite   — uniquement les listes d'articles insolites (rapide, très ciblé)
- *   saviez     — uniquement « Le saviez-vous ? » / Did you know (la mine la
- *                plus profonde : des milliers d'accroches écrites à la main)
- *   categories — uniquement le parcours des catégories (large, notoriété)
- *   tout       — les deux, les listes d'abord (défaut)                        */
+/* D'OÙ VIENNENT LES SUJETS. Dans le mode « maître » — celui de l'action
+ * « 1 · Moissonner » — il y a exactement trois veines, et ce réglage dit
+ * lesquelles on ouvre :
+ *   tout       — les trois (défaut)
+ *   phares     — vos seuls sujets phares, aucun appel aux listes Wikipédia
+ *   insolite   — vos phares + les listes d'articles insolites. Quatre pages
+ *                en français, vingt en anglais : très ciblé, et fini une fois
+ *                lu.
+ *   saviez     — vos phares + « Le saviez-vous ? » / Did you know. Des
+ *                milliers de pages, une de plus chaque jour depuis vingt ans :
+ *                c'est la seule veine qui se renouvelle, et c'est aussi celle
+ *                qui remplit le catalogue le plus vite.
+ * (« curees » et « categories » ne concernent que l'ancien mode catalog.json.)
+ */
 const SOURCE = String(opt('source', 'tout') || 'tout');
+/* --repartir-zero menage|rase : voir repartirDeZero() plus bas. */
+const ZERO = opt('repartir-zero', false);
 const RECLASSER = !!opt('reclasser', false);   // recalculer les potentiels, sans reseau
 const NETTOYER  = !!opt('nettoyer', false);   // retirer les doublons deja entres, sans reseau
 const MODE_MAITRE = !!opt('maitre', false);   // construire le catalogue maitre (la reference)
@@ -1576,7 +1586,17 @@ async function rassembler(){
   }catch{ console.log('  · phares    : consignes/sujets-phares.txt absent'); }
 
   /* --- 2 et 3. les deux moissons ----------------------------------------- */
-  for (const quoi of ['insolite', 'saviez']){
+  /* Le réglage --source ouvre ou ferme chaque veine. « phares » les ferme
+     toutes les deux : on ne fait alors que relire votre fichier, sans un seul
+     appel à Wikipédia. C'est ce qui permet de moissonner l'insolite SEUL, ou
+     « Le saviez-vous ? » SEUL, au lieu de tout prendre à chaque fois. */
+  const veines = SOURCE === 'phares'   ? []
+               : SOURCE === 'insolite' ? ['insolite']
+               : SOURCE === 'saviez'   ? ['saviez']
+               : ['insolite', 'saviez'];
+  if (veines.length < 2)
+    console.log(`  · source    : ${SOURCE} — ${veines.length ? 'seule la veine « ' + veines[0] + ' » est ouverte' : 'aucune liste Wikipédia, vos phares seulement'}`);
+  for (const quoi of veines){
     for (const lang of ['fr', 'en']){
       let e = [];
       try{ e = await moissonInsolite(lang, quoi); }
@@ -2294,7 +2314,179 @@ async function writeAtomic(obj){
 }
 
 /* -------------------------------------------------------------------- main */
+/* ═══════════════ REPARTIR À ZÉRO — vider la poubelle, rien d'autre ═════════
+   Le catalogue grossit à chaque nuit. « Le saviez-vous ? » compte des
+   milliers de pages et il s'en ajoute une chaque jour : au bout de quelques
+   mois on a des dizaines de milliers de sujets dont on n'a rien décidé, et
+   on ne sait plus où regarder. C'est une poubelle, et une poubelle ne se
+   trie pas : elle se vide.
+
+   MAIS on ne perd rien de ce qui a coûté quelque chose. Cette opération
+   GARDE, quoi qu'il arrive :
+
+     · tout sujet qui a une fiche dans anecdotes/ — écrit, au stock ou en
+       ligne. C'est de l'argent dépensé et du texte relu ; il ne sort jamais,
+       même si la moisson ne le retrouverait plus.
+     · vos sujets phares (consignes/sujets-phares.txt) — c'est VOTRE liste.
+     · vos ajouts manuels (consignes/ajouts.json).
+     · ce que vous avez retiré : un retrait est une décision, pas un déchet.
+
+   Deux niveaux, et c'est la seule différence entre les deux :
+     menage (défaut) — garde en plus vos sujets RETENUS pas encore écrits.
+                       Ne part que ce dont vous n'avez rien dit, et ce que
+                       vous avez écarté.
+     rase            — vos retenus pas encore écrits partent aussi. Il ne
+                       reste que les fiches, les phares, les ajouts et les
+                       retirés.
+
+   Rien n'est détruit sans filet : l'ancien catalogue est recopié tel quel
+   dans catalogue-maitre.avant-remise-a-zero.json avant la première écriture.
+   Aucune fiche n'est ouverte en écriture. Gratuit.                         */
+async function repartirDeZero(){
+  const mode = (ZERO === true ? 'menage' : String(ZERO)).toLowerCase();
+  if (mode !== 'menage' && mode !== 'rase'){
+    console.error(`✗ --repartir-zero attend « menage » ou « rase », pas « ${mode} ».`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const maitre = await lireMaitre();
+  if (!maitre || !Array.isArray(maitre.sujets) || !maitre.sujets.length){
+    console.log('Pas de catalogue-maitre.json : il n’y a rien à vider.');
+    return;
+  }
+  const avant = maitre.sujets.length;
+  const decisions = await lireDecisions();
+
+  /* ── 1. Ce que les FICHES savent. C'est la vérité : l'application ne lit
+     qu'elles. On indexe par identifiant ET par titre, parce que les fiches
+     d'avant la version 8.5 n'ont pas de champ « q ». ------------------- */
+  const parTitre = new Map();
+  for (const s of maitre.sujets){
+    if (s.fr) parTitre.set(s.fr, s.qid);
+    if (s.en) parTitre.set(s.en, s.qid);
+  }
+  const avecFiche = new Set();
+  let nFiches = 0, orphelines = 0;
+  let fichiers = [];
+  try{ fichiers = (await fs.readdir(path.join(process.cwd(), 'anecdotes')))
+                    .filter(f => /^(fr|en)-[a-z]+\.json$/.test(f)); }
+  catch{ /* pas de dossier anecdotes : rien n'est écrit, tout peut partir */ }
+  for (const f of fichiers){
+    let j = {};
+    try{ j = JSON.parse(await fs.readFile(path.join(process.cwd(), 'anecdotes', f), 'utf8')); }
+    catch{ continue; }
+    /* Le format du dépôt est { items: { titre: fiche } }. Lire l'objet à plat
+       ferait compter UNE fiche nommée « items », donc zéro sujet gardé — et
+       le garde-fou aurait sauvé la mise, mais de justesse. */
+    const items = (j && typeof j === 'object' && j.items && typeof j.items === 'object')
+                ? j.items : j;
+    for (const titre of Object.keys(items || {})){
+      const rec = items[titre] || {};
+      nFiches++;
+      const q = rec.q || parTitre.get(titre);
+      if (q) avecFiche.add(q); else orphelines++;
+    }
+  }
+
+  /* ── 2. Vos phares, lus dans le fichier lui-même : un sujet reste un phare
+     même si le catalogue a oublié de le marquer. --------------------- */
+  const pharesTitres = new Set();
+  try{
+    const texte = await fs.readFile(path.join(process.cwd(), 'consignes', 'sujets-phares.txt'), 'utf8');
+    for (const l of texte.split(/\r?\n/)){
+      const t = l.trim();
+      if (!t || t.startsWith('#') || !t.includes('|')) continue;
+      const titre = t.split('|')[0].trim();
+      if (titre) pharesTitres.add(titre.toLowerCase());
+    }
+  }catch{}
+
+  /* ── 3. Le tri. Une seule fonction, qui dit AUSSI pourquoi on garde : le
+     journal doit être lisible sans connaître le code. ----------------- */
+  const motifs = { fiche:0, phare:0, ajout:0, retire:0, retenu:0 };
+  function garder(s){
+    if (!s || !s.qid) return null;
+    if (avecFiche.has(s.qid)) return 'fiche';
+    if (s.statut === 'ecrit' || s.statut === 'publie' || s.statut === 'controle') return 'fiche';
+    const src = s.sources || [];
+    if (src.includes('phare')) return 'phare';
+    if ((s.fr && pharesTitres.has(String(s.fr).toLowerCase()))
+     || (s.en && pharesTitres.has(String(s.en).toLowerCase()))) return 'phare';
+    if (src.includes('manuel') || String(s.qid).startsWith('M-')) return 'ajout';
+    if (s.statut === 'retire') return 'retire';
+    if (mode === 'menage' && decisions[s.qid] === 'retenu') return 'retenu';
+    return null;
+  }
+
+  const gardes = [];
+  for (const s of maitre.sujets){
+    const m = garder(s);
+    if (!m) continue;
+    motifs[m]++;
+    gardes.push(s);
+  }
+  const sortis = avant - gardes.length;
+
+  console.log(`\n╔══ REPARTIR À ZÉRO — ${mode === 'rase' ? 'table rase' : 'ménage'}`);
+  console.log(`║  ${avant} sujet(s) au catalogue avant.`);
+  console.log(`║  ${nFiches} fiche(s) lue(s) dans anecdotes/.`);
+  if (orphelines)
+    console.log(`║  ! ${orphelines} fiche(s) dont le sujet est introuvable au catalogue :`);
+  console.log(`╠══ GARDÉS — ${gardes.length}`);
+  console.log(`║  ${motifs.fiche} parce qu'ils ont une fiche (écrite, au stock ou en ligne)`);
+  console.log(`║  ${motifs.phare} parce qu'ils sont dans vos sujets phares`);
+  console.log(`║  ${motifs.ajout} parce qu'ils viennent de vos ajouts manuels`);
+  console.log(`║  ${motifs.retire} parce que vous les aviez retirés`);
+  if (mode === 'menage') console.log(`║  ${motifs.retenu} parce que vous les aviez retenus`);
+  console.log(`╠══ SORTIS — ${sortis}`);
+  console.log(`║  Aucune fiche n'a été ouverte. Rien de ce qui est en ligne n'a bougé.`);
+  console.log(`╚═══════════════════════════════════════════════════════════════`);
+
+  if (!gardes.length){
+    console.log('\n✗ Le tri ne garde AUCUN sujet : c’est anormal, rien n’est écrit.');
+    console.log('  Vérifiez que anecdotes/ et consignes/sujets-phares.txt sont bien au dépôt.');
+    process.exitCode = 1;
+    return;
+  }
+
+  /* ── 4. Le filet : l'ancien catalogue, tel quel, à côté. ------------- */
+  const filet = path.join(process.cwd(), 'catalogue-maitre.avant-remise-a-zero.json');
+  await fs.writeFile(filet, JSON.stringify(maitre, null, 1), 'utf8');
+  console.log(`\n  Filet : catalogue-maitre.avant-remise-a-zero.json (${avant} sujets).`);
+  console.log(`  Pour revenir en arrière : renommez-le catalogue-maitre.json.`);
+
+  /* ── 5. On écrit. -------------------------------------------------- */
+  const doc = { version:1, genere:new Date().toISOString(), total:gardes.length, sujets:gardes };
+  await fs.writeFile(MAITRE + '.tmp', JSON.stringify(doc, null, 1), 'utf8');
+  await fs.rename(MAITRE + '.tmp', MAITRE);
+
+  /* Les décisions qui ne désignent plus rien n'ont plus de sens : on les
+     retire, sinon elles ressusciteraient au prochain sujet portant le même
+     identifiant. */
+  const vivants = new Set(gardes.map(s => s.qid));
+  const neuves = {};
+  let jetees = 0;
+  for (const q of Object.keys(decisions)){
+    if (vivants.has(q)) neuves[q] = decisions[q]; else jetees++;
+  }
+  await fs.mkdir(path.dirname(DECISIONS), { recursive:true });
+  await fs.writeFile(DECISIONS, JSON.stringify(neuves, null, 1), 'utf8');
+
+  await ecrireCsvMaitre(gardes);
+  await vueApplication(gardes);
+
+  console.log(`\n  Écrit : catalogue-maitre.json (${gardes.length}), catalogue-maitre.csv, catalog.json.`);
+  console.log(`  ${jetees} décision(s) devenue(s) sans objet retirée(s) de consignes/decisions.json.`);
+  console.log(`\n  La prochaine moisson repartira de là. Un sujet déjà écrit ne sera jamais`);
+  console.log(`  reproposé : un sujet est un identifiant Wikidata, et le sien est resté.`);
+}
+
 async function main(){
+  /* La remise à zéro ne touche pas au réseau et ne lit pas catalog.json :
+     elle passe avant tout le reste. */
+  if (ZERO) return repartirDeZero();
+
   await fs.mkdir(CACHE, { recursive:true });
   await universSupplementaires();
 
@@ -2763,7 +2955,7 @@ async function main(){
   // Passe 1 — les listes d'articles insolites. Peu de requêtes, beaucoup de
   // valeur : ce sont des sujets dont des contributeurs ont déjà jugé qu'ils
   // étonnent, avec la phrase qui explique pourquoi.
-  if (SOURCE === 'tout' || SOURCE === 'insolite' || SOURCE === 'saviez'){
+  if (SOURCE === 'tout' || SOURCE === 'insolite' || SOURCE === 'saviez' || SOURCE === 'curees'){
     try{
       await passePhares({ sources, index, pairs, claimed, scores });
     }catch(e){
@@ -2791,7 +2983,7 @@ async function main(){
       }
     }
   }
-  if (SOURCE === 'insolite' || SOURCE === 'saviez'){
+  if (SOURCE === 'insolite' || SOURCE === 'saviez' || SOURCE === 'curees'){
     const cat = await save(sources, index, pairs, scores);
     console.log(`\nCatalogue : ${cat.counts.fr} sujets FR / ${cat.counts.en} EN.`);
     return;
