@@ -1,4 +1,66 @@
-# Curio 8.14.0 — ce qui a changé depuis v6
+# Curio 8.15.0 — ce qui a changé depuis v6
+
+## 8.15.0 — les récits, et le bout de la liste
+
+### La moisson ne lit plus que ce que vous publiez
+
+Elle parcourait les listes anglaises même avec `langues: fr`. Elle ramenait
+alors des milliers de sujets qui ne seraient jamais écrits : c'est une bonne
+part de ce qui a fait du catalogue une poubelle. Elle lit maintenant
+`consignes/publication.txt` et n'ouvre que les listes de vos langues.
+
+Ce n'est pas la langue de l'**article** qui est en jeu — une fiche française
+s'écrit très bien à partir d'un article anglais, et `anecdotes/fr-terre.json`
+en contient déjà. C'est la langue des **listes** qu'on parcourt.
+
+### Où en est votre liste de sujets phares
+
+Les deux mines de Wikipédia sont sans fond, et c'est très bien : on n'en verra
+jamais le bout. Vos sujets phares, eux, sont une liste finie que vous avez
+écrite à la main — et rien ne disait où vous en étiez.
+
+*1 · Moisson* porte maintenant la jauge : combien de lignes de
+`sujets-phares.txt` sont **en ligne**, **au stock**, **écrites à relire**, **à
+écrire**, et combien ne sont **pas au catalogue**. Cette dernière colonne dit
+deux choses à la fois — la moisson n'a pas encore eu son tour, ou le titre ne
+désigne aucun article — et le texte sous la jauge explique comment trancher.
+L'état de chaque ligne est lu par la même fonction que la Sélection : un seul
+endroit décide de ce que « écrite » et « en ligne » veulent dire.
+
+### L'univers Reddit s'allume tout seul
+
+Les billets étaient déjà moissonnés, mais ils tombaient dans « Histoire
+oubliée » — ce qui les faisait passer pour des faits d'encyclopédie. Dès que
+`consignes/reddit.txt` liste un subreddit, l'univers **Histoires vraies**
+existe, et les billets y vont. Vider le fichier l'éteint ; un univers qui porte
+déjà des sujets reste.
+
+### Une fiche de récit se voit avant d'être lue
+
+Un récit est raconté à la première personne par quelqu'un qui l'a vécu.
+L'habiller comme une notice serait le vendre pour ce qu'il n'est pas — et ces
+textes se vendent.
+
+Trois marques : la pastille de l'univers devient un **carré**, un **guillemet
+ouvrant** suspendu ouvre le premier paragraphe, et la **provenance** est écrite
+sous le texte, avec le lien vers le billet d'origine. L'habillage typographique
+réservé aux accroches est désactivé : un récit n'a pas d'accroche, il commence.
+
+**Le premier essai était raté** : il donnait au récit un filet à gauche et du
+serif — exactement ce que porte déjà toute accroche. Deux choses différentes
+qui se ressemblent ne distinguent rien. C'est la mesure du style calculé, sur
+une carte de récit et une carte ordinaire côte à côte, qui l'a montré.
+
+*Éprouvé* sur un catalogue à neuf univers : l'univers apparaît dans le choix
+des mondes, la carte porte `data-uni="reddit"`, le guillemet et la pastille
+carrée sont là, la provenance pointe sur le bon permalien — et la carte
+ordinaire n'a rien de tout cela.
+
+### Ce que cette version ne touche pas
+
+Aucune fiche, aucun réglage, aucun fichier de `consignes/` ne part dans le
+paquet. La publication, la relecture et la mise en ligne sont inchangées.
+Reddit reste inerte tant que vous ne listez pas de subreddit.
 
 ## 8.14.0 — vider la poubelle, et choisir sa veine
 

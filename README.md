@@ -63,6 +63,25 @@ ouvrir pour un lancement à la main. La nuit, elle prend tout.
 | **vos sujets phares** | `consignes/sujets-phares.txt` — la seule liste que vous tenez |
 | **les articles insolites** | quatre pages en français, vingt en anglais. Très ciblé, et **fini** une fois lu. |
 | **« Le saviez-vous ? »** | des milliers de pages, une de plus chaque jour depuis vingt ans. La seule veine qui se renouvelle — et celle qui remplit le catalogue le plus vite. |
+| **Reddit** | inerte tant que `consignes/reddit.txt` ne liste aucun subreddit. Dès qu'il en liste un, l'univers **Histoires vraies** s'allume tout seul. |
+
+**La moisson ne lit que les langues que vous publiez.** `langues: fr` dans
+`publication.txt`, et les pages anglaises ne sont plus parcourues — c'est une
+bonne part de ce qui remplissait le catalogue pour rien. Cela ne dit rien de la
+langue des *articles* : une fiche française s'écrit très bien à partir d'un
+article anglais, et c'est déjà le cas chez vous.
+
+**Un sujet ne peut pas entrer deux fois.** Son identité est son identifiant
+Wikidata. Un sujet déjà écrit reste au catalogue même après une remise à zéro :
+il ne sera jamais reproposé à l'écriture.
+
+### Où en est votre liste de sujets phares
+
+Les listes de Wikipédia sont sans fond ; la vôtre a une fin. *1 · Moisson*
+affiche l'avancée de `consignes/sujets-phares.txt` — combien de lignes sont
+**en ligne**, **au stock**, **écrites à relire**, **à écrire**, et combien ne
+sont **pas au catalogue** (la moisson n'a pas encore eu son tour, ou le titre
+ne désigne aucun article).
 
 ### Vider la poubelle du catalogue
 
@@ -186,6 +205,15 @@ commune. La barre de lecture n'affiche aucun compteur.
 
 Les formules payantes ouvrent l'accès illimité, le sommaire, la recherche, la
 collection, le choix des univers et la pioche au hasard.
+
+### Les récits — un univers qui ne se lit pas comme les autres
+
+Une histoire de Reddit est racontée à la première personne par quelqu'un qui
+l'a vécue. L'afficher comme une notice d'encyclopédie reviendrait à la faire
+passer pour un fait établi. Les fiches de l'univers **Histoires vraies** se
+distinguent donc à l'écran : pastille carrée, guillemet ouvrant suspendu devant
+le premier paragraphe, et une ligne de provenance sous le texte avec le lien
+vers le billet d'origine.
 
 > La vérification de la formule est **côté navigateur** : c'est un rappel poli,
 > pas un verrou. Un vrai contrôle demande un serveur — c'est le prochain

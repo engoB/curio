@@ -178,6 +178,7 @@ const I18N = {
     'toc.locked':"Le sommaire fait partie de l'abonnement",
     'search.locked':"La recherche fait partie de l'abonnement",
     'dire.label':'\u00c0 raconter','dire.copy':'Copier','dire.done':'Copi\u00e9 \u2014 pr\u00eat \u00e0 raconter',
+    'recit.source':'Racont\u00e9 par la personne qui l\u2019a v\u00e9cu.','recit.lien':'Voir le billet d\u2019origine',
     /* l'aper\u00e7u bloqu\u00e9 : on lit le d\u00e9but, puis le texte s'estompe */
     'tease.eyebrow':'Aper\u00e7u',
     'tease.title':'La suite fait partie de l\u2019abonnement',
@@ -319,6 +320,7 @@ const I18N = {
     'toc.locked':'The contents list is part of the subscription',
     'search.locked':'Search is part of the subscription',
     'dire.label':'To tell','dire.copy':'Copy','dire.done':'Copied — ready to tell',
+    'recit.source':'Told by the person it happened to.','recit.lien':'See the original post',
     /* the blocked preview: you read the opening, then the text fades out */
     'tease.eyebrow':'Preview',
     'tease.title':'The rest is part of the subscription',

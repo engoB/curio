@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <meta name="theme-color" content="#050E24" />
-<meta name="curio-version" content="8.14.0+286756f66f" />
+<meta name="curio-version" content="8.15.0+b9d132a1e5" />
 <meta name="curio-langues" content="fr" />
 <meta name="curio-images" content="oui" />
 <style>#langBtn,#ligneLangue{display:none !important}</style>
@@ -872,6 +872,44 @@ a{color:var(--accent);text-decoration:none}
 }
 /* Le bouton « copier » a été retiré : on ne copie pas une phrase qu'on va
    dire à voix haute, et il mangeait la largeur de cette phrase. */
+
+/* ══════════ LES RÉCITS — un univers qui ne se lit pas comme les autres ═════
+   Les histoires de Reddit ne sont pas des anecdotes d'encyclopédie. Elles
+   sont racontées à la première personne par quelqu'un qui les a vécues, et
+   les afficher comme une notice reviendrait à les faire passer pour un fait
+   établi. Le lecteur doit voir la différence AVANT de lire.
+
+   Le premier essai leur donnait un filet à gauche et du serif — exactement
+   l'habillage que porte déjà toute accroche. Deux choses différentes qui se
+   ressemblent ne distinguent rien : le signe a été refait.
+
+   Trois marques, chacune impossible à confondre avec l'existant :
+     · la pastille de l'univers devient un carré ;
+     · un guillemet ouvrant, suspendu dans la marge, ouvre le récit — c'est
+       le signe d'une parole rapportée, et rien d'autre sur la carte ne le
+       porte ;
+     · la provenance est écrite, sous le texte.
+   Ni la taille ni l'interligne ne bougent : la lecture reste la lecture. */
+.card--recit .eyebrow .dot{border-radius:2px;transform:rotate(45deg)}
+.card--recit .lede > p:first-of-type{position:relative}
+.card--recit .lede > p:first-of-type::before{
+  content:'\201C';
+  position:absolute;left:-.06em;top:-.34em;
+  font-family:Fraunces,Georgia,serif;font-size:2.6em;line-height:1;
+  color:var(--accent);opacity:.4;pointer-events:none;
+}
+.card--recit .lede > p:first-of-type{text-indent:1.05em}
+/* La provenance : rattachée au texte, jamais en petit gris illisible. On les
+   vend, ces histoires ; taire d'où elles viennent serait malhonnête. */
+.provenance{
+  margin:16px 0 0;font-size:calc(12.5px * var(--lecture));line-height:1.5;
+  color:var(--text-2);font-style:italic;
+}
+.provenance a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+/* Sur une carte de récit, « à raconter » n'est pas une trouvaille
+   d'encyclopédie : c'est la chute de l'histoire. */
+.card--recit .dire{border-left-color:var(--text-2)}
+.card--recit .dire__lb{color:var(--text-2)}
 
 /* ── LE MODE ACCROCHE ─────────────────────────────────────────────────────
    Le bouton qui déplie une fiche : franc, à la largeur du texte, il fait
@@ -2128,6 +2166,7 @@ const I18N = {
     'toc.locked':"Le sommaire fait partie de l'abonnement",
     'search.locked':"La recherche fait partie de l'abonnement",
     'dire.label':'\u00c0 raconter','dire.copy':'Copier','dire.done':'Copi\u00e9 \u2014 pr\u00eat \u00e0 raconter',
+    'recit.source':'Racont\u00e9 par la personne qui l\u2019a v\u00e9cu.','recit.lien':'Voir le billet d\u2019origine',
     /* l'aper\u00e7u bloqu\u00e9 : on lit le d\u00e9but, puis le texte s'estompe */
     'tease.eyebrow':'Aper\u00e7u',
     'tease.title':'La suite fait partie de l\u2019abonnement',
@@ -2269,6 +2308,7 @@ const I18N = {
     'toc.locked':'The contents list is part of the subscription',
     'search.locked':'Search is part of the subscription',
     'dire.label':'To tell','dire.copy':'Copy','dire.done':'Copied — ready to tell',
+    'recit.source':'Told by the person it happened to.','recit.lien':'See the original post',
     /* the blocked preview: you read the opening, then the text fades out */
     'tease.eyebrow':'Preview',
     'tease.title':'The rest is part of the subscription',
@@ -2460,6 +2500,11 @@ const $  = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const el = (tag, cls, html) => { const n=document.createElement(tag); if(cls) n.className=cls; if(html!=null) n.innerHTML=html; return n; };
 const themeById = id => THEMES.find(t=>t.id===id);
+/* Un univers de RÉCITS — des histoires racontées à la première personne par
+   ceux qui les ont vécues — ne se lit pas comme une notice d'encyclopédie,
+   et ne doit pas s'afficher comme elle. Le catalogue le dit (`recit`) ; on
+   retombe sur l'identifiant pour les catalogues construits avant. */
+const estRecit = id => { const t = themeById(id); return !!(t && t.recit) || id === 'reddit'; };
 
 const feed = $('#feed');
 
@@ -3813,9 +3858,13 @@ function fillText(node, item){
      mots — le seuil qu'emploie déjà « 3 · Contrôler » —, ce n'est plus une
      accroche : c'est un paragraphe, et il se lit comme les autres. Le texte
      n'est pas touché ; seul son habillage l'est. */
-  read.classList.toggle('lede--accroche', accrocheCourte(premier));
+  /* Un récit n'a pas d'accroche : il commence. L'habillage typographique
+     réservé aux premières phrases d'encyclopédie n'a rien à y faire. */
+  read.classList.toggle('lede--accroche',
+    accrocheCourte(premier) && !estRecit(item.theme));
   /* On repose la phrase à raconter et la rangée de fin APRÈS les paragraphes :
      elles font partie du texte qui défile, pas du cadre fixe autour de lui. */
+  if(node._provenance) read.appendChild(node._provenance);
   if(node._dire)   read.appendChild(node._dire);
   if(node._endrow) read.appendChild(node._endrow);
 
@@ -3862,6 +3911,8 @@ function fillText(node, item){
 function buildCard(item, deplie){
   const node = el('article','card');
   node.dataset.kind = 'fact';
+  node.dataset.uni = item.theme || '';
+  if(estRecit(item.theme)) node.classList.add('card--recit');
   node._item = item;
   item._node = node;
   if(deplie){ node._deplie = true; node.classList.add('deplie'); }
@@ -3870,6 +3921,10 @@ function buildCard(item, deplie){
 
   const th = themeById(item.theme) || THEMES[0];
   const body = el('div','card__body');
+  /* L'entête d'un récit ne répète pas « une histoire vraie » : le nom de
+     l'univers le dit déjà, et la carte le montre. Elle porte le titre du
+     billet d'origine, comme les autres portent celui de l'article. */
+  const recit = estRecit(item.theme);
   body.appendChild(el('p','eyebrow',
     '<span class="dot"></span>' + esc(th[S.lang].name) +
     (item.article ? ' <span class="sep">·</span> <span class="subj">' + esc(item.article) + '</span>'
@@ -3905,6 +3960,21 @@ function buildCard(item, deplie){
     dire.appendChild(el('span','dire__lb', T()['dire.label']));
     dire.appendChild(el('p','dire__tx', esc(item.raconter)));
     node._dire = dire;
+  }
+
+  /* ── D'OÙ VIENT L'HISTOIRE ──────────────────────────────────────────────
+     Une anecdote d'encyclopédie n'a pas d'auteur : elle est vérifiable, et
+     c'est tout ce qui compte. Un récit, si. Le taire serait le faire passer
+     pour un fait établi — et ces textes se vendent. La mention est donc
+     rattachée à la carte, pas cachée dans un lien de partage. */
+  if(recit){
+    const prov = el('p','provenance');
+    const lien = String(item.url || '');
+    prov.innerHTML = /^https:\/\/(www\.)?reddit\.com\//i.test(lien)
+      ? esc(T()['recit.source']) + ' <a href="' + esc(lien) + '" target="_blank" rel="noopener">'
+        + esc(T()['recit.lien']) + '</a>'
+      : esc(T()['recit.source']);
+    node._provenance = prov;
   }
 
   // Garder et partager sont au bout de l'article, la ou on arrive quand on a

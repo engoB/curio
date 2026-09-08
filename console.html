@@ -122,6 +122,8 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .btn.p{background:var(--accent);color:var(--accent-encre);border-color:var(--accent)}
 .btn.v{background:var(--vert);color:var(--accent-encre);border-color:var(--vert)}
 .btn.o{background:var(--or);color:#17120A;border-color:var(--or)}
+.jauge{height:10px;border-radius:6px;background:var(--ink-4,rgba(128,128,128,.22));border:1px solid var(--line);overflow:hidden;margin:10px 0 0}
+.jauge i{display:block;height:100%;background:var(--vert);border-radius:6px}
 .btn.r{background:var(--rouge-doux);color:var(--rouge);border-color:var(--rouge);font-weight:700}
 .btn.r:hover{color:var(--rouge);border-color:var(--rouge)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
@@ -385,7 +387,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          pouvait dire si le correctif était en place ou si le navigateur
          servait encore l'ancien fichier. La version est écrite ici par
          build.sh, à côté du titre, en petit. -->
-    <h1>Curio &middot; console<b class="ver" id="conVer">8.14.0</b></h1><!-- BUILD:CONSOLE -->
+    <h1>Curio &middot; console<b class="ver" id="conVer">8.15.0</b></h1><!-- BUILD:CONSOLE -->
 
     <!-- ── LES ÉTAPES, DANS L'ORDRE OÙ ON LES FAIT ──────────────────────
          Trois onglets nommés par leur contenu ne disaient pas par où
@@ -500,6 +502,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
         <button class="btn o" id="mLancer">Moissonner maintenant</button>
       </div>
     </div>
+    <div class="reglages" id="chPhares"></div>
   </section>
 
   <section id="vueCat" hidden>
@@ -994,12 +997,15 @@ function chargerTout(){
        de phares que l'outil n'en gardera — deux comptes pour une seule chose,
        et c'est précisément le défaut qu'on ne veut plus. */
     return localTexte('consignes/sujets-phares.txt').then(function(t){
-      S.phares = {};
+      S.phares = {}; S.pharesListe = [];
       String(t||'').split(/\r?\n/).forEach(function(l){
         var x = l.trim();
         if(!x || x.charAt(0)==='#' || x.indexOf('|')<0) return;
-        var titre = x.split('|')[0].trim();
-        if(titre) S.phares[titre.toLowerCase()] = 1;
+        var p = x.split('|');
+        var titre = p[0].trim();
+        if(!titre) return;
+        S.phares[titre.toLowerCase()] = 1;
+        S.pharesListe.push({ titre:titre, uni:(p[1]||'').trim() });
       });
     });
   }).then(function(){
@@ -2386,6 +2392,82 @@ function peindreMoisson(){
      '<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
   $('#pMoisson').value = MOI.auto;
   $('#pMinutes').value = MOI.minutes;
+  peindreAvanceePhares();
+}
+
+/* ═══════════ L'AVANCÉE DE VOS SUJETS PHARES ═══════════════════════════════
+   Les listes d'articles insolites et « Le saviez-vous ? » sont des mines
+   sans fond : on n'en voit pas le bout, et c'est normal. Vos sujets phares,
+   eux, sont une LISTE FINIE — 2 506 lignes que vous avez écrites — et vous
+   devez pouvoir dire où vous en êtes.
+
+   Chaque ligne du fichier est rattachée à son sujet du catalogue par le
+   titre, puis lue avec la même fonction d'état que la Sélection : un seul
+   endroit décide de ce que « écrite », « au stock » et « en ligne »
+   veulent dire. Les « introuvables » sont les lignes que la moisson n'a
+   jamais réussi à relier à un article — elles ne coûtent rien, mais elles
+   n'arriveront jamais nulle part. */
+function avanceePhares(){
+  var r = { total:0, enligne:0, stock:0, ecrites:0, aecrire:0, introuvables:0, retires:0 };
+  var parTitre = {};
+  S.sujets.forEach(function(s){
+    if(s.fr) parTitre[String(s.fr).toLowerCase()] = s;
+    if(s.en) parTitre[String(s.en).toLowerCase()] = s;
+  });
+  var vus = {};
+  (S.pharesListe || []).forEach(function(l){
+    var k = l.titre.toLowerCase();
+    if(vus[k]) return; vus[k] = 1;
+    r.total++;
+    var s = parTitre[k];
+    if(!s){ r.introuvables++; return; }
+    var e = etatDe(s);
+    if(e === 'retire') r.retires++;
+    else if(e === 'publie' || e === 'partielpub') r.enligne++;
+    else if(e === 'ecrit' || e === 'partiel'){
+      /* Écrite ET jugée « ok » : elle est au stock, elle attend son tour.
+         Écrite sans jugement : elle est encore en relecture. */
+      var auStock = S.fiches.some(function(f){
+        var q = f.rec && f.rec.q;
+        var memeSujet = (q && q === s.qid)
+          || (s.fr && f.titre === s.fr) || (s.en && f.titre === s.en);
+        return memeSujet && f.rec && f.rec.v === 'ok';
+      });
+      if(auStock) r.stock++; else r.ecrites++;
+    }
+    else r.aecrire++;
+  });
+  return r;
+}
+function peindreAvanceePhares(){
+  var box = $('#chPhares'); if(!box) return;
+  var r = avanceePhares();
+  if(!r.total){ box.innerHTML = ''; return; }
+  var fait = r.enligne + r.stock + r.ecrites;
+  var pct = Math.round(fait * 100 / r.total);
+  box.innerHTML =
+      '<h3>Vos sujets phares — l’avancée de la liste</h3>'
+    + '<p>Les listes de Wikipédia sont sans fond ; celle-ci est à vous, et elle a une fin. '
+    + '<b>' + nb(fait) + '</b> des <b>' + nb(r.total) + '</b> lignes de '
+    + '<code>consignes/sujets-phares.txt</code> sont écrites ou plus loin — <b>' + pct + ' %</b>.</p>'
+    + '<div class="jauge"><i style="width:' + pct + '%"></i></div>'
+    + '<div class="chiffres" style="margin-top:12px">'
+    + '<div class="bloc v"><b>' + nb(r.enligne) + '</b><span>en ligne</span></div>'
+    + '<div class="bloc k"><b>' + nb(r.stock) + '</b><span>au stock</span></div>'
+    + '<div class="bloc o"><b>' + nb(r.ecrites) + '</b><span>écrites, à relire</span></div>'
+    + '<div class="bloc"><b>' + nb(r.aecrire) + '</b><span>à écrire</span></div>'
+    + '<div class="bloc r"><b>' + nb(r.introuvables) + '</b><span>pas au catalogue</span></div>'
+    + '</div>'
+    + (r.introuvables
+        ? '<p class="apercuPub" style="margin-top:10px"><b>Pas au catalogue</b> veut dire deux '
+          + 'choses. Soit la moisson n’a pas encore eu son tour sur cette ligne — elle avance '
+          + 'par passes de quelques dizaines de minutes, et reprend la nuit suivante. Soit '
+          + 'elle n’a jamais réussi à la relier à un article : titre approximatif, page '
+          + 'renommée, sujet qui n’existe pas sur Wikipédia. Une moisson allée jusqu’au bout '
+          + 'réécrit le fichier avec les seules lignes qui tiennent — c’est ce qui tranche '
+          + 'entre les deux.</p>'
+        : '')
+    + (r.retires ? '<p class="apercuPub">' + nb(r.retires) + ' ligne(s) correspondent à un sujet que vous avez retiré.</p>' : '');
 }
 function enregistrerMoisson(){
   MOI.auto = $('#pMoisson').value;

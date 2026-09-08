@@ -112,6 +112,11 @@ const $  = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const el = (tag, cls, html) => { const n=document.createElement(tag); if(cls) n.className=cls; if(html!=null) n.innerHTML=html; return n; };
 const themeById = id => THEMES.find(t=>t.id===id);
+/* Un univers de RÉCITS — des histoires racontées à la première personne par
+   ceux qui les ont vécues — ne se lit pas comme une notice d'encyclopédie,
+   et ne doit pas s'afficher comme elle. Le catalogue le dit (`recit`) ; on
+   retombe sur l'identifiant pour les catalogues construits avant. */
+const estRecit = id => { const t = themeById(id); return !!(t && t.recit) || id === 'reddit'; };
 
 const feed = $('#feed');
 
@@ -1465,9 +1470,13 @@ function fillText(node, item){
      mots — le seuil qu'emploie déjà « 3 · Contrôler » —, ce n'est plus une
      accroche : c'est un paragraphe, et il se lit comme les autres. Le texte
      n'est pas touché ; seul son habillage l'est. */
-  read.classList.toggle('lede--accroche', accrocheCourte(premier));
+  /* Un récit n'a pas d'accroche : il commence. L'habillage typographique
+     réservé aux premières phrases d'encyclopédie n'a rien à y faire. */
+  read.classList.toggle('lede--accroche',
+    accrocheCourte(premier) && !estRecit(item.theme));
   /* On repose la phrase à raconter et la rangée de fin APRÈS les paragraphes :
      elles font partie du texte qui défile, pas du cadre fixe autour de lui. */
+  if(node._provenance) read.appendChild(node._provenance);
   if(node._dire)   read.appendChild(node._dire);
   if(node._endrow) read.appendChild(node._endrow);
 
@@ -1514,6 +1523,8 @@ function fillText(node, item){
 function buildCard(item, deplie){
   const node = el('article','card');
   node.dataset.kind = 'fact';
+  node.dataset.uni = item.theme || '';
+  if(estRecit(item.theme)) node.classList.add('card--recit');
   node._item = item;
   item._node = node;
   if(deplie){ node._deplie = true; node.classList.add('deplie'); }
@@ -1522,6 +1533,10 @@ function buildCard(item, deplie){
 
   const th = themeById(item.theme) || THEMES[0];
   const body = el('div','card__body');
+  /* L'entête d'un récit ne répète pas « une histoire vraie » : le nom de
+     l'univers le dit déjà, et la carte le montre. Elle porte le titre du
+     billet d'origine, comme les autres portent celui de l'article. */
+  const recit = estRecit(item.theme);
   body.appendChild(el('p','eyebrow',
     '<span class="dot"></span>' + esc(th[S.lang].name) +
     (item.article ? ' <span class="sep">·</span> <span class="subj">' + esc(item.article) + '</span>'
@@ -1557,6 +1572,21 @@ function buildCard(item, deplie){
     dire.appendChild(el('span','dire__lb', T()['dire.label']));
     dire.appendChild(el('p','dire__tx', esc(item.raconter)));
     node._dire = dire;
+  }
+
+  /* ── D'OÙ VIENT L'HISTOIRE ──────────────────────────────────────────────
+     Une anecdote d'encyclopédie n'a pas d'auteur : elle est vérifiable, et
+     c'est tout ce qui compte. Un récit, si. Le taire serait le faire passer
+     pour un fait établi — et ces textes se vendent. La mention est donc
+     rattachée à la carte, pas cachée dans un lien de partage. */
+  if(recit){
+    const prov = el('p','provenance');
+    const lien = String(item.url || '');
+    prov.innerHTML = /^https:\/\/(www\.)?reddit\.com\//i.test(lien)
+      ? esc(T()['recit.source']) + ' <a href="' + esc(lien) + '" target="_blank" rel="noopener">'
+        + esc(T()['recit.lien']) + '</a>'
+      : esc(T()['recit.source']);
+    node._provenance = prov;
   }
 
   // Garder et partager sont au bout de l'article, la ou on arrive quand on a

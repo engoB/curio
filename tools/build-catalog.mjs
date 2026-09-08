@@ -176,6 +176,37 @@ async function universSupplementaires(){
     n++;
     console.log(`  + univers « ${id} » ajouté depuis consignes/univers.txt`);
   }
+
+  /* ── L'UNIVERS REDDIT S'ALLUME TOUT SEUL ────────────────────────────────
+     Les histoires de Reddit ne sont pas des anecdotes d'encyclopédie : ce
+     sont des récits, à la première personne, écrits par quelqu'un qui les a
+     vécus. Les ranger dans « Histoire oubliée » revenait à les faire passer
+     pour ce qu'elles ne sont pas.
+
+     Il fallait jusqu'ici déclarer l'univers à la main dans univers.txt. On
+     ne demande plus : dès que consignes/reddit.txt liste un subreddit,
+     l'univers existe. Il disparaît le jour où vous videz le fichier — sauf
+     s'il porte déjà des sujets, auquel cas le catalogue le garde. */
+  if (!UNIVERSES.some(u => u.id === 'reddit')){
+    let subs = '';
+    try{ subs = await fs.readFile(path.join(process.cwd(), 'consignes', 'reddit.txt'), 'utf8'); }
+    catch{ subs = ''; }
+    const actif = subs.split(/\r?\n/).some(l => {
+      const t = l.trim();
+      return t && !t.startsWith('#') && !/^[\w-]+\s*[:=]/.test(t);
+    });
+    if (actif){
+      UNIVERSES.push({
+        id:'reddit', hue:16, free:true, recit:true,
+        fr:{ name:'Histoires vraies',
+             desc:'Ce que les gens racontent quand ils croient que personne ne les lit.' },
+        en:{ name:'True Stories',
+             desc:'What people tell when they think nobody is reading.' }
+      });
+      n++;
+      console.log('  + univers « reddit » allumé : consignes/reddit.txt liste des subreddits.');
+    }
+  }
   return n;
 }
 
@@ -1596,8 +1627,24 @@ async function rassembler(){
                : ['insolite', 'saviez'];
   if (veines.length < 2)
     console.log(`  · source    : ${SOURCE} — ${veines.length ? 'seule la veine « ' + veines[0] + ' » est ouverte' : 'aucune liste Wikipédia, vos phares seulement'}`);
+
+  /* ── ON NE MOISSONNE QUE CE QU'ON PUBLIE ────────────────────────────────
+     La moisson lisait les listes anglaises même quand seul le français est
+     publié. Elle ramenait alors des milliers de sujets qui ne seront jamais
+     écrits, et c'est une bonne part de ce qui a fait du catalogue une
+     poubelle. On lit consignes/publication.txt : « langues: fr » et la
+     moisson ne touche plus aux pages anglaises.
+
+     Ce n'est pas la langue de l'ARTICLE qui est en jeu — un texte français
+     s'écrit très bien à partir d'un article anglais, et c'est déjà le cas
+     dans anecdotes/fr-terre.json. C'est la langue des LISTES qu'on parcourt.
+     Les listes françaises désignent d'ailleurs surtout des articles
+     français : c'est ce qu'on veut quand on publie en français. */
+  const langues = await languesPubliees();
+  if (langues.length < 2)
+    console.log(`  · langues   : ${langues.join(', ')} seulement — les listes des autres langues ne sont pas lues.`);
   for (const quoi of veines){
-    for (const lang of ['fr', 'en']){
+    for (const lang of langues){
       let e = [];
       try{ e = await moissonInsolite(lang, quoi); }
       catch(err){ console.log(`  ! moisson ${quoi}/${lang} impossible : ${err.message}`); continue; }
@@ -1792,7 +1839,11 @@ async function reglagesReddit(){
   let brut = '';
   try{ brut = await fs.readFile(path.join(process.cwd(), 'consignes', 'reddit.txt'), 'utf8'); }
   catch{ return null; }
-  const r = { subs:[], votes:500, minCar:900, maxCar:9000, periode:'year', parSub:100, uni:'histoire' };
+  /* L'univers par défaut est « reddit » dès qu'il existe — c'est-à-dire dès
+     que ce fichier liste un subreddit. « histoire » ne reste que pour les
+     dépôts qui avaient déjà rangé leurs billets là. */
+  const r = { subs:[], votes:500, minCar:900, maxCar:9000, periode:'year', parSub:100,
+              uni: UNIVERSES.some(u => u.id === 'reddit') ? 'reddit' : 'histoire' };
   for (const l of brut.split(/\r?\n/)){
     const t = l.trim();
     if (!t || t.startsWith('#')) continue;
@@ -2292,7 +2343,7 @@ async function vueApplication(liste){
        de fiches en ligne ne peut encore rien dire. */
     langues: await languesPubliees(),
       images:  await imagesPubliees(),
-    themes: UNIVERSES.map(u => ({ id:u.id, hue:u.hue, free:u.free, fr:u.fr, en:u.en })),
+    themes: UNIVERSES.map(u => ({ id:u.id, hue:u.hue, free:u.free, recit:!!u.recit, fr:u.fr, en:u.en })),
     sources, index, pairs, scores,
     counts: counts(sources, paires)
   };
@@ -3089,7 +3140,7 @@ async function save(sources, index, pairs, scores){
   const cat = {
     generated: new Date().toISOString(),
     ranking: WITH_VIEWS ? 'notoriété (éditions linguistiques) + consultations 12 mois' : 'notoriété (nombre d’éditions linguistiques)',
-    themes: UNIVERSES.map(({ id, hue, free, fr, en }) => ({ id, hue, free, fr, en })),
+    themes: UNIVERSES.map(({ id, hue, free, recit, fr, en }) => ({ id, hue, free, recit:!!recit, fr, en })),
     counts: counts(sources, pairs),
     index,
     pairs: pairs ? [...pairs].map(([fr, en]) => ({ fr, en })) : [],
