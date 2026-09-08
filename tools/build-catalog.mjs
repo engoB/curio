@@ -1482,6 +1482,10 @@ function potentiel(r){
 
 const MAITRE = path.join(process.cwd(), 'catalogue-maitre.json');
 
+/* « retenu » est l'ancien nom d'« à écrire ». Les fichiers de décisions
+   d'avant la 8.16 le portent : on lit les deux, on n'écrit que le nouveau. */
+const aEcrire = v => v === 'aecrire' || v === 'retenu';
+
 /* Une phrase qui ne fait que définir n'a rien à faire ici. « X est une
    commune française du département de… » n'étonnera personne, et c'est
    précisément ce que les listes ramassent quand on ne les surveille pas. */
@@ -2466,7 +2470,7 @@ async function repartirDeZero(){
      || (s.en && pharesTitres.has(String(s.en).toLowerCase()))) return 'phare';
     if (src.includes('manuel') || String(s.qid).startsWith('M-')) return 'ajout';
     if (s.statut === 'retire') return 'retire';
-    if (mode === 'menage' && decisions[s.qid] === 'retenu') return 'retenu';
+    if (mode === 'menage' && aEcrire(decisions[s.qid])) return 'retenu';
     return null;
   }
 
@@ -2622,7 +2626,7 @@ async function main(){
       return;
     }
     const decisions = await lireDecisions();
-    const retenus = maitre.sujets.filter(s => decisions[s.qid] === 'retenu');
+    const retenus = maitre.sujets.filter(s => aEcrire(decisions[s.qid]));
     if (!retenus.length){
       console.log('Aucun sujet retenu dans consignes/decisions.json.');
       console.log('Ouvrez console.html, filtrez (par exemple « Potentiel 9 et plus »),');

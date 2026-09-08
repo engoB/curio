@@ -1,4 +1,92 @@
-# Curio 8.15.0 — ce qui a changé depuis v6
+# Curio 8.16.0 — ce qui a changé depuis v6
+
+## 8.16.0 — un sujet, une case ; et la file avant la dépense
+
+### Les chiffres de la Sélection ne pouvaient pas tomber juste
+
+Ils mélangeaient **deux axes** : la décision (*retenu · écarté · pas décidé*)
+et l'état (*à écrire · écrite · en ligne*). Un sujet retenu ET écrit comptait
+dans les deux. Les sept cases ne faisaient pas le total, et il était
+impossible de voir où passait l'écart.
+
+Il n'y a plus qu'un axe, et quatre cases exclusives dont la somme est
+exactement le catalogue :
+
+| case | ce que ça veut dire |
+|---|---|
+| **pas décidé** | vous n'avez rien dit |
+| **à écrire** | vous l'avez envoyé en écriture |
+| **déjà écrite** | le texte existe — le sujet a quitté la sélection |
+| **écarté** | vous n'en voudrez jamais |
+
+*Éprouvé* sur un catalogue d'essai de 529 sujets reproduisant vos
+proportions — 121 fiches, 63 en file, 45 écartés : **529 = 300 + 63 + 121 +
+45**. Les sujets *incohérents* gardent leur case à part, marquée « déjà
+comptés ci-dessus » : ce n'est pas une cinquième case, c'est l'autre axe.
+
+### « Retenu » n'existe plus
+
+Le mot désignait exactement la même chose qu'« à écrire ». Le produit ne dit
+plus qu'« à écrire », partout — console, outils, journaux. Votre
+`decisions.json` actuel porte « retenu » : il est lu tel quel, et le premier
+enregistrement le remet au nouveau mot. *Éprouvé* : le fichier écrit ne
+contient plus que `aecrire` et `ecarte`, et l'outil d'écriture accepte les
+deux vocabulaires — un import à moitié fait ne peut donc pas envoyer
+l'écriture sur le catalogue entier.
+
+### La Sélection ne fait plus que deux choses
+
+Elle s'ouvre sur ce dont vous n'avez rien dit — son seul métier — et chaque
+ligne porte deux gestes : **envoyer en écriture**, ou **écarter**. Recliquer
+défait. Un sujet déjà écrit n'a plus de geste du tout : il a quitté la
+sélection.
+
+Les deux filtres qui se recoupaient — « décision » et « état » — n'en font
+plus qu'un, sur les quatre cases. On ne peut plus demander « retenus » ET
+« déjà écrites » et obtenir une liste dont on ne sait plus ce qu'elle dit.
+
+### Un onglet entre la décision et la dépense — 3 · À écrire
+
+Le bouton d'écriture vivait au bas de la Sélection, au milieu des sujets
+qu'on était en train de trier. On ne voyait jamais la file telle qu'elle est,
+et on ne pouvait pas la relire **avant** de payer. C'est tout ce que fait ce
+nouvel onglet.
+
+**Chercher les redites — dans le navigateur, gratuit, instantané.** Un sujet
+ne peut pas entrer deux fois au catalogue : son identité est son identifiant
+Wikidata. Mais deux sujets *différents* peuvent raconter la même histoire —
+« Le lac Nyos » et « Éruption limnique du lac Nyos » — et on ne s'en aperçoit
+qu'après avoir payé les deux. Le contrôle compare la file à elle-même **et à
+ce qui est déjà écrit**, puisque réécrire ce qu'on possède est la même dépense
+pour rien.
+
+**Un défaut trouvé par l'épreuve, et corrigé.** Le premier essai a sorti
+soixante fausses redites : sur un titre de trois mots, il ne reste qu'un ou
+deux mots utiles, et « À écrire 0 » partage 100 % de son vocabulaire avec
+« À écrire 1 ». Il faut maintenant six mots utiles de chaque côté et trois
+mots réellement partagés — la règle qu'employait déjà la recherche de redites
+sur les fiches en ligne. Sur le même jeu d'essai : **2 ressemblances, les deux
+que j'avais plantées, zéro fausse**.
+
+### L'avertissement qui vous évite de payer deux fois
+
+Cet onglet lit les **fiches** ; l'outil d'écriture lit le **registre** du
+catalogue. Quand les deux divergent — un sujet marqué « à écrire » qui a
+pourtant sa fiche —, l'outil le reprendrait et vous le repaieriez. C'est le
+seul endroit du produit où une incohérence de registre coûte de l'argent :
+elle est donc dite **là, devant le bouton**, avec la règle exacte de l'outil,
+et non dans un onglet de diagnostic qu'on ouvre après coup.
+
+### Sept onglets
+
+*1 · Moisson · 2 · Sélection · 3 · À écrire · 4 · Relecture · 5 · Contrôle ·
+6 · Publication · 7 · En ligne.* On ne publie jamais depuis la Relecture, et
+on ne dépense jamais depuis la Sélection.
+
+### Ce que cette version ne touche pas
+
+Aucune fiche, aucun réglage, aucun fichier de `consignes/` ne part dans le
+paquet. L'application, le site et la mise en ligne sont inchangés.
 
 ## 8.15.0 — les récits, et le bout de la liste
 

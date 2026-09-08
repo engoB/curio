@@ -32,10 +32,14 @@ aussi dans la console, onglet *Publication*.
 
 C'est le vocabulaire de toute l'interface. Il ne varie jamais.
 
-> **écrite** — le texte existe
+> **au catalogue** — la moisson l'a trouvé
+> → **à écrire** — vous l'avez envoyé en écriture depuis la Sélection
+> → **écrite** — le texte existe
 > → **relue** — vous l'avez jugée, dans votre navigateur
 > → **au stock** — votre jugement est enregistré au dépôt, elle attend son tour
 > → **en ligne** — le lecteur la voit
+
+**Écarté** est la seule sortie : un sujet dont vous ne voudrez jamais.
 
 ---
 
@@ -44,14 +48,33 @@ C'est le vocabulaire de toute l'interface. Il ne varie jamais.
 | | ce qu'on y voit | ce qu'on y fait |
 |---|---|---|
 | **1 · Moisson** | ce qui est au catalogue | agrandir le catalogue, veine par veine — **gratuit** |
-| **2 · Sélection** | les sujets **pas encore écrits** | retenir, écarter, envoyer à l'écriture — **payant** |
-| **3 · Relecture** | les fiches **écrites**, ni au stock ni en ligne | juger le texte, cocher, envoyer au stock |
-| **4 · Contrôle** | l'état de santé du catalogue | des outils qui lisent et rapportent — et le seul qui vide |
-| **5 · Publication** | **le stock** | le rythme, le nom et le logo, sortir des sujets choisis |
-| **6 · En ligne** | ce que le lecteur voit | corriger un texte, retirer une fiche |
+| **2 · Sélection** | les sujets dont vous **n'avez rien dit** | deux gestes : *envoyer en écriture*, ou *écarter* |
+| **3 · À écrire** | **la file** — ce qui attend d'être écrit | chercher les redites, vérifier, **écrire** — la seule dépense |
+| **4 · Relecture** | les fiches **écrites**, ni au stock ni en ligne | juger le texte, cocher, envoyer au stock |
+| **5 · Contrôle** | l'état de santé du catalogue | des outils qui lisent et rapportent — et le seul qui vide |
+| **6 · Publication** | **le stock** | le rythme, le nom et le logo, sortir des sujets choisis |
+| **7 · En ligne** | ce que le lecteur voit | corriger un texte, retirer une fiche |
 
 Aucun onglet n'empiète sur le métier d'un autre. **On ne publie jamais depuis
-la Relecture.**
+la Relecture, et on ne dépense jamais depuis la Sélection.**
+
+### Les quatre cases d'un sujet — elles font le total
+
+Chaque sujet du catalogue est dans **une** case, et une seule. Les quatre
+s'additionnent : leur somme est exactement le nombre de sujets au catalogue.
+Si ce n'est pas le cas, c'est un défaut.
+
+| case | ce que ça veut dire | où il vit |
+|---|---|---|
+| **pas décidé** | vous n'avez rien dit | *2 · Sélection* |
+| **à écrire** | vous l'avez envoyé en écriture | *3 · À écrire* |
+| **déjà écrite** | le texte existe | *4 · Relecture*, le stock, ou en ligne |
+| **écarté** | vous n'en voudrez jamais | nulle part |
+
+Le mot « retenu » a disparu : il désignait la même chose qu'« à écrire », et
+les deux compteurs ne tombaient jamais juste. Vos anciennes décisions sont
+lues telles quelles ; le premier enregistrement remet le fichier au nouveau
+mot.
 
 ### Les trois veines de la moisson
 
@@ -87,7 +110,7 @@ ne désigne aucun article).
 
 « Le saviez-vous ? » ne s'épuise jamais : au bout de quelques mois, le
 catalogue porte des dizaines de milliers de sujets dont vous n'avez rien dit,
-et on ne sait plus où regarder. *4 · Contrôle → **Repartir à zéro*** vide cette
+et on ne sait plus où regarder. *5 · Contrôle → **Repartir à zéro*** vide cette
 masse-là, et elle seule.
 
 **Ce qui reste, quoi qu'il arrive** : tout sujet qui a une fiche — écrite, au
@@ -143,7 +166,7 @@ sinon. **Importer une nouvelle version n'écrase donc aucun de vos réglages.**
 | `marque.txt` | le nom du produit, la signature, le logo |
 | `moisson.txt` | la moisson automatique de la nuit |
 | `sujets-phares.txt` | vos sujets imposés, une ligne par sujet |
-| `exclusions.txt` | ce qui ne doit jamais revenir — *5 · Publier → retirer* y écrit tout seul |
+| `exclusions.txt` | ce qui ne doit jamais revenir — *6 · Publication → retirer* y écrit tout seul |
 | `fr.md`, `en.md` | les consignes d'écriture — c'est là que se règle le style |
 | `reddit.txt` | les subreddits à moissonner (vide = Reddit ignoré) |
 | `ajouts.json` | des sujets qui ne viennent pas de Wikipédia |
@@ -153,7 +176,7 @@ console**, sans toucher à un fichier.
 
 ### Changer le nom, la signature ou le logo
 
-*5 · Publication → **Le nom et le logo***. Vous écrivez, vous enregistrez, et
+*6 · Publication → **Le nom et le logo***. Vous écrivez, vous enregistrez, et
 la console reconstruit le site toute seule.
 
 Pour un logo : déposez votre image dans `icones/` par **Add file → Upload
@@ -174,13 +197,14 @@ favoris et leur formule sont rangés sous des clés qui ne changent pas.
 
 | ce qui ne va pas | ce qu'on fait |
 |---|---|
-| une coquille dans une fiche **en ligne** | *6 · En ligne → **corriger le texte***. La fiche reste en ligne, à sa place. |
-| le sujet est bon, le **texte** est raté | *5 · Publier → **refaire***. Les fiches sont effacées, le sujet repasse « à écrire ». |
-| le sujet n'a pas sa place | *5 · Publier → **retirer***. Il sort, et son titre entre dans `exclusions.txt` : il ne reviendra pas. |
-| vous voulez **reprendre la main** sur toute la mise en ligne | *4 · Contrôle → **Tout renvoyer au stock***. Rien n'est effacé. |
-| deux fiches racontent la même chose | *4 · Contrôle → **Chercher les redites***. Elle rapporte, vous tranchez. |
-| les chiffres se contredisent | *4 · Contrôle → **Pourquoi ces chiffres ?*** puis **Remettre le registre d'accord**. |
-| le catalogue est devenu une poubelle | *4 · Contrôle → **Repartir à zéro***. Vos écrits, vos phares et vos ajouts restent. |
+| une coquille dans une fiche **en ligne** | *7 · En ligne → **corriger le texte***. La fiche reste en ligne, à sa place. |
+| le sujet est bon, le **texte** est raté | *6 · Publication → **refaire***. Les fiches sont effacées, le sujet repasse « à écrire ». |
+| le sujet n'a pas sa place | *6 · Publication → **retirer***. Il sort, et son titre entre dans `exclusions.txt` : il ne reviendra pas. |
+| vous voulez **reprendre la main** sur toute la mise en ligne | *5 · Contrôle → **Tout renvoyer au stock***. Rien n'est effacé. |
+| **deux sujets de la file** racontent la même chose | *3 · À écrire → **Chercher les redites***. Instantané, dans votre navigateur, **avant** de payer. |
+| deux fiches **en ligne** racontent la même chose | *5 · Contrôle → **Chercher les redites***. Elle rapporte, vous tranchez. |
+| les chiffres se contredisent | *5 · Contrôle → **Pourquoi ces chiffres ?*** puis **Remettre le registre d'accord**. |
+| le catalogue est devenu une poubelle | *5 · Contrôle → **Repartir à zéro***. Vos écrits, vos phares et vos ajouts restent. |
 
 ---
 
@@ -190,7 +214,7 @@ favoris et leur formule sont rangés sous des clés qui ne changent pas.
 l'application en bas à droite de l'écran. Si elle ne correspond pas à ce que
 vous venez d'importer, c'est le cache : rechargement forcé.
 
-Ensuite, *4 · Contrôle → **Pourquoi ces chiffres ?***. Ce tableau met côte à
+Ensuite, *5 · Contrôle → **Pourquoi ces chiffres ?***. Ce tableau met côte à
 côte ce que disent vos **fiches** — ce que le lecteur reçoit — et ce que dit le
 **catalogue**. Il conclut par « Les deux comptes concordent », ou vous dit
 combien il en manque.

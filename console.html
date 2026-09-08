@@ -387,21 +387,22 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          pouvait dire si le correctif était en place ou si le navigateur
          servait encore l'ancien fichier. La version est écrite ici par
          build.sh, à côté du titre, en petit. -->
-    <h1>Curio &middot; console<b class="ver" id="conVer">8.15.0</b></h1><!-- BUILD:CONSOLE -->
+    <h1>Curio &middot; console<b class="ver" id="conVer">8.16.0</b></h1><!-- BUILD:CONSOLE -->
 
     <!-- ── LES ÉTAPES, DANS L'ORDRE OÙ ON LES FAIT ──────────────────────
          Trois onglets nommés par leur contenu ne disaient pas par où
-         commencer ni ce qui venait après. Six étapes numérotées le disent :
+         commencer ni ce qui venait après. Sept étapes numérotées le disent :
          on descend la barre de gauche à droite, et chaque chiffre est un
          moment du travail. Rien n'a été retiré — tout ce qui existait est
          rangé sous l'étape à laquelle il appartient. -->
     <div class="onglets" role="tablist">
       <button id="ongMoi" data-vue="moi"><i>1</i>Moisson</button>
       <button id="ongCat" class="on" data-vue="cat"><i>2</i>Sélection</button>
-      <button id="ongRel" data-vue="rel"><i>3</i>Relecture</button>
-      <button id="ongCtl" data-vue="ctl"><i>4</i>Contrôle</button>
-      <button id="ongPub" data-vue="pub"><i>5</i>Publication</button>
-      <button id="ongLig" data-vue="lig"><i>6</i>En ligne</button>
+      <button id="ongEcr" data-vue="ecr"><i>3</i>À écrire</button>
+      <button id="ongRel" data-vue="rel"><i>4</i>Relecture</button>
+      <button id="ongCtl" data-vue="ctl"><i>5</i>Contrôle</button>
+      <button id="ongPub" data-vue="pub"><i>6</i>Publication</button>
+      <button id="ongLig" data-vue="lig"><i>7</i>En ligne</button>
     </div>
     <div class="etatCx">
       <span class="point" id="pt"></span><span id="cx">non connectée</span>
@@ -519,20 +520,17 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       <option value="manuel">Ajouts manuels</option>
         <option value="croise">Croisé : 2 sources ou +</option>
       </select>
-      <select id="fDec">
-        <option value="">Toutes décisions</option>
-        <option value="neutre">Pas encore décidé</option>
-        <option value="retenu">Retenus</option>
-        <option value="ecarte">Écartés</option>
-      </select>
-      <!-- Cet onglet sert à DÉCIDER quoi faire écrire. Il s'ouvre donc sur
-           ce qui n'est pas écrit — le reste a déjà quitté la sélection et
-           vit en 3 · Relecture, 5 · Publication ou 6 · En ligne. Les autres
-           états restent atteignables, mais ils ne sont pas le sujet. -->
+      <!-- UN SEUL FILTRE, SUR LES QUATRE CASES. Il y en avait deux, « décision »
+           et « état », qui se recoupaient : on pouvait demander « retenus » ET
+           « déjà écrites » et obtenir une liste dont on ne savait plus ce
+           qu'elle disait. L'onglet s'ouvre sur ce qui n'est pas décidé : c'est
+           son métier, et il n'en a pas d'autre. -->
       <select id="fEtat">
-        <option value="aecrire">À écrire — rien de fait</option>
-        <option value="">Tous, y compris ce qui est déjà écrit</option>
-        <option value="ecrites">Déjà écrites — elles ont quitté la sélection</option>
+        <option value="pasdecide">Pas décidés — à trancher ici</option>
+        <option value="aecrire">À écrire — la file de 3 · À écrire</option>
+        <option value="ecrite">Déjà écrites — elles ont quitté la sélection</option>
+        <option value="ecarte">Écartés — vous n’en voulez pas</option>
+        <option value="">Tout le catalogue</option>
         <option value="incoherent">⚠ Incohérent — registre et fiches en désaccord</option>
         <option value="suspect">⚠ À vérifier — phrase sans rapport</option>
       </select>
@@ -554,7 +552,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       <span class="compte" id="cCat"></span>
     </div>
     <div class="cmd">
-      <button class="btn v" id="toutRetenir">Retenir ce qui est affiché</button>
+      <button class="btn v" id="toutRetenir">Envoyer en écriture ce qui est affiché</button>
       <button class="btn" id="toutEcarter">Écarter ce qui est affiché</button>
       <button class="btn" id="toutNeutre">Oublier ces décisions</button>
       <button class="btn" id="toutOublier">Tout oublier</button>
@@ -562,6 +560,57 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
     <div class="portee" id="portee"></div>
     <div class="liste" id="lCat"></div>
     <button class="btn plus" id="plusCat" hidden>Afficher la suite</button>
+  </section>
+
+  <!-- ═══════════ 3 · À ÉCRIRE — la file, et le dernier arrêt avant la dépense ═══
+       Entre « je veux ce sujet » et « payez pour l'écrire », il n'y avait
+       rien : le bouton d'écriture vivait au bas de la Sélection, au milieu
+       des sujets qu'on était en train de trier. On ne voyait jamais la file
+       telle qu'elle est, et surtout on ne pouvait pas la relire AVANT de
+       dépenser. C'est ce que fait cet onglet. -->
+  <section id="vueEcr" hidden>
+    <div class="chiffres" id="chEcr"></div>
+    <div class="reglages" style="margin-bottom:14px">
+      <h3>La file d’écriture</h3>
+      <p>Ces sujets attendent d’être écrits. Rien n’a encore coûté un centime :
+         l’écriture est la <b>seule</b> étape payante du produit, et elle ne part
+         que d’ici.</p>
+      <p class="chemin"><b>Le chemin complet, du catalogue au lecteur :</b>
+         <i>au catalogue</i> — la moisson l’a trouvé &nbsp;→&nbsp;
+         <i>à écrire</i> — vous l’avez envoyé ici, depuis <b>2 · Sélection</b> &nbsp;→&nbsp;
+         <i>écrite</i> — le texte existe &nbsp;→&nbsp;
+         <i>relue</i> — vous la jugez en <b>4 · Relecture</b> &nbsp;→&nbsp;
+         <i>au stock</i> — elle attend son tour &nbsp;→&nbsp;
+         <i>en ligne</i> — le lecteur la voit.<br>
+         <b>Écarté</b> est la seule sortie : un sujet dont vous ne voudrez jamais.</p>
+    </div>
+    <div class="cmd">
+      <input type="search" id="qE" placeholder="Chercher dans la file…">
+      <select id="fUniE"><option value="">Tous les univers</option></select>
+      <select id="fPotE">
+        <option value="">Tous potentiels</option>
+        <option value="10">Potentiel 10 seulement</option>
+        <option value="9">Potentiel 9 et plus</option>
+        <option value="8">Potentiel 8 et plus</option>
+        <option value="7">Potentiel 7 et plus</option>
+      </select>
+      <select id="fTriE">
+        <option value="potentiel">Par potentiel</option>
+        <option value="titre">Par titre</option>
+        <option value="univers">Par univers</option>
+      </select>
+      <span class="compte" id="cEcr"></span>
+    </div>
+    <div class="cmd">
+      <button class="btn" id="ecrRedites">Chercher les redites dans la file</button>
+      <button class="btn" id="ecrAudit">Vérifier les sujets de la file</button>
+      <button class="btn p" id="ecrEnr">Enregistrer mes décisions</button>
+      <button class="btn o" id="ecrLancer">Écrire</button>
+    </div>
+    <div class="portee" id="porteeEcr"></div>
+    <div id="redites"></div>
+    <div class="liste" id="lEcr"></div>
+    <button class="btn plus" id="plusEcr" hidden>Afficher la suite</button>
   </section>
 
   <!-- ═══════════════ RELECTURE ═══════════════ -->
@@ -573,7 +622,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       <select id="fUniR"><option value="">Tous les univers</option></select>
       <!-- Cet onglet est un bureau de relecture : il ne montre QUE des fiches
            écrites qui ne sont ni au stock, ni en ligne. Une fiche envoyée au
-           stock en sort — elle appartient désormais à 5 · Publication. -->
+           stock en sort — elle appartient désormais à 6 · Publication. -->
       <select id="fVal">
         <option value="neutre">À relire — pas encore jugées</option>
         <option value="">Toutes celles qui restent à traiter</option>
@@ -613,7 +662,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       &nbsp;→&nbsp; <i>en ligne</i> — le lecteur la voit.<br>
       <b>Ici, on ne publie pas.</b> Cet onglet ne montre que des fiches écrites qui ne sont
       ni au stock, ni en ligne : vous jugez le texte et sa forme, c’est tout. Une fiche
-      envoyée au stock quitte cette liste et vous la retrouvez dans <b>5 · Publication</b>,
+      envoyée au stock quitte cette liste et vous la retrouvez dans <b>6 · Publication</b>,
       d’où elle sort au rythme réglé — ou tout de suite, si vous l’y choisissez.</p>
     <div class="liste" id="lRel"></div>
     <button class="btn plus" id="plusRel" hidden>Afficher la suite</button>
@@ -773,13 +822,13 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          réglé » et espérer tomber dessus. On les coche. -->
     <div class="reglages" style="margin-bottom:16px">
       <h3>Le stock — ce qui attend de sortir</h3>
-      <p>Tout ce que vous avez validé en <b>3 · Relecture</b> puis envoyé au stock arrive ici.
+      <p>Tout ce que vous avez validé en <b>4 · Relecture</b> puis envoyé au stock arrive ici.
          Ces fiches sortent d’elles-mêmes au rythme réglé au-dessus. Cochez celles que vous
          voulez mettre en ligne <b>aujourd’hui</b> sans attendre — un sujet sort avec toutes
          ses langues publiées.</p>
       <p class="chemin"><b>Une fiche passe par quatre états :</b>
          <i>écrite</i> — le texte existe &nbsp;→&nbsp;
-         <i>relue</i> — vous la jugez dans <b>3 · Relecture</b> &nbsp;→&nbsp;
+         <i>relue</i> — vous la jugez dans <b>4 · Relecture</b> &nbsp;→&nbsp;
          <i>au stock</i> — <b>Envoyer au stock</b> enregistre votre jugement au dépôt : la
          fiche arrive dans cette liste &nbsp;→&nbsp;
          <i>en ligne</i> — le lecteur la voit.</p>
@@ -863,7 +912,7 @@ var S = {
   onglet:'cat',
   sujets:[], decisions:{}, decSha:null,
   fiches:[], validations:{}, valSha:null,
-  vueCat:[], nCat:0, vueRel:[], nRel:0, vueLig:[], nLig:0,
+  vueCat:[], nCat:0, vueEcr:[], nEcr:0, vueRel:[], nRel:0, vueLig:[], nLig:0,
   cfg:{ owner:'', repo:'', branch:'main', token:'' },
   connecte:false, sale:false
 };
@@ -910,6 +959,7 @@ function relireBrouillon(){
     if(v.decisions && Object.keys(v.decisions).length) S.decisions = v.decisions;
     if(v.validations && Object.keys(v.validations).length) S.validations = v.validations;
     S.sale = !!v.sale;
+    normaliserDecisions();
   }catch(e){}
 }
 function peindreCfg(){
@@ -1038,6 +1088,14 @@ function chargerFiches(){
   return Promise.all(jobs);
 }
 
+/* Les décisions d'avant la 8.16 disent « retenu ». On les traduit une fois,
+   à la lecture : le reste du programme ne connaît plus qu'« aecrire », et le
+   premier enregistrement remet le fichier au nouveau mot. */
+function normaliserDecisions(){
+  Object.keys(S.decisions || {}).forEach(function(k){
+    if(S.decisions[k] === 'retenu') S.decisions[k] = 'aecrire';
+  });
+}
 function chargerDecisions(){
   return Promise.all([lireFichier('consignes/decisions.json'), lireFichier('consignes/validations.json')])
     .then(function(r){
@@ -1047,6 +1105,7 @@ function chargerDecisions(){
       if(!brouillon){
         if(r[0].texte){ try{ S.decisions = JSON.parse(r[0].texte)||{}; }catch(e){} }
         if(r[1].texte){ try{ S.validations = JSON.parse(r[1].texte)||{}; }catch(e){} }
+        normaliserDecisions();
       }
       S.decSha = r[0].sha; S.valSha = r[1].sha;
       marquerCx(true);
@@ -1059,7 +1118,7 @@ function chargerDecisions(){
 function remplirUnivers(){
   var us = {};
   S.sujets.forEach(function(s){ us[s.uni]=(us[s.uni]||0)+1; });
-  [['#fUni',true],['#fUniR',false],['#fUniL',false]].forEach(function(p){
+  [['#fUni',true],['#fUniE',true],['#fUniR',false],['#fUniL',false]].forEach(function(p){
     var sel = $(p[0]); if(!sel) return;
     while(sel.options.length>1) sel.remove(1);
     Object.keys(us).sort(function(a,b){ return us[b]-us[a]; }).forEach(function(k){
@@ -1188,7 +1247,7 @@ function etatDe(s){
 }
 
 /* Le registre et les fiches se contredisent. On ne corrige pas en silence —
-   on le montre, et « 4 · Contrôle » a de quoi remettre les deux d'accord. */
+   on le montre, et « 5 · Contrôle » a de quoi remettre les deux d'accord. */
 function incoherent(s){
   var e = vuDe(ECRITES, s), g = vuDe(ENLIGNE, s);
   var enLigne = !!(g && (g.fr || g.en));
@@ -1204,17 +1263,69 @@ var ETIQ_AIDE={
   aecrire:'Rien n’est écrit pour ce sujet.',
   partiel:'Une des langues que vous publiez est écrite, l’autre non.',
   partielpub:'Une des langues que vous publiez est en ligne, l’autre attend.',
-  ecrit:'Le texte existe. Il passe par 3 · Relecture, puis par le stock, avant de sortir.',
+  ecrit:'Le texte existe. Il passe par 4 · Relecture, puis par le stock, avant de sortir.',
   publie:'La fiche est en ligne : le lecteur la voit.',
   retire:'Sujet retiré à la main.',
   horslangue:'L’article n’existe dans aucune des langues que vous publiez : rien à écrire.'
 };
 
-function decDe(s){ return S.decisions[s.qid] || 'neutre'; }
+/* ══════════ UNE DÉCISION, UN SEUL MOT ═════════════════════════════════════
+   « retenu » et « à écrire » désignaient la même chose sous deux noms : ici
+   on retenait, le catalogue disait « à écrire », et les deux compteurs ne
+   tombaient jamais juste. Le produit ne dit plus qu'« à écrire ».
+
+   Les fichiers d'avant la 8.16 portent « retenu » : on les lit, on n'écrit
+   plus que le nouveau mot. */
+function normDec(v){ return v === 'retenu' ? 'aecrire' : (v || 'neutre'); }
+function decDe(s){ return normDec(S.decisions[s.qid]); }
+function poserDec(qid, quoi){
+  if(quoi && quoi !== 'neutre') S.decisions[qid] = quoi; else delete S.decisions[qid];
+}
+
+/* ══════════ LA CASE D'UN SUJET — UNE SEULE, ET ELLES S'ADDITIONNENT ═══════
+   Les chiffres de la Sélection mélangeaient DEUX axes : la décision
+   (retenu / écarté / pas décidé) et l'état (à écrire / écrite / en ligne).
+   Un sujet retenu ET écrit comptait deux fois, les sept cases ne faisaient
+   pas le total, et il était impossible de savoir où passait l'écart.
+
+   Il n'y a plus qu'un axe. Quatre cases, exclusives, dans cet ordre — et la
+   somme des quatre fait exactement le catalogue :
+
+     écarté      vous n'en voulez pas, définitivement
+     déjà écrite le texte existe : le sujet a quitté la sélection
+     à écrire    vous l'avez envoyé en écriture, il attend son tour
+     pas décidé  vous n'avez rien dit                                      */
+function caseDe(s){
+  if(s.statut === 'retire') return 'ecarte';
+  var d = decDe(s);
+  if(d === 'ecarte') return 'ecarte';
+  if(vuDe(ECRITES, s)) return 'ecrite';
+  if(s.statut === 'ecrit' || s.statut === 'publie' || s.ecrit || s.publie) return 'ecrite';
+  if(d === 'aecrire') return 'aecrire';
+  return 'pasdecide';
+}
+var CASES = { pasdecide:'pas décidés', aecrire:'à écrire', ecrite:'déjà écrites', ecarte:'écartés' };
+
+/* Le compte des quatre cases, calculé une fois et partagé par la Sélection,
+   la file d'écriture et la barre du bas : trois endroits ne peuvent pas
+   annoncer trois chiffres différents s'ils lisent le même. */
+function comptesCases(){
+  var c = { total:S.sujets.length, pasdecide:0, aecrire:0, ecrite:0, ecarte:0, incoherent:0 };
+  S.sujets.forEach(function(s){
+    c[caseDe(s)]++;
+    if(incoherent(s)) c.incoherent++;
+  });
+  return c;
+}
+/* La file d'écriture : ce qui est décidé « à écrire » et pas encore écrit.
+   C'est exactement ce que l'outil d'écriture ira chercher. */
+function fileEcriture(){
+  return S.sujets.filter(function(s){ return caseDe(s) === 'aecrire'; });
+}
 
 function filtrerCat(){
   var q=plier($('#q').value.trim()), u=$('#fUni').value, sf=$('#fSrc').value,
-      df=$('#fDec').value, ef=$('#fEtat').value, tri=$('#fTri').value,
+      ef=$('#fEtat').value, tri=$('#fTri').value,
       pf=$('#fPot').value;
   S.vueCat = S.sujets.filter(function(s){
     if(u && s.uni!==u) return false;
@@ -1230,16 +1341,17 @@ function filtrerCat(){
     var src=s.sources||[];
     if(sf==='croise'){ if(src.length<2) return false; }
     else if(sf && src.indexOf(sf)<0) return false;
-    if(df && decDe(s)!==df) return false;
-    /* « à vérifier » n'est pas un état : c'est un doute. La phrase et
-       l'article ne partagent pas un seul mot signifiant — c'est ce qui
-       trahit une fiche « Pac-Man » portant l'histoire d'un poulpe. */
+    /* ── UN SEUL FILTRE, SUR LES QUATRE CASES ────────────────────────────
+       Il y en avait deux — « décision » et « état » — qui se recoupaient :
+       on pouvait demander « retenus » ET « déjà écrites », et obtenir une
+       liste dont on ne savait plus ce qu'elle voulait dire. Le filtre porte
+       maintenant sur la case, et la case est unique.
+
+       L'onglet s'ouvre sur « pas décidés » : c'est son métier, et rien
+       d'autre. Le reste reste atteignable, mais ne s'impose plus. */
     if(ef==='suspect'){ if(s.accord!==0) return false; }
-    /* « Déjà écrites » : tout ce qui a un texte, quel que soit son sort
-       ensuite. Ces sujets-là ne se décident plus ici. */
-    else if(ef==='ecrites'){ if(etatDe(s)==='aecrire') return false; }
     else if(ef==='incoherent'){ if(!incoherent(s)) return false; }
-    else if(ef && etatDe(s)!==ef) return false;
+    else if(ef && caseDe(s)!==ef) return false;
     if(q){
       if(!s._f) s._f = plier([s.fr,s.en,s.phrase,s.apercu,(NOMS[s.uni]||[''])[0]].filter(Boolean).join(' '));
       if(s._f.indexOf(q)<0) return false;
@@ -1256,10 +1368,10 @@ function filtrerCat(){
 }
 
 function ligneCat(s){
-  var uni=NOMS[s.uni]||[s.uni,200], src=s.sources||[], et=etatDe(s), d=decDe(s);
+  var uni=NOMS[s.uni]||[s.uni,200], src=s.sources||[], et=etatDe(s), cs=caseDe(s);
   var lien = s.fr ? 'https://fr.wikipedia.org/wiki/'+encodeURIComponent(s.fr.replace(/ /g,'_'))
                   : 'https://en.wikipedia.org/wiki/'+encodeURIComponent(String(s.en).replace(/ /g,'_'));
-  var n = el('article','item'+(d==='retenu'?' retenu':d==='ecarte'?' ecarte':''));
+  var n = el('article','item'+(cs==='aecrire'?' retenu':cs==='ecarte'?' ecarte':''));
 
   var meta = el('div','meta');
   var lg = languesDe(s);
@@ -1274,16 +1386,25 @@ function ligneCat(s){
   if(s.accord===0) h += '<b class="doute" title="La phrase ne partage aucun mot avec l\u2019article : \u00e0 regarder de pr\u00e8s avant d\u2019\u00e9crire.">\u26a0 \u00e0 v\u00e9rifier</b>';
   meta.innerHTML = h;
 
+  /* ── DEUX GESTES, PAS UN DE PLUS ──────────────────────────────────────
+     Depuis cet onglet on ne fait que deux choses : envoyer un sujet en
+     écriture, ou n'en vouloir jamais. Recliquer sur le geste actif le
+     défait — c'est le seul moyen de revenir en arrière, et il est là où
+     l'on regarde. Un sujet déjà écrit n'a plus de geste : il a quitté la
+     sélection, et on ne décide plus de son sort ici. */
   var g = el('span','gestes');
-  [['retenu','à écrire','on-v'],['ecarte','écarter','on-r']].forEach(function(x){
-    var b=el('button','g'+(d===x[0]?' '+x[2]:''),x[1]); b.type='button';
-    b.addEventListener('click', function(){
-      S.decisions[s.qid] = (S.decisions[s.qid]===x[0]) ? 'neutre' : x[0];
-      if(S.decisions[s.qid]==='neutre') delete S.decisions[s.qid];
-      S.sale=true; memoriser(); peindreCat();
+  if(cs === 'ecrite'){
+    g.appendChild(el('span','gnote','déjà écrite — voir 4 · Relecture'));
+  } else {
+    [['aecrire','envoyer en écriture','on-v'],['ecarte','écarter','on-r']].forEach(function(x){
+      var b=el('button','g'+(decDe(s)===x[0]?' '+x[2]:''),x[1]); b.type='button';
+      b.addEventListener('click', function(){
+        poserDec(s.qid, decDe(s)===x[0] ? 'neutre' : x[0]);
+        S.sale=true; memoriser(); peindreCat(); peindreEcr();
+      });
+      g.appendChild(b);
     });
-    g.appendChild(b);
-  });
+  }
   meta.appendChild(g);
   n.appendChild(meta);
 
@@ -1296,21 +1417,20 @@ function ligneCat(s){
 
 function peindreCat(){
   filtrerCat();
-  var c={total:S.sujets.length,retenu:0,ecarte:0,neutre:0,aecrire:0,ecrit:0,publie:0,incoherent:0};
-  S.sujets.forEach(function(s){ c[decDe(s)]++; c[etatDe(s)] = (c[etatDe(s)]||0)+1;
-                                if(incoherent(s)) c.incoherent++; });
-  ETATS_VUS = c;                     // le diagnostic de 4 · Contrôle s'en sert
+  var c = comptesCases();
   var box=$('#chCat'); box.innerHTML='';
-  /* Tous les états ont leur case. « À moitié en ligne » n'en avait pas :
-     un quart du catalogue y tombait sans que rien ne l'affiche, et deux
-     compteurs se contredisaient sans qu'on puisse voir où passait l'écart. */
-  /* Ce qui se décide ICI d'abord ; ce qui a déjà quitté la sélection ensuite. */
-  var dejaEcrites = (c.ecrit||0)+(c.partiel||0)+(c.partielpub||0)+(c.publie||0);
-  [['k',c.total,'au catalogue'],['',c.neutre,'pas décidés'],
-   ['v',c.retenu,'retenus'],['r',c.ecarte,'écartés'],
-   ['o',c.aecrire||0,'à écrire'],['k',dejaEcrites,'déjà écrites'],
-   ['r',c.incoherent,'incohérents']]
+  /* ── CINQ CASES, ET LES QUATRE DERNIÈRES FONT LE TOTAL ─────────────────
+     Il y en avait sept, prises sur deux axes qui se recoupaient : un sujet
+     retenu ET écrit comptait deux fois, la somme ne tombait jamais juste, et
+     on ne pouvait pas savoir où passait l'écart. Une case, un sujet. */
+  [['k',c.total,'au catalogue'],['',c.pasdecide,'pas décidés'],
+   ['v',c.aecrire,'à écrire'],['k',c.ecrite,'déjà écrites'],['r',c.ecarte,'écartés']]
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
+  if(c.incoherent)
+    /* Ce dernier bloc n'est PAS une cinquième case : ces sujets sont déjà
+       comptés dans l'une des quatre. On le dit, sinon on cherche à l'ajouter
+       au total et on retombe sur l'ancienne confusion. */
+    box.appendChild(el('div','bloc r','<b>'+nb(c.incoherent)+'</b><span>⚠ incohérents · déjà comptés ci-dessus</span>'));
 
   $('#cCat').textContent = nb(S.vueCat.length)+' affiché'+(S.vueCat.length>1?'s':'');
   peindrePortee(c);
@@ -1330,17 +1450,15 @@ function filtresActifs(){
   if($('#q').value.trim())  f.push('recherche « '+$('#q').value.trim()+' »');
   if($('#fUni').value)      f.push(t('#fUni'));
   if($('#fSrc').value)      f.push(t('#fSrc'));
-  if($('#fDec').value)      f.push(t('#fDec'));
   if($('#fEtat').value)     f.push(t('#fEtat'));
   if($('#fPot').value)      f.push(t('#fPot'));
   return f;
 }
 function peindrePortee(c){
   var n = S.vueCat.length, f = filtresActifs(), p = $('#portee');
-  var mot = function(x, s, pl){ return nb(x)+' '+(x>1?(pl||s+'s'):s); };
-  $('#toutRetenir').textContent = 'Retenir ces '+nb(n);
+  $('#toutRetenir').textContent = 'Envoyer ces '+nb(n)+' en écriture';
   $('#toutEcarter').textContent = 'Écarter ces '+nb(n);
-  $('#toutNeutre').textContent  = 'Oublier ces '+nb(n);
+  $('#toutNeutre').textContent  = 'Remettre ces '+nb(n)+' sans décision';
   $('#toutRetenir').disabled = $('#toutEcarter').disabled = $('#toutNeutre').disabled = !n;
   /* Le fichier peut porter des décisions sur des sujets qui ne sont plus au
      catalogue (purge, exclusion) : c'est le nombre de clés qui fait foi. */
@@ -1348,13 +1466,14 @@ function peindrePortee(c){
   $('#toutOublier').textContent = 'Tout oublier ('+nb(decidees)+')';
   $('#toutOublier').disabled = !decidees;
   p.innerHTML = (f.length
-      ? 'Les trois boutons ci-dessus agissent sur les <b>'+nb(n)+'</b> sujets du filtre '
+      ? 'Les boutons ci-dessus agissent sur les <b>'+nb(n)+'</b> sujets du filtre '
         + '<b>'+esc(f.join(' + '))+'</b>, pas sur les autres.'
-      : '<span class="tout">Aucun filtre.</span> Les trois boutons ci-dessus agissent sur '
-        + '<b>tout le catalogue — '+nb(n)+' sujets</b>. Filtrez d’abord si ce n’est pas ce que vous voulez.')
-    + '<br>Décidé pour l’instant : <b>'+mot(c.retenu,'retenu')+'</b>, <b>'+mot(c.ecarte,'écarté')+'</b>, '
-    + nb(c.neutre)+' sans décision.'
-    + (decidees ? ' <i>Tout oublier</i> les efface toutes et repart de zéro.' : '');
+      : '<span class="tout">Aucun filtre.</span> Les boutons ci-dessus agissent sur '
+        + '<b>les '+nb(n)+' sujets affichés</b>. Filtrez d’abord si ce n’est pas ce que vous voulez.')
+    + '<br><b>'+nb(c.total)+'</b> au catalogue = <b>'+nb(c.pasdecide)+'</b> pas décidés '
+    + '+ <b>'+nb(c.aecrire)+'</b> à écrire + <b>'+nb(c.ecrite)+'</b> déjà écrites '
+    + '+ <b>'+nb(c.ecarte)+'</b> écartés.'
+    + (decidees ? ' <i>Tout oublier</i> efface vos '+nb(decidees)+' décisions et repart de zéro.' : '');
 }
 /* Une action de lot : on la chiffre, on la fait dire ce qu'elle a fait, et on
    demande confirmation quand elle porte sur tout le catalogue. */
@@ -1370,15 +1489,13 @@ function lot(quoi, verbe){
       + ' sujets du catalogue entier ?'
       + (ecrases ? '\n\nCela change ' + nb(ecrases) + ' décision(s) déjà prise(s).' : '')
       + '\n\nAnnulez pour filtrer d’abord.')) return;
-  S.vueCat.forEach(function(s){
-    if(quoi) S.decisions[s.qid] = quoi; else delete S.decisions[s.qid];
-  });
-  S.sale = true; memoriser(); peindreCat();
-  var r=0, e=0;
-  S.sujets.forEach(function(s){ var d=decDe(s); if(d==='retenu')r++; else if(d==='ecarte')e++; });
-  dit('<b>'+nb(n)+'</b> sujet(s) ' + (quoi==='retenu'?'retenus':quoi==='ecarte'?'écartés':'remis sans décision')
-    + (f.length ? ' — filtre : '+esc(f.join(' + ')) : ' — <b>aucun filtre : tout le catalogue</b>')
-    + '.<br>Au total : <b>'+nb(r)+'</b> retenus, <b>'+nb(e)+'</b> écartés. '
+  S.vueCat.forEach(function(s){ poserDec(s.qid, quoi); });
+  S.sale = true; memoriser(); peindreCat(); peindreEcr();
+  var c = comptesCases();
+  dit('<b>'+nb(n)+'</b> sujet(s) ' + (quoi==='aecrire'?'envoyés en écriture':quoi==='ecarte'?'écartés':'remis sans décision')
+    + (f.length ? ' — filtre : '+esc(f.join(' + ')) : ' — <b>aucun filtre</b>')
+    + '.<br>Au catalogue : <b>'+nb(c.pasdecide)+'</b> pas décidés, <b>'+nb(c.aecrire)+'</b> à écrire, '
+    + '<b>'+nb(c.ecrite)+'</b> déjà écrites, <b>'+nb(c.ecarte)+'</b> écartés. '
     + 'C’est exactement ce que <i>Enregistrer mes décisions</i> écrira dans <code>decisions.json</code>.', 'ok');
 }
 function suiteCat(){
@@ -1387,6 +1504,234 @@ function suiteCat(){
   $('#lCat').appendChild(f); S.nCat=fin;
   $('#plusCat').hidden = S.nCat>=S.vueCat.length;
   $('#plusCat').textContent = 'Afficher la suite ('+nb(S.vueCat.length-S.nCat)+' restants)';
+}
+
+/* ═══════════════════ 3 · À ÉCRIRE — la file d'attente ═════════════════════
+   Entre « je veux ce sujet » et « payez pour l'écrire », il n'y avait rien.
+   Le bouton d'écriture vivait au bas de la Sélection, parmi les sujets qu'on
+   était en train de trier : on ne voyait jamais la file telle qu'elle est,
+   et on ne pouvait pas la relire AVANT de dépenser.
+
+   Cet onglet ne montre qu'une chose : ce qui est décidé « à écrire » et pas
+   encore écrit — exactement ce que l'outil d'écriture ira chercher. */
+function filtrerEcr(){
+  var q = plier($('#qE').value.trim()), u = $('#fUniE').value, pf = $('#fPotE').value,
+      tri = $('#fTriE').value;
+  S.vueEcr = fileEcriture().filter(function(s){
+    if(u && s.uni!==u) return false;
+    if(pf){ var p=s.potentiel||1, n=parseInt(pf,10);
+      if(pf==='10'){ if(p!==10) return false; } else if(p<n) return false; }
+    if(q){
+      if(!s._f) s._f = plier([s.fr,s.en,s.phrase,s.apercu,(NOMS[s.uni]||[''])[0]].filter(Boolean).join(' '));
+      if(s._f.indexOf(q)<0) return false;
+    }
+    return true;
+  });
+  if(tri==='titre') S.vueEcr.sort(function(a,b){ return String(a.fr||a.en).localeCompare(String(b.fr||b.en),'fr'); });
+  else if(tri==='univers') S.vueEcr.sort(function(a,b){
+    return String(a.uni).localeCompare(String(b.uni)) || b.potentiel-a.potentiel; });
+  else S.vueEcr.sort(function(a,b){ return b.potentiel-a.potentiel; });
+  S.nEcr = 0;
+}
+
+function ligneEcr(s){
+  var uni = NOMS[s.uni]||[s.uni,200];
+  var lien = s.fr ? 'https://fr.wikipedia.org/wiki/'+encodeURIComponent(s.fr.replace(/ /g,'_'))
+                  : 'https://en.wikipedia.org/wiki/'+encodeURIComponent(String(s.en).replace(/ /g,'_'));
+  var n = el('article','item retenu');
+  var meta = el('div','meta');
+  meta.innerHTML = '<i class="pastille" style="background:hsl('+uni[1]+' 62% 55%)"></i><span>'+esc(uni[0])+'</span>'
+    + '<b class="note">'+(s.potentiel||1)+'/10</b>'
+    + (s.accord===0 ? '<b class="doute" title="La phrase ne partage aucun mot avec l’article : à regarder avant de payer.">⚠ à vérifier</b>' : '');
+  var g = el('span','gestes');
+  /* Deux sorties, et deux seulement : on remet le sujet en attente de
+     décision, ou on n'en veut plus jamais. */
+  var b1 = el('button','g','retirer de la file'); b1.type='button';
+  b1.addEventListener('click', function(){
+    poserDec(s.qid,'neutre'); S.sale=true; memoriser(); peindreEcr(); peindreCat(); });
+  var b2 = el('button','g','écarter'); b2.type='button';
+  b2.addEventListener('click', function(){
+    poserDec(s.qid,'ecarte'); S.sale=true; memoriser(); peindreEcr(); peindreCat(); });
+  g.appendChild(b1); g.appendChild(b2);
+  meta.appendChild(g);
+  n.appendChild(meta);
+  n.appendChild(el('h2',null,'<a href="'+lien+'" target="_blank" rel="noopener">'+esc(s.fr||s.en)+'</a>'));
+  var txt = s.phrase || s.apercu || '';
+  if(txt) n.appendChild(el('p','phrase'+(s.phrase?' c':''),esc(txt)));
+  return n;
+}
+
+function suiteEcr(){
+  var f=document.createDocumentFragment(), fin=Math.min(S.nEcr+LOT,S.vueEcr.length);
+  for(var i=S.nEcr;i<fin;i++) f.appendChild(ligneEcr(S.vueEcr[i]));
+  $('#lEcr').appendChild(f); S.nEcr=fin;
+  $('#plusEcr').hidden = S.nEcr>=S.vueEcr.length;
+  $('#plusEcr').textContent = 'Afficher la suite ('+nb(S.vueEcr.length-S.nEcr)+' restants)';
+}
+
+function peindreEcr(){
+  if(!$('#chEcr')) return;
+  filtrerEcr();
+  var file = fileEcriture(), c = comptesCases();
+  var hauts = file.filter(function(s){ return (s.potentiel||1) >= 9; }).length;
+  var doutes = file.filter(function(s){ return s.accord === 0; }).length;
+  var unis = {}; file.forEach(function(s){ unis[s.uni]=1; });
+  var box = $('#chEcr'); box.innerHTML='';
+  [['v',file.length,'dans la file'],['k',hauts,'potentiel 9 et plus'],
+   ['k',Object.keys(unis).length,'univers représentés'],
+   ['r',doutes,'⚠ à vérifier'],['',c.pasdecide,'pas encore décidés']]
+   .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],'<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
+
+  $('#cEcr').textContent = nb(S.vueEcr.length)+' affiché'+(S.vueEcr.length>1?'s':'');
+  $('#ecrLancer').textContent = 'Écrire — ' + nb(file.length) + ' sujet(s)';
+  $('#ecrLancer').disabled = !file.length;
+  $('#ecrAudit').textContent = 'Vérifier ces ' + nb(file.length);
+  $('#ecrAudit').disabled = !file.length;
+  $('#ecrRedites').disabled = file.length < 2;
+  $('#ecrEnr').className = 'btn' + (S.sale ? ' p' : '');
+  /* ── LE SEUL ÉCART POSSIBLE AVEC L'OUTIL, ET IL COÛTE DE L'ARGENT ──────
+     Cet onglet lit les FICHES : un sujet qui en a une est « déjà écrit », et
+     il sort de la file. L'outil d'écriture, lui, lit le REGISTRE du catalogue
+     (`statut`). Quand les deux divergent — un sujet marqué « à écrire » qui a
+     pourtant sa fiche —, l'outil le reprendrait et vous le repaieriez.
+
+     C'est le seul endroit du produit où une incohérence de registre coûte
+     réellement quelque chose. On le dit ici, devant le bouton, pas dans un
+     onglet de diagnostic qu'on ouvre après coup. */
+  var explicites = Object.keys(S.decisions).some(function(k){
+    return normDec(S.decisions[k]) === 'aecrire'; });
+  var repayes = S.sujets.filter(function(s){
+    /* La règle exacte de l'outil : il part des sujets que le registre dit
+       « a-ecrire », écarte vos écartés, et se restreint à votre file dès que
+       vous en avez une. Si on comptait autrement, l'avertissement mentirait. */
+    if(s.statut !== 'a-ecrire') return false;
+    if(caseDe(s) !== 'ecrite') return false;
+    if(decDe(s) === 'ecarte') return false;
+    return !explicites || decDe(s) === 'aecrire';
+  }).length;
+  $('#porteeEcr').innerHTML = (S.sale
+    ? '<b>Vos décisions ne sont pas encore au dépôt.</b> <i>Enregistrer mes décisions</i> '
+      + 'écrit <code>consignes/decisions.json</code> — et c’est ce fichier-là que lit '
+      + 'l’écriture, pas ce navigateur.'
+    : 'Vos décisions sont enregistrées au dépôt. L’écriture partira de cette file.')
+    + (repayes
+        ? '<br><b style="color:var(--rouge)">⚠ ' + nb(repayes) + ' sujet(s) ont déjà une fiche, '
+          + 'mais le registre du catalogue les croit encore à écrire.</b> L’écriture les '
+          + 'reprendrait — et vous les paieriez une seconde fois. Lancez '
+          + '<b>5 · Contrôle → Remettre le registre d’accord</b> avant d’écrire.'
+        : '');
+
+  var l=$('#lEcr'); l.innerHTML=''; S.nEcr=0;
+  if(!S.vueEcr.length){
+    l.appendChild(el('div','vide', file.length
+      ? 'Rien ne correspond au filtre.'
+      : 'La file est vide. Allez en <b>2 · Sélection</b> et envoyez des sujets en écriture.'));
+    $('#plusEcr').hidden = true; peindrePied(); return;
+  }
+  suiteEcr(); peindrePied();
+}
+
+/* ══════════ LES REDITES, AVANT DE PAYER ═══════════════════════════════════
+   Un sujet ne peut pas entrer deux fois au catalogue : son identité est son
+   identifiant Wikidata. Mais DEUX sujets différents peuvent raconter la même
+   histoire — « Lac Nyos » et « Éruption limnique », par exemple. On ne s'en
+   aperçoit qu'après avoir payé les deux textes.
+
+   Ce contrôle se fait ICI, dans le navigateur, sur les titres et les phrases :
+   instantané, gratuit, sans action GitHub. Il compare la file à elle-même ET
+   à ce qui est déjà écrit — puisque réécrire ce qu'on a déjà est la même
+   dépense pour rien. Il ne retire rien : il montre, vous tranchez. */
+function motsUtilesC(t){
+  var vides = ('le la les un une des du de d au aux et ou a à en dans sur pour par avec '
+    + 'que qui quoi dont ne pas plus est sont était étaient il elle ils elles on se sa son ses ce '
+    + 'cet cette ces leur leurs the of and to in is was were it its this that for with as at by '
+    + 'from he she they').split(/\s+/);
+  var stop = {}; vides.forEach(function(m){ stop[m]=1; });
+  return String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(function(m){ return m.length>3 && !stop[m]; });
+}
+function sacDe(t){ var o={}, n=0; motsUtilesC(t).forEach(function(m){ if(!o[m]){o[m]=1;n++;} }); o._n=n; return o; }
+/* ── LE GARDE-FOU DES PETITS SACS ──────────────────────────────────────────
+   Un titre de trois mots ne laisse qu'un ou deux mots utiles après filtrage.
+   « À écrire 0 » et « À écrire 1 » partagent alors la totalité de leur
+   vocabulaire : 100 % de ressemblance, et deux sujets qui n'ont rien à voir.
+   L'épreuve en a sorti soixante d'un coup.
+
+   On exige donc de la matière : au moins six mots utiles de chaque côté, et
+   au moins trois mots RÉELLEMENT partagés. C'est la règle qu'emploie déjà la
+   recherche de redites sur les fiches en ligne — deux textes qui racontent la
+   même chose partagent forcément un nom propre, un lieu, un chiffre. */
+var MOTS_MINI = 6, PARTAGES_MINI = 3;
+function jaccardC(a,b){
+  if(a._n < MOTS_MINI || b._n < MOTS_MINI) return 0;
+  var inter=0; for(var m in a){ if(m!=='_n' && b[m]) inter++; }
+  if(inter < PARTAGES_MINI) return 0;
+  return inter / (a._n + b._n - inter);
+}
+function chercherRedites(){
+  var seuil = 0.34;
+  var file = fileEcriture();
+  var sacs = file.map(function(s){
+    return { s:s, sac: sacDe([s.fr, s.en, s.phrase, s.apercu].filter(Boolean).join(' ')) }; });
+  /* Ce qui est déjà écrit, pour ne pas repayer une histoire qu'on possède. */
+  var ecrits = S.fiches.map(function(f){
+    return { f:f, sac: sacDe([f.titre, f.rec.t, f.rec.r, f.rec.x].filter(Boolean).join(' ')) }; });
+
+  var paires = [];
+  for(var i=0;i<sacs.length;i++){
+    for(var j=i+1;j<sacs.length;j++){
+      var v = jaccardC(sacs[i].sac, sacs[j].sac);
+      if(v >= seuil) paires.push({ v:v, a:sacs[i].s, b:sacs[j].s, dejaEcrit:null });
+    }
+    for(var k=0;k<ecrits.length;k++){
+      var w = jaccardC(sacs[i].sac, ecrits[k].sac);
+      if(w >= seuil) paires.push({ v:w, a:sacs[i].s, b:null, dejaEcrit:ecrits[k].f });
+    }
+  }
+  paires.sort(function(x,y){ return y.v - x.v; });
+  return paires.slice(0, 60);
+}
+function peindreRedites(){
+  var box = $('#redites'); if(!box) return;
+  var t0 = Date.now();
+  var paires = chercherRedites();
+  var ms = Date.now() - t0;
+  if(!paires.length){
+    box.innerHTML = '<div class="reglages"><h3>Aucune redite trouvée</h3>'
+      + '<p>Les ' + nb(fileEcriture().length) + ' sujets de la file ont été comparés '
+      + 'entre eux et aux ' + nb(S.fiches.length) + ' fiches déjà écrites — en '
+      + ms + ' ms, dans ce navigateur, sans rien lancer. Rien ne se ressemble '
+      + 'au-delà du seuil.</p></div>';
+    return;
+  }
+  var h = '<div class="reglages"><h3>' + nb(paires.length) + ' ressemblance(s) à trancher</h3>'
+    + '<p>Deux sujets peuvent raconter la même histoire sous deux titres — et vous '
+    + 'paieriez deux fois. <b>Rien n’est retiré</b> : écartez celui dont vous ne voulez pas, '
+    + 'ou laissez les deux si ce sont bien deux histoires.</p>';
+  paires.forEach(function(pr, i){
+    h += '<div class="outil" style="margin-top:10px">'
+      + '<p><b>' + Math.round(pr.v*100) + ' % de vocabulaire commun</b></p>'
+      + '<p>· <b>' + esc(pr.a.fr || pr.a.en) + '</b> <span class="quand">(dans la file)</span></p>'
+      + (pr.dejaEcrit
+          ? '<p>· <b>' + esc(pr.dejaEcrit.rec.t || pr.dejaEcrit.titre) + '</b> '
+            + '<span class="quand">(déjà écrite — vous la possédez)</span></p>'
+          : '<p>· <b>' + esc(pr.b.fr || pr.b.en) + '</b> <span class="quand">(dans la file)</span></p>')
+      + '<button class="btn" data-ecarter="' + esc(pr.a.qid) + '">Écarter « '
+      + esc((pr.a.fr || pr.a.en).slice(0,40)) + ' »</button>'
+      + (pr.b ? ' <button class="btn" data-ecarter="' + esc(pr.b.qid) + '">Écarter « '
+                + esc((pr.b.fr || pr.b.en).slice(0,40)) + ' »</button>' : '')
+      + '</div>';
+    void i;
+  });
+  h += '</div>';
+  box.innerHTML = h;
+  box.querySelectorAll('[data-ecarter]').forEach(function(b){
+    b.addEventListener('click', function(){
+      poserDec(b.dataset.ecarter, 'ecarte');
+      S.sale = true; memoriser(); peindreEcr(); peindreCat(); peindreRedites();
+      dit('Sujet écarté. <b>Enregistrer mes décisions</b> pour que l’écriture en tienne compte.','ok');
+    });
+  });
 }
 
 /* ══════════════════════════ RELECTURE ══════════════════════════ */
@@ -1407,7 +1752,7 @@ function valDe(f){ var k=f.lang+'|'+f.titre; return S.validations[k]||'neutre'; 
    trouvable en cherchant, introuvable dans les publiés.
 
    La console adopte la règle de l'application — celle que le LECTEUR
-   éprouve, puisque c'est elle qui décide ce qu'il reçoit. Et « 4 · Contrôle
+   éprouve, puisque c'est elle qui décide ce qu'il reçoit. Et « 5 · Contrôle
    → Remettre le registre d'accord » inscrit une vraie date sur ces fiches,
    une fois pour toutes : après quoi il n'y a plus d'ambiguïté à arbitrer. */
 function enLigne(f){
@@ -1450,7 +1795,7 @@ function filtrerRel(){
     /* ── CE BUREAU NE VOIT QUE CE QU'IL A À RELIRE ───────────────────────
        Une fiche EN LIGNE ne se relit plus : elle se retire ou se refait, et
        cela se fait ailleurs. Une fiche AU STOCK est jugée : elle appartient
-       à 5 · Publication, qui décide quand elle sort.
+       à 6 · Publication, qui décide quand elle sort.
 
        Ne reste donc ici que ce qui attend vraiment votre lecture — le texte
        vient d'être écrit, vous jugez le fond et la forme. C'est le seul
@@ -1481,11 +1826,11 @@ function ficheHtml(f){
          en ligne (le lecteur la voit), au stock (jugée et enregistrée, elle
          sortira au rythme réglé), à relire (écrite, elle attend votre
          lecture — et c'est le seul cas qui a sa place dans cet onglet). */
-      /* Quatre états, quatre mots, les mêmes ici et dans 5 · Publication :
+      /* Quatre états, quatre mots, les mêmes ici et dans 6 · Publication :
          écrite → relue → au stock → en ligne. */
       + (l ? '<b class="e-publie" title="Le lecteur la voit sur le site.">en ligne</b>'
            : f.rec.v==='ok'
-             ? '<b class="e-partielpub" title="Votre jugement est enregistré au dépôt. Elle sortira au rythme réglé dans 5 · Publication, ou tout de suite si vous la cochez là-bas.">au stock</b>'
+             ? '<b class="e-partielpub" title="Votre jugement est enregistré au dépôt. Elle sortira au rythme réglé dans 6 · Publication, ou tout de suite si vous la cochez là-bas.">au stock</b>'
              : valDe(f)==='valide'
                ? '<b class="e-partiel" title="Vous l’avez validée dans ce navigateur. Elle rejoindra le stock quand vous appuierez sur « Envoyer au stock ».">validée — à envoyer</b>'
                : '<b class="e-ecrit" title="Écrite, pas encore relue.">à relire</b>')
@@ -1659,9 +2004,9 @@ function peindrePied(){
   var r=$('#resume'), a=$('#actions'); a.innerHTML='';
   if(!S.connecte){
     var ret0=0, eca0=0, val0=0;
-    S.sujets.forEach(function(s){ var d=decDe(s); if(d==='retenu')ret0++; else if(d==='ecarte')eca0++; });
+    S.sujets.forEach(function(s){ var d=decDe(s); if(d==='aecrire')ret0++; else if(d==='ecarte')eca0++; });
     S.fiches.forEach(function(f){ if(valDe(f)==='valide') val0++; });
-    var fait = S.onglet==='cat' ? (nb(ret0)+' retenus · '+nb(eca0)+' écartés')
+    var fait = (S.onglet==='cat'||S.onglet==='ecr') ? (nb(ret0)+' à écrire · '+nb(eca0)+' écartés')
                                 : (nb(val0)+' cochées pour le stock');
     r.innerHTML = '<b>'+fait+'</b>, gardés dans ce navigateur. '
                 + 'Connectez le dépôt pour les enregistrer d’un clic — ou déposez le fichier vous-même.';
@@ -1670,34 +2015,26 @@ function peindrePied(){
     var b=el('button','btn p','Connecter le dépôt');
     b.addEventListener('click',function(){ $('#reglages').hidden=false; window.scrollTo(0,0); });
     a.appendChild(b);
-    if(S.onglet==='cat')
+    if(S.onglet==='cat'||S.onglet==='ecr')
       a.appendChild(boutonFichier('decisions.json', S.decisions, '<b>2 · Écrire</b>'));
     else if(S.onglet==='rel')
       a.appendChild(boutonFichier('validations.json', S.validations, '<b>5 · Publier → valider</b>'));
     return;
   }
-  if(S.onglet==='cat'){
-    var ret=0, eca=0;
-    S.sujets.forEach(function(s){ var d=decDe(s); if(d==='retenu')ret++; else if(d==='ecarte')eca++; });
-    /* « à finir » compte aussi : il reste une langue à écrire. */
-    var aEcrire = S.sujets.filter(function(s){
-      var e = etatDe(s); return decDe(s)==='retenu' && (e==='aecrire' || e==='partiel'); }).length;
-    r.innerHTML = '<b>'+nb(ret)+'</b> retenus · <b>'+nb(eca)+'</b> écartés'
+  if(S.onglet==='cat' || S.onglet==='ecr'){
+    /* ── LE PIED NE DOUBLE PLUS L'ONGLET ─────────────────────────────────
+       « Vérifier » et « Écrire » vivaient ici, au bas de la Sélection, au
+       milieu des sujets qu'on était en train de trier — et l'écriture est la
+       seule dépense du produit. Les deux gestes sont maintenant dans
+       3 · À écrire, devant la file qu'ils concernent. Le pied ne fait plus
+       que dire où l'on en est, et enregistrer. */
+    var c = comptesCases();
+    r.innerHTML = '<b>'+nb(c.pasdecide)+'</b> pas décidés · <b>'+nb(c.aecrire)+'</b> à écrire · '
+                + '<b>'+nb(c.ecrite)+'</b> déjà écrites · <b>'+nb(c.ecarte)+'</b> écartés'
                 + (S.sale ? ' · <span style="color:var(--or)">non enregistré</span>' : '');
     var b1=el('button','btn'+(S.sale?' p':''),'Enregistrer mes décisions');
     b1.addEventListener('click', enregistrerDecisions);
-    /* La passe qualité, entre la sélection et la dépense. Elle ne coûte que
-       du réseau, et elle ne porte que sur les retenus — c'est-à-dire sur ce
-       que vous êtes sur le point de payer. */
-    var bA=el('button','btn','Vérifier les '+nb(ret)+' retenus');
-    bA.disabled = !ret;
-    bA.title = 'Reprend chaque sujet retenu : l’article existe-t-il toujours, '
-             + 'est-il assez fourni, votre phrase parle-t-elle bien de lui ?';
-    bA.addEventListener('click', envoyerAudit);
-    var b2=el('button','btn o','Écrire — '+nb(aEcrire)+' retenus');
-    b2.disabled = !aEcrire;
-    b2.addEventListener('click', envoyerEcriture);
-    a.appendChild(b1); a.appendChild(bA); a.appendChild(b2);
+    a.appendChild(b1);
   }else if(S.onglet==='pub'){
     var prets = stockPret();
     r.innerHTML = '<b>'+nb(prets)+'</b> sujet(s) prêts à sortir · rythme <b>'+esc(PUB.rythme)+'</b>'
@@ -1746,12 +2083,12 @@ function boutonFichier(nom, donnees, quoi){
 function enregistrerDecisions(){
   dit('Enregistrement…','info');
   var txt = JSON.stringify(S.decisions, null, 1), r=0, e=0;
-  S.sujets.forEach(function(s){ var d=decDe(s); if(d==='retenu')r++; else if(d==='ecarte')e++; });
+  S.sujets.forEach(function(s){ var d=decDe(s); if(d==='aecrire')r++; else if(d==='ecarte')e++; });
   return ecrireFichier('consignes/decisions.json', txt, S.decSha,
-      'console : ' + r + ' retenus, ' + e + ' écartés')
+      'console : ' + r + ' à écrire, ' + e + ' écartés')
     .then(function(sha){ S.decSha=sha; S.sale=false; memoriser(); peindrePied();
-      dit('Enregistré dans le dépôt : <b>'+nb(r)+'</b> retenus, <b>'+nb(e)+'</b> écartés. '
-        + 'L’écriture ne touchera que les retenus.','ok'); })
+      dit('Enregistré dans le dépôt : <b>'+nb(r)+'</b> à écrire, <b>'+nb(e)+'</b> écartés. '
+        + 'L’écriture ne touchera que la file « à écrire ».','ok'); })
     .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
 }
 function enregistrerValidations(){
@@ -1763,12 +2100,12 @@ function enregistrerValidations(){
       dit('Relecture enregistrée dans le dépôt.','ok'); })
     .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
 }
-/* La passe qualité sur les seuls retenus. On enregistre d'abord — l'audit lit
+/* La passe qualité sur la seule file d'écriture. On enregistre d'abord — l'audit lit
    decisions.json dans le dépôt, pas ce navigateur — puis on lance l'action. */
 function envoyerAudit(){
-  var n = S.sujets.filter(function(s){ return decDe(s)==='retenu'; }).length;
+  var n = fileEcriture().length;
   var dur = window.confirm(
-    'Vérifier la qualité des ' + n + ' sujets retenus.\n\n'
+    'Vérifier la qualité des ' + n + ' sujets de la file.\n\n'
     + 'L’audit reprend chaque sujet : l’article existe-t-il toujours, est-il assez\n'
     + 'fourni, n’est-ce pas une page d’homonymie, votre phrase parle-t-elle bien\n'
     + 'de cet article ? Gratuit, il ne supprime rien.\n\n'
@@ -1805,8 +2142,7 @@ var MODELES = [
 function coutTexte(m){ return ((2000 + 300) * m.in + 1500 * m.out) / 1e6; }
 
 function envoyerEcriture(){
-  var dispo = S.sujets.filter(function(s){
-    var e = etatDe(s); return decDe(s)==='retenu' && (e==='aecrire' || e==='partiel'); });
+  var dispo = fileEcriture();
   if(!dispo.length) return;
   /* ── COMPTER CE QUI RESTE VRAIMENT À ÉCRIRE ────────────────────────────
      Un sujet rédigé en français seul reste « à finir » — il lui manque
@@ -1833,7 +2169,7 @@ function envoyerEcriture(){
      quand on change de langue, sinon ils mentent dès le deuxième lot. */
   var SEUILS = [10,9,8,7,0];
   function libelle(p){
-    return p===0 ? 'Tous les retenus' : (p===10 ? 'Uniquement les 10/10' : p+'/10 et au-dessus');
+    return p===0 ? 'Toute la file' : (p===10 ? 'Uniquement les 10/10' : p+'/10 et au-dessus');
   }
   var opts = SEUILS.map(function(p){
     return '<option value="'+p+'"'+(p===0?' selected':'')+'></option>'; }).join('');
@@ -1892,7 +2228,7 @@ function envoyerEcriture(){
     note.textContent = m.note;
     tot.innerHTML = '<b>' + nb(n) + '</b> sujet(s) → <b>' + nb(textes) + '</b> texte(s) → '
       + '<b>' + d.toFixed(2) + ' $</b> (~' + (d/1.08).toFixed(2) + ' €)'
-      + '<span>Il reste ' + nb(max) + ' sujet(s) retenus à ce seuil. '
+      + '<span>Il reste ' + nb(max) + ' sujet(s) dans la file à ce seuil. '
       + 'Une tranche interrompue n’est jamais repayée : la relance reprend où elle s’est arrêtée.</span>';
   }
   [pot,nn,lg,md].forEach(function(x){ x.addEventListener('input', recalcul); x.addEventListener('change', recalcul); });
@@ -1933,7 +2269,7 @@ function envoyerEcriture(){
 
      1. relire       — vous jugez, ici, dans ce navigateur
      2. le stock     — vos jugements sont enregistres au depot (rec.v=ok)
-     3. la sortie    — 5 · Publication en tire au rythme réglé
+     3. la sortie    — 6 · Publication en tire au rythme réglé
 
    Ce bouton fait la marche 2, et rien de plus. Les « à refaire » repassent à
    écrire, les « à retirer » sortent : c'est la même opération, appliquée. */
@@ -1953,7 +2289,7 @@ function envoyerPublication(){
     + '  • ' + r + ' fiche(s) « à refaire » repassent à écrire\n'
     + '  • ' + x + ' fiche(s) « à retirer » sortent définitivement\n\n'
     + 'Rien ne part en ligne maintenant : la sortie se fait au rythme réglé\n'
-    + 'dans 5 · Publication, ou d’un coup avec « Mettre en ligne… ».')) return;
+    + 'dans 6 · Publication, ou d’un coup avec « Mettre en ligne… ».')) return;
   dit('Enregistrement de la relecture, puis envoi au stock…','info');
   enregistrerValidations().then(function(){
     return lancerAction('5-publier.yml', { operation:'valider', combien:'', titre:'' });
@@ -2286,7 +2622,7 @@ function peindreChoix(){
   if(!S_CHOIX.vue.length){
     l.appendChild(el('div','vide', stockDisponible().length
       ? 'Rien au stock ne correspond à ce filtre.'
-      : 'Le stock est vide.<br>Validez des fiches dans <b>3 · Relecture</b>, '
+      : 'Le stock est vide.<br>Validez des fiches dans <b>4 · Relecture</b>, '
         + 'puis appuyez sur <b>Envoyer au stock</b> : elles arriveront ici.'));
     $('#plusChoix').hidden = true; compterChoix(); return;
   }
@@ -2342,7 +2678,7 @@ function texteReglagePublication(){
    + '# Photos des fiches : oui (voilées) | franches (à nu) | non\n'
    + 'images: ' + PUB.images + '\n\n'
    + '# Le passage de la relecture au STOCK prêt à publier.\n'
-   + '#   manuel  vous appuyez sur « Envoyer au stock » dans 3 · Relecture\n'
+   + '#   manuel  vous appuyez sur « Envoyer au stock » dans 4 · Relecture\n'
    + '#   auto    chaque passage de publication prend d’abord vos validées\n'
    + '# Dans les deux cas, valider ne met JAMAIS en ligne : c’est le rythme\n'
    + '# ci-dessus qui décide quand une fiche du stock sort.\n'
@@ -2383,11 +2719,11 @@ function peindreEssais(){
 function peindreMoisson(){
   var total = S.sujets.length;
   var neufs = S.sujets.filter(function(s){ return decDe(s)==='neutre'; }).length;
-  var ret   = S.sujets.filter(function(s){ return decDe(s)==='retenu'; }).length;
+  var ret   = S.sujets.filter(function(s){ return decDe(s)==='aecrire'; }).length;
   var eca   = S.sujets.filter(function(s){ return decDe(s)==='ecarte'; }).length;
   var box = $('#chMoi'); box.innerHTML = '';
   [['k',total,'sujets au catalogue'],['o',neufs,'pas encore décidés'],
-   ['v',ret,'retenus'],['r',eca,'écartés']]
+   ['v',ret,'à écrire'],['r',eca,'écartés']]
    .forEach(function(b){ box.appendChild(el('div','bloc '+b[0],
      '<b>'+nb(b[1])+'</b><span>'+b[2]+'</span>')); });
   $('#pMoisson').value = MOI.auto;
@@ -2507,8 +2843,8 @@ var OUTILS = [
     quoi:'Reprend tout le catalogue et signale deux sujets qui désignent la même chose — '
        + 'même identifiant Wikidata, ou titres qui se recouvrent. Ne supprime rien.',
     quand:'Après chaque grosse moisson.' },
-  { op:'auditer', nom:'Vérifier les sujets retenus',
-    quoi:'Sur vos seuls retenus : l’article existe-t-il toujours, est-il assez fourni, '
+  { op:'auditer', nom:'Vérifier les sujets de la file d’écriture',
+    quoi:'Sur les seuls sujets que vous avez envoyés en écriture : l’article existe-t-il toujours, est-il assez fourni, '
        + 'n’est-ce pas une page d’homonymie ? C’est la passe à faire AVANT de payer.',
     quand:'Juste avant de lancer un lot d’écriture.', dur:'écarter ce qui échoue gravement' },
   { op:'ranger', nom:'Reclasser les univers',
@@ -2533,7 +2869,6 @@ var OUTILS = [
    combien de fiches n'ont trouvé aucun sujet, et combien de sujets sont dans
    chaque état. Il ne modifie rien, ne demande rien au réseau, et se lit en
    dix secondes. */
-var ETATS_VUS = {};
 function peindreDiagnostic(){
   var boite = $('#diag'); if(!boite) return;
   var auj = new Date().toISOString().slice(0,10);
@@ -2567,7 +2902,17 @@ function peindreDiagnostic(){
     return !reclamees['t:'+x.lang+'|'+x.titre];
   });
 
-  var c = ETATS_VUS;
+  /* ── LE DIAGNOSTIC REGARDE L'AUTRE AXE, ET LUI SEUL ────────────────────
+     La Sélection ne compte plus que les quatre cases — c'est ce qui les rend
+     additives. Le diagnostic, lui, a besoin de l'ÉTAT des sujets : c'est
+     précisément son métier de confronter ce que dit le registre à ce que
+     disent les fiches. Il le calcule ici, chez lui, plutôt que de forcer la
+     Sélection à afficher un axe dont elle n'a que faire. */
+  var c = { incoherent:0 };
+  S.sujets.forEach(function(s){
+    var e = etatDe(s); c[e] = (c[e]||0)+1;
+    if(incoherent(s)) c.incoherent++;
+  });
   var somme = (c.publie||0) + (c.partielpub||0);
   var lignes = [
     ['Fiches sur le disque, dans vos langues publiées', nb(f.publiees), ''],
@@ -2624,7 +2969,7 @@ function trierRemiseAZero(mode){
     || (s.en && pharesTitres[String(s.en).toLowerCase()])){ r.phare++; return; }
     if(src.indexOf('manuel') >= 0 || String(s.qid).indexOf('M-')===0){ r.ajout++; return; }
     if(s.statut==='retire'){ r.retire++; return; }
-    if(mode==='menage' && decDe(s)==='retenu'){ r.retenu++; return; }
+    if(mode==='menage' && decDe(s)==='aecrire'){ r.retenu++; return; }
     r.sortis++;
   });
   r.gardes = r.fiche + r.phare + r.ajout + r.retire + r.retenu;
@@ -2640,7 +2985,7 @@ function carteRemiseAZero(){
          + '<p class="quand">Gardés : ' + nb(r.fiche) + ' qui ont une fiche · '
          + nb(r.phare) + ' sujets phares · ' + nb(r.ajout) + ' ajouts · '
          + nb(r.retire) + ' que vous aviez retirés'
-         + (mode==='menage' ? ' · ' + nb(r.retenu) + ' que vous aviez retenus' : '')
+         + (mode==='menage' ? ' · ' + nb(r.retenu) + ' envoyés en écriture' : '')
          + '.</p>';
   }
   d.innerHTML = '<h4>Repartir à zéro — vider la poubelle du catalogue</h4>'
@@ -2655,7 +3000,7 @@ function carteRemiseAZero(){
     + '<p>L’ancien catalogue est recopié dans <code>catalogue-maitre.avant-remise-a-zero.json</code> '
     + 'avant la première écriture : pour revenir en arrière, renommez-le.</p>'
     + '<div class="champs" style="margin-top:12px"><div>'
-    + '<label for="zMode">Vos sujets retenus mais pas encore écrits</label>'
+    + '<label for="zMode">Vos sujets envoyés en écriture, pas encore écrits</label>'
     + '<select id="zMode">'
     + '<option value="menage">Les garder — ménage</option>'
     + '<option value="rase">Les vider aussi — table rase</option>'
@@ -2779,8 +3124,8 @@ function peindreLig(){
   if(!c.total){
     l.appendChild(el('div','vide', toutes
       ? 'Rien ne correspond.'
-      : 'Aucune fiche en ligne pour l’instant.<br>Validez des fiches en <b>3 · Relecture</b>, '
-        + 'puis mettez-les en ligne en <b>5 · Publication</b>.'));
+      : 'Aucune fiche en ligne pour l’instant.<br>Validez des fiches en <b>4 · Relecture</b>, '
+        + 'puis mettez-les en ligne en <b>6 · Publication</b>.'));
     $('#plusLig').hidden = true; return;
   }
   suiteLig();
@@ -2909,7 +3254,7 @@ function corrigerFiche(f){
 /* ══════════════════════════ branchements ══════════════════════════ */
 /* Six étapes, une seule fonction. Ajouter la septième ne demandera qu'un
    bouton et une section : plus de liste d'identifiants à tenir à jour. */
-var ETAPES = ['moi','cat','rel','ctl','pub','lig'];
+var ETAPES = ['moi','cat','ecr','rel','ctl','pub','lig'];
 function onglet(nom){
   if(ETAPES.indexOf(nom) < 0) nom = 'cat';
   S.onglet = nom;
@@ -2922,6 +3267,7 @@ function onglet(nom){
   });
   if(nom==='pub') peindrePub();
   if(nom==='moi') peindreMoisson();
+  if(nom==='ecr') peindreEcr();
   if(nom==='ctl'){ peindreCat(); peindreControle(); peindreDiagnostic(); }
   if(nom==='lig') { filtrerLig(); peindreLig(); }
   peindrePied();
@@ -2930,9 +3276,21 @@ document.querySelectorAll('.onglets button').forEach(function(b){
   b.addEventListener('click', function(){ onglet(b.dataset.vue); });
 });
 
+/* ── 3 · À écrire ─────────────────────────────────────────────────────── */
+['qE','fUniE','fPotE','fTriE'].forEach(function(id){
+  var n = $('#'+id); if(!n) return;
+  n.addEventListener(id==='qE' ? 'input' : 'change', peindreEcr);
+});
+$('#plusEcr').addEventListener('click', suiteEcr);
+$('#ecrRedites').addEventListener('click', function(){
+  dit('Comparaison en cours…','info'); window.setTimeout(peindreRedites, 20); });
+$('#ecrAudit').addEventListener('click', envoyerAudit);
+$('#ecrEnr').addEventListener('click', enregistrerDecisions);
+$('#ecrLancer').addEventListener('click', envoyerEcriture);
+
 /* « Ouvrir le fonds » a été retiré : il demandait une note dans une fenêtre
    système et publiait un nombre qu'on ne voyait pas avant de valider. La liste
-   cochable de 5 · Publication fait la même chose, en montrant ce qui va
+   cochable de 6 · Publication fait la même chose, en montrant ce qui va
    sortir. */
 
 ['pRythme','pCombien','pOrdre','pDate','pLangues','pStock','pImages','pMoisson'].forEach(function(id){
@@ -3030,7 +3388,7 @@ $('#regOubli').addEventListener('click',function(){
   S.cfg.token=''; $('#rToken').value=''; ecrireCfg(); marquerCx(false);
   dit('Jeton oublié. La console repasse en lecture seule.','ok');
 });
-['q','fUni','fSrc','fDec','fEtat','fPot','fTri'].forEach(function(id){
+['q','fUni','fSrc','fEtat','fPot','fTri'].forEach(function(id){
   var n=document.getElementById(id);
   n.addEventListener(id==='q'?'input':'change', peindreCat);
 });
@@ -3040,14 +3398,14 @@ $('#regOubli').addEventListener('click',function(){
 });
 $('#plusCat').addEventListener('click', suiteCat);
 $('#plusRel').addEventListener('click', suiteRel);
-$('#toutRetenir').addEventListener('click',function(){ lot('retenu','Retenir'); });
+$('#toutRetenir').addEventListener('click',function(){ lot('aecrire','Envoyer en écriture'); });
 $('#toutEcarter').addEventListener('click',function(){ lot('ecarte','Écarter'); });
 $('#toutNeutre').addEventListener('click',function(){ lot('','Oublier la décision de'); });
 $('#toutOublier').addEventListener('click',function(){
   var n = Object.keys(S.decisions).length;
-  if(!n || !window.confirm('Effacer les '+nb(n)+' décisions du catalogue — retenus et écartés — '
+  if(!n || !window.confirm('Effacer les '+nb(n)+' décisions du catalogue — à écrire et écartés — '
     + 'et repartir d’une page blanche ?\n\nAucune fiche écrite n’est touchée.')) return;
-  S.decisions = {}; S.sale=true; memoriser(); peindreCat();
+  S.decisions = {}; S.sale=true; memoriser(); peindreCat(); peindreEcr();
   dit('Les '+nb(n)+' décisions sont effacées. <b>Enregistrer mes décisions</b> videra aussi '
     + '<code>decisions.json</code> dans le dépôt.', 'ok');
 });
@@ -3138,7 +3496,10 @@ window.addEventListener('beforeunload',function(e){
 
 /* La sélection s'ouvre sur ce qui reste à décider : les sujets non écrits.
    C'est son métier ; le reste est ailleurs. */
-var _fe = $('#fEtat'); if(_fe) _fe.value = 'aecrire';
+/* La Sélection s'ouvre sur ce qui n'est PAS décidé : c'est son unique métier.
+   Elle s'ouvrait sur « à écrire », c'est-à-dire sur ce qui est déjà tranché —
+   la file, qui a désormais son propre onglet. */
+var _fe = $('#fEtat'); if(_fe) _fe.value = 'pasdecide';
 var _fv = $('#fVal');  if(_fv) _fv.value = 'neutre';
 lireCfg(); relireBrouillon(); peindreCfg(); peindreEssais();
 if(S.cfg.token) marquerCx(false,'vérification…');

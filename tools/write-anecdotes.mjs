@@ -254,6 +254,18 @@ function coutCourant(){
 
 /* Les sujets que la tranche permet d'écrire : les meilleurs d'abord, jamais
    deux fois le même, et toujours les deux langues. */
+/* ── UNE DÉCISION, UN SEUL MOT ─────────────────────────────────────────────
+   « retenu » et « à écrire » désignaient la même chose sous deux noms : dans
+   la console on retenait, dans le catalogue le sujet était « à écrire », et
+   les compteurs des deux ne tombaient jamais juste. Le produit ne dit plus
+   qu'« à écrire ».
+
+   consignes/decisions.json d'avant la 8.16 porte « retenu » : on le lit, on
+   n'écrit plus que « aecrire ». Un fichier ancien continue donc de commander
+   l'écriture exactement comme avant — c'est ce qui évite qu'un import à
+   moitié fait envoie l'écriture sur le catalogue entier. */
+const aEcrire = v => v === 'aecrire' || v === 'retenu';
+
 function planDeTranche(maitre, budgetEuros, decisions){
   const cout = coutParTexte();
   const parSujet = LANGUES_TRANCHE.length;          // 1 ou 2 textes par sujet
@@ -266,11 +278,11 @@ function planDeTranche(maitre, budgetEuros, decisions){
      des sujets, on n'écrit QUE ceux-là — et jamais ce que vous avez écarté.
      Sans décision, on prend simplement les meilleurs. */
   const dec = decisions || {};
-  const retenusExplicites = Object.keys(dec).filter(k => dec[k] === 'retenu').length;
+  const retenusExplicites = Object.keys(dec).filter(k => aEcrire(dec[k])).length;
 
   let candidats = (maitre.sujets || [])
     .filter(s => s.statut === 'a-ecrire' && (s.fr || s.en) && dec[s.qid] !== 'ecarte');
-  if (retenusExplicites) candidats = candidats.filter(s => dec[s.qid] === 'retenu');
+  if (retenusExplicites) candidats = candidats.filter(s => aEcrire(dec[s.qid]));
 
   /* Un sujet écrit en français reste « à écrire » — il lui manque l'anglais —
      mais une tranche EN FRANÇAIS n'a plus rien à y faire. Sans ce filtre, une
@@ -1270,9 +1282,9 @@ async function ecrireTranche(retenus, maitre){
      c'est ce compte-là qui vous intéresse, pas les vingt-deux mille du
      catalogue entier — l'écriture ne pioche que dans vos retenus. */
   const dec = await lireDecisions();
-  const retenusExplicites = Object.keys(dec).filter(k => dec[k] === 'retenu').length;
+  const retenusExplicites = Object.keys(dec).filter(k => aEcrire(dec[k])).length;
   const enJeu = maitre.sujets.filter(x => x.statut === 'a-ecrire'
-      && (!retenusExplicites || dec[x.qid] === 'retenu'));
+      && (!retenusExplicites || aEcrire(dec[x.qid])));
   const aFinir     = enJeu.filter(x => (x.langues || []).length === 1).length;
   const aCommencer = enJeu.length - aFinir;
   console.log(`\n╔══ TRANCHE TERMINÉE ═══════════════════════════════════════`);
