@@ -35,6 +35,21 @@
 #                attendre une livraison. Gratuite, aucune fiche touchee.
 #                La console la declenche toute seule quand vous enregistrez
 #                le nom, le logo ou le rythme.
+#    repartir-a-zero  VIDER LA POUBELLE DU CATALOGUE. « Le saviez-vous ? »
+#                compte des milliers de pages et il s en ajoute une chaque
+#                jour : au bout de quelques mois le catalogue porte des
+#                dizaines de milliers de sujets dont vous n avez rien dit,
+#                et on ne sait plus ou regarder.
+#                CE QUI EST GARDE, quoi qu il arrive : tout sujet qui a une
+#                fiche (ecrite, au stock ou en ligne), vos sujets phares, vos
+#                ajouts manuels, et ce que vous aviez retire. Le choix
+#                « garder » decide du seul point restant :
+#                  menage  (defaut) garde aussi vos RETENUS pas encore ecrits
+#                  rase             ils partent aussi
+#                AUCUNE FICHE N EST OUVERTE. L ancien catalogue est recopie
+#                dans catalogue-maitre.avant-remise-a-zero.json avant la
+#                premiere ecriture : pour revenir en arriere, renommez-le.
+#                Il faut ecrire VIDER dans la case « confirmer ». Gratuit.
 #    ranger      remet chaque sujet dans son univers d apres son article.
 #                Les archives « Le saviez-vous ? » ont des sections datees,
 #                qui ne disent rien du sujet : tout tombait dans Mysteres.
@@ -65,11 +80,25 @@ on:
           - reparer
           - doublons
           - reconstruire
+          - repartir-a-zero
       appliquer:
         description: "auditer : ecarter ce qui echoue (sinon on ne fait que lire)"
         required: false
         default: false
         type: boolean
+      garder:
+        description: "repartir-a-zero : garder aussi vos retenus pas encore ecrits ?"
+        required: false
+        default: menage
+        type: choice
+        options:
+          - menage
+          - rase
+      confirmer:
+        description: "repartir-a-zero : ecrivez VIDER pour confirmer"
+        required: false
+        default: ""
+
 
 permissions:
   contents: write
@@ -116,6 +145,22 @@ jobs:
             reparer)   node tools/publier.mjs --reparer  2>&1 | tee curio.log
                        node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
             doublons)  node tools/publier.mjs --doublons 2>&1 | tee curio.log ;;
+            repartir-a-zero)
+              # Le garde-fou. Sans le mot, on ne fait rien : cette operation
+              # est la seule du produit qui retire des lignes du catalogue.
+              if [ "${{ github.event.inputs.confirmer }}" != "VIDER" ]; then
+                echo "::error::Pour vider le catalogue, ecrivez VIDER dans la case « confirmer »." | tee curio.log
+                exit 1
+              fi
+              G="${{ github.event.inputs.garder }}"
+              [ -z "$G" ] && G=menage
+              node tools/build-catalog.mjs --repartir-zero "$G" 2>&1 | tee curio.log
+              # Et tout de suite apres : le registre est remis d accord avec
+              # les fiches, et les chiffres du site recalcules. Sans ces deux
+              # passes, un sujet garde pour sa fiche pourrait rester marque
+              # « a ecrire » et etre repropose a l ecriture.
+              node tools/publier.mjs --reparer 2>&1 | tee -a curio.log
+              node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log ;;
             reconstruire)
               # RECONSTRUIRE LE SITE. Le nom du produit, le logo, les langues
               # publiees, les photos, le sommaire : tous sont graves dans
@@ -143,7 +188,7 @@ jobs:
           git config user.name  "curio-bot"
           git config user.email "curio-bot@users.noreply.github.com"
           rm -f curio.log
-          for p in catalogue-maitre.json catalogue-maitre.csv catalog.json rapport-phares.csv audit-retenus.csv doublons.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json app.html index.html console.html sw.js version.json manifest.webmanifest; do
+          for p in catalogue-maitre.json catalogue-maitre.csv catalogue-maitre.avant-remise-a-zero.json catalog.json rapport-phares.csv audit-retenus.csv doublons.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json app.html index.html console.html sw.js version.json manifest.webmanifest; do
             if [ -e "$p" ]; then
               git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
             fi
