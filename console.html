@@ -981,7 +981,7 @@ function api(chemin, opts){
   var h = { 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28' };
   if(S.cfg.token) h.Authorization = 'Bearer ' + S.cfg.token;
   if(opts.body) h['Content-Type']='application/json';
-return fetch('https://api.github.com/repos/' + S.cfg.owner + '/' + S.cfg.repo + '/contents' + chemin, {
+return fetch('https://api.github.com/repos/'+S.cfg.owner+'/'+S.cfg.repo+chemin, {
     method: opts.method||'GET', headers:h, body: opts.body?JSON.stringify(opts.body):undefined
   }).then(function(r){
     if(r.status===204) return {};
