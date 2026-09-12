@@ -1,6 +1,6 @@
 {
  "version": 1,
- "genere": "2026-09-08T11:42:53.002Z",
+ "genere": "2026-09-12T13:51:13.236Z",
  "total": 1889,
  "sujets": [
   {
@@ -22,7 +22,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -46,7 +46,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -70,7 +70,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -94,7 +94,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -119,7 +119,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -144,7 +144,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 6,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -168,7 +168,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -193,7 +193,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-04",
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -241,7 +241,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -314,7 +314,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -338,7 +338,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -362,7 +362,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -387,7 +387,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-04",
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -412,7 +412,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -437,7 +437,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -485,7 +485,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -509,7 +509,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -533,7 +533,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -558,7 +558,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 6,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -582,7 +582,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -607,7 +607,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -632,7 +632,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -657,7 +657,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -705,7 +705,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -729,7 +729,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -754,7 +754,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -778,7 +778,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -802,7 +802,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -826,7 +826,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -920,7 +920,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -945,7 +945,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -969,7 +969,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -994,7 +994,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -1043,7 +1043,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -1067,7 +1067,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -1142,7 +1142,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -1190,7 +1190,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -1263,7 +1263,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -1288,7 +1288,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -1338,7 +1338,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-04",
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -1388,7 +1388,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-04",
-   "accord": 7,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -1437,7 +1437,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -1486,7 +1486,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-04",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -1535,7 +1535,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -1559,7 +1559,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -1608,7 +1608,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -1633,7 +1633,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 6,
+   "accord": 5,
    "langues": [
     "fr"
    ]
@@ -1706,7 +1706,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -1731,7 +1731,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-04",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -1756,7 +1756,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -1780,7 +1780,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -1853,7 +1853,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -1877,7 +1877,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -1997,7 +1997,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 7,
+   "accord": 5,
    "langues": [
     "fr"
    ]
@@ -2022,7 +2022,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -2047,7 +2047,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 6,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -2096,7 +2096,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -2121,7 +2121,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -2169,7 +2169,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -2194,7 +2194,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-04",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -2218,7 +2218,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -2242,7 +2242,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -2266,7 +2266,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -2291,7 +2291,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -2315,7 +2315,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -2339,7 +2339,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -2363,7 +2363,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -2412,7 +2412,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -2437,7 +2437,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -2486,7 +2486,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-04",
-   "accord": 8,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -2510,7 +2510,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -2534,7 +2534,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -2559,7 +2559,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -2608,7 +2608,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -2632,7 +2632,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -2657,7 +2657,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -2706,7 +2706,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -2755,7 +2755,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -2779,7 +2779,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 8,
+   "accord": 5,
    "langues": [
     "fr"
    ]
@@ -2803,7 +2803,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -2851,7 +2851,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -2875,7 +2875,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -2924,7 +2924,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -2948,7 +2948,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -2973,7 +2973,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -2996,7 +2996,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -3019,7 +3019,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -3044,7 +3044,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -3068,7 +3068,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -3091,7 +3091,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -3114,7 +3114,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -3137,7 +3137,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -3207,7 +3207,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -3232,7 +3232,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -3279,7 +3279,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -3325,7 +3325,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -3348,7 +3348,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -3372,7 +3372,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -3467,7 +3467,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -3491,7 +3491,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -3539,7 +3539,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -3563,7 +3563,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -3586,7 +3586,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -3609,7 +3609,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -3632,7 +3632,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -3681,7 +3681,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -3705,7 +3705,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -3728,7 +3728,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -3752,7 +3752,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -3801,7 +3801,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -3921,7 +3921,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -4018,7 +4018,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -4067,7 +4067,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4114,7 +4114,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4187,7 +4187,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 8,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -4211,7 +4211,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -4234,7 +4234,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -4257,7 +4257,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4281,7 +4281,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -4328,7 +4328,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -4353,7 +4353,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 7,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -4400,7 +4400,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4469,7 +4469,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4541,7 +4541,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4564,7 +4564,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -4587,7 +4587,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4657,7 +4657,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4680,7 +4680,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -4705,7 +4705,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4777,7 +4777,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4825,7 +4825,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4848,7 +4848,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4871,7 +4871,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -4895,7 +4895,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -4943,7 +4943,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -5037,7 +5037,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5060,7 +5060,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5083,7 +5083,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -5108,7 +5108,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -5155,7 +5155,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -5178,7 +5178,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -5225,7 +5225,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5249,7 +5249,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5297,7 +5297,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5322,7 +5322,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -5346,7 +5346,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5369,7 +5369,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -5416,7 +5416,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5512,7 +5512,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -5558,7 +5558,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5582,7 +5582,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -5654,7 +5654,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -5679,7 +5679,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -5752,7 +5752,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5776,7 +5776,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -5800,7 +5800,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -5869,7 +5869,7 @@
    "statut": "publie",
    "ecrit": "2026-09-07",
    "publie": "2026-09-07",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5892,7 +5892,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -5916,7 +5916,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -5965,7 +5965,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -5989,7 +5989,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -6013,7 +6013,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -6109,7 +6109,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -6252,7 +6252,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -6299,7 +6299,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -6416,7 +6416,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -6464,7 +6464,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -6489,7 +6489,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -6585,7 +6585,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -6609,7 +6609,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -6633,7 +6633,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -6657,7 +6657,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -6775,7 +6775,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -6821,7 +6821,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -6869,7 +6869,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7013,7 +7013,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -7036,7 +7036,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7060,7 +7060,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7084,7 +7084,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -7107,7 +7107,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -7179,7 +7179,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -7204,7 +7204,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -7251,7 +7251,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -7274,7 +7274,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7297,7 +7297,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7320,7 +7320,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7367,7 +7367,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -7390,7 +7390,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7414,7 +7414,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7462,7 +7462,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -7485,7 +7485,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 8,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -7509,7 +7509,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -7557,7 +7557,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7582,7 +7582,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7631,7 +7631,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -7679,7 +7679,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -7702,7 +7702,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7751,7 +7751,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -7798,7 +7798,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7822,7 +7822,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -7847,7 +7847,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -7871,7 +7871,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -7894,7 +7894,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -7917,7 +7917,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -7941,7 +7941,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -8035,7 +8035,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -8082,7 +8082,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8131,7 +8131,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8154,7 +8154,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -8203,7 +8203,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8251,7 +8251,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -8276,7 +8276,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 6,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -8300,7 +8300,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -8323,7 +8323,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -8348,7 +8348,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -8395,7 +8395,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -8443,7 +8443,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -8467,7 +8467,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8491,7 +8491,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8561,7 +8561,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -8634,7 +8634,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8682,7 +8682,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8732,7 +8732,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -8755,7 +8755,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -8778,7 +8778,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8802,7 +8802,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8873,7 +8873,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8970,7 +8970,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -8994,7 +8994,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9017,7 +9017,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -9041,7 +9041,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9065,7 +9065,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9089,7 +9089,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9112,7 +9112,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -9136,7 +9136,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9183,7 +9183,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9253,7 +9253,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9276,7 +9276,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9301,7 +9301,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -9348,7 +9348,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9445,7 +9445,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9515,7 +9515,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -9538,7 +9538,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 8,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9587,7 +9587,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9611,7 +9611,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9634,7 +9634,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9659,7 +9659,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9682,7 +9682,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9705,7 +9705,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9728,7 +9728,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9799,7 +9799,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9846,7 +9846,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9893,7 +9893,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9917,7 +9917,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -9940,7 +9940,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -9988,7 +9988,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -10011,7 +10011,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -10035,7 +10035,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10082,7 +10082,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -10130,7 +10130,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -10180,7 +10180,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10204,7 +10204,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -10301,7 +10301,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -10348,7 +10348,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10372,7 +10372,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10396,7 +10396,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -10467,7 +10467,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -10515,7 +10515,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10539,7 +10539,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10563,7 +10563,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10586,7 +10586,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -10609,7 +10609,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10656,7 +10656,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10680,7 +10680,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10846,7 +10846,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -10870,7 +10870,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10893,7 +10893,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -10916,7 +10916,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -10940,7 +10940,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -10983,7 +10983,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -11073,7 +11073,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -11096,7 +11096,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -11236,7 +11236,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -11259,7 +11259,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -11351,7 +11351,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -11526,7 +11526,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -11574,7 +11574,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -11598,7 +11598,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -11669,7 +11669,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -12189,7 +12189,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -12864,7 +12864,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -13038,7 +13038,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -13533,7 +13533,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -13557,7 +13557,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -13663,7 +13663,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -13753,7 +13753,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -13777,7 +13777,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -13843,7 +13843,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -13908,7 +13908,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -13952,7 +13952,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -13997,7 +13997,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -14021,7 +14021,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -14065,7 +14065,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -14195,7 +14195,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -14260,7 +14260,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -14283,7 +14283,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -14347,7 +14347,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -14392,7 +14392,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -14417,7 +14417,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -14442,7 +14442,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -14486,7 +14486,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 7,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -14600,7 +14600,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -14624,7 +14624,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -14670,7 +14670,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -14693,7 +14693,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -14761,7 +14761,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -14809,7 +14809,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -14832,7 +14832,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -14980,7 +14980,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -15029,7 +15029,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -15114,7 +15114,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -15207,7 +15207,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -15231,7 +15231,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -15326,7 +15326,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -15349,7 +15349,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -15396,7 +15396,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -15561,7 +15561,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -15693,7 +15693,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -15764,7 +15764,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -15831,7 +15831,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -15916,7 +15916,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -16026,7 +16026,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -16133,7 +16133,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -16157,7 +16157,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -16204,7 +16204,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -16247,7 +16247,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -16295,7 +16295,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -16549,7 +16549,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -16617,7 +16617,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -16703,7 +16703,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -16920,7 +16920,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 7,
+   "accord": 5,
    "langues": [
     "fr"
    ]
@@ -16943,7 +16943,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -16966,7 +16966,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -17032,7 +17032,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -17098,7 +17098,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -17231,7 +17231,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -17275,7 +17275,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -17535,7 +17535,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -17582,7 +17582,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -17691,7 +17691,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -17836,7 +17836,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -17859,7 +17859,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -18038,7 +18038,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -18105,7 +18105,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -18238,7 +18238,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -18281,7 +18281,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -18305,7 +18305,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -18499,7 +18499,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -18607,7 +18607,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -18678,7 +18678,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -18723,7 +18723,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -18791,7 +18791,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -18814,7 +18814,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -18838,7 +18838,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -19015,7 +19015,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -19038,7 +19038,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -19082,7 +19082,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -19106,7 +19106,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -19131,7 +19131,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -19156,7 +19156,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -19180,7 +19180,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -19249,7 +19249,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -19294,7 +19294,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 7,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -19582,7 +19582,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -19791,7 +19791,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -19918,7 +19918,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -19987,7 +19987,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -20163,7 +20163,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -20257,7 +20257,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -20325,7 +20325,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -20394,7 +20394,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -20590,7 +20590,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -20614,7 +20614,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 1
+   "accord": 0
   },
   {
    "qid": "Q911160",
@@ -20658,7 +20658,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -20683,7 +20683,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -20818,7 +20818,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 8,
+   "accord": 6,
    "langues": [
     "fr"
    ]
@@ -20861,7 +20861,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -20884,7 +20884,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -20971,7 +20971,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -20996,7 +20996,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -21044,7 +21044,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -21107,7 +21107,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -21152,7 +21152,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -21217,7 +21217,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -21373,7 +21373,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -21459,7 +21459,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -21524,7 +21524,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -21547,7 +21547,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -21611,7 +21611,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -21659,7 +21659,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -21683,7 +21683,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -21728,7 +21728,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 6,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -21752,7 +21752,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -21840,7 +21840,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -22012,7 +22012,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -22182,7 +22182,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -22205,7 +22205,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -22312,7 +22312,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -22335,7 +22335,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -22419,7 +22419,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -22502,7 +22502,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -22637,7 +22637,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -22816,7 +22816,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -22863,7 +22863,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -22886,7 +22886,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -22930,7 +22930,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -23043,7 +23043,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -23111,7 +23111,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -23226,7 +23226,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -23383,7 +23383,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -23511,7 +23511,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -23556,7 +23556,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -23661,7 +23661,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -23727,7 +23727,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -23815,7 +23815,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -23904,7 +23904,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -24055,7 +24055,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -24078,7 +24078,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -24141,7 +24141,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -24290,7 +24290,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -24742,7 +24742,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -24813,7 +24813,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -25050,7 +25050,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -25096,7 +25096,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -25160,7 +25160,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -25227,7 +25227,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -25250,7 +25250,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -25444,7 +25444,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -25491,7 +25491,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -25684,7 +25684,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -25727,7 +25727,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -25751,7 +25751,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -25794,7 +25794,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -25818,7 +25818,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -25841,7 +25841,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -25864,7 +25864,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -25888,7 +25888,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -26038,7 +26038,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -26082,7 +26082,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -26105,7 +26105,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -26149,7 +26149,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -26362,7 +26362,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -26385,7 +26385,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -26529,7 +26529,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -26553,7 +26553,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -26724,7 +26724,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -26828,7 +26828,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -26892,7 +26892,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -26957,7 +26957,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -27004,7 +27004,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -27027,7 +27027,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -27198,7 +27198,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -27412,7 +27412,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -27544,7 +27544,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -27609,7 +27609,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -27678,7 +27678,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -27770,7 +27770,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -27794,7 +27794,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -27818,7 +27818,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -27928,7 +27928,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -27991,7 +27991,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -28080,7 +28080,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -28164,7 +28164,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -28317,7 +28317,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -28341,7 +28341,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -28795,7 +28795,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -29070,7 +29070,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -29137,7 +29137,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -29287,7 +29287,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -29698,7 +29698,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -29934,7 +29934,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -30021,7 +30021,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -30107,7 +30107,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -30401,7 +30401,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -30448,7 +30448,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -30618,7 +30618,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -30641,7 +30641,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -30705,7 +30705,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -30749,7 +30749,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -30772,7 +30772,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -30795,7 +30795,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -30923,7 +30923,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -31031,7 +31031,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -31139,7 +31139,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -31288,7 +31288,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 7,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -31401,7 +31401,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -31569,7 +31569,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -31634,7 +31634,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -31657,7 +31657,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -31767,7 +31767,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -31856,7 +31856,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -31879,7 +31879,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -32008,7 +32008,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -32051,7 +32051,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -32098,7 +32098,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -32122,7 +32122,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -32170,7 +32170,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -32214,7 +32214,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -32260,7 +32260,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -32427,7 +32427,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -32450,7 +32450,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -32585,7 +32585,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -32648,7 +32648,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -32754,7 +32754,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -32837,7 +32837,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -32881,7 +32881,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -32966,7 +32966,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -32989,7 +32989,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -33013,7 +33013,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -33036,7 +33036,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -33084,7 +33084,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -33128,7 +33128,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -33192,7 +33192,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -33367,7 +33367,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -33675,7 +33675,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 0,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -33902,7 +33902,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -34105,7 +34105,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -34233,7 +34233,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -34276,7 +34276,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -34300,7 +34300,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -34386,7 +34386,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -34410,7 +34410,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -34456,7 +34456,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -34499,7 +34499,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -34653,7 +34653,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -34721,7 +34721,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -34745,7 +34745,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -34791,7 +34791,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -34834,7 +34834,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -34858,7 +34858,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -34921,7 +34921,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -34964,7 +34964,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -35033,7 +35033,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -35056,7 +35056,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -35079,7 +35079,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -35208,7 +35208,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -35297,7 +35297,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -35360,7 +35360,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -35383,7 +35383,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -35750,7 +35750,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -35833,7 +35833,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -35922,7 +35922,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -36031,7 +36031,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -36097,7 +36097,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -36269,7 +36269,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -36418,7 +36418,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -36587,7 +36587,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -36610,7 +36610,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -36633,7 +36633,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -36802,7 +36802,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -37017,7 +37017,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -37160,7 +37160,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -37312,7 +37312,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -37398,7 +37398,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -37421,7 +37421,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -37610,7 +37610,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -37633,7 +37633,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -37676,7 +37676,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -37699,7 +37699,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -37828,7 +37828,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 1
   },
   {
    "qid": "Q878856",
@@ -37868,7 +37868,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -37914,7 +37914,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -37937,7 +37937,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -38003,7 +38003,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -38026,7 +38026,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -38049,7 +38049,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -38132,7 +38132,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -38241,7 +38241,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -38479,7 +38479,7 @@
    "statut": "a-ecrire",
    "ecrit": null,
    "publie": null,
-   "accord": 2
+   "accord": 1
   },
   {
    "qid": "Q6598702",
@@ -38711,7 +38711,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -38817,7 +38817,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -38840,7 +38840,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -38926,7 +38926,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -38949,7 +38949,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -38972,7 +38972,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -39015,7 +39015,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39118,7 +39118,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39164,7 +39164,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39187,7 +39187,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39253,7 +39253,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39299,7 +39299,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39322,7 +39322,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 5,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39368,7 +39368,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -39414,7 +39414,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39437,7 +39437,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -39503,7 +39503,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -39592,7 +39592,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -39655,7 +39655,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39698,7 +39698,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 4,
    "langues": [
     "fr"
    ]
@@ -39741,7 +39741,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39764,7 +39764,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39787,7 +39787,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39876,7 +39876,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -39962,7 +39962,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -40134,7 +40134,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -40177,7 +40177,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -40200,7 +40200,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -40263,7 +40263,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -40349,7 +40349,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -40372,7 +40372,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 5,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -40415,7 +40415,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 4,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -40613,7 +40613,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -40934,7 +40934,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 2,
    "langues": [
     "fr"
    ]
@@ -40957,7 +40957,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -41063,7 +41063,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -41146,7 +41146,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -41295,7 +41295,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -41381,7 +41381,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 3,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -41404,7 +41404,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -41450,7 +41450,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -41493,7 +41493,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -41516,7 +41516,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 4,
+   "accord": 3,
    "langues": [
     "fr"
    ]
@@ -41651,7 +41651,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -41780,7 +41780,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -41869,7 +41869,7 @@
    "statut": "publie",
    "ecrit": null,
    "publie": "2026-09-05",
-   "accord": 1,
+   "accord": 0,
    "langues": [
     "fr"
    ]
@@ -42015,7 +42015,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 2,
+   "accord": 1,
    "langues": [
     "fr"
    ]
@@ -42081,7 +42081,7 @@
    "statut": "ecrit",
    "ecrit": "2026-09-07",
    "publie": null,
-   "accord": 6,
+   "accord": 4,
    "langues": [
     "fr"
    ]
