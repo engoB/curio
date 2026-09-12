@@ -58,7 +58,18 @@ BASELINE=$(marque baseline)
 # absent : on garde le nom en toutes lettres, ce qui est un choix parfaitement
 # valable. Le fichier lui-meme se depose par Add file -> Upload files : aucune
 # ligne de code a toucher pour changer de logo.
+# DEPUIS LA 8.20 : DEPOSER LE FICHIER SUFFIT.
+# Si aucun chemin n est ecrit dans marque.txt, on va chercher tout seul un
+# fichier nomme « logo » dans icones/. Add file -> Upload files, nommez-le
+# logo.svg (ou .png), et c est fini : plus rien a ecrire nulle part.
+# Un chemin ecrit a la main garde la priorite : on ne decide pas a votre
+# place quand vous avez decide.
 LOGO=$(marque logo)
+if [ -z "$LOGO" ]; then
+  for essai in icones/logo.svg icones/logo.png icones/logo.webp icones/logo.jpg icones/logo.jpeg; do
+    if [ -f "$essai" ]; then LOGO="$essai"; break; fi
+  done
+fi
 if [ -n "$LOGO" ] && [ -f "$LOGO" ]; then
   TITRE="<img class=\"marquelogo\" src=\"$LOGO\" alt=\"$NOM\" />"
 else
@@ -100,6 +111,34 @@ esac
 VUE_APP='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover'
 VUE_SITE='width=device-width,initial-scale=1,viewport-fit=cover'
 
+# --- le paiement, grave dans la page ----------------------------------------
+# Les liens de paiement, les prix et l adresse du verificateur vivaient dans
+# parts/20-data.js : les changer demandait une livraison. Ils vivent
+# maintenant dans consignes/paiement.txt, comme le nom et le rythme, et la
+# construction les grave en <meta>. Changer de prix, c est un chiffre sur
+# GitHub et « Entretien -> reconstruire ».
+#
+# Rien de secret ne passe ici : ce sont des adresses publiques. Le jeton Polar
+# reste dans les secrets de Cloudflare.
+#
+# Les valeurs sont nettoyees de < > " et & : elles entrent dans un attribut
+# HTML, et une adresse mal collee ne doit pas pouvoir casser la page.
+metas_paiement() {
+  f=$(fichier_reglage paiement)
+  [ -f "$f" ] || return 0
+  for k in site verificateur lien-mensuel lien-annuel lien-avie portail essai essai-jours \
+           mise-en-avant appareils \
+           prix-mensuel unite-mensuel unite-mensuel-en \
+           prix-annuel unite-annuel unite-annuel-en \
+           prix-avie unite-avie unite-avie-en; do
+    v=$(sed -n "s/^[[:space:]]*$k:[[:space:]]*//p" "$f" 2>/dev/null | head -1 \
+        | sed 's/[[:space:]]*$//; s/[<>"&]//g')
+    [ -n "$v" ] && printf '<meta name="curio-p-%s" content="%s" />\n' "$k" "$v"
+  done
+  return 0
+}
+PAIEMENT=$(metas_paiement)
+
 doc_head() {
 VUE="${1:-$VUE_SITE}"
 cat <<EOF
@@ -114,6 +153,7 @@ cat <<EOF
 <meta name="curio-images" content="$IMAGES" />
 $CACHE_LANGUE
 $CACHE_SOMMAIRE
+$PAIEMENT
 EOF
 }
 
@@ -174,8 +214,20 @@ if [ -f console.html ]; then
   ' console.html > console.html.tmp && mv console.html.tmp console.html
 fi
 
+# --- marque.json : le nom, la signature et le logo, lisibles par une page ----
+# consignes/ n est pas servi publiquement (regle _redirects), et l atelier a
+# besoin du nom et du logo pour dessiner les visuels. On les recopie donc dans
+# un petit fichier public. Rien de secret : c est ce qui est deja ecrit en
+# toutes lettres sur le site.
+LOGO_PUBLIC=""
+[ -n "$LOGO" ] && [ -f "$LOGO" ] && LOGO_PUBLIC="$LOGO"
+printf '{"nom":"%s","baseline":"%s","logo":"%s"}\n' \
+  "$(printf '%s' "$NOM" | sed 's/[\\"]/\\&/g')" \
+  "$(printf '%s' "$BASELINE" | sed 's/[\\"]/\\&/g')" \
+  "$LOGO_PUBLIC" > marque.json
+
 # --- version.json : lu par l'action pour afficher la version dans son rapport
 printf '{"version":"%s","build":"%s","date":"%s"}\n' \
   "$LISIBLE" "$EMPREINTE" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > version.json
 
-echo "Curio $PLEINE — app.html, index.html, console.html, version.json, service worker"
+echo "Curio $PLEINE — app.html, index.html, console.html, marque.json, version.json, service worker"

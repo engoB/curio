@@ -1,0 +1,154 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# PAIEMENT — vos liens Polar, vos prix, votre verificateur de cle
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# CE FICHIER EST UN EXEMPLE. Pour vous en servir :
+#   1. GitHub → consignes/ → Add file → Create new file
+#   2. nommez-le  consignes/paiement.txt
+#   3. collez ce contenu, remplissez, Commit
+#   4. Actions → Entretien → reconstruire
+#
+# Le paquet ne livre JAMAIS votre paiement.txt : il ecraserait vos liens a
+# chaque import. Tout ce qui le lit — build.sh, l'application — lit le votre
+# s'il existe, et cet exemple sinon.
+#
+# Rien ici n'est secret. Ce sont des adresses publiques, elles sont gravees
+# dans app.html et lisibles par tout le monde. VOTRE JETON POLAR NE VA PAS
+# ICI : il va dans les secrets de Cloudflare, comme ANTHROPIC_API_KEY va dans
+# les secrets de GitHub.
+#
+# ───────────────────────────────────────────────────────────────────────────
+# 0 · L'ADRESSE PUBLIQUE DU SITE
+# ───────────────────────────────────────────────────────────────────────────
+# Sans barre oblique a la fin. Tant que c'est vide, la console suppose
+# github.io. Une fois votre domaine en place, ecrivez-le ici : c'est ce qui
+# rend justes les trois liens d'essai de l'onglet Publication.
+# Exemple :  site: https://entrefilet.com
+
+site:
+
+# ───────────────────────────────────────────────────────────────────────────
+# 1 · LE VERIFICATEUR
+# ───────────────────────────────────────────────────────────────────────────
+# L'adresse de votre petit programme Cloudflare (le Worker livre dans
+# worker/curio-api.js). C'est lui qui demande a Polar si une cle est valable.
+#
+# VIDE = aucune verification. Les boutons ouvrent quand meme le paiement, et
+# une cle collee a la main est acceptee sur sa seule forme. C'est le
+# comportement d'avant la 8.17 : utile pour essayer, insuffisant pour vendre.
+#
+# Exemple :  verificateur: https://exemple.com/api
+
+verificateur:
+
+# ───────────────────────────────────────────────────────────────────────────
+# 2 · LES TROIS LIENS DE PAIEMENT
+# ───────────────────────────────────────────────────────────────────────────
+# Vos « Checkout Links » Polar, un par produit. Laissez vide une formule que
+# vous ne vendez pas : son encadre disparait de l'ecran d'achat.
+#
+# Dans Polar, reglez l'adresse de retour de CHAQUE lien sur :
+#     https://VOTRE-DOMAINE/api/retour?checkout_id={CHECKOUT_ID}
+# C'est ce qui deverrouille l'application toute seule apres l'achat.
+
+lien-mensuel:
+lien-annuel:
+lien-avie:
+
+# ───────────────────────────────────────────────────────────────────────────
+# 3 · LE PORTAIL CLIENT
+# ───────────────────────────────────────────────────────────────────────────
+# L'adresse ou un lecteur retrouve sa cle, change de carte ou resilie. Polar
+# la fournit toute faite : Settings → Customer Portal.
+# Exemple :  portail: https://polar.sh/mon-organisation/portal
+
+portail:
+
+# ───────────────────────────────────────────────────────────────────────────
+# 4 · LES PRIX AFFICHES
+# ───────────────────────────────────────────────────────────────────────────
+# Ce sont les prix ECRITS SUR L'ECRAN. Les vrais prix sont ceux de Polar :
+# si vous changez ici sans changer la-bas, vous mentez a vos lecteurs.
+#
+# Rappel utile : Polar prend 5 % + 0,50 $ par transaction (plan gratuit),
+# plus 1,5 % pour une carte hors Etats-Unis. Sur 4,99 € cela fait ~16 % ;
+# sur 39 €, ~8 %. Le petit montant paie surtout les frais fixes.
+
+prix-mensuel: 4,99
+unite-mensuel: € / mois
+unite-mensuel-en: € / month
+
+prix-annuel: 39
+unite-annuel: € / an
+unite-annuel-en: € / year
+
+prix-avie: 79
+unite-avie: € une fois
+unite-avie-en: € once
+
+# QUELLE FORMULE EST MISE EN AVANT — annuel, mensuel, avie, ou aucune.
+#
+# L'encadre en avant est celui qu'on choisit trois fois sur quatre. L'annuel
+# est le bon choix : sur 4,99 € Polar preleve ~16 %, sur 39 € ~8 %. Douze mois
+# d'annuel rapportent autant que neuf mois de mensuel, et ne demandent qu'une
+# seule decision au lecteur.
+#
+# Le rabais affiche sur l'encadre est CALCULE a partir des prix ci-dessus. Un
+# rabais annonce qui ne correspond pas aux prix se voit tout de suite.
+
+mise-en-avant: annuel
+
+# SUR COMBIEN D'APPAREILS UNE CLE S'ACTIVE
+#
+# ATTENTION : ce chiffre n'est qu'un TEXTE. La vraie limite se regle dans
+# Polar, dans le benefice « License Keys », champ « Limit activations ».
+# Mettez ici le MEME nombre, sinon le message ment.
+#
+# Chaque appareil consomme une activation a la premiere utilisation de la
+# cle. Au-dela, Polar refuse, et le client libere un appareil depuis son
+# espace client — tout seul, sans vous ecrire.
+
+appareils: 3
+
+# ───────────────────────────────────────────────────────────────────────────
+# 5 · L'ESSAI GRATUIT DU LECTEUR
+# ───────────────────────────────────────────────────────────────────────────
+# Combien de jours d'acces complet, offerts a qui appuie sur le bouton.
+# Sans carte bancaire, sans compte, sans rien : c'est ce qui fait qu'on
+# appuie.
+#
+# Il ouvre tout — le catalogue entier, la recherche, le sommaire, les univers,
+# la pioche — SAUF LA COLLECTION. Ce n'est pas une restriction commerciale,
+# c'est le contraire : on refuse de laisser quelqu'un ranger vingt anecdotes
+# dans un tiroir qu'on lui reprend le quatrieme jour. Une fin d'essai qui
+# efface un travail personnel laisse un bien plus mauvais souvenir qu'une fin
+# d'essai qui rend simplement le catalogue.
+#
+# 0 l'eteint : le bloc disparait de l'ecran d'achat.
+#
+# Il se prend une fois par navigateur. Quelqu'un qui efface ses donnees peut
+# le reprendre — c'est le prix de n'avoir aucun compte lecteur, et il est
+# faible : rien n'est consomme, le catalogue est deja dans son navigateur.
+#
+# Polar propose aussi une periode d'essai sur l'abonnement. Elle est utile,
+# mais elle demande la carte AVANT d'avoir rien montre : gardez-la pour plus
+# tard, quand les gens connaitront le produit.
+
+essai-jours: 3
+
+# ───────────────────────────────────────────────────────────────────────────
+# 6 · VOTRE ESSAI PRIVE, A VOUS
+# ───────────────────────────────────────────────────────────────────────────
+# Jusqu'a la 8.16, ?pro=1 ouvrait tout, pour n'importe qui. Sur un produit
+# gratuit c'etait un outil d'essai ; sur un produit qu'on vend, c'est une
+# porte ouverte.
+#
+# Ecrivez ici un mot de votre choix. L'adresse d'essai devient alors :
+#     .../app.html?essai=VOTRE-MOT        comme un abonne
+#     .../app.html?essai=VOTRE-MOT-avie   comme un achat a vie
+#     .../app.html?essai=0                retour au gratuit
+#
+# VIDE = ?pro=1 et ?pro=sub continuent de marcher, comme avant. Tant que vous
+# n'avez pas branche le paiement, ne changez rien.
+
+essai:

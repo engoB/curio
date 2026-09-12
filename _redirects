@@ -1,0 +1,57 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  CE QUE LE SITE NE SERT PAS
+#  Lu par Cloudflare Pages. Sans effet sur GitHub Pages.
+# ═══════════════════════════════════════════════════════════════════════════
+#
+#  Cloudflare Pages sert TOUT le contenu du depot, y compris les dossiers de
+#  travail. Passer le depot en prive n'y change rien : ce n'est pas GitHub qui
+#  publie, c'est Cloudflare, et il publie ce qu'on lui donne.
+#
+#  Les regles ci-dessous sont appliquees AVANT les fichiers : une adresse
+#  listee ici n'atteint jamais le fichier, meme s'il existe.
+#
+#  Format :   /chemin/*   /destination   code
+#  Une seule etoile par ligne. Les commentaires commencent par #.
+#
+# ───────────────────────────────────────────────────────────────────────────
+#  1 · LES DOSSIERS DE TRAVAIL — aucun navigateur n'en a besoin
+# ───────────────────────────────────────────────────────────────────────────
+/parts/*            /prive.html   302
+/tools/*            /prive.html   302
+/worker/*           /prive.html   302
+/consignes/*        /prive.html   302
+/github-workflows/* /prive.html   302
+/build.sh           /prive.html   302
+/CHANGEMENTS.md     /prive.html   302
+/LISEZ-MOI.txt      /prive.html   302
+/PLAN-EN-LIGNE.md   /prive.html   302
+# Le calendrier du blog : il dit ce qui sortira demain. Sans interet public.
+/histoires/etat.json /prive.html  302
+
+# ───────────────────────────────────────────────────────────────────────────
+#  2 · LE STOCK
+# ───────────────────────────────────────────────────────────────────────────
+#  anecdotes/ contient TOUTES vos fiches, y compris les 883 qui ne sont pas
+#  en ligne. Le site, lui, ne sert que fiches/, fabrique par tools/servir.mjs
+#  et qui ne contient que le publie.
+#
+#  SI VOUS UTILISEZ LA VUE CURATION (app.html?curation=1), elle lit
+#  anecdotes/ : mettez alors une regle Cloudflare Access sur /anecdotes/*
+#  (Zero Trust -> Access -> Applications) ET SUPPRIMEZ LA LIGNE CI-DESSOUS.
+#  Tant que l'Access n'est pas en place, gardez-la : mieux vaut une Curation
+#  vide qu'un stock ouvert.
+/anecdotes/*        /prive.html   302
+
+# ───────────────────────────────────────────────────────────────────────────
+#  3 · CE QUI RESTE OUVERT, ET POURQUOI
+# ───────────────────────────────────────────────────────────────────────────
+#  /histoires/*         le blog — c'est fait pour etre lu et indexe
+#  /sitemap.xml         le plan du site, pour Google
+#  /robots.txt          idem
+#  /fiches/*            l'application les lit — ce sont les fiches en ligne
+#  /catalog.json        l'application le lit — la liste des sujets
+#  /icones/*            les icones
+#  /console.html        VOTRE console : fermez-la avec Cloudflare Access
+#  /catalogue.html      idem, avec catalogue-maitre.json
+#  /atelier.html        VOTRE atelier : idem
+#  /marque.json         le nom et le logo — deja ecrits sur le site

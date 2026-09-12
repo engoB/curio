@@ -23,7 +23,7 @@
  * il ne décide plus de ce qui s'affiche.
  * ======================================================================== */
 
-const VERSION = 'curio-8.16.1+821fa568da';   /* BUILD:VERSION */
+const VERSION = 'curio-8.21.0+67d471de2f';   /* BUILD:VERSION */
 const COQUILLE = VERSION + '-app';     // l'application
 const CONTENU  = VERSION + '-txt';     // les anecdotes
 
@@ -63,6 +63,14 @@ self.addEventListener('fetch', e => {
 
   const url = new URL(req.url);
   const memeOrigine = url.origin === self.location.origin;
+
+  /* --- le vérificateur de clé : JAMAIS de cache --------------------------
+     /api/ est le petit programme Cloudflare qui demande à Polar si une clé
+     tient toujours. Sans cette ligne, sa réponse tombait dans la règle
+     « le reste du même domaine : cache d'abord » : une clé révoquée serait
+     restée valable indéfiniment, et une clé refusée le serait restée aussi.
+     On le laisse passer sans rien garder. */
+  if (memeOrigine && url.pathname.startsWith('/api/')) return;
 
   /* --- les anecdotes et le catalogue : réseau d'abord, cache en secours --- */
   if (memeOrigine && /\.json$/.test(url.pathname)) {

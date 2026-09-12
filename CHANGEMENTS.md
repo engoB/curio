@@ -1,4 +1,539 @@
-# Curio 8.16.0 — ce qui a changé depuis v6
+# Curio 8.21.0 — ce qui a changé depuis v6
+
+## 8.21.0 — l’essai ne fait plus de promesse qu’il reprend
+
+### La collection reste fermée pendant l’essai
+
+Vous aviez raison, et c'était un vrai défaut de conception.
+
+L'essai ouvrait **tout**, collection comprise. Un essayeur mettait vingt
+anecdotes de côté pendant trois jours — et les perdait toutes le quatrième.
+Ce n'est pas un détail : une fin d'essai qui efface un travail personnel
+laisse un souvenir bien pire qu'une fin d'essai qui rend simplement le
+catalogue.
+
+Il y a donc maintenant **deux notions distinctes** dans le code, et il fallait
+les séparer :
+
+| | |
+|---|---|
+| `estPremium()` | a-t-on accès au catalogue ? — **l'essai compte** |
+| `estAbonne()` | a-t-on **payé** ? — l'essai ne compte pas |
+
+Pendant l'essai : le catalogue entier, la recherche, le sommaire, les univers
+et la pioche sont ouverts, et ne laissent rien derrière eux quand ça se
+referme. Le bouton « Garder » d'une fiche est masqué — on ne peut donc rien
+ranger dans un tiroir qu'on va reprendre.
+
+La collection, elle, **reste visible dans le menu, avec un cadenas**. La
+cacher laisserait croire qu'elle n'existe pas ; la montrer fermée donne une
+raison de s'abonner. Et y toucher explique *pourquoi* : « ce que vous y
+mettriez serait perdu dans trois jours ». « Réservé aux abonnés » est une
+porte fermée ; une raison, c'est autre chose.
+
+### Une clé ne s'installe plus partout
+
+Une clé sans limite circule : un abonnement payé par un devient un abonnement
+lu par vingt.
+
+Polar compte les **activations**. Chaque appareil en consomme une à la
+première utilisation de la clé, et le nombre se règle dans le bénéfice
+*License Keys* (champ *Limit activations*). Au-delà, Polar refuse — et le
+client libère un appareil depuis son espace client, tout seul, sans vous
+écrire.
+
+Le Worker gagne donc une adresse, `/activer`, et l'application distingue deux
+gestes qu'il ne fallait pas confondre : une clé qui arrive sur un appareil
+neuf **s'active** ; une clé déjà activée ici se contente d'une
+**vérification** — sinon chaque semaine mangerait une place.
+
+Deux détails qui comptent :
+
+- **L'étiquette envoyée à Polar est lisible** — « Chrome sur Android · 8/9 ».
+  Le client doit reconnaître *lequel* libérer ; un identifiant ne se reconnaît
+  pas.
+- **La revérification renvoie l'activation de cet appareil**, pas seulement la
+  clé. Sans ce champ, libérer un appareil depuis l'espace client n'aurait
+  aucun effet et la limite ne limiterait rien. L'appareil libéré se referme à
+  la vérification suivante, en disant comment revenir.
+
+Et Polar refuse pour deux raisons très différentes : « clé inconnue » accuse
+le client de s'être trompé, « trop d'appareils » lui dit quoi faire. Les
+confondre serait désastreux — le Worker lit le message de Polar pour les
+distinguer.
+
+### L'annuel est mis en avant, et le rabais est calculé
+
+L'encadré en avant est celui qu'on choisit trois fois sur quatre. C'était
+l'achat à vie ; c'est maintenant l'**annuel**, et il passe **en premier** —
+sur un téléphone les encadrés s'empilent, et le premier est le seul qu'on
+voie sans faire défiler.
+
+Le rabais affiché — « Le meilleur choix, 35 % de moins » — est **calculé** à
+partir de `prix-mensuel` × 12 et `prix-annuel`. Jamais écrit à la main : un
+rabais annoncé qui ne correspond pas aux prix affichés se voit tout de suite,
+et c'est le genre de détail qui fait douter du reste.
+
+Réglable par `mise-en-avant` : annuel, mensuel, avie, aucune.
+
+### Pinterest
+
+Une publication Instagram vit **vingt-quatre heures**. Une épingle Pinterest
+envoie du trafic pendant **deux ans**. C'est le réseau le plus rentable pour
+ce contenu-là, et le seul où publier à la main n'est pas pénible.
+
+L'atelier fabrique donc une **sixième planche** : l'épingle, en 1000 × 1500 —
+le format 2:3, le seul que Pinterest affiche en entier. Elle porte l'adresse
+du site en bas, parce qu'une épingle republiée par quelqu'un d'autre perd son
+lien mais pas ce qui est écrit dessus.
+
+Et une **description d'épingle** séparée de la légende Instagram. Pinterest
+est un moteur de recherche déguisé en tableau d'images : ce qui compte est la
+phrase et les mots qu'on cherche, pas les mots-dièse. Elle porte le lien vers
+la page publique de la fiche — construit depuis le champ `b`, une seule
+définition de l'adresse dans tout le produit.
+
+### Vérifié
+
+Vingt-six contrôles de plus, tous sur Chromium.
+
+L'essai ouvre le catalogue, la pioche et les univers ; la collection reste
+visible, verrouillée, et y toucher explique pourquoi ; le bouton « Garder »
+est masqué ; un abonné, lui, l'ouvre normalement.
+
+L'annuel est le premier encadré, c'est lui qui est en avant, l'achat à vie ne
+l'est plus, et le rabais lu à l'écran est bien 35 % — calculé, pas écrit.
+
+Une clé neuve passe par `/activer` avec une étiquette lisible, l'activation
+est mémorisée, la revérification la renvoie, une clé déjà sur trois appareils
+n'ouvre pas et dit quoi faire, et un appareil libéré ailleurs se referme.
+
+L'atelier sort bien six planches, dont l'épingle en 1000 × 1500, et sa
+description Pinterest ne contient aucun mot-dièse.
+
+
+## 8.20.0 — plus rien à écrire à la main
+
+Cette version n'ajoute presque pas de fonctions. Elle enlève des obstacles :
+tout ce qui obligeait encore à créer un fichier, écrire un chemin ou toucher
+au code se règle maintenant depuis la console ou en déposant une image.
+
+### Le paiement et le blog se règlent dans la console
+
+`consignes/paiement.txt` et `consignes/blog.txt` étaient les deux derniers
+réglages du produit qui demandaient d'aller créer un fichier sur GitHub.
+
+*6 · Publication* porte maintenant deux blocs de plus : **Le paiement** (site,
+vérificateur, espace client, trois liens, trois prix, essai) et **Le blog**
+(interrupteur, rythme, ordre, photos, titre). La console écrit le fichier
+entier, commentaires compris, et relance la reconstruction toute seule.
+
+Le fichier reste la vérité : vous pouvez continuer à l'éditer à la main si
+vous préférez, et la console le relit tel quel.
+
+*Éprouvé* sur Chromium, avec une API GitHub simulée : les deux fichiers sont
+écrits avec les bonnes valeurs, restent lisibles par `build.sh` (une clé par
+ligne), la reconstruction est lancée, et les trois liens d'essai suivent le
+nouveau mot dans la seconde.
+
+### Le logo : déposer le fichier suffit
+
+Avant : déposer l'image **et** écrire son chemin dans le champ « logo ».
+
+Maintenant : si aucun chemin n'est écrit, `build.sh` va chercher tout seul
+`icones/logo.svg` — puis `.png`, `.webp`, `.jpg`. *Add file → Upload files*,
+nommez-le `logo.svg`, et c'est fini. Un chemin écrit à la main garde la
+priorité : on ne décide pas à votre place quand vous avez décidé.
+
+**L'icône de l'application installée** aussi. `tools/icones.mjs` refabrique les
+quatre fichiers `curio-*.png` à partir de votre logo, aux bonnes tailles, sur
+fond d'encre — *Entretien → **icones***. La version « maskable » reçoit une
+marge plus large, parce qu'Android rogne les bords en cercle et qu'un logo qui
+touche le bord se retrouve coupé : c'est le défaut le plus courant des icônes
+d'applications installées.
+
+Les anciennes sont recopiées dans `icones/avant-logo/` avant d'être remplacées.
+
+### Un essai de trois jours, sans carte bancaire
+
+Un bouton sur l'écran d'achat. On appuie, tout s'ouvre — le catalogue entier,
+la collection, la recherche, la pioche. Trois jours plus tard, ça se referme
+tout seul, en le disant, et la collection est conservée.
+
+**Pourquoi pas l'essai de Polar ?** Parce qu'il demande la carte avant d'avoir
+rien montré, et que c'est exactement le geste que quelqu'un qui vient de
+découvrir l'application ne fera pas. Celui-ci ne coûte rien à personne : le
+catalogue est déjà dans le navigateur, l'ouvrir trois jours ne consomme aucune
+ressource et n'appelle aucun serveur.
+
+Il donne **exactement** ce que donne l'abonnement. Un essai qui retient quelque
+chose ne prouve rien et ne convertit personne.
+
+Il se prend une fois par navigateur, et la durée se règle dans la console.
+`0` l'éteint.
+
+### Installer sur mobile et sur ordinateur
+
+C'est le navigateur qui installe, pas Polar et pas un magasin d'applications.
+Le geste diffère selon l'appareil, et c'est toute la difficulté : Safari cache
+l'installation derrière *Partager*, Chrome la propose tout seul, un ordinateur
+la met dans la barre d'adresse.
+
+Le bandeau d'invitation existait, mais il n'apparaissait qu'une fois, au bon
+moment, et jamais à qui l'avait écarté. Quelqu'un qui **cherchait** à installer
+n'avait aucun moyen — un abonné, notamment.
+
+Deux entrées, donc : **un bouton dans le menu**, et **un bouton sur l'écran qui
+suit le paiement**. Les deux affichent la marche à suivre de *cet* appareil-là.
+
+### Le partage était cassé, et personne ne pouvait le voir
+
+Le bouton « partager » envoyait l'adresse de l'application. Celui qui recevait
+le lien tombait sur le flux du jour — **pas sur l'anecdote dont on venait de
+lui parler** — et n'avait aucune raison de rester. Le bouche-à-oreille du
+produit ne menait nulle part.
+
+Il envoie maintenant **la page publique de cette anecdote**, avec son accroche.
+Une page lisible sans rien installer, indexée, et qui porte un bouton « ouvrir
+l'application ».
+
+Le mécanisme : `tools/blog.mjs` écrit l'adresse de la page dans la fiche
+(champ `b`), **dans les deux dossiers** — `anecdotes/`, la vérité, sans quoi
+`servir.mjs` l'effacerait au passage suivant, et `fiches/`, pour que ce soit
+vrai tout de suite. L'adresse vient de `histoires/etat.json` et n'est jamais
+recalculée : deux façons de fabriquer une même adresse finissent toujours par
+diverger.
+
+### Le blog n'affiche plus de photos
+
+`images: non` est le nouveau défaut, et c'est le bon réglage. Les images de
+Wikimedia Commons ne sont pas libres de droits ; la plupart exigent la mention
+de l'auteur, et une réclamation d'ayant droit sur un site marchand se règle en
+centaines d'euros.
+
+Une page de texte pur se charge instantanément et ne ressemble à aucun
+agrégateur — ce qui, pour un texte original, est plutôt un avantage.
+
+`images: oui` les rallume, et seules les fiches créditées en portent.
+
+### Vérifié
+
+Soixante-quinze contrôles automatisés sur Chromium.
+
+**La console d'abord** — vous m'aviez demandé de n'y rien casser et je ne
+l'avais pas éprouvée : elle s'ouvre sans une erreur, ses sept onglets
+répondent, sa version est gravée, et on peut cliquer sur tout sans rien
+déclencher. Puis, avec une API GitHub simulée : les deux nouveaux formulaires
+lisent, écrivent et relancent les bonnes actions.
+
+**L'essai** : il s'ouvre, ouvre tout, se voit dans la pastille, disparaît
+quand il a été pris, referme l'application à son terme et rouvre l'écran
+d'achat — et un essai encore en cours n'est jamais coupé.
+
+**L'installation** : le bouton est là, il ouvre la marche à suivre, un deuxième
+appui ne l'empile pas, et sur un iPhone simulé elle parle bien de *Partager*
+et d'*écran d'accueil*.
+
+**Le partage** : il vise la page publique et envoie l'accroche.
+
+**Le logo** : déposé sans rien écrire, il apparaît dans `marque.json` et dans
+l'application. Les quatre icônes sortent aux bonnes tailles.
+
+Et les 52 contrôles du paiement repassent tous.
+
+
+## 8.19.0 — l’atelier : fabriquer les visuels, et dire la vérité sur les réseaux
+
+### Une page à part, `atelier.html`
+
+La console gère le catalogue et les fiches. L’atelier gère ce qui en sort : le
+blog, les visuels, la file. Ce sont deux métiers — et c’est votre propre règle
+qu’un onglet n’empiète jamais sur celui d’un autre.
+
+| onglet | ce qu’on y fait |
+|---|---|
+| **1 · Aujourd’hui** | ce qu’il y a à faire, et rien d’autre : la page du blog du jour, la fiche à poster |
+| **2 · Visuels** | choisir une fiche, relire les trois phrases, télécharger le carrousel |
+| **3 · La file** | les quatorze prochains jours, une proposition par jour |
+| **4 · Blog** | l’état du blog, en lecture seule |
+| **5 · Réglages** | le nom, le domaine, les mots-dièse, la phrase d’appel |
+
+### Les visuels sont dessinés dans votre navigateur
+
+Cinq images par fiche : quatre planches de carrousel en 1080 × 1350 et une
+story en 1080 × 1920.
+
+1. **L’accroche** — le champ `r`, en grand. Il est déjà écrit pour arrêter le
+   pouce, c’est exactement le bon texte.
+2. **Le détail** et 3. **le retournement** — deux phrases prises dans le texte.
+   L’atelier cherche celles qui portent un **chiffre ou une date**, parce que
+   ce sont celles qui se retiennent. Vous les corrigez si elles tombent mal.
+4. **La carte de fin** — l’appel et votre adresse.
+
+Tout est dessiné sur une toile, en pixels réels. **L’aperçu *est* l’image** :
+il est réduit par la feuille de style, le téléchargement est en pleine taille.
+Ce que vous voyez est ce qui sort, au pixel près.
+
+Un détail qui coûte cher quand on l’oublie : les polices sont attendues avant
+le premier dessin. Une toile qui mesure avec une police de repli, puis reçoit
+la vraie, déborde — et personne ne rattrape ça après coup.
+
+### Ce que l’atelier ne fait pas, et pourquoi
+
+**Il ne publie pas à votre place, et il n’écrit rien au dépôt.**
+
+Publier automatiquement sur **Instagram** suppose un compte professionnel, une
+application déclarée chez Meta, une revue avec vidéo de démonstration, et un
+jeton à renouveler tous les soixante jours. Sur **TikTok**, une application non
+auditée ne peut poster qu’en privé ou en brouillon — la publication directe
+demande un audit, long et souvent refusé pour un compte sans historique.
+
+Ce n’est pas un pis-aller : les trois premiers mois d’un compte se jouent sur
+ce qu’on apprend en publiant à la main. Le jour où vous saurez quel format
+marche, l’automatiser prendra une journée — et vos images seront déjà à une
+adresse publique, ce que l’API de Meta exige de toute façon.
+
+En attendant : deux minutes par jour, et aucune dépendance à Meta.
+
+### `marque.json`
+
+`consignes/` n’est plus servi publiquement, et l’atelier a besoin du nom et du
+logo pour dessiner. `build.sh` les recopie donc dans un petit fichier public.
+Rien de secret : c’est ce qui est déjà écrit en toutes lettres sur le site. Et
+une seule définition de la marque dans tout le produit — celle de
+`consignes/marque.txt`.
+
+### Vérifié
+
+Dix-sept contrôles sur Chromium : la page se charge sans une erreur, les cinq
+planches sortent aux bonnes tailles (1080×1350 ×4, 1080×1920), la première
+contient vraiment du texte clair (compté au pixel), l’accroche et une phrase du
+texte sont bien reprises, modifier un champ redessine, « publiée » est
+mémorisé, la file propose quatorze jours, l’onglet blog lit `etat.json`, et il
+n’y a aucun débordement horizontal en 390 px.
+
+
+## 8.18.0 — le blog, et les images qui ne sont pas libres de droits
+
+### L'application n'a qu'une seule adresse : Google n'a rien à indexer
+
+Pas de titre par sujet, pas de texte à lire, rien qui puisse remonter sur une
+recherche. Une application ne se réfère pas ; des pages, si.
+
+`tools/blog.mjs` fabrique **une page publique par fiche déjà en ligne**, à
+`/histoires/le-signal-wow/`, avec le texte entier, l'image créditée, la
+source, trois fiches voisines et un appel à l'application. Plus huit pages
+d'univers — ce sont elles qui se classent sur les requêtes larges — un
+`sitemap.xml`, un `robots.txt` et un flux RSS.
+
+**Il ne publie jamais le stock.** Il lit `fiches/`, pas `anecdotes/` : ce qui
+va sur le web ouvert est exactement ce que le lecteur gratuit voit déjà.
+
+**Votre meilleure matière SEO, vous ne le saviez pas** : le champ `r` de
+chaque fiche est mot pour mot une requête de longue traîne. *« En 1977, un
+radiotélescope de l'Ohio a capté pendant exactement 72 secondes un signal
+radio trente fois plus fort que le bruit de fond »* n'est pas une phrase de
+présentation, c'est ce que quelqu'un tape. Le titre de l'onglet est donc
+`{sujet} — {titre} | {marque}` : le sujet porte le mot-clé, le titre porte
+l'accroche.
+
+### Le rythme : un premier lot, puis une par jour
+
+Vous vouliez une par jour. C'est bon pour la fraîcheur — mais 269 pages à une
+par jour, c'est **neuf mois** avant que votre corpus soit indexé, alors qu'un
+site neuf met déjà trois à six mois à démarrer. `demarrage: 40` sort quarante
+pages le premier jour — assez pour que Google comprenne de quoi parle le site,
+assez peu pour ne pas ressembler à un dépotoir — puis `rythme: 1`.
+
+Le calendrier est **écrit une fois** dans `histoires/etat.json`. Une fiche a
+une date de parution et une adresse, et elles ne bougent plus : une adresse
+qui change est un lien mort et un référencement perdu.
+
+### Les images de Wikimedia ne sont pas libres de droits
+
+Vos fiches stockent l'image comme une adresse. Elles ne stockent **ni
+l'auteur, ni la licence**. Or les photos de Wikimedia Commons sont sous
+licence — CC BY, CC BY-SA, domaine public — et la plupart **exigent la mention
+de l'auteur**. Tant que l'image n'apparaissait que dans une application qu'on
+ne vendait pas, le risque était théorique. Dès qu'on vend, qu'on publie un
+blog indexé et qu'on poste sur Instagram, il devient réel.
+
+`tools/credits.mjs` va chercher, pour chaque image, l'auteur, la licence et la
+page Commons, et les écrit dans la fiche (`ic`, `il`, `ip`). **Le blog
+n'affiche une image que si elle est créditée** — sinon la page sort sans
+photo. C'est prudent, et ça se répare en une action.
+
+*Non vérifié, et je le dis* : Wikipédia est injoignable depuis mon bac à
+sable. L'outil est écrit sur la documentation de l'API. Lancez-le d'abord avec
+`--max 10` et regardez une fiche avant de le lâcher sur les 1 152.
+
+### `weekly.fr` = 269 = le total : la cause, pas le symptôme
+
+Le calcul de `write-anecdotes.mjs` est juste — il compte les fiches publiées
+depuis moins de sept jours. Ce sont les **données** qui mentent : une remise
+en ligne massive a posé la même date sur tout le catalogue. La 8.16.1 avait
+mis un garde-fou dans l'application ; c'était un pansement honnête.
+
+`tools/reetaler.mjs` soigne la cause : il réécrit le champ `p` des fiches déjà
+en ligne en les répartissant **en arrière** depuis aujourd'hui, au rythme de
+`consignes/publication.txt`. Rien ne sort, rien ne rentre, les mêmes fiches
+restent en ligne — seules leurs dates deviennent vraisemblables. Les deux
+langues d'un même sujet reçoivent la même date : une fiche française et sa
+jumelle anglaise ne sont pas deux nouveautés.
+
+Il demande le mot **REETALER** pour écrire quoi que ce soit. Sans lui, il dit
+seulement ce qu'il ferait.
+
+### Vérifié
+
+Sur un jeu de 120 fiches réparties en huit univers : 40 pages au premier
+passage, 80 programmées jusqu'au 27 novembre, un deuxième passage qui ne
+change **rien** (le calendrier ne se rejoue pas), 48 pages dont chaque bloc de
+données structurées est un JSON valide.
+
+Et un piège tendu exprès : une fiche dont le titre contient
+`</script><img src=x onerror=alert(1)>`. Aucune balise inattendue, aucun
+attribut injecté, sur les 48 pages. Le chevron ouvrant est échappé jusque dans
+le JSON-LD — un `</script>` dans un texte de fiche serait sorti du bloc de
+données et aurait cassé la page.
+
+Rendu vérifié sur Chromium en 900 px et en 390 px : aucun débordement
+horizontal.
+
+
+## 8.17.0 — le stock cesse d'être public, et le paiement devient un vrai verrou
+
+### Vos 883 fiches de stock étaient téléchargeables par n'importe qui
+
+C'est le défaut le plus cher de tout le produit, et il datait de la première
+version qui a servi des fiches.
+
+`anecdotes/fr-cosmos.json` faisait 884 ko et contenait **268 fiches
+complètes**, texte intégral. `index.json` en annonçait **21** en ligne pour
+Cosmos. L'écart — 247 fiches — était le stock, et il partait dans le
+navigateur de chaque visiteur.
+
+Le tri se faisait dans `filtrerPubliees()`, côté lecteur. C'était un filtre
+d'affichage, pas une serrure : il suffisait d'ouvrir l'adresse du fichier.
+Sur un produit gratuit, c'était une curiosité. Sur un produit qu'on vend,
+l'abonnement donnait accès à un corpus déjà public.
+
+**Deux dossiers, deux métiers :**
+
+| | |
+|---|---|
+| `anecdotes/` | la vérité. Toutes les fiches, stock compris. Plus jamais servie au lecteur. |
+| `fiches/` | ce que le site sert. Uniquement les fiches en ligne, sans vos champs internes. |
+
+`tools/servir.mjs` fabrique le second à partir du premier, à chaque
+publication et à chaque reconstruction. Sa règle de tri est **copiée mot pour
+mot** sur `filtrerPubliees()` — il ne peut pas exister deux définitions de
+« en ligne » dans le produit, c'est ce qui a coûté le plus cher quand c'est
+arrivé.
+
+Les champs `v` (votre jugement) et `d` (date d'écriture) ne sortent pas non
+plus : ils ne regardent que vous.
+
+La vue Curation, elle, lit toujours `anecdotes/` — c'est l'atelier, il doit
+tout montrer. Sur Cloudflare, une règle Access ferme `/anecdotes/*` à tout le
+monde sauf vous ; en attendant, `_redirects` la ferme à tout le monde.
+
+*Éprouvé* sur un jeu reproduisant vos cas réels — fiche au stock (`p: null`),
+fiche programmée (`p` futur), fiche retirée, fiche en quarantaine, fiche
+d'avant la version 8 sans `p` ni `q`, fichier au format `{items:{}}` : 21
+fiches servies sur 31 écrites, et les bonnes.
+
+### `?pro=1` ouvrait tout le produit à qui connaissait l'adresse
+
+Tant que rien n'était vendu, c'était un outil d'essai. Le jour où on vend,
+c'est une porte laissée ouverte, et elle était écrite dans le README.
+
+`essai:` dans `consignes/paiement.txt` porte maintenant un mot de votre
+choix. L'essai devient `?essai=votre-mot` (comme un abonné),
+`?essai=votre-mot-avie` (comme un achat à vie), `?essai=0` (retour au
+gratuit), et `?pro=` ne fait plus rien. Tant que ce réglage est vide,
+`?pro=` marche comme avant : rien ne casse chez qui n'a pas encore branché
+le paiement.
+
+La console suit le fichier — une seule définition de l'essai dans tout le
+produit — et ses trois liens pointent sur `site:` dès qu'il est réglé, au
+lieu de `github.io`.
+
+### Une clé de licence, vérifiée pour de bon
+
+L'application n'a toujours ni serveur ni compte lecteur. Le paiement passe
+par **Polar**, qui délivre une clé à l'achat, et par un petit programme
+Cloudflare — `worker/curio-api.js`, 200 lignes, livré et documenté — qui
+demande à Polar si cette clé tient toujours.
+
+Trois règles, et elles comptent :
+
+1. On vérifie **tous les sept jours**, pas à chaque ouverture. Entre deux,
+   l'application ne demande rien au réseau : elle reste utilisable dans le
+   métro, exactement comme avant.
+2. **Une panne de réseau ne verrouille jamais.** Si le vérificateur ne répond
+   pas, l'accès est gardé et on redemandera. On ne punit pas quelqu'un qui a
+   payé parce que son Wi-Fi est mauvais. Seule une réponse claire — révoquée,
+   expirée, inconnue — referme.
+3. Une **date d'expiration passée** referme sans réseau : c'est un
+   calendrier, pas un jugement.
+
+Polar révoque la clé tout seul quand un abonnement s'arrête ; l'application
+le voit à la vérification suivante et revient au gratuit, en l'expliquant.
+
+**Le retour de paiement.** L'acheteur ne tape rien. Polar le renvoie vers le
+vérificateur, qui retrouve sa clé et le renvoie dans l'application avec elle
+dans le fragment de l'adresse (`#cle=…`, jamais un paramètre : un fragment
+n'atteint aucun serveur et ne part pas dans l'en-tête Referer). L'application
+s'ouvre, dit merci, et **montre la clé en grand avec un bouton copier** —
+c'est ce dont il aura besoin sur son deuxième appareil, et c'est le moment
+que la plupart des produits ratent.
+
+**Un défaut évité de justesse** : l'ancien champ de clé passait la saisie en
+majuscules avant de la tester. Les clés de Polar contiennent de l'hexadécimal
+minuscule : *aucune* n'aurait été acceptée.
+
+### Les prix et les liens ne sont plus dans le code
+
+Ils vivaient dans `parts/20-data.js` : changer un prix demandait une
+livraison complète. Ils vivent dans `consignes/paiement.txt`, gravé en
+`<meta>` par `build.sh` — exactement comme le nom, le logo et le rythme. Un
+chiffre sur GitHub, *Entretien → reconstruire*, et c'est en ligne.
+
+Une formule sans lien de paiement ne s'affiche plus du tout. Supprimer le
+mensuel — ce qui est raisonnable, les 50 centimes fixes de Polar mangent 16 %
+d'un abonnement à 4,99 € — retire son encadré au lieu de laisser un bouton
+mort.
+
+### Cloudflare : `_headers`, `_redirects`, et ce qui ne doit pas être servi
+
+Cloudflare Pages sert **tout** le contenu du dépôt. Passer le dépôt en privé
+n'y change rien : ce n'est plus GitHub qui publie.
+
+- `_redirects` ferme `parts/`, `tools/`, `worker/`, `consignes/`,
+  `github-workflows/`, `build.sh` et `anecdotes/`. Ces règles sont appliquées
+  **avant** les fichiers : l'adresse n'atteint jamais le fichier.
+- `_headers` interdit la mise en cache de `sw.js` et des pages. Sans lui, tout
+  le travail que `build.sh` fait sur le nom du cache est annulé par le cache
+  de Cloudflare, et un correctif déployé reste invisible.
+- `/api/*` n'est mis en cache ni par Cloudflare, ni par le service worker —
+  celui-ci l'aurait rangé dans « le reste du même domaine : cache d'abord »,
+  et une clé révoquée serait restée valable indéfiniment.
+
+### Vérifié
+
+Cinquante-neuf contrôles automatisés sur Chromium, dont : le stock absent des
+fichiers servis ; une clé valable, révoquée, expirée, inconnue, en minuscules ;
+une panne du vérificateur qui ne ferme pas ; une date passée qui ferme sans
+réseau ; la revérification qui ne part pas avant sept jours et part après ; le
+retour de paiement de bout en bout ; l'écran d'achat sans le mensuel ; et le
+comportement d'avant, intact, quand `consignes/paiement.txt` n'existe pas.
+
+**Non vérifié, et je le dis** : l'API de Polar est injoignable depuis mon bac
+à sable. Le Worker est écrit sur sa documentation, pas sur des appels réels.
+Faites l'essai complet dans le bac à sable de Polar (`sandbox.polar.sh`) avant
+d'ouvrir la boutique — la marche à suivre est dans `worker/LISEZ-MOI.txt`.
+
 
 ## 8.16.0 — un sujet, une case ; et la file avant la dépense
 

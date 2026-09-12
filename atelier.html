@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#050E24" />
+<title>Curio · atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&family=Archivo:wght@400;500;600;700&display=swap" />
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ATELIER — la diffusion, et rien d'autre.
+
+   La console gere le catalogue et les fiches. L'atelier gere ce qui en sort :
+   le blog, les visuels, les legendes, la file. Ce sont deux metiers, et un
+   onglet n'empiete jamais sur celui d'un autre — c'est votre propre regle.
+
+   Elle ne SAIT rien ecrire au depot. Elle lit ce que le site sert, dessine
+   dans votre navigateur, et vous donne des fichiers a telecharger. Ce qui est
+   fait ou pas est garde dans CE navigateur. Rien a casser, rien a perdre.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#050E24;--ink-2:#0B1B3D;--ink-3:#12274F;
+  --line:rgba(150,190,255,.15);--line-fort:rgba(150,190,255,.3);
+  --texte:#EAF1FF;--texte-2:#9DB4D8;--texte-3:#6A82A8;
+  --accent:#3FA9FF;--accent-ink:#04162E;--brass:#F0C46A;
+  --vert:#4ADE80;--rouge:#F87171;
+  --r:14px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--texte);
+  font:15px/1.65 Archivo,"Helvetica Neue",Arial,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+
+header{position:sticky;top:0;z-index:10;background:rgba(5,14,36,.94);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header .dedans{max-width:1100px;margin:0 auto;padding:14px 20px 0}
+h1{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:21px;margin:0 0 4px;
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h1 .ver{font-family:Archivo,sans-serif;font-size:11px;font-weight:500;color:var(--texte-3);
+  border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+h1 small{font-family:Archivo,sans-serif;font-size:13px;font-weight:400;color:var(--texte-2)}
+nav{display:flex;gap:2px;overflow-x:auto;margin-top:10px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{
+  flex:none;background:none;border:0;border-bottom:2px solid transparent;
+  color:var(--texte-3);font:500 14px/1 Archivo,sans-serif;padding:12px 14px;cursor:pointer;
+  white-space:nowrap;
+}
+nav button:hover{color:var(--texte-2)}
+nav button.actif{color:var(--texte);border-bottom-color:var(--accent)}
+
+main{max-width:1100px;margin:0 auto;padding:26px 20px 90px}
+section[hidden]{display:none}
+h2{font-family:Fraunces,Georgia,serif;font-weight:500;font-size:22px;margin:34px 0 4px}
+h2:first-child{margin-top:0}
+.sous{color:var(--texte-2);font-size:14px;margin:0 0 18px;max-width:66ch}
+
+.cartes{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-bottom:22px}
+.bloc{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.bloc b{display:block;font-family:Fraunces,Georgia,serif;font-size:30px;line-height:1.1}
+.bloc span{display:block;color:var(--texte-3);font-size:13px;margin-top:4px}
+
+.rangee{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:11px;
+  border:1px solid var(--line-fort);background:var(--ink-2);color:var(--texte);
+  font:500 14px/1 Archivo,sans-serif;cursor:pointer;
+}
+.btn:hover{background:var(--ink-3);text-decoration:none}
+.btn--fort{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn--fort:hover{filter:brightness(1.09);background:var(--accent)}
+.btn--fait{background:transparent;border-color:var(--vert);color:var(--vert)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+label.champ{display:block;margin:14px 0 0;font-size:13px;color:var(--texte-2)}
+input[type=text],input[type=search],select,textarea{
+  width:100%;margin-top:5px;padding:10px 12px;border-radius:11px;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--texte);
+  font:400 14px/1.5 Archivo,sans-serif;
+}
+textarea{resize:vertical;min-height:74px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+.deux{display:grid;gap:24px;grid-template-columns:minmax(300px,1fr) minmax(260px,340px);align-items:start}
+@media(max-width:820px){ .deux{grid-template-columns:1fr} }
+
+/* les aperçus */
+.planches{display:flex;gap:12px;overflow-x:auto;padding:4px 0 12px}
+.planche{flex:none;text-align:center}
+.planche canvas{
+  width:200px;height:auto;border-radius:10px;border:1px solid var(--line);
+  background:var(--ink-2);display:block;cursor:pointer;
+}
+.planche canvas.story{width:150px}
+.planche canvas.pin{width:168px}
+.planche.choisie canvas{outline:2px solid var(--accent);outline-offset:2px}
+.planche p{margin:7px 0 0;font-size:12px;color:var(--texte-3)}
+
+.liste{list-style:none;padding:0;margin:0}
+.liste li{border:1px solid var(--line);border-radius:var(--r);background:var(--ink-2);
+  padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start}
+.liste .corps{flex:1;min-width:0}
+.liste b{display:block;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:17px;
+  line-height:1.3;margin-bottom:4px}
+.liste p{margin:0;color:var(--texte-2);font-size:13.5px}
+.liste .quand{color:var(--texte-3);font-size:12px;margin-top:6px}
+.pastille{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;
+  border:1px solid var(--line-fort);color:var(--texte-2);white-space:nowrap}
+.pastille.fait{border-color:var(--vert);color:var(--vert)}
+.pastille.auj{border-color:var(--brass);color:var(--brass)}
+
+.dit{border-radius:var(--r);padding:13px 16px;margin:14px 0;font-size:14px;border:1px solid}
+.dit.ok{border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.08);color:#BBF7D0}
+.dit.ko{border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.08);color:#FECACA}
+.dit.info{border-color:var(--line);background:var(--ink-2);color:var(--texte-2)}
+
+.note{color:var(--texte-3);font-size:13px;line-height:1.6;max-width:70ch}
+.legende{white-space:pre-wrap;background:var(--ink-2);border:1px solid var(--line);
+  border-radius:var(--r);padding:14px 16px;font-size:14px;line-height:1.6}
+#toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);
+  background:var(--ink-3);border:1px solid var(--line-fort);border-radius:12px;
+  padding:11px 18px;font-size:14px;opacity:0;pointer-events:none;transition:.22s;z-index:50;
+  max-width:min(92vw,520px);text-align:center;
+}
+#toast.vu{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header><div class="dedans">
+  <h1>Curio &middot; atelier<b class="ver" id="ver">—</b>
+    <small>la diffusion — le blog, les visuels, la file</small></h1>
+  <nav>
+    <button data-onglet="jour"     class="actif">1 · Aujourd’hui</button>
+    <button data-onglet="visuels">2 · Visuels</button>
+    <button data-onglet="file">3 · La file</button>
+    <button data-onglet="blog">4 · Blog</button>
+    <button data-onglet="reglages">5 · Réglages</button>
+  </nav>
+</div></header>
+
+<main>
+
+<!-- ══════════════ 1 · AUJOURD'HUI ══════════════ -->
+<section id="s-jour">
+  <h2>Le programme du jour</h2>
+  <p class="sous">Ce qu’il y a à faire, et rien d’autre. Deux minutes.</p>
+  <div class="cartes" id="chiffres"></div>
+  <div id="jourContenu"></div>
+</section>
+
+<!-- ══════════════ 2 · VISUELS ══════════════ -->
+<section id="s-visuels" hidden>
+  <h2>Fabriquer les visuels</h2>
+  <p class="sous">Choisissez une fiche, relisez les trois phrases, téléchargez.
+     Ce que vous voyez est exactement ce qui sortira : l’aperçu <em>est</em> l’image.</p>
+
+  <div class="deux">
+    <div>
+      <label class="champ">Chercher une fiche
+        <input type="search" id="q" placeholder="un mot du titre ou de l’accroche…" />
+      </label>
+      <div class="rangee">
+        <select id="fUnivers" style="width:auto;min-width:190px"></select>
+        <select id="fTri" style="width:auto">
+          <option value="s">les plus insolites d’abord</option>
+          <option value="t">par titre</option>
+          <option value="reste">jamais publiées d’abord</option>
+        </select>
+      </div>
+      <ul class="liste" id="listeFiches"></ul>
+      <p class="note" id="listeInfo"></p>
+    </div>
+
+    <div>
+      <div id="editeur" hidden>
+        <label class="champ">L’accroche — planche 1
+          <textarea id="t1"></textarea></label>
+        <label class="champ">Le détail — planche 2
+          <textarea id="t2"></textarea></label>
+        <label class="champ">Le retournement — planche 3
+          <textarea id="t3"></textarea></label>
+        <div class="rangee">
+          <button class="btn" id="btnRegen">Reprendre les phrases de la fiche</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="apercus" hidden>
+    <h2>Le carrousel</h2>
+    <p class="sous">Quatre planches en 1080 × 1350, une story verticale, et une épingle
+       Pinterest au format 2:3. Touchez une planche pour la télécharger seule.</p>
+    <div class="planches" id="planches"></div>
+    <div class="rangee">
+      <button class="btn btn--fort" id="btnTout">Tout télécharger</button>
+      <button class="btn" id="btnStory">La story seule</button>
+      <button class="btn" id="btnLegende">Copier la légende</button>
+      <button class="btn" id="btnPin">Copier la description Pinterest</button>
+      <button class="btn" id="btnFait">Marquer comme publiée</button>
+    </div>
+    <h2>La légende — Instagram, Facebook</h2>
+    <div class="legende" id="legende"></div>
+    <h2>La description — Pinterest</h2>
+    <p class="sous">Pinterest est un moteur de recherche déguisé en tableau d’images :
+       ce qui compte est la phrase, pas les mots-dièse. Et une épingle envoie du trafic
+       pendant <b>deux ans</b>, contre vingt-quatre heures pour une publication Instagram.</p>
+    <div class="legende" id="pin"></div>
+    <p class="note" id="pinLien"></p>
+  </div>
+</section>
+
+<!-- ══════════════ 3 · LA FILE ══════════════ -->
+<section id="s-file" hidden>
+  <h2>Les quatorze prochains jours</h2>
+  <p class="sous">Une fiche par jour, tirée des mieux notées qui n’ont jamais été publiées.
+     Ce n’est pas une contrainte : c’est une proposition, vous prenez celle que vous voulez.</p>
+  <ul class="liste" id="listeFile"></ul>
+  <p class="note">« Publiée » est gardé dans ce navigateur. Sur un autre appareil,
+     la file repartira de zéro — c’est voulu : rien à synchroniser, rien à casser.</p>
+</section>
+
+<!-- ══════════════ 4 · BLOG ══════════════ -->
+<section id="s-blog" hidden>
+  <h2>L’état du blog</h2>
+  <p class="sous">Une page publique par fiche en ligne, une par jour.
+     Rien à faire ici : c’est une lecture.</p>
+  <div class="cartes" id="chiffresBlog"></div>
+  <div id="blogContenu"></div>
+</section>
+
+<!-- ══════════════ 5 · RÉGLAGES ══════════════ -->
+<section id="s-reglages" hidden>
+  <h2>Réglages de l’atelier</h2>
+  <p class="sous">Ils ne concernent que le dessin des visuels et la légende.
+     Ils vivent dans ce navigateur.</p>
+
+  <label class="champ">Le nom écrit sur les visuels
+    <input type="text" id="rNom" /></label>
+  <label class="champ">L’adresse écrite sur la dernière planche
+    <input type="text" id="rDomaine" placeholder="entrefilet.com" /></label>
+  <label class="champ">Les mots-dièse, séparés par des espaces
+    <textarea id="rTags" placeholder="#anecdote #insolite #culturegenerale"></textarea></label>
+  <label class="champ">La phrase d’appel, sur la dernière planche
+    <input type="text" id="rAppel" /></label>
+  <label class="champ">Les mots de recherche Pinterest — une phrase, pas des mots-dièse
+    <textarea id="rPinMots" placeholder="anecdote insolite, culture générale, le saviez-vous"></textarea></label>
+  <div class="rangee">
+    <button class="btn btn--fort" id="btnReglages">Enregistrer</button>
+    <button class="btn" id="btnOublier">Oublier ce qui est marqué publié</button>
+  </div>
+
+  <h2>Ce que l’atelier ne fait pas</h2>
+  <p class="note">
+    Il ne publie pas à votre place, et il n’écrit rien au dépôt. C’est délibéré.<br /><br />
+    Publier automatiquement sur <b>Instagram</b> suppose un compte professionnel, une
+    application déclarée chez Meta, une revue avec vidéo de démonstration, et un jeton
+    à renouveler tous les soixante jours. Sur <b>TikTok</b>, une application non auditée
+    ne peut poster qu’en privé ou en brouillon.<br /><br />
+    Les trois premiers mois d’un compte se jouent sur ce qu’on apprend en publiant à la
+    main. Le jour où vous saurez quel format marche, l’automatiser prendra une journée —
+    et vos images seront déjà à une adresse publique, ce que l’API de Meta exige.
+  </p>
+</section>
+
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ══════════════════════════ état ══════════════════════════ */
+var $  = function(s){ return document.querySelector(s); };
+var $$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+var UNIVERS = {
+  cosmos:{nom:'Cosmos',hue:196}, vivant:{nom:'Le Vivant',hue:148},
+  histoire:{nom:'Histoire oubliée',hue:28}, esprit:{nom:'Corps & Esprit',hue:320},
+  sciences:{nom:'Sciences & Inventions',hue:262}, mysteres:{nom:'Mystères',hue:8},
+  terre:{nom:'Terre & Océans',hue:178}, arts:{nom:'Arts & Civilisations',hue:44},
+  recits:{nom:'Histoires vraies',hue:96}
+};
+function nomUni(u){ return (UNIVERS[u]&&UNIVERS[u].nom)||u; }
+function hueUni(u){ return (UNIVERS[u]&&UNIVERS[u].hue)||200; }
+
+var DEFAUTS = {
+  nom:'Curio', domaine:'', tags:'#anecdote #insolite #saviezvous #culturegenerale',
+  appel:'La suite dans l’application',
+  /* Pinterest ne se lit pas comme Instagram : on n'y met pas de mots-diese,
+     on y ecrit une phrase avec les mots qu'on cherche. Une epingle envoie du
+     trafic pendant DEUX ANS, contre vingt-quatre heures pour une publication
+     Instagram — c'est le reseau le plus rentable pour ce contenu-la. */
+  pinMots:'anecdote insolite, culture générale, le saviez-vous, fait étonnant'
+};
+var R = {};                 // les réglages
+var FICHES = [];            // toutes les fiches en ligne
+var BLOG = null;            // histoires/etat.json
+var FAITES = {};            // ce qui est marqué publié
+var choisie = null;         // la fiche ouverte dans l'onglet Visuels
+var PHRASES = ['','',''];
+
+function lire(cle, d){ try{ var v=localStorage.getItem(cle); return v===null?d:JSON.parse(v); }catch(e){ return d; } }
+function ecrire(cle, v){ try{ localStorage.setItem(cle, JSON.stringify(v)); }catch(e){} }
+
+var minuteur;
+function dis(m){
+  var t=$('#toast'); t.textContent=m; t.classList.add('vu');
+  clearTimeout(minuteur); minuteur=setTimeout(function(){ t.classList.remove('vu'); }, 2600);
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function jourFr(d){
+  var m=['janvier','février','mars','avril','mai','juin','juillet','août',
+         'septembre','octobre','novembre','décembre'];
+  var p=String(d).split('-');
+  return parseInt(p[2],10)+' '+m[parseInt(p[1],10)-1]+' '+p[0];
+}
+function auj(){ return new Date().toISOString().slice(0,10); }
+function plusJours(n){ return new Date(Date.now()+n*864e5).toISOString().slice(0,10); }
+
+/* ══════════════════════════ chargement ══════════════════════════ */
+
+function charger(url){
+  return fetch(url, {cache:'no-cache'}).then(function(r){
+    if(!r.ok) throw new Error(url+' : '+r.status);
+    return r.json();
+  });
+}
+
+function toutCharger(){
+  R = Object.assign({}, DEFAUTS, lire('curio.atelier', {}));
+  FAITES = lire('curio.atelier.faites', {});
+
+  /* Le nom et le logo viennent de marque.json, ecrit par build.sh. Une seule
+     definition de la marque dans tout le produit : celle de
+     consignes/marque.txt. */
+  var p1 = charger('marque.json').then(function(m){
+    if(m && m.nom && !lire('curio.atelier',{}).nom) R.nom = m.nom;
+  }).catch(function(){});
+
+  var p2 = charger('version.json').then(function(v){
+    if(v && v.version) $('#ver').textContent = v.version;
+  }).catch(function(){ $('#ver').textContent='?'; });
+
+  var p3 = charger('fiches/index.json').then(function(ix){
+    var unis = Object.keys((ix && ix.byUniverse) || {});
+    if(!unis.length) unis = Object.keys(UNIVERS);
+    return Promise.all(unis.map(function(u){
+      return charger('fiches/fr-'+u+'.json').then(function(j){
+        var items=(j&&j.items)||{};
+        Object.keys(items).forEach(function(sujet){
+          var f=items[sujet];
+          if(!f || !f.t || !f.x) return;
+          FICHES.push({sujet:sujet, uni:u, t:f.t, x:f.x, r:f.r||'', s:f.s||0,
+                       i:f.i||'', ic:f.ic||'', il:f.il||'', u:f.u||'', b:f.b||''});
+        });
+      }).catch(function(){});
+    }));
+  }).catch(function(e){
+    $('#jourContenu').innerHTML =
+      '<div class="dit ko">Impossible de lire <code>fiches/index.json</code>. '
+      + 'C’est <code>tools/servir.mjs</code> qui le fabrique : lancez '
+      + '<b>Entretien → servir</b>, puis rechargez.</div>';
+  });
+
+  var p4 = charger('histoires/etat.json').then(function(e){ BLOG=e; }).catch(function(){ BLOG=null; });
+
+  return Promise.all([p1,p2,p3,p4]).then(function(){
+    FICHES.sort(function(a,b){ return (b.s-a.s) || a.t.localeCompare(b.t); });
+    peindreTout();
+  });
+}
+
+/* ══════════════════════════ les phrases ══════════════════════════ */
+/* La planche 1 est l'accroche : elle existe deja, c'est le champ `r`, et elle
+   est faite pour arreter le pouce. Les planches 2 et 3 se prennent dans le
+   texte : on cherche les phrases qui portent un CHIFFRE ou une DATE, parce
+   que ce sont celles qui se retiennent. */
+function phrasesDe(f){
+  var p1 = (f.r || f.t || '').trim();
+  var brut = String(f.x).replace(/\*\*/g,'').replace(/\*/g,'');
+  var phrases = brut.split(/(?<=[.!?])\s+/)
+    .map(function(s){ return s.replace(/\s+/g,' ').trim(); })
+    .filter(function(s){ return s.length>=45 && s.length<=210; });
+
+  var notee = phrases.map(function(s,i){
+    var n = 0;
+    if(/\d/.test(s)) n += 3;
+    if(/\b(1[0-9]{3}|20[0-2][0-9])\b/.test(s)) n += 2;
+    if(/[«"]/.test(s)) n += 1;
+    if(i > 1) n += 1;                          // pas la toute premiere ligne
+    if(s.length > 90 && s.length < 165) n += 1;
+    return {s:s, n:n, i:i};
+  }).sort(function(a,b){ return b.n-a.n || a.i-b.i; });
+
+  var pris = [];
+  for(var k=0; k<notee.length && pris.length<2; k++){
+    var c = notee[k].s;
+    if(pris.some(function(x){ return x.slice(0,40)===c.slice(0,40); })) continue;
+    if(c.slice(0,40) === p1.slice(0,40)) continue;
+    pris.push(c);
+  }
+  return [p1, pris[0]||'', pris[1]||''];
+}
+
+/* La description d'epingle. Pinterest est un moteur de recherche deguise en
+   tableau d'images : ce qui compte est la PHRASE, pas les mots-diese. On y
+   met l'accroche, les mots qu'on cherche, et le lien. */
+function pinDe(f){
+  var lien = lienDe(f);
+  return (f.r || f.t).trim()
+       + '\n\n' + R.pinMots
+       + (lien ? '\n\n' + lien : '');
+}
+/* L'adresse de la page publique de cette fiche. Le champ `b` est ecrit par
+   tools/blog.mjs : une seule definition de l'adresse dans tout le produit. */
+function lienDe(f){
+  if(!R.domaine || !f.b) return '';
+  return 'https://' + String(R.domaine).replace(/^https?:\/\//,'').replace(/\/+$/,'')
+       + '/histoires/' + f.b + '/';
+}
+
+function legendeDe(f){
+  var l = (f.r||'').trim();
+  var lien = lienDe(f);
+  var dom = lien ? '\n\n' + lien : (R.domaine ? '\n\n' + R.domaine : '');
+  return l + '\n\n' + '→ ' + R.appel + dom
+       + '\n\nSource : ' + f.sujet + ' (Wikipédia)'
+       + '\n\n' + R.tags;
+}
+
+/* ══════════════════════════ le dessin ══════════════════════════ */
+/* Tout se fait sur une toile, en pixels reels. L'apercu est reduit par le CSS,
+   le telechargement est en pleine taille : ce que vous voyez est ce qui sort,
+   au pixel pres. */
+
+function retour(ctx, texte, x, maxL, taille, hauteur, police){
+  ctx.font = taille + 'px ' + police;
+  var mots = String(texte).split(/\s+/), lignes = [], cur = '';
+  for(var i=0;i<mots.length;i++){
+    var essai = cur ? cur+' '+mots[i] : mots[i];
+    if(ctx.measureText(essai).width > maxL && cur){ lignes.push(cur); cur = mots[i]; }
+    else cur = essai;
+  }
+  if(cur) lignes.push(cur);
+  return lignes;
+}
+
+/* On reduit la taille jusqu'a ce que le texte tienne dans sa boite. Un texte
+   qui deborde d'une image carree, personne ne le rattrape apres coup. */
+function ajuster(ctx, texte, maxL, maxH, depart, mini, police, interligne){
+  var t = depart;
+  while(t > mini){
+    var l = retour(ctx, texte, 0, maxL, t, 0, police);
+    if(l.length * t * interligne <= maxH) return {taille:t, lignes:l};
+    t -= 2;
+  }
+  return {taille:mini, lignes:retour(ctx, texte, 0, maxL, mini, 0, police)};
+}
+
+var SERIF = '"Fraunces",Georgia,serif';
+var SANS  = '"Archivo","Helvetica Neue",Arial,sans-serif';
+
+function dessiner(cv, spec){
+  var W = cv.width, H = cv.height, ctx = cv.getContext('2d');
+  var hue = spec.hue == null ? 200 : spec.hue;
+  var marge = Math.round(W * 0.095);
+
+  /* le fond */
+  var g = ctx.createLinearGradient(0, 0, W * 0.4, H);
+  g.addColorStop(0, 'hsl(' + hue + ' 46% 13%)');
+  g.addColorStop(0.55, '#071531');
+  g.addColorStop(1, '#050E24');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+  /* une lueur, pour que ce ne soit pas un aplat */
+  var l = ctx.createRadialGradient(W*0.78, H*0.16, 0, W*0.78, H*0.16, W*0.9);
+  l.addColorStop(0, 'hsl(' + hue + ' 90% 60% / .18)');
+  l.addColorStop(1, 'hsl(' + hue + ' 90% 60% / 0)');
+  ctx.fillStyle = l; ctx.fillRect(0, 0, W, H);
+
+  /* le filet d'univers, en haut à gauche */
+  ctx.fillStyle = 'hsl(' + hue + ' 85% 66%)';
+  ctx.fillRect(marge, marge, Math.round(W*0.09), Math.round(W*0.008));
+
+  /* le nom de l'univers */
+  if(spec.univers){
+    ctx.font = '600 ' + Math.round(W*0.026) + 'px ' + SANS;
+    ctx.fillStyle = 'hsl(' + hue + ' 70% 74%)';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(spec.univers.toUpperCase(), marge, marge + Math.round(W*0.062));
+  }
+
+  /* le texte */
+  var hautTexte = marge + Math.round(W*0.13);
+  var basTexte  = H - marge - Math.round(W*0.115);
+  var maxL = W - marge*2, maxH = basTexte - hautTexte;
+  var fam = spec.sans ? SANS : SERIF;
+  var a = ajuster(ctx, spec.texte || '', maxL, maxH,
+                  Math.round(W * (spec.gros ? 0.082 : 0.058)),
+                  Math.round(W * 0.030), fam, 1.28);
+
+  ctx.font = (spec.sans ? '500 ' : '400 ') + a.taille + 'px ' + fam;
+  ctx.fillStyle = '#EAF1FF';
+  ctx.textBaseline = 'top';
+  var interligne = a.taille * 1.28;
+  var bloc = a.lignes.length*interligne + (spec.sous ? interligne*1.5 : 0);
+  var y = hautTexte + Math.max(0, (maxH - bloc) / 2);
+  if(spec.centre) ctx.textAlign = 'center';
+  var ox = spec.centre ? W/2 : marge;
+  for(var i=0;i<a.lignes.length;i++){
+    ctx.fillText(a.lignes[i], ox, y + i*interligne);
+  }
+  /* La deuxieme ligne de la carte de fin : l'adresse, en grand et en couleur.
+     C'est la seule chose qu'on veut qu'on retienne de cette planche-la. */
+  if(spec.sous){
+    ctx.font = '600 ' + Math.round(a.taille * 0.72) + 'px ' + SANS;
+    ctx.fillStyle = 'hsl(' + hue + ' 82% 70%)';
+    ctx.fillText(spec.sous, ox, y + a.lignes.length*interligne + interligne*0.45);
+  }
+  ctx.textAlign = 'left';
+
+  /* le pied : la marque, et le numéro de planche */
+  ctx.font = '600 ' + Math.round(W*0.027) + 'px ' + SANS;
+  ctx.fillStyle = '#9DB4D8';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(spec.marque || '', marge, H - marge);
+  if(spec.numero){
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#6A82A8';
+    ctx.fillText(spec.numero + '/' + spec.total, W - marge, H - marge);
+    ctx.textAlign = 'left';
+  }
+  if(spec.domaine){
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'hsl(' + hue + ' 70% 74%)';
+    ctx.fillText(spec.domaine, W - marge, H - marge);
+    ctx.textAlign = 'left';
+  }
+}
+
+function planchesDe(f){
+  var hue = hueUni(f.uni);
+  return [
+    {cle:'1', legende:'L’accroche',      W:1080,H:1350, texte:PHRASES[0], hue:hue,
+     univers:nomUni(f.uni), marque:R.nom, gros:true, numero:1, total:4},
+    {cle:'2', legende:'Le détail',       W:1080,H:1350, texte:PHRASES[1], hue:hue,
+     univers:'', marque:R.nom, numero:2, total:4},
+    {cle:'3', legende:'Le retournement', W:1080,H:1350, texte:PHRASES[2], hue:hue,
+     univers:'', marque:R.nom, numero:3, total:4},
+    {cle:'4', legende:'La carte de fin', W:1080,H:1350, texte:R.appel, hue:hue,
+     univers:'', marque:R.nom, gros:true, sans:true, centre:true,
+     sous:R.domaine || R.nom},
+    {cle:'s', legende:'La story',        W:1080,H:1920, texte:PHRASES[0], hue:hue,
+     univers:nomUni(f.uni), marque:R.nom, gros:true, story:true},
+    /* L'EPINGLE PINTEREST. 1000 x 1500, le format 2:3 que Pinterest attend et
+       le seul qu'il affiche en entier. Elle porte l'adresse en bas : une
+       epingle republiee par quelqu'un d'autre perd son lien, mais pas ce qui
+       est ecrit dessus. */
+    {cle:'pin', legende:'L’épingle Pinterest', W:1000,H:1500, texte:PHRASES[0], hue:hue,
+     univers:nomUni(f.uni), marque:R.nom, gros:true, pin:true,
+     domaine:R.domaine}
+  ];
+}
+
+function nomFichier(f, cle){
+  var base = f.sujet.normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,50);
+  return base + '-' + cle + '.png';
+}
+
+function telecharger(cv, nom){
+  return new Promise(function(res){
+    cv.toBlob(function(b){
+      var u = URL.createObjectURL(b);
+      var a = document.createElement('a');
+      a.href = u; a.download = nom; document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(u); a.remove(); res(); }, 120);
+    }, 'image/png');
+  });
+}
+
+/* ══════════════════════════ onglet Visuels ══════════════════════════ */
+
+function peindreListe(){
+  var q = ($('#q').value||'').toLowerCase().trim();
+  var u = $('#fUnivers').value;
+  var tri = $('#fTri').value;
+
+  var l = FICHES.filter(function(f){
+    if(u && f.uni !== u) return false;
+    if(!q) return true;
+    return (f.t+' '+f.sujet+' '+f.r).toLowerCase().indexOf(q) >= 0;
+  });
+  if(tri === 't') l.sort(function(a,b){ return a.t.localeCompare(b.t); });
+  else if(tri === 'reste') l.sort(function(a,b){
+    return (FAITES[a.sujet]?1:0)-(FAITES[b.sujet]?1:0) || b.s-a.s; });
+  else l.sort(function(a,b){ return b.s-a.s; });
+
+  var box = $('#listeFiches'); box.innerHTML='';
+  l.slice(0,60).forEach(function(f){
+    var li=document.createElement('li');
+    li.innerHTML = '<div class="corps"><b>'+esc(f.t)+'</b>'
+      + '<p>'+esc((f.r||'').slice(0,150))+'</p>'
+      + '<p class="quand">'+esc(nomUni(f.uni))+' · potentiel '+f.s
+      + (FAITES[f.sujet] ? ' · <span class="pastille fait">publiée le '+esc(FAITES[f.sujet])+'</span>' : '')
+      + '</p></div>'
+      + '<button class="btn">Ouvrir</button>';
+    li.querySelector('button').addEventListener('click', function(){ ouvrir(f); });
+    box.appendChild(li);
+  });
+  $('#listeInfo').textContent = l.length + ' fiche(s)'
+    + (l.length > 60 ? ' — les 60 premières sont affichées.' : '.');
+}
+
+function ouvrir(f){
+  choisie = f;
+  PHRASES = phrasesDe(f);
+  $('#t1').value = PHRASES[0];
+  $('#t2').value = PHRASES[1];
+  $('#t3').value = PHRASES[2];
+  $('#editeur').hidden = false;
+  $('#apercus').hidden = false;
+  peindrePlanches();
+  $('#apercus').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function peindrePlanches(){
+  if(!choisie) return;
+  PHRASES = [$('#t1').value, $('#t2').value, $('#t3').value];
+  var box = $('#planches'); box.innerHTML='';
+  planchesDe(choisie).forEach(function(sp){
+    var d = document.createElement('div'); d.className='planche';
+    var cv = document.createElement('canvas');
+    cv.width = sp.W; cv.height = sp.H;
+    if(sp.story) cv.className='story';
+    if(sp.pin)   cv.className='pin';
+    dessiner(cv, sp);
+    cv.addEventListener('click', function(){
+      telecharger(cv, nomFichier(choisie, sp.cle));
+      dis('Planche téléchargée.');
+    });
+    var p = document.createElement('p'); p.textContent = sp.legende;
+    d.appendChild(cv); d.appendChild(p); box.appendChild(d);
+  });
+  $('#legende').textContent = legendeDe(choisie);
+  $('#pin').textContent = pinDe(choisie);
+  var l = lienDe(choisie);
+  $('#pinLien').textContent = l
+    ? 'L’épingle enverra vers ' + l
+    : (R.domaine
+        ? 'Cette fiche n’a pas encore de page au blog : l’épingle partira sans lien.'
+        : 'Réglez votre adresse dans l’onglet 5 pour que l’épingle porte un lien — '
+          + 'sans lien, une épingle ne rapporte rien.');
+}
+
+/* ══════════════════════════ onglet Aujourd'hui ══════════════════════════ */
+
+function fichesDuJour(n, depart){
+  /* Deterministe : la meme date donne les memes fiches, sur tous les
+     appareils. On ne tire pas au hasard — sinon la file de l'onglet 3 et le
+     programme du jour ne diraient jamais la meme chose. */
+  var restantes = FICHES.filter(function(f){ return !FAITES[f.sujet]; });
+  if(!restantes.length) return [];
+  var graine = 0, d = depart || auj();
+  for(var i=0;i<d.length;i++) graine = (graine*31 + d.charCodeAt(i)) >>> 0;
+  var out = [];
+  for(var k=0;k<n && restantes.length;k++){
+    var j = (graine + k*7919) % restantes.length;
+    out.push(restantes[j]);
+    restantes = restantes.filter(function(x,idx){ return idx!==j; });
+  }
+  return out;
+}
+
+function peindreJour(){
+  var box = $('#chiffres'); box.innerHTML='';
+  var faites = Object.keys(FAITES).length;
+  [[FICHES.length,'fiches en ligne, prêtes à servir'],
+   [faites,'déjà publiées sur les réseaux'],
+   [Math.max(0,FICHES.length-faites),'jamais publiées'],
+   [BLOG ? Object.keys(BLOG.parutions||{}).length : 0,'programmées au blog']]
+  .forEach(function(c){
+    var d=document.createElement('div'); d.className='bloc';
+    d.innerHTML='<b>'+c[0]+'</b><span>'+c[1]+'</span>';
+    box.appendChild(d);
+  });
+
+  var h = '';
+  /* la page du blog du jour */
+  if(BLOG && BLOG.parutions){
+    var duJour = Object.keys(BLOG.parutions).filter(function(s){
+      return BLOG.parutions[s] === auj(); });
+    h += '<h2>Au blog aujourd’hui</h2>';
+    if(duJour.length){
+      h += '<ul class="liste">' + duJour.slice(0,6).map(function(s){
+        var a = (BLOG.adresses||{})[s] || '';
+        return '<li><div class="corps"><b>'+esc(s)+'</b>'
+             + '<p class="quand">déjà en ligne, rien à faire</p></div>'
+             + (a ? '<a class="btn" target="_blank" rel="noopener" href="histoires/'+esc(a)+'/">Voir</a>' : '')
+             + '</li>';
+      }).join('') + '</ul>';
+      if(duJour.length>6) h += '<p class="note">…et '+(duJour.length-6)+' autre(s).</p>';
+    } else {
+      h += '<div class="dit info">Rien ne paraît au blog aujourd’hui.</div>';
+    }
+  } else {
+    h += '<h2>Au blog</h2><div class="dit info">Le blog n’est pas encore allumé. '
+       + 'Réglez <code>consignes/blog.txt</code>, écrivez <code>actif: oui</code>, '
+       + 'puis lancez <b>Entretien → blog</b>.</div>';
+  }
+
+  /* la fiche à poster */
+  var prop = fichesDuJour(1)[0];
+  h += '<h2>À poster aujourd’hui</h2>';
+  if(!prop){
+    h += '<div class="dit ok">Tout a été publié. Il n’y a rien à faire — c’est rare, profitez-en.</div>';
+  } else {
+    h += '<ul class="liste"><li><div class="corps">'
+       + '<b>'+esc(prop.t)+'</b><p>'+esc((prop.r||'').slice(0,190))+'</p>'
+       + '<p class="quand">'+esc(nomUni(prop.uni))+' · potentiel '+prop.s+'</p></div>'
+       + '<button class="btn btn--fort" id="btnJour">Fabriquer</button></li></ul>';
+  }
+  $('#jourContenu').innerHTML = h;
+  if(prop){
+    $('#btnJour').addEventListener('click', function(){
+      onglet('visuels'); ouvrir(prop);
+    });
+  }
+}
+
+/* ══════════════════════════ onglet File ══════════════════════════ */
+
+function peindreFile(){
+  var box = $('#listeFile'); box.innerHTML='';
+  var deja = {};
+  for(var k=0;k<14;k++){
+    var jour = plusJours(k);
+    var restantes = FICHES.filter(function(f){ return !FAITES[f.sujet] && !deja[f.sujet]; });
+    if(!restantes.length) break;
+    var graine=0; for(var i=0;i<jour.length;i++) graine=(graine*31+jour.charCodeAt(i))>>>0;
+    var f = restantes[graine % restantes.length];
+    deja[f.sujet]=1;
+    var li=document.createElement('li');
+    li.innerHTML = '<div class="corps"><b>'+esc(f.t)+'</b>'
+      + '<p>'+esc((f.r||'').slice(0,140))+'</p>'
+      + '<p class="quand"><span class="pastille'+(k===0?' auj':'')+'">'
+      + (k===0?'aujourd’hui':jourFr(jour))+'</span> · '+esc(nomUni(f.uni))+'</p></div>'
+      + '<button class="btn">Fabriquer</button>';
+    (function(fi){ li.querySelector('button').addEventListener('click', function(){
+      onglet('visuels'); ouvrir(fi); }); })(f);
+    box.appendChild(li);
+  }
+  if(!box.children.length){
+    box.innerHTML = '<div class="dit ok">Plus rien en attente : tout est marqué publié.</div>';
+  }
+}
+
+/* ══════════════════════════ onglet Blog ══════════════════════════ */
+
+function peindreBlog(){
+  var box=$('#chiffresBlog'); box.innerHTML='';
+  if(!BLOG || !BLOG.parutions){
+    $('#blogContenu').innerHTML = '<div class="dit info">'
+      + 'Aucun <code>histoires/etat.json</code> : le blog n’a jamais tourné.<br /><br />'
+      + '1. copiez <code>consignes/blog.exemple.txt</code> en <code>consignes/blog.txt</code><br />'
+      + '2. écrivez <code>actif: oui</code><br />'
+      + '3. Actions → <b>Entretien → blog</b></div>';
+    return;
+  }
+  var p = BLOG.parutions, a = auj();
+  var cles = Object.keys(p);
+  var enLigne = cles.filter(function(s){ return p[s] <= a; });
+  var aVenir  = cles.filter(function(s){ return p[s] >  a; });
+  var dates = cles.map(function(s){ return p[s]; }).sort();
+  [[enLigne.length,'pages en ligne'],[aVenir.length,'pages programmées'],
+   [dates.length?jourFr(dates[dates.length-1]):'—','dernière parution prévue']]
+  .forEach(function(c){
+    var d=document.createElement('div'); d.className='bloc';
+    d.innerHTML='<b style="font-size:'+(typeof c[0]==='string'?'19px':'30px')+'">'+esc(c[0])
+      +'</b><span>'+c[1]+'</span>';
+    box.appendChild(d);
+  });
+  var suivantes = aVenir.sort(function(x,y){ return p[x].localeCompare(p[y]); }).slice(0,10);
+  $('#blogContenu').innerHTML = '<h2>Les dix prochaines</h2><ul class="liste">'
+    + (suivantes.length ? suivantes.map(function(s){
+        return '<li><div class="corps"><b>'+esc(s)+'</b>'
+             + '<p class="quand">'+jourFr(p[s])+'</p></div></li>'; }).join('')
+      : '<li><div class="corps"><p>Tout est déjà paru.</p></div></li>')
+    + '</ul>';
+}
+
+/* ══════════════════════════ réglages & onglets ══════════════════════════ */
+
+function peindreReglages(){
+  $('#rNom').value = R.nom || '';
+  $('#rDomaine').value = R.domaine || '';
+  $('#rTags').value = R.tags || '';
+  $('#rAppel').value = R.appel || '';
+  $('#rPinMots').value = R.pinMots || '';
+}
+
+function peindreTout(){
+  var sel = $('#fUnivers');
+  sel.innerHTML = '<option value="">tous les univers</option>';
+  Object.keys(UNIVERS).forEach(function(u){
+    if(!FICHES.some(function(f){ return f.uni===u; })) return;
+    var o=document.createElement('option'); o.value=u; o.textContent=nomUni(u);
+    sel.appendChild(o);
+  });
+  peindreJour(); peindreListe(); peindreFile(); peindreBlog(); peindreReglages();
+}
+
+function onglet(nom){
+  $$('nav button').forEach(function(b){ b.classList.toggle('actif', b.dataset.onglet===nom); });
+  ['jour','visuels','file','blog','reglages'].forEach(function(n){
+    $('#s-'+n).hidden = (n!==nom);
+  });
+}
+$$('nav button').forEach(function(b){
+  b.addEventListener('click', function(){ onglet(b.dataset.onglet); });
+});
+
+['#t1','#t2','#t3'].forEach(function(s){
+  $(s).addEventListener('input', peindrePlanches);
+});
+$('#q').addEventListener('input', peindreListe);
+$('#fUnivers').addEventListener('change', peindreListe);
+$('#fTri').addEventListener('change', peindreListe);
+
+$('#btnRegen').addEventListener('click', function(){
+  if(!choisie) return;
+  var p = phrasesDe(choisie);
+  $('#t1').value=p[0]; $('#t2').value=p[1]; $('#t3').value=p[2];
+  peindrePlanches(); dis('Phrases reprises de la fiche.');
+});
+
+$('#btnTout').addEventListener('click', function(){
+  if(!choisie) return;
+  var cvs = $$('#planches canvas');
+  var i = 0;
+  var pl = planchesDe(choisie);
+  (function suite(){
+    if(i >= cvs.length) { dis(cvs.length + ' images téléchargées.'); return; }
+    telecharger(cvs[i], nomFichier(choisie, pl[i].cle)).then(function(){ i++; suite(); });
+  })();
+});
+$('#btnStory').addEventListener('click', function(){
+  var cvs = $$('#planches canvas');
+  if(!cvs.length || !choisie) return;
+  telecharger(cvs[cvs.length-1], nomFichier(choisie,'story'));
+  dis('Story téléchargée.');
+});
+$('#btnPin').addEventListener('click', function(){
+  if(!choisie) return;
+  var t = pinDe(choisie);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){ dis('Description Pinterest copiée.'); },
+      function(){ dis('Sélectionnez la description et copiez-la à la main.'); });
+  } else dis('Sélectionnez la description et copiez-la à la main.');
+});
+$('#btnLegende').addEventListener('click', function(){
+  if(!choisie) return;
+  var t = legendeDe(choisie);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){ dis('Légende copiée.'); },
+      function(){ dis('Sélectionnez la légende et copiez-la à la main.'); });
+  } else dis('Sélectionnez la légende et copiez-la à la main.');
+});
+$('#btnFait').addEventListener('click', function(){
+  if(!choisie) return;
+  FAITES[choisie.sujet] = auj();
+  ecrire('curio.atelier.faites', FAITES);
+  peindreJour(); peindreListe(); peindreFile();
+  dis('Marquée comme publiée.');
+});
+
+$('#btnReglages').addEventListener('click', function(){
+  R.nom = $('#rNom').value.trim() || DEFAUTS.nom;
+  R.domaine = $('#rDomaine').value.trim().replace(/^https?:\/\//,'').replace(/\/+$/,'');
+  R.tags = $('#rTags').value.trim();
+  R.appel = $('#rAppel').value.trim() || DEFAUTS.appel;
+  R.pinMots = $('#rPinMots').value.trim() || DEFAUTS.pinMots;
+  ecrire('curio.atelier', R);
+  peindrePlanches();
+  dis('Réglages enregistrés.');
+});
+$('#btnOublier').addEventListener('click', function(){
+  if(!confirm('Effacer la liste de ce qui est marqué publié ? Les fiches ne bougent pas.')) return;
+  FAITES = {}; ecrire('curio.atelier.faites', FAITES);
+  peindreJour(); peindreListe(); peindreFile();
+  dis('Liste effacée.');
+});
+
+/* Les polices doivent etre chargees AVANT le premier dessin, sinon la toile
+   mesure avec une police de repli et le texte deborde une fois la vraie
+   police arrivee. On attend, puis on redessine. */
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(function(){ if(choisie) peindrePlanches(); });
+}
+
+toutCharger();
+})();
+</script>
+</body>
+</html>

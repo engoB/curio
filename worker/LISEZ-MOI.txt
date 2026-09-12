@@ -1,0 +1,146 @@
+LE VERIFICATEUR — INSTALLATION, PAS A PAS
+=========================================
+
+Ce dossier contient UN fichier : curio-api.js. C'est un « Worker » Cloudflare,
+un petit programme qui tourne chez Cloudflare et qui fait deux choses :
+
+  · il demande a Polar si une cle de licence est toujours valable ;
+  · il rattrape la cle du client au retour de son paiement, et le renvoie
+    vers l'application deja ouverte.
+
+Il ne se depose PAS dans le depot GitHub comme les autres fichiers : on le
+colle dans l'interface de Cloudflare. Vous n'aurez rien a installer sur votre
+machine, et aucune ligne de commande.
+
+
+CE QU'IL VOUS FAUT AVANT DE COMMENCER
+=====================================
+
+  1. Un compte Cloudflare, avec votre domaine dedans.
+  2. Un compte Polar, avec vos produits crees.
+  3. Dans Polar : un benefice de type « License Keys » attache aux produits.
+  4. Dans Polar : Settings -> Developers -> New Token, avec les droits
+       checkouts:read
+       license_keys:read
+       customer_sessions:write
+     Copiez le jeton. Polar ne le remontre jamais.
+  5. Dans Polar : votre identifiant d'organisation (Settings -> General).
+
+
+ETAPE 1 — CREER LE WORKER
+=========================
+
+  Cloudflare -> Workers & Pages -> Create -> Worker
+  Nom : curio-api
+  Deploy   (il repond « Hello World », c'est normal)
+
+
+ETAPE 2 — COLLER LE CODE
+========================
+
+  Edit code -> tout selectionner, tout effacer
+  -> coller le contenu de curio-api.js
+  -> Deploy
+
+
+ETAPE 3 — LES REGLAGES
+======================
+
+  Settings -> Variables and Secrets -> Add
+
+    POLAR_TOKEN   type Secret   votre jeton Polar
+    POLAR_ORG     type Text     votre identifiant d'organisation
+    SITE          type Text     https://votre-domaine.com
+
+  Facultatif, pour essayer sans vraie carte bancaire :
+
+    POLAR_API     type Text     https://sandbox-api.polar.sh
+
+  Le jeton ne quitte jamais Cloudflare. Il n'est ecrit nulle part dans le
+  depot, et l'application ne le voit jamais.
+
+
+ETAPE 4 — L'ADRESSE
+===================
+
+  Settings -> Domains & Routes -> Add -> Route
+    Route : votre-domaine.com/api/*
+    Zone  : votre-domaine.com
+
+  Le Worker repond alors sur https://votre-domaine.com/api/...
+
+
+ETAPE 5 — VERIFIER
+==================
+
+  Ouvrez https://votre-domaine.com/api/sante
+
+  Vous devez lire quelque chose comme :
+
+    {"etat":"debout","jeton":"present","organisation":"presente",
+     "site":"https://votre-domaine.com","api":"https://api.polar.sh"}
+
+  Si un reglage dit MANQUANT, revenez a l'etape 3.
+
+
+ETAPE 6 — LE DIRE A L'APPLICATION
+=================================
+
+  Dans le depot, creez consignes/paiement.txt a partir de
+  consignes/paiement.exemple.txt, et remplissez :
+
+    site: https://votre-domaine.com
+    verificateur: https://votre-domaine.com/api
+    lien-mensuel: ...
+    lien-annuel: ...
+    lien-avie: ...
+    portail: ...
+
+  Puis : Actions -> Entretien -> reconstruire.
+
+
+ETAPE 7 — LES ADRESSES DE RETOUR, DANS POLAR
+============================================
+
+  Pour CHACUN de vos trois liens de paiement, reglez l'adresse de retour sur
+
+    https://votre-domaine.com/api/retour?checkout_id={CHECKOUT_ID}
+
+  Ecrivez {CHECKOUT_ID} tel quel, avec les accolades : c'est Polar qui le
+  remplace.
+
+  C'est cette ligne, et elle seule, qui fait que l'acheteur revient dans
+  l'application deja deverrouillee, sans rien taper.
+
+
+ESSAYER SANS PAYER
+==================
+
+  Polar a un bac a sable complet : sandbox.polar.sh. Creez-y les memes
+  produits, prenez-y un jeton, mettez POLAR_API a https://sandbox-api.polar.sh
+  et servez-vous des cartes d'essai de Stripe (4242 4242 4242 4242, une date
+  future, n'importe quel cryptogramme).
+
+  Faites un achat complet avant d'ouvrir la vraie boutique. C'est vingt
+  minutes, et c'est la seule facon de savoir que le retour marche.
+
+
+SI QUELQUE CHOSE NE VA PAS
+==========================
+
+  · /api/sante ne repond pas       -> la route de l'etape 4 n'est pas posee
+  · « jeton MANQUANT »             -> etape 3, le nom doit etre exactement
+                                      POLAR_TOKEN
+  · l'achat marche mais l'application ne s'ouvre pas
+                                   -> l'adresse de retour de l'etape 7, ou
+                                      le benefice « License Keys » n'est pas
+                                      attache au produit achete
+  · Cloudflare -> Workers -> curio-api -> Logs montre chaque appel en direct.
+
+
+CE QU'IL NE FAIT PAS
+====================
+
+  Il ne stocke rien. Aucune base de donnees, aucun client enregistre, aucune
+  cle gardee. Il pose une question a Polar et repond. C'est tout, et c'est
+  voulu : rien a faire fuiter, rien a sauvegarder, rien a maintenir.

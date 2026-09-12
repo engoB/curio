@@ -1099,8 +1099,8 @@ a{color:var(--accent);text-decoration:none}
    doit avoir envie de cliquer dessus, c'est la porte de l'abonnement, pas un
    bouton grisé. Le tracé est en SVG encodé : net à toutes les densités, et
    il suit la couleur du laiton dans les deux thèmes. */
-.counter.verrou,.iconbtn.verrou{position:relative;overflow:visible}
-.counter.verrou::after,.iconbtn.verrou::after{
+.counter.verrou,.iconbtn.verrou,.opt__a.verrou{position:relative;overflow:visible}
+.counter.verrou::after,.iconbtn.verrou::after,.opt__a.verrou::after{
   content:"";position:absolute;top:-5px;right:-5px;
   width:16px;height:16px;border-radius:50%;
   background:var(--brass);border:2px solid var(--ink);
@@ -1115,7 +1115,11 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
 }
 /* le trait du cadenas doit rester lisible sur le laiton clair du thème clair */
 :root[data-theme="light"] .counter.verrou::after,
+:root[data-theme="light"] .opt__a.verrou::after,
 :root[data-theme="light"] .iconbtn.verrou::after{box-shadow:0 1px 3px rgba(20,26,36,.25)}
+/* Dans le panneau, la ligne fait toute la largeur : le cadenas se pose au
+   bout du texte, pas dans le coin d'un bouton rond. */
+.opt__a.verrou::after{top:50%;right:12px;transform:translateY(-50%)}
 .counter{
   display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 12px 0 13px;
   border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);
@@ -1273,6 +1277,30 @@ stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round
   border:1px solid var(--line);background:var(--ink-2);color:var(--text);font-size:14px;
 }
 .keyrow input::placeholder{color:var(--text-3)}
+
+/* La clé, montrée après l'achat. Elle doit être lisible d'un coup d'œil et
+   copiable d'un doigt : c'est un mot de passe qu'on ne retape jamais.
+   `user-select:all` fait que le premier appui sélectionne tout — sur un
+   téléphone, c'est ce qui évite de traîner deux poignées de sélection. */
+/* L'essai gratuit. Il doit se distinguer des trois formules sans leur voler
+   la vedette : le laiton, qui ne sert nulle part ailleurs dans cet écran. */
+.essai{
+  display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  margin:16px 0 4px;padding:15px 17px;border-radius:14px;
+  border:1px solid var(--brass);background:var(--brass-soft);
+}
+.essai b{display:block;font-size:15px;color:var(--text);margin-bottom:2px}
+.essai span{display:block;font-size:13px;color:var(--text-2);max-width:44ch}
+.rangee-cle{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+.clebloc{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0 10px;
+  padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--ink-2);
+}
+.clebloc code{
+  flex:1;min-width:180px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:14px;line-height:1.5;color:var(--text);word-break:break-all;user-select:all;
+}
 
 /* recherche & bibliothèque */
 .searchbar{display:flex;gap:8px;margin-bottom:20px}

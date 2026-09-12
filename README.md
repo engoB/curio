@@ -17,12 +17,20 @@ console en favori.
 | **LA CONSOLE** — à mettre en favori | `https://VOTRE-COMPTE.github.io/curio/console.html` |
 | Le site | `https://VOTRE-COMPTE.github.io/curio/` |
 | L'application | `https://VOTRE-COMPTE.github.io/curio/app.html` |
+| **L'ATELIER** — la diffusion | `https://VOTRE-COMPTE.github.io/curio/atelier.html` |
 | Le catalogue en lecture seule | `https://VOTRE-COMPTE.github.io/curio/catalogue.html` |
 | Les actions | `https://github.com/VOTRE-COMPTE/curio/actions` |
 | Vos réglages | `https://github.com/VOTRE-COMPTE/curio/tree/main/consignes` |
 
 **Pour essayer l'application comme un lecteur** : ajoutez `?pro=0` (gratuit),
-`?pro=sub` (abonné) ou `?pro=1` (achat à vie) à l'adresse de `app.html`. Le
+`?pro=sub` (abonné) ou `?pro=1` (achat à vie) à l'adresse de `app.html`.
+
+> **Dès que vous vendez, fermez cette porte.** Écrivez un mot dans `essai:`
+> de `consignes/paiement.txt` : l'essai devient `?essai=votre-mot`,
+> `?essai=votre-mot-avie` et `?essai=0`, et `?pro=` cesse d'ouvrir quoi que
+> ce soit. La console met ses trois liens à jour toute seule.
+
+Le
 réglage ne vaut que pour le navigateur qui ouvre le lien. Les trois liens sont
 aussi dans la console, onglet *Publication*.
 
@@ -170,6 +178,12 @@ sinon. **Importer une nouvelle version n'écrase donc aucun de vos réglages.**
 | `fr.md`, `en.md` | les consignes d'écriture — c'est là que se règle le style |
 | `reddit.txt` | les subreddits à moissonner (vide = Reddit ignoré) |
 | `ajouts.json` | des sujets qui ne viennent pas de Wikipédia |
+| `paiement.txt` | vos liens Polar, vos prix, l'adresse du vérificateur, votre mot d'essai, l'adresse publique du site |
+| `blog.txt` | le blog : l'interrupteur, le chemin, le rythme, ce qui est écrit sur les pages |
+
+**Tout se règle depuis la console**, onglet *6 · Publication* : le rythme, le
+nom, le logo, **le paiement** et **le blog**. Vous n'avez plus à créer un
+fichier à la main — mais vous pouvez toujours, le fichier reste la vérité.
 
 Le rythme, le nom, le logo, les langues et le sommaire se règlent **depuis la
 console**, sans toucher à un fichier.
@@ -184,12 +198,153 @@ files**, puis écrivez son chemin — `icones/logo.svg` par exemple. Vide, c'est
 le nom en toutes lettres. Une image nette de 400 px de large suffit ; le SVG
 est idéal.
 
-**L'icône de l'application installée** est un fichier à part. Remplacez
-`icones/curio-192.png`, `curio-512.png`, `curio-512-maskable.png` et
-`curio-180.png` par les vôtres, **aux mêmes noms et aux mêmes tailles**.
+**Déposer le fichier suffit.** Si vous ne remplissez pas le champ « logo »,
+la construction va chercher toute seule `icones/logo.svg` — puis `.png`,
+`.webp`, `.jpg`. *Add file → Upload files*, nommez-le `logo.svg`, et c'est
+fini.
+
+**L'icône de l'application installée** se refait aussi toute seule :
+*Actions → Entretien → **icones*** fabrique les quatre `curio-*.png` à partir
+de votre logo, aux bonnes tailles. Les anciennes sont recopiées dans
+`icones/avant-logo/`.
 
 Changer de nom ne casse rien pour vos lecteurs : leur collection, leurs
 favoris et leur formule sont rangés sous des clés qui ne changent pas.
+
+---
+
+## Vendre — le paiement, la clé, le stock
+
+### Le stock n'est plus public
+
+`anecdotes/` contient **toutes** vos fiches, y compris les 883 qui ne sont
+pas en ligne. Jusqu'à la 8.16 c'est ce dossier que le site servait, et le tri
+« en ligne » se faisait dans le navigateur : n'importe qui pouvait ouvrir
+l'adresse du fichier et lire le stock entier.
+
+Depuis la 8.17, le site sert `fiches/`, fabriqué par `tools/servir.mjs` à
+chaque publication. Il ne contient que le publié. `anecdotes/` reste la
+vérité, et se ferme :
+
+- **sur Cloudflare** : une règle Access sur `/anecdotes/*`, ou la ligne déjà
+  écrite dans `_redirects` ;
+- la vue Curation (`app.html?curation=1`) lit `anecdotes/`, donc elle a besoin
+  de l'Access — pas du blocage.
+
+À lancer à la main si vous avez modifié des fiches directement :
+*Actions → Entretien → **servir***.
+
+### L'essai de trois jours
+
+Un bouton sur l'écran d'achat : *« Essayez trois jours »*. Sans carte, sans
+compte. Sa durée se règle dans la console ; `0` l'éteint.
+
+Il ouvre tout — catalogue, recherche, sommaire, univers, pioche — **sauf la
+collection**. Ce n'est pas une restriction commerciale : on refuse de laisser
+quelqu'un ranger vingt anecdotes dans un tiroir qu'on lui reprend le quatrième
+jour. La collection reste visible dans le menu, avec un cadenas, et y toucher
+explique pourquoi.
+
+### Combien d'appareils par clé
+
+Une clé sans limite circule. Polar compte les **activations** : chaque appareil
+en consomme une, et le nombre se règle **dans Polar** — bénéfice *License
+Keys*, champ *Limit activations*. Mettez le même nombre dans la console, qui
+ne sert qu'au message affiché au lecteur.
+
+Au-delà, le lecteur libère un appareil depuis son espace client, tout seul.
+L'appareil libéré se referme à sa vérification suivante.
+
+### Installer sur mobile et sur ordinateur
+
+C'est le **navigateur** qui installe — ni Polar, ni un magasin d'applications.
+Un bouton *« Installer sur cet appareil »* vit dans le menu, et il est proposé
+juste après le paiement. Il affiche la marche à suivre de cet appareil-là :
+Safari cache l'installation derrière *Partager*, Chrome la propose tout seul,
+un ordinateur la met dans la barre d'adresse.
+
+Un abonné installe sur le nombre d'appareils que vous avez réglé dans Polar,
+avec la même clé.
+
+### La clé de licence
+
+Le lecteur achète chez **Polar**, qui lui donne une clé. L'application la fait
+vérifier par un petit programme Cloudflare — `worker/curio-api.js`, avec sa
+notice pas à pas dans `worker/LISEZ-MOI.txt`.
+
+- vérification **tous les sept jours**, pas à chaque ouverture ;
+- une **panne de réseau ne verrouille jamais** ;
+- une clé révoquée par Polar (résiliation, remboursement) ramène au gratuit à
+  la vérification suivante, en l'expliquant ;
+- au retour du paiement, l'application s'ouvre toute seule et **montre la clé**
+  avec un bouton copier.
+
+Tant que `verificateur:` est vide dans `consignes/paiement.txt`, rien de tout
+cela ne tourne et le produit se comporte comme avant.
+
+### Les prix
+
+Ils sont dans `consignes/paiement.txt`, plus dans le code. Un chiffre changé,
+*Entretien → reconstruire*, et c'est en ligne. Une formule sans lien de
+paiement ne s'affiche pas.
+
+---
+
+## L'atelier — la diffusion
+
+`atelier.html`, une page à part. **La console gère le catalogue et les fiches ;
+l'atelier gère ce qui en sort.** Deux métiers, deux pages.
+
+| onglet | ce qu'on y fait |
+|---|---|
+| **1 · Aujourd'hui** | ce qu'il y a à faire, et rien d'autre |
+| **2 · Visuels** | choisir une fiche, relire les trois phrases, télécharger |
+| **3 · La file** | les quatorze prochains jours |
+| **4 · Blog** | l'état du blog, en lecture seule |
+| **5 · Réglages** | le nom, le domaine, les mots-dièse, la phrase d'appel, les mots Pinterest |
+
+Six images par fiche : quatre planches de carrousel en 1080 × 1350, une story
+en 1080 × 1920, et une **épingle Pinterest** en 1000 × 1500. **L'aperçu *est*
+l'image** — il est simplement réduit à l'écran. Ce que vous voyez est ce qui
+sort.
+
+Deux textes, et ils ne se ressemblent pas : la **légende** (Instagram,
+Facebook) avec ses mots-dièse, et la **description Pinterest**, une phrase
+avec les mots qu'on cherche et le lien vers la page publique. Pinterest est un
+moteur de recherche déguisé en tableau d'images ; une épingle envoie du trafic
+pendant deux ans, contre vingt-quatre heures pour une publication Instagram.
+
+Il n'écrit rien au dépôt et ne publie à votre place nulle part : ce qui est
+marqué publié vit dans ce navigateur. Rien à synchroniser, rien à casser.
+
+**Fermez-la avec Cloudflare Access**, comme la console.
+
+---
+
+## Le blog — être trouvable
+
+Une page publique par fiche **déjà en ligne**, une par jour, avec tout ce
+qu'un moteur de recherche attend : texte entier, données structurées, cartes
+de partage, plan du site, flux RSS, huit pages d'univers.
+
+Il part **éteint**. Réglez `consignes/blog.txt`, écrivez `actif: oui`, et
+lancez *Actions → Entretien → **blog***. Ensuite il tourne tout seul, tous les
+jours, avec la publication.
+
+**Il ne publie jamais le stock** : il lit `fiches/`. Ce qui va sur le web
+ouvert est exactement ce que le lecteur gratuit voit déjà.
+
+**Avant de l'allumer**, deux choses :
+
+1. votre domaine doit être en place — des pages publiées sous une adresse
+   provisoire puis déplacées, c'est un référencement à refaire de zéro ;
+2. lancez *Entretien → **credits*** une fois. Les images de Wikimedia Commons
+   ne sont pas libres de droits : la plupart exigent l'auteur et la licence.
+   Le blog n'affiche une image que si elle est créditée.
+
+Et une fois en ligne : déposez `sitemap.xml` dans **Google Search Console** et
+dans **Bing Webmaster Tools**. C'est cinq minutes, et sans ça vous attendrez
+des mois de plus.
 
 ---
 
@@ -251,10 +406,18 @@ vers le billet d'origine.
 parts/          les sources — 00/10/20/30 pour l'application, L0/L1/L2 pour le site
 build.sh        recompose app.html et index.html, grave la version partout
 console.html    la console de pilotage        ← votre outil
+atelier.html    l'atelier de diffusion        ← votre autre outil
 catalogue.html  un tableau de bord en lecture seule
 tools/          moisson, écriture, contrôle, publication
 consignes/      vos réglages et vos consignes d'écriture
-anecdotes/      les fiches écrites, un fichier par langue et par univers
+anecdotes/      TOUTES vos fiches, stock compris — jamais servie au lecteur
+fiches/         ce que le site sert : les fiches EN LIGNE seulement
+histoires/      le blog — une page publique par fiche en ligne
+sitemap.xml     le plan du site, pour Google
+robots.txt      idem
+worker/         le vérificateur de clé, à coller dans Cloudflare
+_headers        les en-têtes du site (Cloudflare Pages)
+_redirects      ce que le site ne sert pas (Cloudflare Pages)
 icones/         l'icône de l'application installée, et votre logo
 github-workflows/  à recopier dans .github/workflows/
 ```
@@ -271,7 +434,8 @@ produit avant d'y toucher.
 
 ## Installation, si vous repartez de zéro
 
-1. Créez un dépôt **public** nommé `curio`.
+1. Créez un dépôt nommé `curio` — **public** si vous restez sur GitHub Pages,
+   privé si vous passez par Cloudflare Pages.
 2. Déposez tout le contenu du paquet à la racine — *Add file → Upload files*.
 3. *Settings → Pages* → Source : **Deploy from a branch**, branche `main`,
    dossier `/ (root)`.

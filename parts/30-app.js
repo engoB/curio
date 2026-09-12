@@ -84,7 +84,27 @@ const S = {
   lastDay:   LS.get('curio.lastDay', null),
   favs:      LS.get('curio.favs', []),
   seen:      LS.get('curio.seen', []),
-  onboarded: LS.get('curio.onboarded', false)
+  onboarded: LS.get('curio.onboarded', false),
+  /* ── LA CLÉ DE LICENCE ────────────────────────────────────────────────
+     cle    la clé Polar collée ou reçue au retour du paiement
+     exp    sa date d'expiration telle que Polar la donne (ou null : à vie)
+     verif  quand nous l'avons vérifiée pour la dernière fois (millisecondes)
+     Elles ne servent qu'à une chose : savoir s'il faut redemander. */
+  cle:       LS.get('curio.cle', ''),
+  cleExp:    LS.get('curio.cle.exp', null),
+  cleVerif:  LS.get('curio.cle.verif', 0),
+  /* L'identifiant de l'activation de CET appareil. Une clé s'active sur un
+     nombre limité d'appareils : c'est lui qui dit lequel. */
+  cleAct:    LS.get('curio.cle.act', ''),
+  /* ── L'ESSAI ──────────────────────────────────────────────────────────
+     essaiFin   quand il se termine (millisecondes). 0 = jamais commencé.
+     essaiPris  il a été pris une fois, et ne se reprend pas.
+     Il vit dans CE navigateur, comme tout le reste : sans compte lecteur,
+     c'est la seule mémoire dont on dispose. Quelqu'un qui vide son
+     navigateur peut le reprendre — c'est le prix de n'avoir aucun compte,
+     et c'est un prix qu'on paie volontiers. */
+  essaiFin:  LS.get('curio.essai.fin', 0),
+  essaiPris: LS.get('curio.essai.pris', false)
 };
 /* Minuit. Le tirage d'hier meurt — c'est tout le principe : ce qui était
    offert hier ne l'est plus. La MÉMOIRE, elle, survit : c'est elle qui empêche
@@ -614,12 +634,35 @@ function goOffline(){
   const t = $('#offlineTag'); if(t) t.classList.add('show');
 }
 
+/* ── OÙ LIRE LES FICHES ────────────────────────────────────────────────────
+   Deux dossiers, deux métiers :
+
+     fiches/      ce que le site sert : les anecdotes EN LIGNE, et rien
+                  d'autre. Fabriqué par tools/servir.mjs.
+     anecdotes/   la vérité complète, stock compris. Fermée au public par une
+                  règle Cloudflare Access, ouverte à vous.
+
+   La vue Curation est l'atelier : elle doit tout montrer, donc elle lit la
+   seconde. Tout le reste lit la première.
+
+   Elle relit le paramètre d'adresse plutôt que la constante CURATION, qui est
+   déclarée cent lignes plus bas : une `const` appelée par du code exécuté
+   plus tôt lève « Cannot access before initialization » et tue toute
+   l'application. Déclaration de fonction, et lecture directe. */
+function dossierFiches(){
+  try{
+    if(new URLSearchParams(location.search).get('curation') === '1')
+      return CONFIG.anecdotesSource || CONFIG.anecdotesDir;
+  }catch(e){}
+  return CONFIG.anecdotesDir;
+}
+
 /* ================= compteurs publics ================= */
 let STATS = null;
 async function loadStats(){
   if(!CONFIG.anecdotesDir) return;
   try{
-    const r = await fetch(CONFIG.anecdotesDir + '/index.json', { cache:'no-cache' });
+    const r = await fetch(dossierFiches() + '/index.json', { cache:'no-cache' });
     if(!r.ok) return;
     const j = await r.json();
     if(j && j.total){
@@ -753,7 +796,7 @@ async function loadWritten(lang, uni){
   let map = null;
   if(CONFIG.anecdotesDir){
     try{
-      const r = await fetch(CONFIG.anecdotesDir + '/' + lang + '-' + uni + '.json', { cache:'default' });
+      const r = await fetch(dossierFiches() + '/' + lang + '-' + uni + '.json', { cache:'default' });
       if(r.ok){
         const j = await r.json();
         if(j && j.items && Object.keys(j.items).length) map = filtrerPubliees(j.items);
@@ -1242,7 +1285,29 @@ async function fetchNext(){
    commence sur une anecdote qu'il n'a pas encore vue, tirée pour la journée.
    Le gratuit a ses cinq du jour ; celui qui paie ne doit pas avoir moins bien
    qu'un rendez-vous, il doit l'avoir sans compteur. */
-function estPremium(){ return S.plan === 'lifetime' || S.plan === 'paid' || S.plan === 'sub'; }
+/* ── DEUX NOTIONS, ET IL FAUT LES DISTINGUER ─────────────────────────────
+
+   estPremium()  a-t-on accès au catalogue ? — l'essai compte.
+   estAbonne()   a-t-on PAYÉ ? — l'essai ne compte pas.
+
+   La différence tient en une phrase : **la collection n'est pas ouverte
+   pendant l'essai.**
+
+   Un essayeur qui met vingt anecdotes de côté pendant trois jours les perd
+   toutes le quatrième. Ce n'est pas une restriction commerciale, c'est le
+   contraire : on refuse de lui faire ranger des choses dans un tiroir qu'on
+   va lui reprendre. Une fin d'essai qui efface un travail personnel laisse un
+   souvenir bien pire qu'une fin d'essai qui rend le catalogue.
+
+   Tout le reste — le catalogue entier, la recherche, le sommaire, le choix
+   des univers, la pioche — est ouvert pendant l'essai, et ne laisse rien
+   derrière lui quand il se referme. */
+function estPremium(){
+  return S.plan === 'lifetime' || S.plan === 'paid' || S.plan === 'sub' || S.plan === 'essai';
+}
+function estAbonne(){
+  return S.plan === 'lifetime' || S.plan === 'paid' || S.plan === 'sub';
+}
 
 /* Une clé au hasard dans tout le catalogue, en évitant ce qui a été lu
    récemment. `exclure` est un Set de titres déjà présents dans le flux. */
@@ -1618,7 +1683,9 @@ function buildCard(item, deplie){
   const bFav = el('button','ebtn ebtn--fav',
       '<svg viewBox="0 0 24 24"><path d="M6.5 3.5h11a1.5 1.5 0 011.5 1.5v15.2l-7-3.6-7 3.6V5a1.5 1.5 0 011.5-1.5z"/></svg>'
     + '<span class="lb">' + T()['act.keep'] + '</span>');
-  bFav.hidden = !estPremium();
+  /* Pendant l'essai, on ne peut RIEN mettre de côté : ce serait un tiroir
+     qu'on reprend trois jours plus tard. */
+  bFav.hidden = !estAbonne();
   bFav.addEventListener('click', e=>{ e.stopPropagation(); basculerFavori(item, node); });
 
   const bShare = el('button','ebtn',
@@ -1898,13 +1965,14 @@ function renderPlanTag(){
   const n2 = $('#planTag2');
   const nom = p === 'lifetime' ? T()['plan.life']
             : p === 'free'     ? T()['plan.free']
+            : p === 'essai'    ? T()['essai.badge'](joursDEssai())
             :                    T()['plan.paid'];   // sub, monthly, yearly
   /* La pastille portait le reste du jour, et le décomptait : c'était le
      second compteur à rebours, après la jauge. Elle ne dit plus que la
      formule ; le nombre offert vit à côté, dans « 5 anecdotes aujourd'hui »,
      et il ne bouge pas. */
   n.textContent = nom;
-  n.classList.toggle('paye', p === 'monthly' || p === 'yearly' || p === 'sub');
+  n.classList.toggle('paye', p === 'monthly' || p === 'yearly' || p === 'sub' || p === 'essai');
   n.classList.toggle('vie',  p === 'lifetime');
   n.classList.remove('bas');
   n.title = p === 'free' ? T()['plan.freeTip'] : T()['plan.paidTip'];
@@ -2042,12 +2110,65 @@ function applyPickedIfChanged(){
 })();
 
 /* ============================ tarifs ============================ */
+/* Une formule qu'on ne vend pas ne s'affiche pas. Si vous supprimez le
+   mensuel de consignes/paiement.txt — ce qui est raisonnable, les 50 centimes
+   fixes de Polar mangent 16 % d'un abonnement à 4,99 € — son encadré doit
+   disparaître de l'écran, pas rester à proposer un bouton mort.
+
+   Tant qu'AUCUN lien n'est réglé, on montre les trois : c'est la vitrine de
+   démonstration, et il faut bien qu'elle montre quelque chose. */
+function formulesVendues(){
+  const toutes = ['monthly','yearly','lifetime'];
+  const vendues = toutes.filter(k => String(CONFIG.checkout[k] || '').trim());
+  const l = vendues.length ? vendues : toutes;
+  /* Celle qu'on met en avant passe EN PREMIER. Sur un téléphone les encadrés
+     s'empilent, et le premier est le seul qu'on voie sans faire défiler :
+     l'y mettre est la moitié du travail de mise en avant. */
+  const a = formuleEnAvant();
+  return a && l.indexOf(a) > 0 ? [a].concat(l.filter(k => k !== a)) : l;
+}
+/* ── QUELLE FORMULE ON MET EN AVANT ──────────────────────────────────────
+   L'encadré en avant est celui qu'on choisit trois fois sur quatre. C'était
+   l'achat à vie ; c'est maintenant l'ANNUEL, et c'est le bon calcul : sur
+   4,99 € Polar prélève ~16 %, sur 39 € ~8 %. Douze mois d'abonnement annuel
+   rapportent autant que neuf mois de mensuel — et ne demandent qu'une seule
+   décision au lecteur.
+
+   Réglable par « mise-en-avant » dans consignes/paiement.txt : annuel,
+   mensuel, avie, ou aucune. */
+function formuleEnAvant(){
+  const v = String(CONFIG.miseEnAvant || 'annuel').toLowerCase();
+  if(v === 'mensuel') return 'monthly';
+  if(v === 'avie' || v === 'vie') return 'lifetime';
+  if(v === 'aucune' || v === 'non') return '';
+  return 'yearly';
+}
+/* L'économie de l'annuel, CALCULÉE — jamais écrite à la main. Un rabais
+   annoncé qui ne correspond pas aux prix affichés se voit tout de suite, et
+   c'est le genre de détail qui fait douter du reste. */
+function economieAnnuelle(){
+  const nb = (x)=> parseFloat(String(x||'').replace(',', '.').replace(/[^\d.]/g,''));
+  const m = nb(CONFIG.prices.monthly.amount), a = nb(CONFIG.prices.yearly.amount);
+  if(!m || !a || a >= m * 12) return 0;
+  return Math.round((1 - a / (m * 12)) * 100);
+}
 function renderPlans(){
+  peindreEssai();
   const box = $('#plans'); box.innerHTML = '';
-  ['monthly','yearly','lifetime'].forEach(k=>{
+  /* Le lien vers l'espace client, s'il est réglé. */
+  const lig = $('#portailLigne'), lien = $('#portailLien');
+  if(lig && lien){
+    const p = String(CONFIG.portail || '').trim();
+    if(p){ lien.href = p; lig.hidden = false; } else { lig.hidden = true; }
+  }
+  formulesVendues().forEach(k=>{
     const p = CONFIG.prices[k];
-    const card = el('div','plan' + (k==='lifetime' ? ' feature' : ''));
-    if(k === 'lifetime') card.appendChild(el('span','tag', T().planTag));
+    const avant = (k === formuleEnAvant());
+    const card = el('div','plan' + (avant ? ' feature' : ''));
+    if(avant){
+      const eco = (k === 'yearly') ? economieAnnuelle() : 0;
+      card.appendChild(el('span','tag', eco ? T()['plan.eco'](eco) : T().planTag));
+    }
     card.appendChild(el('h4', null, T().plansTitle[k]));
     card.appendChild(el('div','price',
       '<b>' + (S.lang==='fr' ? p.amount : p.amountEn) + '</b><span>' + (S.lang==='fr' ? p.unit : p.unitEn) + '</span>'));
@@ -2055,7 +2176,7 @@ function renderPlans(){
     T().planFeat[k].forEach(f => ul.appendChild(el('li', null,
       '<svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span>' + esc(f) + '</span>')));
     card.appendChild(ul);
-    const btn = el('button','btn ' + (k==='lifetime' ? 'btn--brass' : 'btn--primary') + ' btn--block', T().planCta[k]);
+    const btn = el('button','btn ' + (avant ? 'btn--brass' : 'btn--primary') + ' btn--block', T().planCta[k]);
     btn.addEventListener('click', ()=>{
       const link = CONFIG.checkout[k];
       if(link) window.open(link, '_blank', 'noopener');
@@ -2065,13 +2186,78 @@ function renderPlans(){
     box.appendChild(card);
   });
 }
+/* La clé collée à la main. Elle n'est PAS mise en majuscules : les clés de
+   Polar contiennent de l'hexadécimal minuscule, et l'ancien code les cassait
+   toutes en les passant en majuscules avant de les tester. */
+(function brancherEssai(){
+  const b = $('#essaiBtn'); if(!b) return;
+  b.addEventListener('click', commencerEssai);
+})();
+
 $('#keyBtn').addEventListener('click', ()=>{
-  const v = ($('#keyInput').value || '').trim().toUpperCase();
-  if(/^CURIO-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(v)){
-    unlock('lifetime');
-    close(); resetFeed(); toast(T().activated);
-  } else toast(T().badkey);
+  activerCle($('#keyInput').value, false);
 });
+$('#keyInput').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') activerCle($('#keyInput').value, false);
+});
+
+/* ── L'INSTALLATION, À LA DEMANDE ────────────────────────────────────────
+   Le bandeau d'invitation attend le bon moment — trois fiches lues, deux
+   minutes — et ne revient pas quand on l'a écarté. C'est le bon
+   comportement pour une invitation. Mais quelqu'un qui CHERCHE à installer
+   doit pouvoir le faire, et il n'avait aucun moyen.
+
+   Deux entrées, donc : le menu, et l'écran qui suit l'achat. Elles appellent
+   le même bandeau, avec la marche à suivre de SON téléphone — iOS ne
+   s'installe pas comme Android, et Android pas comme un ordinateur. */
+function brancherInstall(){
+  const menu = $('#instBtn');
+  if(menu){
+    menu.hidden = installe();
+    menu.addEventListener('click', ()=>{
+      close();
+      const t = $('#tbMore'); if(t) t.classList.remove('open');
+      proposerInstall(true);
+    });
+  }
+  const apres = $('#cleInstall');
+  if(apres){
+    apres.hidden = installe();
+    apres.addEventListener('click', ()=>{ close(); proposerInstall(true); });
+  }
+}
+
+/* Montrer la clé, avec de quoi la copier. Appelée juste après un
+   déverrouillage réussi, et jamais autrement : ce n'est pas un écran qu'on
+   visite, c'est un écran qui arrive au bon moment. */
+function montrerCle(){
+  if(!S.cle) return;
+  const n = $('#cleTexte'); if(!n) return;
+  n.textContent = S.cle;
+  const e = $('#cleExpire');
+  if(e){
+    const lignes = [];
+    if(S.cleExp) lignes.push((S.lang === 'fr' ? 'Valable jusqu’au ' : 'Valid until ')
+                             + String(S.cleExp).slice(0,10));
+    lignes.push(T()['cle.appareilsInfo'](CONFIG.appareils));
+    e.textContent = lignes.join(' · ');
+  }
+  open('#cleSheet');
+}
+(function copierCle(){
+  const b = $('#cleCopier'); if(!b) return;
+  b.addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(S.cle); toast(T()['cle.copiee']); }
+    catch(err){
+      /* Pas de presse-papiers (vieux Safari, page non sécurisée) : on
+         sélectionne le texte, l'appui long fera le reste. */
+      try{
+        const r = document.createRange(); r.selectNodeContents($('#cleTexte'));
+        const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      }catch(e2){}
+    }
+  });
+})();
 
 /* ============================ panneaux ============================ */
 function open(sel){ $(sel).classList.add('open'); document.body.style.overflow='hidden'; }
@@ -2090,7 +2276,7 @@ function estFavori(it){ return S.favs.some(f => (f.cle || f.url) === (cleFavori(
 
 function basculerFavori(it, node){
   if(!it) return;
-  if(!estPremium()){ open('#paywall'); return; }
+  if(!estAbonne()){ refuserCollection(); return; }
   const cle = cleFavori(it);
   const i = S.favs.findIndex(f => (f.cle || f.url) === (cle || it.url));
   if(i >= 0){ S.favs.splice(i,1); toast(T().unsaved); }
@@ -2108,13 +2294,36 @@ function basculerFavori(it, node){
   majCollection();
 }
 
+/* ── PARTAGER, C'EST ENVOYER QUELQU'UN QUELQUE PART ──────────────────────
+   Le partage envoyait l'adresse de l'application. Celui qui recevait le lien
+   tombait sur le flux du jour — pas sur l'anecdote dont on venait de lui
+   parler. Le bouche-a-oreille du produit ne menait nulle part.
+
+   Quand la fiche a une page au blog (champ `b`, ecrit par tools/blog.mjs),
+   c'est ELLE qu'on envoie : une page publique, lisible sans rien installer,
+   indexee par Google, et qui porte un bouton « ouvrir l'application ».
+
+   Et on envoie l'ACCROCHE avec, pas seulement le titre. « Signal Wow! » ne
+   donne envie a personne ; « En 1977, un radiotelescope de l'Ohio a capte
+   pendant 72 secondes… » se transfere tout seul. */
+function lienDePartage(it){
+  const base = String(CONFIG.site || '').replace(/\/+$/, '');
+  const f = it && writtenFor(S.lang, it.theme, it.article || it.title);
+  if(base && f && f.b) return base + '/histoires/' + f.b + '/';
+  return location.origin + location.pathname;
+}
+/* Exposee pour les essais automatises : elle n'est appelee par rien d'autre
+   et ne change aucun comportement. */
+window.__partage = (it)=>partager(it);
 async function partager(it){
   if(!it) return;
-  const lien = location.origin + location.pathname;
-  const payload = { title: '__MARQUE__ — ' + it.title, text: it.title, url: lien };
+  const lien = lienDePartage(it);
+  const f = writtenFor(S.lang, it.theme, it.article || it.title);
+  const accroche = (f && f.r) ? String(f.r).trim() : it.title;
+  const payload = { title: '__MARQUE__ — ' + it.title, text: accroche, url: lien };
   try{
     if(navigator.share){ await navigator.share(payload); return; }
-    await navigator.clipboard.writeText(it.title + ' — ' + lien);
+    await navigator.clipboard.writeText(accroche + '\n\n' + lien);
     toast(T().copied);
   }catch(e){ /* annule */ }
 }
@@ -2123,10 +2332,17 @@ function majCollection(){
   const d = $('#libDot');
   if(d) d.hidden = !S.favs.length;
 }
+/* On refuse la collection, et on dit POURQUOI. « Réservé aux abonnés » est
+   une porte fermée ; « elle vous suivrait, alors qu'un essai s'arrête » est
+   une raison. La deuxième convertit, la première agace. */
+function refuserCollection(){
+  open('#paywall');
+  toast(T()[S.plan === 'essai' ? 'coll.essai' : 'coll.libre']);
+}
 $('#libBtn').addEventListener('click', ()=>{
   /* Ceinture : même si le bouton réapparaissait, la collection reste une
-     contrepartie de l'abonnement. */
-  if(!estPremium()){ open('#paywall'); return; }
+     contrepartie de l'abonnement — et pas de l'essai. */
+  if(!estAbonne()){ refuserCollection(); return; }
   renderLib(); open('#libSheet');
 });
 function renderLib(){
@@ -2308,7 +2524,15 @@ function majPremium(){
      panneau. La feuille de style les éteint au-dessus de 1100 px, où la
      rangée dépliée les montre déjà. */
   const bb = $('#pioBar'); if(bb) bb.hidden = !p;
-  const l = $('#libBtn'); if(l) l.hidden = !p;
+  /* La collection reste VISIBLE pendant l'essai, et marquée d'un verrou.
+     La cacher laisserait croire qu'elle n'existe pas ; la montrer fermée
+     donne une raison de s'abonner. */
+  const l = $('#libBtn');
+  if(l){
+    l.hidden = !p;
+    l.classList.toggle('verrou', p && !estAbonne());
+    l.title = estAbonne() ? T()['opt.collection'] : T()['coll.essai'];
+  }
   /* Le choix des univers est une commande sur ce qu'on lit : en gratuit, les
      cinq du jour viennent des huit, et le bouton n'aurait rien à commander. */
   const u = $('#uniBtn'); if(u) u.hidden = !p;
@@ -3479,19 +3703,293 @@ function relock(){
   if(demarre) resetFeed();
   toast(T()['plan.back']);
 }
-/* ── ESSAYER LES TROIS FORMULES ────────────────────────────────────────────
-   Trois adresses, et rien à installer :
-     ?pro=1    comme un achat à vie
-     ?pro=sub  comme un abonné
-     ?pro=0    retour à la version gratuite
-   Le réglage s'écrit dans CE navigateur — celui qui ouvre le lien — et nulle
-   part ailleurs. La console les propose en toutes lettres dans son onglet
-   Publication, pour n'avoir pas à s'en souvenir. */
-(function testUnlock(){
-  const q = new URLSearchParams(location.search).get('pro');
-  if(q === '1' || q === 'true'){ unlock('lifetime'); }
-  else if(q === 'sub' || q === 'abo'){ unlock('sub'); }
-  else if(q === '0'){ relock(); }
+/* ═══════════════════════ LA CLÉ DE LICENCE ════════════════════════════════
+   Le produit n'a aucun compte lecteur et aucun serveur. C'est une force, et
+   c'est tout le problème du paiement : après l'achat, comment ce navigateur-
+   ci sait-il qu'il a payé ?
+
+   Jusqu'à la 8.16, il ne le savait pas. unlock() écrivait « payé » dans le
+   stockage local et c'était tout ; ?pro=1 ouvrait l'application à qui
+   connaissait l'adresse. C'était un rappel poli, pas une serrure.
+
+   Depuis la 8.17 : Polar délivre une clé à l'achat. L'application la fait
+   vérifier par le petit programme Cloudflare dont l'adresse est dans
+   consignes/paiement.txt. Polar révoque la clé tout seul quand l'abonnement
+   s'arrête, et l'application le voit à la vérification suivante.
+
+   TROIS RÈGLES, et elles comptent :
+
+   1. On vérifie tous les SEPT jours, pas à chaque ouverture. Entre deux,
+      l'application ne demande rien au réseau — elle reste utilisable dans le
+      métro, comme avant.
+
+   2. UNE PANNE DE RÉSEAU NE VERROUILLE JAMAIS. Si le vérificateur ne répond
+      pas, on garde l'accès et on redemandera la prochaine fois. On ne punit
+      pas quelqu'un qui a payé parce que son Wi-Fi est mauvais. Seule une
+      réponse claire — « révoquée », « expirée », « inconnue » — referme.
+
+   3. Une date d'expiration passée, elle, referme sans réseau : la date est
+      connue, ce n'est pas un jugement, c'est un calendrier.              */
+
+const CLE_JOURS = 7;
+
+/* ═══════════════════════ L'ESSAI DE TROIS JOURS ═══════════════════════════
+   Sans carte, sans compte, sans rien. On appuie, et tout s'ouvre.
+
+   Pourquoi pas l'essai de Polar ? Parce qu'il demande une carte bancaire
+   avant d'avoir rien montré, et que c'est exactement le geste que quelqu'un
+   qui vient de découvrir l'application ne fera pas. Celui-ci ne coûte rien à
+   personne : le catalogue est déjà dans le navigateur, l'ouvrir trois jours
+   ne consomme aucune ressource.
+
+   Il se prend UNE fois par navigateur. Quelqu'un qui efface ses données peut
+   le reprendre : c'est le prix de n'avoir aucun compte lecteur, et c'est un
+   prix qu'on paie volontiers pour ne rien avoir à protéger.
+
+   Sa durée se règle dans consignes/paiement.txt (« essai-jours »). Zéro
+   l'éteint : le bloc disparaît de l'écran d'achat. */
+function dureeEssai(){
+  const n = parseInt(CONFIG.essaiJours, 10);
+  return isNaN(n) ? 3 : Math.max(0, n);
+}
+function essaiPossible(){
+  return dureeEssai() > 0 && !S.essaiPris && S.plan === 'free';
+}
+function joursDEssai(){
+  if(!S.essaiFin) return 0;
+  return Math.max(0, Math.ceil((S.essaiFin - Date.now()) / 864e5));
+}
+function essaiFini(){
+  return S.plan === 'essai' && S.essaiFin && Date.now() > S.essaiFin;
+}
+function commencerEssai(){
+  if(!essaiPossible()) return;
+  S.essaiFin  = Date.now() + dureeEssai() * 864e5;
+  S.essaiPris = true;
+  LS.set('curio.essai.fin', S.essaiFin);
+  LS.set('curio.essai.pris', true);
+  unlock('essai');
+  close(); resetFeed();
+  toast(T()['essai.ouvert'](dureeEssai()));
+  peindreEssai();
+}
+/* La fin de l'essai. Elle ne se produit qu'à l'ouverture de l'application —
+   on ne coupe jamais la lecture de quelqu'un au milieu d'une fiche. */
+function verifierEssai(){
+  if(!essaiFini()) return false;
+  S.essaiFin = 0; LS.set('curio.essai.fin', 0);
+  relock();
+  toast(T()['essai.fini']);
+  open('#paywall');
+  return true;
+}
+function peindreEssai(){
+  const bloc = $('#essaiBloc'); if(!bloc) return;
+  bloc.hidden = !essaiPossible();
+  const t = $('#essaiTitre');
+  if(t) t.textContent = T()['essai.titre'](dureeEssai());
+}
+
+function memoriserCle(cle, exp, act){
+  S.cle = cle || ''; S.cleExp = exp || null; S.cleVerif = Date.now();
+  if(act !== undefined) S.cleAct = act || '';
+  LS.set('curio.cle', S.cle);
+  LS.set('curio.cle.exp', S.cleExp);
+  LS.set('curio.cle.verif', S.cleVerif);
+  LS.set('curio.cle.act', S.cleAct);
+}
+function oublierCle(){
+  S.cle = ''; S.cleExp = null; S.cleVerif = 0; S.cleAct = '';
+  LS.del('curio.cle'); LS.del('curio.cle.exp');
+  LS.del('curio.cle.verif'); LS.del('curio.cle.act');
+}
+
+/* ── QUEL APPAREIL ? ─────────────────────────────────────────────────────
+   L'étiquette que le client verra dans son espace client quand il devra
+   libérer un appareil. Elle doit lui permettre de reconnaître LEQUEL — donc
+   des mots, pas un identifiant : « Safari sur iPhone · 8 sept. ». */
+function nomDeLAppareil(){
+  const ua = navigator.userAgent;
+  const sys = /iPhone/.test(ua) ? 'iPhone'
+            : /iPad/.test(ua) ? 'iPad'
+            : /Android/.test(ua) ? 'Android'
+            : /Mac OS X/.test(ua) ? 'Mac'
+            : /Windows/.test(ua) ? 'Windows'
+            : /Linux/.test(ua) ? 'Linux' : 'appareil';
+  const nav = /Edg\//.test(ua) ? 'Edge'
+            : /OPR\//.test(ua) ? 'Opera'
+            : /Firefox/.test(ua) ? 'Firefox'
+            : /Chrome/.test(ua) ? 'Chrome'
+            : /Safari/.test(ua) ? 'Safari' : 'navigateur';
+  const d = new Date();
+  return nav + ' sur ' + sys + ' · ' + d.getDate() + '/' + (d.getMonth() + 1);
+}
+
+/* Activer : c'est ce qui consomme une place d'appareil chez Polar. On ne le
+   fait qu'UNE fois, quand la clé arrive. Les vérifications suivantes ne
+   réactivent rien — sinon chaque semaine mangerait une place. */
+async function demanderActivation(cle){
+  const base = verificateur();
+  if(!base) return { etat:'sans-verificateur' };
+  try{
+    const r = await fetch(base + '/activer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cle: cle, appareil: nomDeLAppareil() })
+    });
+    if(!r.ok) return { etat: 'reseau' };
+    const j = await r.json();
+    return (j && j.etat) ? j : { etat: 'reseau' };
+  }catch(e){ return { etat: 'reseau' }; }
+}
+function verificateur(){
+  return String(CONFIG.verificateur || '').replace(/\/+$/, '');
+}
+
+/* Demande au vérificateur. Il répond
+   { etat:'ok'|'revoquee'|'expiree'|'inconnue', plan:'sub'|'lifetime', expire }
+   et nous ajoutons 'reseau' quand nous n'avons pas pu demander, et
+   'sans-verificateur' quand aucune adresse n'est réglée. */
+async function demanderCle(cle){
+  const base = verificateur();
+  if(!base) return { etat:'sans-verificateur' };
+  try{
+    const r = await fetch(base + '/verifier', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cle: cle, activation: S.cleAct || '' })
+    });
+    if(!r.ok) return { etat: 'reseau' };
+    const j = await r.json();
+    if(!j || !j.etat) return { etat: 'reseau' };
+    return j;
+  }catch(e){ return { etat: 'reseau' }; }
+}
+
+/* Sans vérificateur réglé, on garde l'ancien comportement : une clé qui a la
+   bonne forme ouvre. C'est ce qu'il faut tant que rien n'est branché, et ce
+   n'est évidemment pas une serrure. */
+function formeDeCle(v){
+  return /^[A-Za-z0-9]{3,}[-_][A-Za-z0-9-]{4,}$/.test(String(v || '').trim());
+}
+
+async function activerCle(cle, discret){
+  cle = String(cle || '').trim();
+  if(!cle) return false;
+
+  if(!verificateur()){
+    if(formeDeCle(cle)){
+      memoriserCle(cle, null); unlock('lifetime');
+      close(); resetFeed(); toast(T().activated); montrerCle();
+      return true;
+    }
+    toast(T().badkey); return false;
+  }
+
+  if(!discret) toast(T()['cle.verif']);
+  /* Une clé qui arrive sur un appareil neuf s'ACTIVE : c'est ce geste-là qui
+     consomme une des places. Une clé déjà activée ici se contente d'une
+     vérification. */
+  const rep = (S.cle === cle && S.cleAct)
+            ? await demanderCle(cle)
+            : await demanderActivation(cle);
+
+  if(rep.etat === 'ok'){
+    memoriserCle(cle, rep.expire || null,
+                 rep.activation !== undefined ? rep.activation : S.cleAct);
+    unlock(rep.plan === 'lifetime' ? 'lifetime' : 'sub');
+    close(); resetFeed(); toast(T()['cle.ok']); montrerCle();
+    return true;
+  }
+  if(rep.etat === 'trop-d-appareils'){ toast(T()['cle.appareils'](CONFIG.appareils)); return false; }
+  if(rep.etat === 'reseau'){ toast(T()['cle.reseau']); return false; }
+  if(rep.etat === 'expiree'){ toast(T()['cle.expiree']); return false; }
+  if(rep.etat === 'revoquee'){ toast(T()['cle.revoquee']); return false; }
+  toast(T()['cle.inconnue']);
+  return false;
+}
+
+/* La revérification silencieuse, au lancement. Elle ne parle que pour
+   annoncer une mauvaise nouvelle, et jamais pour une panne de réseau. */
+async function reverifierCle(){
+  if(!S.cle) return;
+
+  /* Le calendrier d'abord : il n'a besoin de personne. */
+  if(S.cleExp && String(S.cleExp).slice(0,10) < today()){
+    oublierCle(); relock(); toast(T()['cle.expiree']); return;
+  }
+  if(!verificateur()) return;
+  if(Date.now() - (S.cleVerif || 0) < CLE_JOURS * 864e5) return;
+
+  const rep = await demanderCle(S.cle);
+  if(rep.etat === 'ok'){
+    memoriserCle(S.cle, rep.expire || null);
+    if(!estAbonne()) unlock(rep.plan === 'lifetime' ? 'lifetime' : 'sub');
+    return;
+  }
+  /* L'appareil a été libéré depuis l'espace client, pour en équiper un
+     autre. On referme celui-ci, en le disant. */
+  if(rep.etat === 'trop-d-appareils'){
+    oublierCle(); relock(); toast(T()['cle.liberee']); return;
+  }
+  /* Pas de réponse : on ne touche à rien. On redemandera. */
+  if(rep.etat === 'reseau' || rep.etat === 'sans-verificateur') return;
+
+  oublierCle(); relock();
+  toast(T()[rep.etat === 'expiree' ? 'cle.expiree' : 'cle.revoquee']);
+}
+
+/* ── LE RETOUR DE PAIEMENT ────────────────────────────────────────────────
+   Polar renvoie l'acheteur vers le vérificateur, qui le renvoie ici avec sa
+   clé dans le FRAGMENT de l'adresse : app.html#cle=…
+
+   Le fragment, et pas le paramètre : il n'est jamais envoyé au serveur, il
+   n'entre pas dans les journaux, et il ne part pas dans l'en-tête Referer
+   vers Wikipédia à la première image chargée. On l'efface de la barre
+   d'adresse aussitôt lu. */
+function cleDeLAdresse(){
+  let v = '';
+  try{
+    const h = new URLSearchParams(String(location.hash || '').replace(/^#/, ''));
+    v = h.get('cle') || h.get('key') || '';
+    if(!v) v = new URLSearchParams(location.search).get('cle') || '';
+  }catch(e){}
+  return String(v || '').trim();
+}
+function effacerCleDeLAdresse(){
+  try{
+    const u = new URL(location.href);
+    u.hash = ''; u.searchParams.delete('cle');
+    history.replaceState(null, '', u.pathname + u.search);
+  }catch(e){}
+}
+
+/* ── ESSAYER LES TROIS FORMULES, SANS OUVRIR LA PORTE À TOUT LE MONDE ──────
+   ?pro=1 ouvrait l'application à quiconque connaissait l'adresse. Tant que
+   rien n'était vendu, c'était un outil d'essai ; à partir du moment où on
+   vend, c'est une porte laissée ouverte.
+
+   Réglez « essai: unmotavous » dans consignes/paiement.txt et l'essai devient
+     ?essai=unmotavous        comme un abonné
+     ?essai=unmotavous-avie   comme un achat à vie
+     ?essai=0                 retour au gratuit
+   Tant que ce réglage est vide, ?pro= continue de marcher comme avant. */
+(function essai(){
+  const q = new URLSearchParams(location.search);
+  const mot = String(CONFIG.essai || '').trim();
+
+  if(mot){
+    const e = q.get('essai');
+    if(e === '0'){ relock(); return; }
+    if(e === mot){ unlock('sub'); return; }
+    if(e === mot + '-avie'){ unlock('lifetime'); return; }
+    return;                       // ?pro= ne fait plus rien
+  }
+
+  const p = q.get('pro');
+  if(p === '1' || p === 'true'){ unlock('lifetime'); }
+  else if(p === 'sub' || p === 'abo'){ unlock('sub'); }
+  else if(p === '0'){ relock(); }
 })();
 
 /* La version est gravée dans une balise <meta> par build.sh : on l'affiche
@@ -3512,6 +4010,7 @@ function relock(){
   if(b) b.title = '__MARQUE__ ' + v + ' — revenir à l’accueil';
 })();
 
+brancherInstall();
 $('#streakN').textContent = S.streak;
 applyTheme(); applyLang(); langueUnique(); majNomTheme(); renderPlans(); renderUniverses(); renderQuota(); renderTocCount(); majPioche();
 
@@ -3568,8 +4067,12 @@ window.addEventListener('beforeinstallprompt', e=>{
    pour toujours : elle revient une semaine après, trois fois au maximum.
    Passé la troisième, on ne redemande plus jamais. */
 function proposerInstall(force){
-  if(installe()) return;
-  if(document.querySelector('.install')) return;
+  if(installe()){ if(force) toast(T()['inst.deja']); return; }
+  /* Demandé à la main : on efface le bandeau en place plutôt que de ne rien
+     faire — sans quoi appuyer sur « Installer » n'a aucun effet visible, et
+     on appuie trois fois. */
+  const vieux = document.querySelector('.install');
+  if(vieux){ if(!force) return; vieux.remove(); }
 
   const ua = navigator.userAgent;
   const iOS = /iP(hone|ad|od)/.test(ua)
@@ -3660,6 +4163,25 @@ Promise.all([loadStats(), loadCatalog()]).finally(()=>{
   demarre = true;
   if(!S.onboarded){ open('#onboard'); ensureAhead(); }
   else { resetFeed(); }
+
+  /* ── LA CLÉ, EN DERNIER ────────────────────────────────────────────────
+     L'application est déjà à l'écran : le déverrouillage se voit tout de
+     suite, au lieu d'une page blanche pendant qu'on interroge le réseau.
+
+     Quelqu'un qui revient de Polar n'a pas à subir l'écran d'accueil : il
+     vient de payer, il a déjà décidé. */
+  /* L'essai d'abord : s'il est fini, on referme avant de demander quoi que
+     ce soit au réseau. */
+  verifierEssai();
+
+  const recue = cleDeLAdresse();
+  if(recue){
+    effacerCleDeLAdresse();
+    S.onboarded = true; LS.set('curio.onboarded', true);
+    activerCle(recue, true);
+  }else{
+    reverifierCle();
+  }
 });
 })();
 </script>

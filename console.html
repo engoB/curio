@@ -387,7 +387,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
          pouvait dire si le correctif était en place ou si le navigateur
          servait encore l'ancien fichier. La version est écrite ici par
          build.sh, à côté du titre, en petit. -->
-    <h1>Curio &middot; console<b class="ver" id="conVer">8.16.1</b></h1><!-- BUILD:CONSOLE -->
+    <h1>Curio &middot; console<b class="ver" id="conVer">8.21.0</b></h1><!-- BUILD:CONSOLE -->
 
     <!-- ── LES ÉTAPES, DANS L'ORDRE OÙ ON LES FAIT ──────────────────────
          Trois onglets nommés par leur contenu ne disaient pas par où
@@ -815,6 +815,157 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;back
       </div>
     </div>
 
+    <!-- ══ LE PAIEMENT ═══════════════════════════════════════════════════
+         Il vivait dans consignes/paiement.txt, qu'il fallait créer à la main
+         sur GitHub. C'était la dernière chose du produit qui demandait
+         d'aller éditer un fichier — donc la dernière à corriger. -->
+    <div class="reglages" style="margin-bottom:16px">
+      <h3>Le paiement</h3>
+      <p>Vos liens Polar, vos prix, votre essai. Rien de secret ici : ce sont des adresses
+         publiques, gravées dans la page. <b>Votre jeton Polar ne va pas là</b> — il va dans
+         les secrets de Cloudflare, comme <code>ANTHROPIC_API_KEY</code> va dans ceux de GitHub.</p>
+      <div class="champs">
+        <div>
+          <label for="pSite">L’adresse publique du site</label>
+          <input type="text" id="pSite" placeholder="https://mon-domaine.com">
+        </div>
+        <div>
+          <label for="pVerif">Le vérificateur de clé (le Worker Cloudflare)</label>
+          <input type="text" id="pVerif" placeholder="https://mon-domaine.com/api">
+        </div>
+        <div>
+          <label for="pPortail">L’espace client Polar</label>
+          <input type="text" id="pPortail" placeholder="https://polar.sh/mon-orga/portal">
+        </div>
+      </div>
+      <div class="champs">
+        <div>
+          <label for="pLienM">Lien de paiement — mensuel</label>
+          <input type="text" id="pLienM" placeholder="https://buy.polar.sh/…">
+        </div>
+        <div>
+          <label for="pLienA">Lien de paiement — annuel</label>
+          <input type="text" id="pLienA" placeholder="laisser vide = formule non vendue">
+        </div>
+        <div>
+          <label for="pLienV">Lien de paiement — à vie</label>
+          <input type="text" id="pLienV" placeholder="laisser vide = formule non vendue">
+        </div>
+      </div>
+      <div class="champs">
+        <div>
+          <label for="pPrixM">Prix mensuel affiché</label>
+          <input type="text" id="pPrixM" placeholder="4,99">
+        </div>
+        <div>
+          <label for="pPrixA">Prix annuel affiché</label>
+          <input type="text" id="pPrixA" placeholder="39">
+        </div>
+        <div>
+          <label for="pPrixV">Prix à vie affiché</label>
+          <input type="text" id="pPrixV" placeholder="79">
+        </div>
+      </div>
+      <div class="champs">
+        <div>
+          <label for="pEssaiJours">Essai gratuit du lecteur, en jours</label>
+          <input type="text" id="pEssaiJours" placeholder="3">
+        </div>
+        <div>
+          <label for="pAvant">Formule mise en avant</label>
+          <select id="pAvant">
+            <option value="annuel">l’annuel</option>
+            <option value="mensuel">le mensuel</option>
+            <option value="avie">l’achat à vie</option>
+            <option value="aucune">aucune</option>
+          </select>
+        </div>
+        <div>
+          <label for="pAppareils">Appareils par clé <b>(à régler aussi dans Polar)</b></label>
+          <input type="text" id="pAppareils" placeholder="3">
+        </div>
+        <div>
+          <label for="pEssai">Votre mot d’essai privé (remplace ?pro=1)</label>
+          <input type="text" id="pEssai" placeholder="un mot à vous">
+        </div>
+      </div>
+      <p class="quand"><b>Les appareils par clé se règlent à DEUX endroits :</b> ici pour le
+         message affiché au lecteur, et dans Polar — bénéfice <i>License Keys</i>, champ
+         <i>Limit activations</i> — pour la vraie limite. Mettez le même nombre, sinon le
+         message ment.<br><br>
+         Les prix écrits ici sont ceux <b>affichés</b>. Les vrais sont ceux de
+         Polar : si vous changez ici sans changer là-bas, vous mentez à vos lecteurs.
+         Polar prend 5 % + 0,50 $, plus 1,5 % pour une carte française — soit ~16 % sur
+         4,99 € et ~8 % sur 39 €.</p>
+      <div class="cmd" style="margin:14px 0 0">
+        <button class="btn p" id="paEnregistrer">Enregistrer et reconstruire le site</button>
+      </div>
+    </div>
+
+    <!-- ══ LE BLOG ══════════════════════════════════════════════════════ -->
+    <div class="reglages" style="margin-bottom:16px">
+      <h3>Le blog</h3>
+      <p>Une page publique par fiche <b>déjà en ligne</b>, pour exister sur Google.
+         Il ne publie jamais votre stock. Il part éteint : allumez-le quand votre domaine
+         est en place — des pages publiées sous une adresse provisoire puis déplacées,
+         c’est un référencement à refaire de zéro.</p>
+      <div class="champs">
+        <div>
+          <label for="bActif">Le blog</label>
+          <select id="bActif">
+            <option value="non">éteint</option>
+            <option value="oui">allumé</option>
+          </select>
+        </div>
+        <div>
+          <label for="bDemarrage">Pages au premier passage</label>
+          <input type="text" id="bDemarrage" placeholder="40">
+        </div>
+        <div>
+          <label for="bRythme">Pages par jour ensuite</label>
+          <input type="text" id="bRythme" placeholder="1">
+        </div>
+      </div>
+      <div class="champs">
+        <div>
+          <label for="bOrdre">Dans quel ordre</label>
+          <select id="bOrdre">
+            <option value="potentiel">les mieux notées d’abord</option>
+            <option value="date">dans l’ordre de mise en ligne</option>
+            <option value="hasard">au hasard</option>
+          </select>
+        </div>
+        <div>
+          <label for="bImages">Les photos</label>
+          <select id="bImages">
+            <option value="non">pas de photo</option>
+            <option value="oui">photos créditées</option>
+          </select>
+        </div>
+        <div>
+          <label for="bVoisines">Fiches voisines en bas de page</label>
+          <input type="text" id="bVoisines" placeholder="3">
+        </div>
+      </div>
+      <div class="champs">
+        <div>
+          <label for="bTitre">Le titre du blog</label>
+          <input type="text" id="bTitre" placeholder="Les histoires">
+        </div>
+        <div>
+          <label for="bDesc">Sa description</label>
+          <input type="text" id="bDesc" placeholder="Des anecdotes vraies et étonnantes.">
+        </div>
+      </div>
+      <p class="quand">Les photos partent <b>éteintes</b>, et c’est le bon réglage : les images
+         de Wikimedia ne sont pas libres de droits, et la plupart exigent la mention de
+         l’auteur. Le dossier des pages est <code>histoires/</code> ; il ne se change plus une
+         fois des pages publiées.</p>
+      <div class="cmd" style="margin:14px 0 0">
+        <button class="btn p" id="blEnregistrer">Enregistrer les réglages du blog</button>
+      </div>
+    </div>
+
     <!-- ══ CHOISIR CE QUI SORT MAINTENANT ═══════════════════════════════
          Le rythme sert au quotidien. Mais il arrive qu'on veuille sortir
          CEUX-LÀ : les trois qui vont avec l'actualité, la série qu'on a
@@ -1061,8 +1212,9 @@ function chargerTout(){
   }).then(function(){
     return S.cfg.token ? chargerDecisions() : null;
   }).then(function(){
-    return S.cfg.token ? Promise.all([lirePublication(), lireMoisson(), lireMarque()])
-                       : Promise.all([lirePublicationLocale(), lireMarqueLocale()]);
+    return S.cfg.token ? Promise.all([lirePublication(), lireMoisson(), lireMarque(),
+                                        lirePaiement(), lirePaiement2(), lireBlog()])
+                       : Promise.all([lirePublicationLocale(), lireMarqueLocale(), lirePaiementLocale()]);
   }).then(function(){
     calculerEcrites();
     peindreCat(); peindreRel(); peindrePied();
@@ -2385,6 +2537,210 @@ function analyserMarque(texte){
     else if(k==='logo') MQ.logo=v;
   });
 }
+/* ── LE PAIEMENT ────────────────────────────────────────────────────────
+   La console n'a besoin que de deux choses de consignes/paiement.txt :
+   le mot d'essai — sans lui les trois liens d'essai pointent sur un ?pro=
+   qui ne fait plus rien — et l'adresse publique du site, qui n'est plus
+   forcement github.io une fois le domaine en place.
+
+   Une seule definition de l'essai dans tout le produit : celle du fichier.
+   C'est la regle qui a coute le plus cher quand elle a ete enfreinte. */
+var PAIE = { essai:'', site:'', sha:null };
+function ligneDe(t, cle){
+  var m = String(t||'').match(new RegExp('^\\s*' + cle + '\\s*:\\s*(.*)$','m'));
+  return m ? String(m[1]).trim() : '';
+}
+function analyserPaiement(t){
+  PAIE.essai = ligneDe(t, 'essai');
+  PAIE.site  = ligneDe(t, 'site').replace(/\/+$/, '');
+  peindreEssais();
+}
+function lirePaiement(){
+  return lireAvecExemple('paiement').then(function(r){
+    PAIE.sha = r.sha; analyserPaiement(r.texte);
+  }).catch(function(){});
+}
+function lirePaiementLocale(){
+  return localTexte('consignes/paiement.txt').then(function(t){
+    if(t && /^\s*[\w-]+\s*:/m.test(t)){ analyserPaiement(t); return; }
+    return localTexte('consignes/paiement.exemple.txt').then(analyserPaiement);
+  }).catch(function(){});
+}
+
+/* ── LES DEUX FICHIERS QU'ON EDITAIT ENCORE A LA MAIN ────────────────────
+   consignes/paiement.txt et consignes/blog.txt etaient les derniers reglages
+   du produit qui obligeaient a aller creer un fichier sur GitHub. Ils se
+   remplissent ici, comme le rythme et la marque, et la console les ecrit.
+
+   Un principe, et il tient tout le produit : le fichier reste la verite. La
+   console le lit, le reecrit en entier avec ses commentaires, et rien
+   d'autre. Vous pouvez continuer a l'editer a la main si vous preferez. */
+var PA2 = { sha:null, v:{} };
+var BL  = { sha:null, v:{} };
+
+function valeursDe(t){
+  var out = {};
+  String(t||'').split('\n').forEach(function(l){
+    if(/^\s*#/.test(l)) return;
+    var m = l.match(/^\s*([\w-]+)\s*:\s*(.*)$/);
+    if(m) out[m[1]] = m[2].trim();
+  });
+  return out;
+}
+function litVal(o, k, d){ return (o && o[k]) ? o[k] : (d || ''); }
+
+function peindrePaiement(){
+  var v = PA2.v;
+  /* Un champ vide au premier passage laisse croire que le reglage n'existe
+     pas. On remet les valeurs par defaut du produit — les memes que celles
+     gravees dans l'application quand le fichier est muet : une seule
+     definition, meme quand elle est implicite. */
+  var mets = { pSite:['site',''], pVerif:['verificateur',''], pPortail:['portail',''],
+               pLienM:['lien-mensuel',''], pLienA:['lien-annuel',''], pLienV:['lien-avie',''],
+               pPrixM:['prix-mensuel','4,99'], pPrixA:['prix-annuel','39'],
+               pPrixV:['prix-avie','79'],
+               pEssaiJours:['essai-jours','3'], pEssai:['essai',''],
+               pAvant:['mise-en-avant','annuel'], pAppareils:['appareils','3'] };
+  Object.keys(mets).forEach(function(id){
+    var n = $('#'+id); if(n) n.value = litVal(v, mets[id][0], mets[id][1]);
+  });
+  /* Le mot d'essai commande les trois liens d'essai plus haut : on les
+     rafraichit des qu'il change, pour n'avoir jamais deux verites. */
+  PAIE.essai = litVal(v,'essai',''); PAIE.site = litVal(v,'site','').replace(/\/+$/,'');
+  peindreEssais();
+}
+function peindreBlog(){
+  var v = BL.v;
+  var sel = { bActif:['actif','non'], bOrdre:['ordre','potentiel'], bImages:['images','non'] };
+  Object.keys(sel).forEach(function(id){
+    var n = $('#'+id); if(n) n.value = litVal(v, sel[id][0], sel[id][1]);
+  });
+  var txt = { bDemarrage:['demarrage','40'], bRythme:['rythme','1'],
+              bVoisines:['voisines','3'], bTitre:['titre','Les histoires'],
+              bDesc:['description',''] };
+  Object.keys(txt).forEach(function(id){
+    var n = $('#'+id); if(n) n.value = litVal(v, txt[id][0], txt[id][1]);
+  });
+}
+
+function lirePaiement2(){
+  return lireAvecExemple('paiement').then(function(r){
+    PA2.sha = r.sha; PA2.v = valeursDe(r.texte); peindrePaiement();
+  }).catch(function(){});
+}
+function lireBlog(){
+  return lireAvecExemple('blog').then(function(r){
+    BL.sha = r.sha; BL.v = valeursDe(r.texte); peindreBlog();
+  }).catch(function(){});
+}
+
+function textePaiement(){
+  function q(id){ var n=$('#'+id); return n ? n.value.trim() : ''; }
+  return '# ═══════════════════════════════════════════════════════════════════\n'
+   + '# PAIEMENT — écrit par console.html\n'
+   + '# ═══════════════════════════════════════════════════════════════════\n'
+   + '#\n'
+   + '# Rien ici n’est secret : ce sont des adresses publiques, gravées dans\n'
+   + '# app.html. VOTRE JETON POLAR NE VA PAS ICI — il va dans les secrets de\n'
+   + '# Cloudflare, comme ANTHROPIC_API_KEY va dans ceux de GitHub.\n\n'
+   + '# L’adresse publique du site, sans barre oblique finale.\n'
+   + 'site: ' + q('pSite') + '\n\n'
+   + '# Le vérificateur de clé — le Worker de worker/curio-api.js.\n'
+   + '# Vide : aucune vérification, comme avant la 8.17.\n'
+   + 'verificateur: ' + q('pVerif') + '\n\n'
+   + '# Les liens de paiement Polar. Vide = formule non vendue, son encadré\n'
+   + '# disparaît de l’écran d’achat.\n'
+   + '# Adresse de retour à régler dans Polar, pour chacun :\n'
+   + '#   https://VOTRE-DOMAINE/api/retour?checkout_id={CHECKOUT_ID}\n'
+   + 'lien-mensuel: ' + q('pLienM') + '\n'
+   + 'lien-annuel: '  + q('pLienA') + '\n'
+   + 'lien-avie: '    + q('pLienV') + '\n\n'
+   + '# L’espace client Polar : c’est là qu’un lecteur retrouve sa clé.\n'
+   + 'portail: ' + q('pPortail') + '\n\n'
+   + '# Les prix AFFICHÉS. Les vrais sont ceux de Polar.\n'
+   + 'prix-mensuel: ' + q('pPrixM') + '\n'
+   + 'unite-mensuel: € / mois\n'
+   + 'unite-mensuel-en: € / month\n'
+   + 'prix-annuel: ' + q('pPrixA') + '\n'
+   + 'unite-annuel: € / an\n'
+   + 'unite-annuel-en: € / year\n'
+   + 'prix-avie: ' + q('pPrixV') + '\n'
+   + 'unite-avie: € une fois\n'
+   + 'unite-avie-en: € once\n\n'
+   + '# L’essai gratuit du lecteur, en jours. 0 l’éteint.\n'
+   + 'essai-jours: ' + q('pEssaiJours') + '\n\n'
+   + '# La formule mise en avant : annuel, mensuel, avie, aucune.\n'
+   + '# Le rabais affiché est calculé à partir des prix ci-dessus.\n'
+   + 'mise-en-avant: ' + (q('pAvant') || 'annuel') + '\n\n'
+   + '# Sur combien d’appareils une clé s’active. ATTENTION : ce chiffre n’est\n'
+   + '# qu’un texte — la vraie limite se règle dans Polar, bénéfice\n'
+   + '# « License Keys », champ « Limit activations ». Mettez le même.\n'
+   + 'appareils: ' + (q('pAppareils') || '3') + '\n\n'
+   + '# Votre essai privé. Rempli, il remplace ?pro=1 par ?essai=ce-mot.\n'
+   + 'essai: ' + q('pEssai') + '\n';
+}
+function texteBlog(){
+  function q(id){ var n=$('#'+id); return n ? n.value.trim() : ''; }
+  return '# ═══════════════════════════════════════════════════════════════════\n'
+   + '# LE BLOG — écrit par console.html\n'
+   + '# ═══════════════════════════════════════════════════════════════════\n'
+   + '#\n'
+   + '# Une page publique par fiche DÉJÀ EN LIGNE. Il ne publie jamais le\n'
+   + '# stock : il lit fiches/, pas anecdotes/.\n\n'
+   + '# Éteint tant que « oui » n’est pas écrit ici.\n'
+   + 'actif: ' + (q('bActif') || 'non') + '\n\n'
+   + '# Le dossier des pages. NE LE CHANGEZ PLUS une fois des pages publiées :\n'
+   + '# chaque adresse changée est un lien mort.\n'
+   + 'chemin: ' + litVal(BL.v,'chemin','histoires') + '\n\n'
+   + '# Le rythme. Le premier passage sort « demarrage » pages d’un coup —\n'
+   + '# un site neuf avec trois pages n’apprend rien à Google.\n'
+   + 'demarrage: ' + (q('bDemarrage') || '40') + '\n'
+   + 'rythme: ' + (q('bRythme') || '1') + '\n'
+   + 'ordre: ' + (q('bOrdre') || 'potentiel') + '\n\n'
+   + '# Ce qui est écrit sur les pages. Le nom et le logo viennent de\n'
+   + '# consignes/marque.txt ; l’adresse du site, de consignes/paiement.txt.\n'
+   + 'titre: ' + q('bTitre') + '\n'
+   + 'description: ' + q('bDesc') + '\n'
+   + 'auteur: ' + litVal(BL.v,'auteur','') + '\n\n'
+   + '# LES PHOTOS. Éteintes par défaut : les images de Wikimedia ne sont pas\n'
+   + '# libres de droits, et la plupart exigent la mention de l’auteur.\n'
+   + 'images: ' + (q('bImages') || 'non') + '\n\n'
+   + '# Le maillage interne — la moitié du référencement d’un site de contenu.\n'
+   + 'voisines: ' + (q('bVoisines') || '3') + '\n\n'
+   + '# Avancé. « anecdotes » publierait VOTRE STOCK ENTIER sur le web ouvert.\n'
+   + 'source: ' + litVal(BL.v,'source','fiches') + '\n'
+   + 'langue: ' + litVal(BL.v,'langue','fr') + '\n';
+}
+
+function enregistrerPaiement(){
+  if(!S.cfg.token){ dit('Il faut un jeton pour écrire dans le dépôt.','ko'); return; }
+  dit('Enregistrement…','info');
+  ecrireFichier('consignes/paiement.txt', textePaiement(), PA2.sha,
+                'console : réglages de paiement')
+    .then(function(sha){
+      PA2.sha = sha; PA2.v = valeursDe(textePaiement()); peindrePaiement();
+      return lancerAction('entretien.yml', { operation:'reconstruire' });
+    })
+    .then(function(){
+      dit('Enregistré. Le site se reconstruit — comptez une minute, puis rechargez '
+        + 'l’application pour voir les nouveaux prix.','ok'); })
+    .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+}
+function enregistrerBlog(){
+  if(!S.cfg.token){ dit('Il faut un jeton pour écrire dans le dépôt.','ko'); return; }
+  dit('Enregistrement…','info');
+  var allume = ($('#bActif')||{}).value === 'oui';
+  ecrireFichier('consignes/blog.txt', texteBlog(), BL.sha, 'console : réglages du blog')
+    .then(function(sha){
+      BL.sha = sha; BL.v = valeursDe(texteBlog()); peindreBlog();
+      if(!allume){ dit('Enregistré. Le blog reste éteint.','ok'); return null; }
+      return lancerAction('entretien.yml', { operation:'blog' }).then(function(){
+        dit('Enregistré, et le blog est lancé. Regardez l’action « Entretien » '
+          + 'dans deux minutes.','ok'); });
+    })
+    .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
+}
+
 function lireMarque(){
   return lireAvecExemple('marque').then(function(r){
     MQ.sha = r.sha; analyserMarque(r.texte);
@@ -2702,15 +3058,31 @@ function enregistrerPublication(){
     .catch(function(e){ dit('Échec : '+esc(e.message),'ko'); });
 }
 
-/* Les trois liens d'essai : ils pointent sur l'application du dépôt, avec le
-   paramètre qui écrit la formule dans CE navigateur. */
+/* Les trois liens d'essai : ils pointent sur l'application, avec le paramètre
+   qui écrit la formule dans CE navigateur.
+
+   Deux choses ont changé en 8.17, et les deux se voyaient ici :
+
+   · l'adresse. Une fois le site sur votre domaine, github.io ne sert plus
+     rien. « site: » dans consignes/paiement.txt donne la bonne adresse ;
+   · le paramètre. ?pro=1 ouvrait l'application à qui connaissait l'adresse.
+     Dès que « essai: » porte un mot, l'essai devient ?essai=ce-mot, et
+     ?pro= ne fait plus rien. Les liens ci-dessous suivent le fichier — il
+     n'existe qu'une seule définition de l'essai dans tout le produit. */
 function peindreEssais(){
-  var base = 'https://' + (S.cfg.owner||'').toLowerCase() + '.github.io/'
-           + (S.cfg.repo||'') + '/app.html';
-  if(!S.cfg.owner || !S.cfg.repo) base = 'app.html';
-  var paires = [['essaiFree','?pro=0'],['essaiAbo','?pro=sub'],['essaiVie','?pro=1']];
+  var base;
+  if(PAIE.site)                      base = PAIE.site + '/app.html';
+  else if(S.cfg.owner && S.cfg.repo) base = 'https://' + (S.cfg.owner||'').toLowerCase()
+                                          + '.github.io/' + (S.cfg.repo||'') + '/app.html';
+  else                               base = 'app.html';
+
+  var mot = PAIE.essai;
+  var paires = mot
+    ? [['essaiFree','?essai=0'],['essaiAbo','?essai='+encodeURIComponent(mot)],
+       ['essaiVie','?essai='+encodeURIComponent(mot)+'-avie']]
+    : [['essaiFree','?pro=0'],['essaiAbo','?pro=sub'],['essaiVie','?pro=1']];
   paires.forEach(function(x){
-    var a = $('#'+x[0]); if(a) a.href = base + x[1];
+    var a = $('#'+x[0]); if(a){ a.href = base + x[1]; a.title = base + x[1]; }
   });
 }
 
@@ -3309,6 +3681,8 @@ $('#ecrLancer').addEventListener('click', envoyerEcriture);
   });
 });
 $('#mqEnregistrer').addEventListener('click', enregistrerMarque);
+$('#paEnregistrer').addEventListener('click', enregistrerPaiement);
+$('#blEnregistrer').addEventListener('click', enregistrerBlog);
 ['mNom','mBaseline','mLogo'].forEach(function(id){
   var e=$('#'+id); if(!e) return;
   e.addEventListener('input', function(){

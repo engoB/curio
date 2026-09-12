@@ -131,6 +131,16 @@
       <span data-i18n="pio.cta">Piocher au hasard</span>
     </button>
 
+    <!-- L'INSTALLATION, DANS LE MENU.
+         Le bandeau d'invitation ne s'affiche qu'une fois, au bon moment, et
+         jamais a quelqu'un qui l'a ecarte. Restait a offrir le geste a qui le
+         cherche — notamment a quelqu'un qui vient de payer. Le bouton
+         s'efface tout seul quand l'application est deja installee. -->
+    <button class="opt__a" id="instBtn" hidden>
+      <svg viewBox="0 0 24 24"><path d="M12 3v11m0 0l-4-4m4 4l4-4M4 17v2.5A1.5 1.5 0 005.5 21h13a1.5 1.5 0 001.5-1.5V17"/></svg>
+      <span data-i18n="inst.menu">Installer sur cet appareil</span>
+    </button>
+
     <div class="opt__pied">
       <div class="streak" id="streakBox" title="Série de jours consécutifs">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.6 3.4.6 5.4-.8 7C9.4 11 8 12.6 8 15a4 4 0 008 0c0-1.4-.5-2.4-1-3.2 2.4 1 4 3.2 4 5.9A7 7 0 015 17.7C5 11.7 12 10 12 2z"/></svg>
@@ -201,11 +211,59 @@
       </div>
       <button class="iconbtn sheet__close" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
+    <!-- L'ESSAI.
+         Il est au-dessus des prix, et pas en dessous : quelqu'un qui vient de
+         buter sur le mur du gratuit veut d'abord voir ce qu'il y a derriere.
+         Il ne s'affiche que s'il n'a jamais ete pris sur ce navigateur. -->
+    <div class="essai" id="essaiBloc" hidden>
+      <div>
+        <b id="essaiTitre">Essayez trois jours</b>
+        <span data-i18n="essai.sous">Tout le catalogue, sans carte bancaire, sans compte. Ça s’arrête tout seul.</span>
+      </div>
+      <button class="btn btn--brass" id="essaiBtn" data-i18n="essai.cta">Commencer l’essai</button>
+    </div>
     <div class="plans" id="plans"></div>
     <p class="fineprint" data-i18n="pay.fine">Paiement sécurisé. Résiliable à tout moment, sans justification. L'achat à vie inclut les huit univers et toutes les anecdotes à venir.</p>
     <div class="keyrow">
-      <input id="keyInput" placeholder="CURIO-XXXX-XXXX" aria-label="Clé de licence" />
+      <input id="keyInput" placeholder="CURIO-XXXX-XXXX" aria-label="Clé de licence" autocomplete="off" spellcheck="false" />
       <button class="btn btn--ghost" id="keyBtn" data-i18n="pay.key">Activer ma clé</button>
+    </div>
+    <!-- Une clé se perd. L'espace client Polar la redonne après un code reçu
+         par courriel : c'est la seule chose à savoir, et elle doit être écrite
+         là où on la cherche, c'est-à-dire ici. Le lien reste caché tant
+         qu'aucun portail n'est réglé dans consignes/paiement.txt. -->
+    <p class="fineprint" id="portailLigne" hidden>
+      <span data-i18n="cle.perdue">Clé perdue ? Votre espace client vous la redonne.</span>
+      <a id="portailLien" href="#" target="_blank" rel="noopener" data-i18n="cle.retrouver">Retrouver ma clé</a>
+    </p>
+  </div>
+</section>
+
+<!-- ====================== VOTRE CLÉ ======================
+     Le moment le plus important du parcours, et celui que la plupart des
+     produits ratent : juste après le paiement. L'acheteur revient de Polar,
+     l'application s'ouvre toute seule — et on lui montre sa clé, en grand,
+     avec un bouton copier, parce qu'il en aura besoin sur son deuxième
+     appareil et qu'il ne la retrouvera pas tout seul. -->
+<section class="sheet" id="cleSheet" role="dialog" aria-modal="true">
+  <div class="sheet__inner">
+    <div class="sheet__head">
+      <div>
+        <h2 data-i18n="cle.titre">Votre clé</h2>
+        <p data-i18n="cle.garder">Gardez cette clé : elle ouvre __MARQUE__ sur vos autres appareils.</p>
+      </div>
+      <button class="iconbtn sheet__close" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="clebloc">
+      <code id="cleTexte"></code>
+      <button class="btn btn--primary" id="cleCopier" data-i18n="cle.copier">Copier</button>
+    </div>
+    <p class="fineprint" id="cleExpire"></p>
+    <!-- Le meilleur moment pour proposer l'installation est celui-ci : on
+         vient de payer, on est content, et l'application n'est encore qu'un
+         onglet parmi trente. -->
+    <div class="rangee-cle">
+      <button class="btn btn--ghost" id="cleInstall" data-i18n="inst.menu">Installer sur cet appareil</button>
     </div>
   </div>
 </section>

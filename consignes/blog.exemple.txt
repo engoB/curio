@@ -1,0 +1,102 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# LE BLOG — une page par fiche, une par jour, pour exister sur Google
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# CE FICHIER EST UN EXEMPLE. Copiez-le en consignes/blog.txt et modifiez-le.
+# Le paquet ne livre jamais votre blog.txt.
+#
+# CE QUE FAIT LE BLOG
+#   Une page publique par anecdote DEJA EN LIGNE, avec le texte entier, la
+#   source, les donnees structurees, les cartes de partage, un plan du site
+#   et un flux RSS. Plus huit pages d'univers, qui sont celles qui se classent
+#   sur les recherches larges.
+#
+# CE QU'IL NE FAIT PAS
+#   Il ne publie JAMAIS le stock. Il lit fiches/, qui ne contient que ce que
+#   le lecteur gratuit peut deja voir. Les 883 fiches en reserve restent la
+#   valeur de l'abonnement.
+#
+# ───────────────────────────────────────────────────────────────────────────
+# 1 · L'INTERRUPTEUR
+# ───────────────────────────────────────────────────────────────────────────
+# Il part ETEINT. Allumez-le quand votre domaine est en place : des pages
+# publiees sous une adresse provisoire, puis deplacees, c'est un
+# referencement a refaire depuis zero.
+
+actif: non
+
+# ───────────────────────────────────────────────────────────────────────────
+# 2 · OU
+# ───────────────────────────────────────────────────────────────────────────
+# Le dossier des pages. « histoires » donne des adresses du genre
+#   https://votre-domaine.com/histoires/le-signal-wow/
+#
+# NE LE CHANGEZ PLUS une fois des pages publiees : chaque adresse changee est
+# un lien mort et un referencement perdu.
+
+chemin: histoires
+
+# ───────────────────────────────────────────────────────────────────────────
+# 3 · LE RYTHME
+# ───────────────────────────────────────────────────────────────────────────
+# demarrage : combien de pages sortent le tout premier jour.
+#             Un site neuf avec trois pages n'apprend rien a Google sur ce
+#             dont il parle ; quarante, oui. Et 269 pages a une par jour,
+#             c'est neuf mois avant que votre corpus entier soit indexe.
+# rythme    : combien par jour ensuite.
+#
+# Le calendrier est ECRIT UNE FOIS dans histoires/etat.json. Une fiche a une
+# date de parution et elle ne bouge plus, meme si vous changez ces reglages :
+# ils ne s'appliquent qu'aux fiches pas encore programmees.
+
+demarrage: 40
+rythme: 1
+
+# ordre : dans quel ordre les fiches passent au blog.
+#   potentiel   les mieux notees d'abord — les plus fortes en vitrine
+#   date        dans l'ordre de leur mise en ligne dans l'application
+#   hasard      au hasard
+
+ordre: potentiel
+
+# ───────────────────────────────────────────────────────────────────────────
+# 4 · CE QUI EST ECRIT SUR LES PAGES
+# ───────────────────────────────────────────────────────────────────────────
+# Le nom du produit et le logo viennent de consignes/marque.txt : il n'y a
+# qu'une seule definition de la marque dans tout le produit.
+# L'adresse du site vient de consignes/paiement.txt (« site: »).
+
+titre: Les histoires
+description: Des anecdotes vraies et etonnantes, ecrites a partir de Wikipedia. Une par jour.
+auteur:
+
+# LES PHOTOS. Elles partent ETEINTES, et c'est le bon reglage.
+#
+# Les images de Wikimedia Commons ne sont PAS libres de droits : elles sont
+# sous licence, et la plupart exigent la mention de l'auteur. Sur un site
+# qu'on vend et qu'on indexe, une reclamation d'ayant droit se regle en
+# centaines d'euros.
+#
+# Et une page de texte pur se charge instantanement et ne ressemble a aucun
+# agregateur — ce qui, pour un texte original, est un avantage.
+#
+# « oui » les rallume. Seules les fiches CREDITEES portent alors une image :
+# lancez d'abord « Entretien -> credits », qui va chercher auteur et licence.
+
+images: non
+
+# Combien de fiches voisines proposer en bas de chaque page. Le maillage
+# interne est la moitie du referencement d'un site de contenu ; 0 le coupe.
+
+voisines: 3
+
+# ───────────────────────────────────────────────────────────────────────────
+# 5 · REGLAGES AVANCES — n'y touchez que si vous savez pourquoi
+# ───────────────────────────────────────────────────────────────────────────
+# source : le dossier lu. « fiches » = les anecdotes en ligne seulement.
+#          Mettre « anecdotes » publierait VOTRE STOCK ENTIER sur le web
+#          ouvert, gratuitement, et viderait l'abonnement de son sens.
+# langue : la langue publiee au blog.
+
+source: fiches
+langue: fr

@@ -80,6 +80,11 @@ on:
           - reparer
           - doublons
           - reconstruire
+          - servir
+          - blog
+          - icones
+          - credits
+          - reetaler
           - repartir-a-zero
       appliquer:
         description: "auditer : ecarter ce qui echoue (sinon on ne fait que lire)"
@@ -95,7 +100,7 @@ on:
           - menage
           - rase
       confirmer:
-        description: "repartir-a-zero : ecrivez VIDER pour confirmer"
+        description: "repartir-a-zero : VIDER  ·  reetaler : REETALER"
         required: false
         default: ""
 
@@ -168,7 +173,49 @@ jobs:
               # fallait qu'on vous livre un paquet pour qu'un simple changement
               # de nom prenne effet. Elle ne coute rien et ne touche a aucune
               # fiche : elle recompose les deux pages depuis parts/.
-              sh build.sh 2>&1 | tee curio.log ;;
+              sh build.sh 2>&1 | tee curio.log
+              node tools/servir.mjs 2>&1 | tee -a curio.log ;;
+            blog)
+              # LE BLOG. Une page publique par fiche deja en ligne, une par
+              # jour. Il lit fiches/ — jamais le stock. Regle dans
+              # consignes/blog.txt, et eteint tant que « actif: oui » n y est
+              # pas ecrit.
+              node tools/servir.mjs 2>&1 | tee curio.log
+              node tools/blog.mjs   2>&1 | tee -a curio.log ;;
+            icones)
+              # LES ICONES DE L APPLICATION INSTALLEE, refaites a partir de
+              # votre logo. Deposez icones/logo.svg (ou .png) par
+              # Add file -> Upload files, et lancez ceci : les quatre
+              # fichiers curio-*.png sont refabriques aux bonnes tailles.
+              #
+              # Les anciennes sont recopiees dans icones/avant-logo/ avant
+              # d etre remplacees.
+              npm i --no-save --silent sharp 2>&1 | tail -2
+              node tools/icones.mjs 2>&1 | tee curio.log
+              sh build.sh 2>&1 | tee -a curio.log ;;
+            credits)
+              # LES CREDITS D IMAGES. Les photos de Wikimedia Commons ne sont
+              # pas libres de droits : la plupart exigent l auteur et la
+              # licence. Cet outil va les chercher et les ecrit dans les
+              # fiches. Le blog n affiche une image QUE si elle est creditee.
+              node tools/credits.mjs 2>&1 | tee curio.log ;;
+            reetaler)
+              # REETALER LES DATES DE PUBLICATION. A lancer une fois, apres
+              # une remise en ligne massive qui a pose la meme date sur tout
+              # le catalogue — c est ce qui fait dire a index.json « 269
+              # nouveautes cette semaine » sur un catalogue de 269.
+              #
+              # Sans le mot REETALER dans « confirmer », il ne fait que dire
+              # ce qu il ferait.
+              node tools/reetaler.mjs --confirmer "${{ github.event.inputs.confirmer }}" 2>&1 | tee curio.log
+              node tools/write-anecdotes.mjs --index 2>&1 | tee -a curio.log
+              node tools/servir.mjs 2>&1 | tee -a curio.log ;;
+            servir)
+              # PREPARER CE QUE LE SITE SERT. fiches/ ne contient que les
+              # anecdotes en ligne ; anecdotes/ garde tout, stock compris, et
+              # n est plus servi au lecteur. A lancer si vous avez modifie des
+              # fiches a la main.
+              node tools/servir.mjs 2>&1 | tee curio.log ;;
           esac
 
       - name: Compte rendu
@@ -188,7 +235,11 @@ jobs:
           git config user.name  "curio-bot"
           git config user.email "curio-bot@users.noreply.github.com"
           rm -f curio.log
-          for p in catalogue-maitre.json catalogue-maitre.csv catalogue-maitre.avant-remise-a-zero.json catalog.json rapport-phares.csv audit-retenus.csv doublons.csv anecdotes controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json app.html index.html console.html sw.js version.json manifest.webmanifest; do
+          B=consignes/blog.txt
+          [ -f "$B" ] || B=consignes/blog.exemple.txt
+          CH=$(sed -n 's/^[[:space:]]*chemin:[[:space:]]*//p' "$B" 2>/dev/null | head -1 | tr -d '[:space:]/')
+          [ -n "$CH" ] || CH=histoires
+          for p in catalogue-maitre.json catalogue-maitre.csv catalogue-maitre.avant-remise-a-zero.json catalog.json rapport-phares.csv audit-retenus.csv doublons.csv anecdotes fiches "$CH" sitemap.xml robots.txt controle.csv consignes/exclusions.txt consignes/sujets-phares.txt consignes/sujets-phares.avant-nettoyage.txt consignes/decisions.json app.html index.html console.html atelier.html sw.js version.json marque.json manifest.webmanifest icones; do
             if [ -e "$p" ]; then
               git add -A -- "$p" || { echo "::error::git add $p a echoue."; exit 1; }
             fi

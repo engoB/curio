@@ -1,9 +1,28 @@
 <script>
 /* =========================================================================
    CURIO — configuration
-   Branchez vos liens de paiement ici (Stripe Payment Links, Lemon Squeezy,
-   Gumroad, Paddle…). Voir README.md.
    ========================================================================= */
+
+/* ── LE PAIEMENT NE VIT PLUS ICI ──────────────────────────────────────────
+   Jusqu'à la 8.16, les liens de paiement et les prix étaient écrits en dur
+   dans ce fichier : changer un prix demandait une livraison complète. Ils
+   vivent maintenant dans consignes/paiement.txt, que build.sh grave en
+   <meta> à la construction — exactement comme le nom, le logo et le rythme.
+
+   Vous changez un chiffre sur GitHub, vous lancez « Entretien →
+   reconstruire », et c'est en ligne. Aucune ligne de code à toucher.
+
+   Déclaration de fonction, pas constante fléchée : elle est appelée dans
+   l'initialiseur de CONFIG, quelques lignes plus bas. Une `const` y serait
+   encore dans sa zone morte, et toute l'application s'arrêterait là. */
+function reglagePaiement(cle, defaut){
+  try{
+    const m = document.querySelector('meta[name="curio-p-' + cle + '"]');
+    const v = m && m.getAttribute('content');
+    return (v && v.trim()) ? v.trim() : defaut;
+  }catch(e){ return defaut; }
+}
+
 const CONFIG = {
   // ── LA JOURNÉE OFFERTE ──────────────────────────────────────────────
   // Cinq anecdotes, tirées au hasard chaque matin dans les huit univers, à
@@ -24,23 +43,60 @@ const CONFIG = {
   textMin: 320,
   // Longueur visée du repli extractif, quand aucune anecdote rédigée n'existe.
   fullTarget: 4200,
-  // Anecdotes rédigées, produites par tools/write-anecdotes.mjs.
-  // Un fichier par langue et par univers : anecdotes/fr-cosmos.json
-  anecdotesDir: 'anecdotes',
+  // ── CE QUE LE SITE SERT, ET CE QU'IL GARDE ──────────────────────────
+  // `fiches/` ne contient que les anecdotes EN LIGNE. Il est fabriqué par
+  // tools/servir.mjs à chaque publication.
+  //
+  // `anecdotes/` reste la vérité : toutes les fiches, stock compris. Elle
+  // n'est plus servie au lecteur — jusqu'à la 8.16, le fichier public
+  // contenait les 268 fiches de Cosmos alors que 21 seulement étaient en
+  // ligne, et le tri se faisait dans le navigateur. C'était un filtre
+  // d'affichage, pas une serrure : l'abonnement vendait l'accès à un corpus
+  // déjà public.
+  //
+  // La vue Curation (?curation=1) lit `anecdotes/`, parce que c'est
+  // l'atelier et qu'il doit tout montrer. Sur Cloudflare, une règle Access
+  // ferme /anecdotes/* à tout le monde sauf vous.
+  anecdotesDir: 'fiches',
+  anecdotesSource: 'anecdotes',
   // Note minimale « insolite » (0 à 10) pour qu'une anecdote entre dans le flux.
   // 7 est le seuil du « tiens donc » : en dessous, c'est intéressant mais
   // attendu, et ce n'est pas ce qu'on vient chercher ici. Le texte reste
   // dans le dépôt — vous ne perdez rien, vous ne le servez plus.
   minInsolite: 7,
+  // ── LE PAIEMENT ─────────────────────────────────────────────────────
+  // Tout vient de consignes/paiement.txt. Les valeurs par défaut ci-dessous
+  // ne servent qu'à une chose : que la page reste lisible tant que vous
+  // n'avez pas écrit ce fichier.
+  //
+  // `verificateur` est l'adresse du Worker Cloudflare (worker/curio-api.js).
+  // Vide : aucune vérification de clé, comme avant. Rempli : l'application
+  // demande à Polar, par son intermédiaire, si la clé est bien valable.
+  /* L'adresse publique du site. Elle sert au partage : sans elle, on ne peut
+     pas fabriquer le lien vers la page publique d'une anecdote. */
+  site:         reglagePaiement('site', ''),
+  verificateur: reglagePaiement('verificateur', ''),
+  /* La durée de l'essai gratuit, en jours. 0 l'éteint. */
+  essaiJours:   reglagePaiement('essai-jours', '3'),
+  /* Quelle formule est mise en avant : annuel (défaut), mensuel, avie, aucune. */
+  miseEnAvant:  reglagePaiement('mise-en-avant', 'annuel'),
+  /* Sur combien d'appareils une même clé s'active. Informatif : la vraie
+     limite est celle réglée dans Polar. Sert à écrire le bon message. */
+  appareils:    reglagePaiement('appareils', '3'),
+  portail:      reglagePaiement('portail', ''),
+  essai:        reglagePaiement('essai', ''),
   checkout: {
-    monthly:  '',   // ex. https://buy.stripe.com/xxxx
-    yearly:   '',
-    lifetime: ''
+    monthly:  reglagePaiement('lien-mensuel', ''),
+    yearly:   reglagePaiement('lien-annuel', ''),
+    lifetime: reglagePaiement('lien-avie', '')
   },
   prices: {
-    monthly:  { amount: '4,99', unit: '€ / mois',  amountEn: '4.99', unitEn: '€ / month' },
-    yearly:   { amount: '39',   unit: '€ / an',    amountEn: '39',   unitEn: '€ / year'  },
-    lifetime: { amount: '79',   unit: '€ une fois', amountEn: '79',  unitEn: '€ once'    }
+    monthly:  { amount: reglagePaiement('prix-mensuel','4,99'), unit: reglagePaiement('unite-mensuel','€ / mois'),
+                amountEn: reglagePaiement('prix-mensuel','4,99').replace(',', '.'), unitEn: reglagePaiement('unite-mensuel-en','€ / month') },
+    yearly:   { amount: reglagePaiement('prix-annuel','39'), unit: reglagePaiement('unite-annuel','€ / an'),
+                amountEn: reglagePaiement('prix-annuel','39').replace(',', '.'), unitEn: reglagePaiement('unite-annuel-en','€ / year') },
+    lifetime: { amount: reglagePaiement('prix-avie','79'), unit: reglagePaiement('unite-avie','€ une fois'),
+                amountEn: reglagePaiement('prix-avie','79').replace(',', '.'), unitEn: reglagePaiement('unite-avie-en','€ once') }
   }
 };
 
@@ -252,7 +308,38 @@ const I18N = {
       lifetime:['Lecture illimitée, pour toujours','La pioche : une anecdote au hasard','Ma collection','Un seul paiement']
     },
     planCta:{monthly:"S'abonner",yearly:"S'abonner",lifetime:'Acheter à vie'},
-    demo:'Lien de paiement non configuré — voir README.md'
+    demo:'Lien de paiement non configuré — voir README.md',
+    /* ── la clé de licence ─────────────────────────────────────────────── */
+    'cle.verif':'Vérification de votre clé…',
+    'cle.ok':'C’est ouvert. Merci !',
+    'cle.copiee':'Clé copiée.',
+    'cle.garder':'Gardez cette clé : elle ouvre __MARQUE__ sur vos autres appareils.',
+    'cle.copier':'Copier',
+    'cle.revoquee':'Cette clé n’est plus active. Si vous venez de résilier, c’est normal ; sinon, écrivez-nous.',
+    'cle.expiree':'Cette clé a expiré. Le renouvellement se fait depuis votre espace client.',
+    'cle.inconnue':'Clé non reconnue. Vérifiez que vous l’avez copiée en entier.',
+    'cle.reseau':'Impossible de joindre le vérificateur. Réessayez dans un instant — votre accès n’est pas perdu.',
+    'cle.horsligne':'Pas de réseau : votre accès reste ouvert. Nous revérifierons plus tard.',
+    'cle.deja':'J’ai déjà une clé',
+    'cle.retrouver':'Retrouver ma clé',
+    'cle.titre':'Votre clé',
+    'cle.perdue':'Clé perdue ? Votre espace client vous la redonne.',
+    /* ── l'essai ─────────────────────────────────────────────────────── */
+    'essai.titre': n => n === 1 ? 'Essayez un jour' : `Essayez ${n} jours`,
+    'essai.sous':'Tout le catalogue, sans carte bancaire, sans compte. Ça s’arrête tout seul.',
+    'essai.cta':'Commencer l’essai',
+    'essai.ouvert': n => `C’est ouvert pour ${n} jour${n>1?'s':''}. Bonne lecture.`,
+    'essai.fini':'Votre essai est terminé. Votre collection est conservée.',
+    'essai.badge': n => n > 1 ? `Essai · ${n} j` : 'Essai · dernier jour',
+    /* ── l'installation ──────────────────────────────────────────────── */
+    'inst.menu':'Installer sur cet appareil',
+    'inst.deja':'__MARQUE__ est déjà installé sur cet appareil.',
+    'coll.essai':'La collection n’est pas ouverte pendant l’essai : ce que vous y mettriez serait perdu dans trois jours. Elle vient avec l’abonnement.',
+    'coll.libre':'La collection vient avec l’abonnement.',
+    'plan.eco': n => `Le meilleur choix — ${n} % de moins`,
+    'cle.appareils': n => `Cette clé est déjà active sur ${n} appareils. Libérez-en un depuis votre espace client, puis réessayez.`,
+    'cle.appareilsInfo': n => `Utilisable sur ${n} appareils`,
+    'cle.liberee':'Cet appareil a été libéré depuis votre espace client. Recollez votre clé pour le réactiver.'
   },
   en:{
     tagline:'The world is stranger than you think', scroll:'Scroll', shuffle:'Shuffle all',
@@ -394,7 +481,35 @@ const I18N = {
       lifetime:['Unlimited reading, forever','The draw: one piece at random','My collection','One single payment']
     },
     planCta:{monthly:'Subscribe',yearly:'Subscribe',lifetime:'Buy lifetime'},
-    demo:'Checkout link not configured — see README.md'
+    demo:'Checkout link not configured — see README.md',
+    'cle.verif':'Checking your key…',
+    'cle.ok':'You’re in. Thank you!',
+    'cle.copiee':'Key copied.',
+    'cle.garder':'Keep this key: it unlocks __MARQUE__ on your other devices.',
+    'cle.copier':'Copy',
+    'cle.revoquee':'This key is no longer active. If you just cancelled, that’s expected; otherwise, get in touch.',
+    'cle.expiree':'This key has expired. Renew it from your customer area.',
+    'cle.inconnue':'Key not recognised. Check that you copied all of it.',
+    'cle.reseau':'Could not reach the checker. Try again shortly — your access is not lost.',
+    'cle.horsligne':'No network: your access stays open. We’ll check again later.',
+    'cle.deja':'I already have a key',
+    'cle.retrouver':'Find my key',
+    'cle.titre':'Your key',
+    'cle.perdue':'Lost your key? Your customer area gives it back.',
+    'essai.titre': n => n === 1 ? 'Try it for a day' : `Try it for ${n} days`,
+    'essai.sous':'The whole catalogue, no card, no account. It ends on its own.',
+    'essai.cta':'Start the trial',
+    'essai.ouvert': n => `You’re in for ${n} day${n>1?'s':''}. Enjoy.`,
+    'essai.fini':'Your trial has ended. Your collection is kept.',
+    'essai.badge': n => n > 1 ? `Trial · ${n}d` : 'Trial · last day',
+    'inst.menu':'Install on this device',
+    'inst.deja':'__MARQUE__ is already installed on this device.',
+    'coll.essai':'The collection stays closed during the trial: whatever you put there would be gone in three days. It comes with the subscription.',
+    'coll.libre':'The collection comes with the subscription.',
+    'plan.eco': n => `Best value — ${n}% off`,
+    'cle.appareils': n => `This key is already active on ${n} devices. Free one up in your customer area, then try again.`,
+    'cle.appareilsInfo': n => `Usable on ${n} devices`,
+    'cle.liberee':'This device was freed up from your customer area. Paste your key again to reactivate it.'
   }
 };
 </script>
